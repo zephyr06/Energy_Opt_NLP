@@ -2,12 +2,11 @@
 
 #include <CppUnitLite/TestHarness.h>
 
-#include "../sources/utils.h"
+#include "../sources/Tasks.h"
 
 TEST(ReadTaskSet, p1)
 {
-    cout << "Enter test\n"
-         << endl;
+
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_n3_v1.csv";
 
     TaskSet taskset1 = ReadTaskSet(path, "RM");

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <math.h>
 #include <filesystem>
+#include <boost/integer/common_factor.hpp>
 
 #include <CppUnitLite/TestHarness.h>
 
@@ -72,12 +73,17 @@ public:
     // TaskSet()  { vector<TaskPeriodic> tasks; }
     TaskSet(vector<TaskPeriodic> tasks) : tasks(tasks) {}
 
-    int size()
+    TaskPeriodic &operator[](int index)
+    {
+        return tasks[index];
+    }
+
+    int size() const
     {
         return tasks.size();
     }
 
-    vector<int> GetParameter(string parameterType)
+    const vector<int> GetParameter(string parameterType) const
     {
         uint N = size();
         vector<int> parameterList;
@@ -96,7 +102,10 @@ public:
             else if (parameterType == "offset")
                 parameterList.push_back(tasks[i].offset);
             else
-                throw "parameterType in GetParameter is not recognized!\n";
+            {
+                cout << "parameterType in GetParameter is not recognized!\n";
+                throw;
+            }
         }
         return parameterList;
     }
@@ -106,6 +115,34 @@ public:
     {
         return task1.period < task2.period;
     };
+
+    float utilization() const
+    {
+        vector<int> periodHigh = GetParameter("period");
+        vector<int> executionTimeHigh = GetParameter("executionTime");
+        int N = periodHigh.size();
+        float utilization = 0;
+        for (int i = 0; i < N; i++)
+            utilization += float(executionTimeHigh[i]) / periodHigh[i];
+        return utilization;
+    }
+
+    const int hyperPeriod() const
+    {
+        int N = size();
+        if (N == 0)
+        {
+            cout << "Empty task set in hyperperiod()!\n";
+            throw;
+        }
+        else
+        {
+            int hyper = tasks[0].period;
+            for (int i = 1; i < N; i++)
+                hyper = boost::integer::lcm(hyper, tasks[i].period);
+            return hyper;
+        }
+    }
 
     void Reorder(string priorityType)
     {
@@ -119,7 +156,8 @@ public:
         }
         else
         {
-            throw "Unrecognized priorityType in Reorder!\n";
+            cout << "Unrecognized priorityType in Reorder!\n";
+            throw;
         }
     }
 };
