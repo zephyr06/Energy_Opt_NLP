@@ -11,10 +11,10 @@ TEST(ReadTaskSet, p1)
 
     TaskSet taskset1 = ReadTaskSet(path, "RM");
 
-    CHECK_EQUAL(500, taskset1.tasks[0].period);
-    CHECK_EQUAL(550, taskset1.tasks[1].period);
-    CHECK_EQUAL(880, taskset1.tasks[2].period);
-    CHECK_EQUAL(2, taskset1.tasks[0].overhead);
+    CHECK_EQUAL(500, taskset1[0].period);
+    CHECK_EQUAL(550, taskset1[1].period);
+    CHECK_EQUAL(880, taskset1[2].period);
+    CHECK_EQUAL(2, taskset1[0].overhead);
 }
 
 int main()

@@ -11,7 +11,9 @@
 
 using namespace std;
 
-class TaskPeriodic
+#define TaskSet vector<Task>
+
+class Task
 {
 public:
     // Member list
@@ -23,19 +25,19 @@ public:
 
     // initializer
 
-    TaskPeriodic() : offset(0), period(0),
-                     overhead(0), executionTime(0),
-                     deadline(0) {}
-    TaskPeriodic(int offset, int period, int overhead, int executionTime,
-                 int deadline) : offset(offset), period(period),
-                                 overhead(overhead), executionTime(executionTime),
-                                 deadline(deadline) {}
+    Task() : offset(0), period(0),
+             overhead(0), executionTime(0),
+             deadline(0) {}
+    Task(int offset, int period, int overhead, int executionTime,
+         int deadline) : offset(offset), period(period),
+                         overhead(overhead), executionTime(executionTime),
+                         deadline(deadline) {}
 
-    TaskPeriodic(vector<int> dataInLine)
+    Task(vector<int> dataInLine)
     {
         if (dataInLine.size() != 5)
         {
-            cout << "The length of dataInLine in TaskPeriodic constructor is wrong! Must be 5!\n";
+            cout << "The length of dataInLine in Task constructor is wrong! Must be 5!\n";
             throw;
         }
 
@@ -63,105 +65,84 @@ public:
     }
 };
 
-class TaskSet
+vector<int> GetParameter(const TaskSet &taskset, string parameterType)
 {
-public:
-    // member list
-    vector<TaskPeriodic> tasks;
+    uint N = taskset.size();
+    vector<int> parameterList;
+    parameterList.reserve(N);
 
-    // method list
-    // TaskSet()  { vector<TaskPeriodic> tasks; }
-    TaskSet(vector<TaskPeriodic> tasks) : tasks(tasks) {}
-
-    TaskPeriodic &operator[](int index)
+    for (uint i = 0; i < N; i++)
     {
-        return tasks[index];
-    }
-
-    int size() const
-    {
-        return tasks.size();
-    }
-
-    const vector<int> GetParameter(string parameterType) const
-    {
-        uint N = size();
-        vector<int> parameterList;
-        parameterList.reserve(N);
-
-        for (uint i = 0; i < N; i++)
-        {
-            if (parameterType == "period")
-                parameterList.push_back(tasks[i].period);
-            else if (parameterType == "executionTime")
-                parameterList.push_back(tasks[i].executionTime);
-            else if (parameterType == "overhead")
-                parameterList.push_back(tasks[i].overhead);
-            else if (parameterType == "deadline")
-                parameterList.push_back(tasks[i].deadline);
-            else if (parameterType == "offset")
-                parameterList.push_back(tasks[i].offset);
-            else
-            {
-                cout << "parameterType in GetParameter is not recognized!\n";
-                throw;
-            }
-        }
-        return parameterList;
-    }
-
-    // some helper function for Reorder
-    static bool comparePeriod(TaskPeriodic task1, TaskPeriodic task2)
-    {
-        return task1.period < task2.period;
-    };
-
-    float utilization() const
-    {
-        vector<int> periodHigh = GetParameter("period");
-        vector<int> executionTimeHigh = GetParameter("executionTime");
-        int N = periodHigh.size();
-        float utilization = 0;
-        for (int i = 0; i < N; i++)
-            utilization += float(executionTimeHigh[i]) / periodHigh[i];
-        return utilization;
-    }
-
-    const int hyperPeriod() const
-    {
-        int N = size();
-        if (N == 0)
-        {
-            cout << "Empty task set in hyperperiod()!\n";
-            throw;
-        }
+        if (parameterType == "period")
+            parameterList.push_back(taskset[i].period);
+        else if (parameterType == "executionTime")
+            parameterList.push_back(taskset[i].executionTime);
+        else if (parameterType == "overhead")
+            parameterList.push_back(taskset[i].overhead);
+        else if (parameterType == "deadline")
+            parameterList.push_back(taskset[i].deadline);
+        else if (parameterType == "offset")
+            parameterList.push_back(taskset[i].offset);
         else
         {
-            int hyper = tasks[0].period;
-            for (int i = 1; i < N; i++)
-                hyper = boost::integer::lcm(hyper, tasks[i].period);
-            return hyper;
-        }
-    }
-
-    void Reorder(string priorityType)
-    {
-        if (priorityType == "RM")
-        {
-            sort(tasks.begin(), tasks.end(), comparePeriod);
-        }
-        else if (priorityType == "orig")
-        {
-            return;
-        }
-        else
-        {
-            cout << "Unrecognized priorityType in Reorder!\n";
+            cout << "parameterType in GetParameter is not recognized!\n";
             throw;
         }
     }
+    return parameterList;
+}
+
+// some helper function for Reorder
+static bool comparePeriod(Task task1, Task task2)
+{
+    return task1.period < task2.period;
 };
 
+float Utilization(const TaskSet &tasks)
+{
+    vector<int> periodHigh = GetParameter(tasks, "period");
+    vector<int> executionTimeHigh = GetParameter(tasks, "executionTime");
+    int N = periodHigh.size();
+    float utilization = 0;
+    for (int i = 0; i < N; i++)
+        utilization += float(executionTimeHigh[i]) / periodHigh[i];
+    return utilization;
+}
+
+int HyperPeriod(const TaskSet &tasks)
+{
+    int N = tasks.size();
+    if (N == 0)
+    {
+        cout << "Empty task set in HyperPeriod()!\n";
+        throw;
+    }
+    else
+    {
+        int hyper = tasks[0].period;
+        for (int i = 1; i < N; i++)
+            hyper = boost::integer::lcm(hyper, tasks[i].period);
+        return hyper;
+    }
+}
+
+TaskSet Reorder(TaskSet tasks, string priorityType)
+{
+    if (priorityType == "RM")
+    {
+        sort(tasks.begin(), tasks.end(), comparePeriod);
+    }
+    else if (priorityType == "orig")
+    {
+        ;
+    }
+    else
+    {
+        cout << "Unrecognized priorityType in Reorder!\n";
+        throw;
+    }
+    return tasks;
+}
 TaskSet ReadTaskSet(string path, string priorityType = "RM")
 {
     // some default parameters in this function
@@ -170,7 +151,7 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
     string line;
     size_t pos = 0;
 
-    vector<TaskPeriodic> taskSet;
+    vector<Task> taskSet;
 
     fstream file;
     file.open(path, ios::in);
@@ -191,10 +172,10 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
             }
             dataInLine.push_back(atoi(line.c_str()));
             dataInLine.erase(dataInLine.begin());
-            taskSet.push_back(TaskPeriodic(dataInLine));
+            taskSet.push_back(Task(dataInLine));
         }
         TaskSet ttt(taskSet);
-        ttt.Reorder(priorityType);
+        ttt = Reorder(ttt, priorityType);
         return ttt;
     }
     else
@@ -202,4 +183,17 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
         cout << "The path does not exist in ReadTaskSet!\n";
         throw;
     }
+}
+
+bool CheckSchedulability(const TaskSet &taskSet)
+{
+    int N = taskSet.size();
+    // for (int i = 0; i < N; i++)
+    // {
+    //     vector<Task> const_iterator first =
+    //     TaskSet hpTasks(first, last);
+    //     if (ResponseTimeAnalysis(task, hpTasks) > task.deadline)
+    //         return false;
+    // }
+    return true;
 }

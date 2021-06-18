@@ -1,12 +1,12 @@
 #include "Tasks.h"
 
-int ResponseTimeAnalysisWarm(const int beginTime, const TaskPeriodic &taskCurr, const TaskSet &tasksHighPriority)
+int ResponseTimeAnalysisWarm(const int beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
 {
-    const vector<int> periodHigh = tasksHighPriority.GetParameter("period");
-    const vector<int> executionTimeHigh = tasksHighPriority.GetParameter("executionTime");
+    const vector<int> periodHigh = GetParameter(tasksHighPriority, "period");
+    const vector<int> executionTimeHigh = GetParameter(tasksHighPriority, "executionTime");
     int N = periodHigh.size();
 
-    if (tasksHighPriority.utilization() > 1 - 1e-4)
+    if (Utilization(tasksHighPriority) > 1.0)
     {
         // cout << "The given task set is unschedulable\n";
         return INT32_MAX;
@@ -34,11 +34,11 @@ int ResponseTimeAnalysisWarm(const int beginTime, const TaskPeriodic &taskCurr, 
     throw;
 }
 
-int ResponseTimeAnalysis(const TaskPeriodic &taskCurr, const TaskSet &tasksHighPriority)
+int ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
 {
-    const vector<int> executionTimeHigh = tasksHighPriority.GetParameter("executionTime");
-    int executionTimeAll = taskCurr.executionTime + (tasksHighPriority.tasks.begin(),
-                                                     tasksHighPriority.tasks.end(), 0);
+    const vector<int> executionTimeHigh = GetParameter(tasksHighPriority, "executionTime");
+    int executionTimeAll = taskCurr.executionTime + (tasksHighPriority.begin(),
+                                                     tasksHighPriority.end(), 0);
 
     return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
 }
