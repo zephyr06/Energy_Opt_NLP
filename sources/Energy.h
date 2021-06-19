@@ -1,4 +1,18 @@
+#include <gtsam/base/numericalDerivative.h>
+#include <gtsam/geometry/Point3.h>
+#include <gtsam/inference/Key.h>
+#include <gtsam/inference/Symbol.h>
+#include <gtsam/linear/VectorValues.h>
+#include <gtsam/nonlinear/GaussNewtonOptimizer.h>
+#include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/NonlinearFactorGraph.h>
+#include <gtsam/nonlinear/Values.h>
+
 #include "Tasks.h"
+#include "Parameters.h"
+
+typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
+typedef Eigen::Matrix<double, TASK_NUMBER, 1> ErrElement;
 
 const float EstimateEnergyTask(const Task &task, float frequency)
 /**
@@ -13,17 +27,17 @@ const float EstimateEnergyTask(const Task &task, float frequency)
     return task.executionTime * pow(frequency, 2);
 }
 
-const vector<float> EstimateEnergyTaskSet(const TaskSet &tasks, vector<float> frequencyList)
+ErrElement EstimateEnergyTaskSet(const TaskSet &taskSet, const ComputationTimeVector &executionTimeVector)
 {
-    int N = tasks.size();
-    int hp = HyperPeriod(tasks);
-    vector<float> energyAll;
-    energyAll.reserve(N);
-
-    for (uint i = 0; i < N; i++)
+    int N = taskSet.size();
+    int hp = HyperPeriod(taskSet);
+    ErrElement res;
+    for (int i = 0; i < N; i++)
     {
-        energyAll.push_back(hp / tasks[i].period *
-                            EstimateEnergyTask(tasks[i], frequencyList[i]));
+        float tt = taskSet[i].executionTime / executionTimeVector(i, 0);
+        tt = hp / taskSet[i].period *
+             EstimateEnergyTask(taskSet[i], tt);
+        res(i, 0) = tt;
     }
-    return energyAll;
+    return res;
 }

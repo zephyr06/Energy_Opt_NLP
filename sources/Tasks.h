@@ -20,19 +20,22 @@ public:
     int offset;
     int period;
     int overhead;
-    int executionTime;
+    float executionTime;
     int deadline;
 
     // initializer
 
     Task() : offset(0), period(0),
-             overhead(0), executionTime(0),
+             overhead(0), executionTime(0.0),
              deadline(0) {}
-    Task(int offset, int period, int overhead, int executionTime,
+    Task(int offset, int period, int overhead, float executionTime,
          int deadline) : offset(offset), period(period),
                          overhead(overhead), executionTime(executionTime),
                          deadline(deadline) {}
 
+    /**
+ * only used in ReadTaskSet because the input parameter's type is int
+ **/
     Task(vector<int> dataInLine)
     {
         if (dataInLine.size() != 5)
@@ -65,24 +68,25 @@ public:
     }
 };
 
-vector<int> GetParameter(const TaskSet &taskset, string parameterType)
+template <typename T>
+vector<T> GetParameter(const TaskSet &taskset, string parameterType)
 {
     uint N = taskset.size();
-    vector<int> parameterList;
+    vector<T> parameterList;
     parameterList.reserve(N);
 
     for (uint i = 0; i < N; i++)
     {
         if (parameterType == "period")
-            parameterList.push_back(taskset[i].period);
+            parameterList.push_back((T)(taskset[i].period));
         else if (parameterType == "executionTime")
-            parameterList.push_back(taskset[i].executionTime);
+            parameterList.push_back((T)(taskset[i].executionTime));
         else if (parameterType == "overhead")
-            parameterList.push_back(taskset[i].overhead);
+            parameterList.push_back((T)(taskset[i].overhead));
         else if (parameterType == "deadline")
-            parameterList.push_back(taskset[i].deadline);
+            parameterList.push_back((T)(taskset[i].deadline));
         else if (parameterType == "offset")
-            parameterList.push_back(taskset[i].offset);
+            parameterList.push_back((T)(taskset[i].offset));
         else
         {
             cout << "parameterType in GetParameter is not recognized!\n";
@@ -100,8 +104,8 @@ static bool comparePeriod(Task task1, Task task2)
 
 float Utilization(const TaskSet &tasks)
 {
-    vector<int> periodHigh = GetParameter(tasks, "period");
-    vector<int> executionTimeHigh = GetParameter(tasks, "executionTime");
+    vector<int> periodHigh = GetParameter<int>(tasks, "period");
+    vector<float> executionTimeHigh = GetParameter<float>(tasks, "executionTime");
     int N = periodHigh.size();
     float utilization = 0;
     for (int i = 0; i < N; i++)
@@ -183,17 +187,4 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
         cout << "The path does not exist in ReadTaskSet!\n";
         throw;
     }
-}
-
-bool CheckSchedulability(const TaskSet &taskSet)
-{
-    int N = taskSet.size();
-    // for (int i = 0; i < N; i++)
-    // {
-    //     vector<Task> const_iterator first =
-    //     TaskSet hpTasks(first, last);
-    //     if (ResponseTimeAnalysis(task, hpTasks) > task.deadline)
-    //         return false;
-    // }
-    return true;
 }

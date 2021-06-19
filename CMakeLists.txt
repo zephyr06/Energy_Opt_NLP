@@ -16,6 +16,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${GTSAM_DIR}/../GTSAMCMakeTools")
 # Boost - same requirement as gtsam
 find_package(Boost 1.50 REQUIRED)
 find_package(CppUnitLite REQUIRED)
+find_package( OpenCV REQUIRED )
 include_directories(${Boost_INCLUDE_DIR})
 
 # file(GLOB sources "*.cpp" "*.h")
@@ -29,7 +30,7 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} gtsam)
 # linking with dependencies
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${CONVENIENCE_LIB_NAME} CppUnitLite)
-# target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
+target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
 
 add_subdirectory(tests)
 add_subdirectory(sources)

@@ -1,9 +1,10 @@
 #include "Tasks.h"
 
-int ResponseTimeAnalysisWarm(const int beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
+template <typename T>
+T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
 {
-    const vector<int> periodHigh = GetParameter(tasksHighPriority, "period");
-    const vector<int> executionTimeHigh = GetParameter(tasksHighPriority, "executionTime");
+    const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
+    const vector<T> executionTimeHigh = GetParameter<T>(tasksHighPriority, "executionTime");
     int N = periodHigh.size();
 
     if (Utilization(tasksHighPriority) > 1.0)
@@ -14,11 +15,11 @@ int ResponseTimeAnalysisWarm(const int beginTime, const Task &taskCurr, const Ta
 
     bool stop_flag = false;
 
-    int responseTimeBefore = beginTime;
+    T responseTimeBefore = beginTime;
     while (not stop_flag)
     {
-        int responseTime = taskCurr.executionTime;
-        for (uint i = 0; i < N; i++)
+        T responseTime = taskCurr.executionTime;
+        for (int i = 0; i < N; i++)
             responseTime += ceil(responseTimeBefore / float(periodHigh[i])) * executionTimeHigh[i];
         if (responseTime == responseTimeBefore)
         {
@@ -33,12 +34,28 @@ int ResponseTimeAnalysisWarm(const int beginTime, const Task &taskCurr, const Ta
     cout << "RTA analysis stops unexpectedly!\n";
     throw;
 }
-
-int ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
+template <typename T>
+T ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
 {
-    const vector<int> executionTimeHigh = GetParameter(tasksHighPriority, "executionTime");
-    int executionTimeAll = taskCurr.executionTime + (tasksHighPriority.begin(),
-                                                     tasksHighPriority.end(), 0);
+    const vector<T> executionTimeHigh = GetParameter<T>(tasksHighPriority, "executionTime");
+    T executionTimeAll = taskCurr.executionTime;
+    for (auto &task : tasksHighPriority)
+        executionTimeAll += task.executionTime;
+    return ResponseTimeAnalysisWarm<T>(executionTimeAll, taskCurr, tasksHighPriority);
+}
 
-    return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
+template <typename T>
+bool CheckSchedulability(const TaskSet &taskSet)
+{
+    int N = taskSet.size();
+    for (int i = 0; i < N; i++)
+    {
+        TaskSet::const_iterator first = taskSet.begin();
+        vector<Task>::const_iterator last = taskSet.begin() + i;
+        TaskSet hpTasks(first, last);
+        if (ResponseTimeAnalysis<T>(taskSet[i], hpTasks) >
+            min(taskSet[i].deadline, taskSet[i].period))
+            return false;
+    }
+    return true;
 }
