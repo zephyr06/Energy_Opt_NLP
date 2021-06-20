@@ -12,6 +12,7 @@
 #include "Parameters.h"
 
 typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
+typedef Eigen::Matrix<double, TASK_NUMBER, TASK_NUMBER> JacobianOpt;
 typedef Eigen::Matrix<double, TASK_NUMBER, 1> ErrElement;
 
 const float EstimateEnergyTask(const Task &task, float frequency)
@@ -24,7 +25,7 @@ const float EstimateEnergyTask(const Task &task, float frequency)
     scalar, energy consumption of the task if it runs at the given frequency
 */
 {
-    return task.executionTime * pow(frequency, 2);
+    return task.executionTime * pow(frequency, 2) * weightEnergy;
 }
 
 ErrElement EstimateEnergyTaskSet(const TaskSet &taskSet, const ComputationTimeVector &executionTimeVector)

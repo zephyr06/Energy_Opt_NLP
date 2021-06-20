@@ -53,8 +53,9 @@ bool CheckSchedulability(const TaskSet &taskSet)
         TaskSet::const_iterator first = taskSet.begin();
         vector<Task>::const_iterator last = taskSet.begin() + i;
         TaskSet hpTasks(first, last);
-        if (ResponseTimeAnalysis<T>(taskSet[i], hpTasks) >
-            min(taskSet[i].deadline, taskSet[i].period))
+        T rta = ResponseTimeAnalysis<T>(taskSet[i], hpTasks);
+        cout << "response time for task " << i << " is " << rta << endl;
+        if (rta > min(taskSet[i].deadline, taskSet[i].period))
             return false;
     }
     return true;
