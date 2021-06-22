@@ -126,14 +126,14 @@ public:
                 return err;
             };
 
-            *H = numericalDerivative11(f, executionTimeVector,
-                                       deltaOptimizer);
-            // *H = jacobian;
+            // *H = numericalDerivative11(f, executionTimeVector,
+            //                            deltaOptimizer);
+            *H = jacobian;
 
-            cout << "The Jacobian is " << endl
-                 << *H << endl;
-            cout << "The approximated Jacobian is " << endl
-                 << jacobian << endl;
+            // cout << "The Jacobian is " << endl
+            //      << *H << endl;
+            // cout << "The approximated Jacobian is " << endl
+            //      << jacobian << endl;
         }
         return err;
     }
@@ -179,16 +179,16 @@ float OptimizeTaskSet(TaskSet &tasks)
     Values initialEstimate;
     initialEstimate.insert(key, InitializeOptimization(tasks));
 
-    LevenbergMarquardtParams params;
-    params.setlambdaInitial(initialLambda);
-    params.setVerbosityLM("SUMMARY");
-    params.setlambdaLowerBound(lowerLambda);
-    params.setlambdaUpperBound(upperLambda);
-    LevenbergMarquardtOptimizer optimizer(graph, initialEstimate, params);
-    // DoglegParams params;
-    // params.setVerbosityDL("VALUES");
-    // params.setDeltaInitial(deltaInitialDogleg);
-    // DoglegOptimizer optimizer(graph, initialEstimate, params);
+    // LevenbergMarquardtParams params;
+    // params.setlambdaInitial(initialLambda);
+    // params.setVerbosityLM("SUMMARY");
+    // params.setlambdaLowerBound(lowerLambda);
+    // params.setlambdaUpperBound(upperLambda);
+    // LevenbergMarquardtOptimizer optimizer(graph, initialEstimate, params);
+    DoglegParams params;
+    params.setVerbosityDL("VALUES");
+    params.setDeltaInitial(deltaInitialDogleg);
+    DoglegOptimizer optimizer(graph, initialEstimate, params);
 
     Values result = optimizer.optimize();
 
