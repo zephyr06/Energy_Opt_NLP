@@ -43,10 +43,21 @@ class ComputationFactor : public NoiseModelFactor1<ComputationTimeVector>
 {
 public:
     TaskSet tasks_;
+    ComputationTimeVector responseTimeBase_;
 
     ComputationFactor(Key key, TaskSet &tasks,
                       SharedNoiseModel model) : NoiseModelFactor1<ComputationTimeVector>(model, key),
-                                                tasks_(tasks) {}
+                                                tasks_(tasks)
+    {
+        for (int i = 0; i < TASK_NUMBER; i++)
+        {
+            vector<Task> hpTasks;
+            for (int j = 0; j < i; j++)
+                hpTasks.push_back(tasks_[j]);
+
+            responseTimeBase_[i] = ResponseTimeAnalysis<float>(tasks_[i], hpTasks);
+        }
+    }
 
     Vector evaluateError(const ComputationTimeVector &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
     {
@@ -71,7 +82,7 @@ public:
             for (int j = 0; j < i; j++)
                 hpTasks.push_back(taskSetCurr_[j]);
 
-            float responseTime = ResponseTimeAnalysis<float>(taskCurr_, hpTasks);
+            float responseTime = ResponseTimeAnalysisWarm<float>(responseTimeBase_[i], taskCurr_, hpTasks);
 
             err(i, 0) += Barrier(tasks_[i].deadline - responseTime);
             // approximate the Jacobian
@@ -119,16 +130,16 @@ public:
                     for (int j = 0; j < i; j++)
                         hpTasks.push_back(taskSetCurr_[j]);
 
-                    float responseTime = ResponseTimeAnalysis<float>(taskCurr_, hpTasks);
+                    float responseTime = ResponseTimeAnalysisWarm<float>(responseTimeBase_[i], taskCurr_, hpTasks);
 
                     err(i, 0) += Barrier(tasks_[i].deadline - responseTime);
                 }
                 return err;
             };
 
-            // *H = numericalDerivative11(f, executionTimeVector,
-            //                            deltaOptimizer);
-            *H = jacobian;
+            *H = numericalDerivative11(f, executionTimeVector,
+                                       deltaOptimizer);
+            // *H = jacobian;
 
             // cout << "The Jacobian is " << endl
             //      << *H << endl;
