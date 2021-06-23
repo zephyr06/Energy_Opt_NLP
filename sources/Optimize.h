@@ -88,22 +88,22 @@ public:
             // approximate the Jacobian
             if (H)
             {
-                if (tasks_[i].deadline - responseTime > 0 + deltaOptimizer)
+                if (tasks_[i].deadline - responseTime >= 0)
                 {
                     jacobian(i, i) = -2 * hyperPeriod / tasks_[i].period * pow(tasks_[i].executionTime / executionTimeVector(i, 0), 3) * weightEnergy;
                     jacobian(i, i) -= 1 / (tasks_[i].deadline - responseTime);
                     for (int j = 0; j < i; j++)
                     {
-                        jacobian(i, j) = -1 / (tasks_[i].deadline - responseTime) * ceil(responseTime / tasks_[i].period);
+                        jacobian(i, j) = -1 / (tasks_[i].deadline - responseTime) * ceil(responseTime / tasks_[j].period);
                     }
                 }
                 else
                 {
                     jacobian(i, i) = -2 * hyperPeriod / tasks_[i].period * pow(tasks_[i].executionTime / executionTimeVector(i, 0), 3) * weightEnergy;
-                    jacobian(i, i) -= 1e4 * pow(10, TASK_NUMBER - 3) * -1;
+                    jacobian(i, i) -= punishmentInBarrier * pow(10, TASK_NUMBER - 3) * -1;
                     for (int j = 0; j < i; j++)
                     {
-                        jacobian(i, j) = 1e4 * pow(10, TASK_NUMBER - 3) * ceil(responseTime / tasks_[i].period);
+                        jacobian(i, j) = punishmentInBarrier * pow(10, TASK_NUMBER - 3) * ceil(responseTime / tasks_[j].period);
                     }
                 }
             }
@@ -132,19 +132,35 @@ public:
 
                     float responseTime = ResponseTimeAnalysisWarm<float>(responseTimeBase_[i], taskCurr_, hpTasks);
 
-                    err(i, 0) += Barrier(tasks_[i].deadline - responseTime);
+                    float tt = Barrier(tasks_[i].deadline - responseTime);
+                    err(i, 0) += tt;
                 }
                 return err;
             };
 
-            *H = numericalDerivative11(f, executionTimeVector,
-                                       deltaOptimizer);
-            // *H = jacobian;
+            // TWO things to notice there
+            // - When the iteration points are close to the barrier function bounder,
+            // the first order numerical derivative will be unaccurate because of the log function,
+            // and so gives different results than analytic Jacobian;
 
-            // cout << "The Jacobian is " << endl
-            //      << *H << endl;
-            // cout << "The approximated Jacobian is " << endl
-            //      << jacobian << endl;
+            // - At the very close boundary where numerical Jacobian may give a
+            // very large result because of the punishment coefficient, it may be okay to use either form;
+            // The log barrier function makes the Jacobian very large already,
+            // and so the update step should be small correspondingly
+
+            // *H = numericalDerivative11(f, executionTimeVector,
+            //                            deltaOptimizer);
+            *H = jacobian;
+
+            cout << "The current evaluation point is " << endl
+                 << executionTimeVector << endl;
+            cout << "The Jacobian is " << endl
+                 << *H << endl;
+            cout << "The approximated Jacobian is " << endl
+                 << jacobian << endl;
+            cout << "The current error is " << endl
+                 << err << endl
+                 << err.norm() << endl;
         }
         return err;
     }
@@ -178,7 +194,7 @@ float OptimizeTaskSet(TaskSet &tasks)
 
     // build the factor graph since there
 
-    auto model = noiseModel::Isotropic::Sigma(3, noiseModelSigma);
+    auto model = noiseModel::Isotropic::Sigma(TASK_NUMBER, noiseModelSigma);
 
     NonlinearFactorGraph graph;
     Symbol key('a', 0);
@@ -190,15 +206,22 @@ float OptimizeTaskSet(TaskSet &tasks)
     Values initialEstimate;
     initialEstimate.insert(key, InitializeOptimization(tasks));
 
+    // usually, when the change of variables between steps is smaller than 1,
+    // we can already terminate; the corresponding minimal of relative error is
+    // approximately 2e-3;
+
     // LevenbergMarquardtParams params;
     // params.setlambdaInitial(initialLambda);
     // params.setVerbosityLM("SUMMARY");
     // params.setlambdaLowerBound(lowerLambda);
     // params.setlambdaUpperBound(upperLambda);
+    // params.setRelativeErrorTol(relativeErrorTolerance);
     // LevenbergMarquardtOptimizer optimizer(graph, initialEstimate, params);
     DoglegParams params;
-    params.setVerbosityDL("VALUES");
+    params.setVerbosityDL("DELTA");
     params.setDeltaInitial(deltaInitialDogleg);
+    params.setRelativeErrorTol(relativeErrorTolerance);
+
     DoglegOptimizer optimizer(graph, initialEstimate, params);
 
     Values result = optimizer.optimize();

@@ -180,6 +180,7 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
         }
         TaskSet ttt(taskSet);
         ttt = Reorder(ttt, priorityType);
+        cout << "Finish reading the data file succesfully!\n";
         return ttt;
     }
     else

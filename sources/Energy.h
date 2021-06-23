@@ -35,10 +35,9 @@ ErrElement EstimateEnergyTaskSet(const TaskSet &taskSet, const ComputationTimeVe
     ErrElement res;
     for (int i = 0; i < N; i++)
     {
-        float tt = taskSet[i].executionTime / executionTimeVector(i, 0);
-        tt = hp / taskSet[i].period *
-             EstimateEnergyTask(taskSet[i], tt);
-        res(i, 0) = tt;
+        float frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
+        res(i, 0) = hp / taskSet[i].period *
+                    EstimateEnergyTask(taskSet[i], frequencyRunTime);
     }
     return res;
 }

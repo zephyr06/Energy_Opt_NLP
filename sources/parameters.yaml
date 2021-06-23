@@ -2,10 +2,14 @@
 
 # TASK_NUMBER: 3
 deltaOptimizer: 1e-3
-weightEnergy: 1e1
-punishmentInBarrier: 1e5
+weightEnergy: 1e4
+
+# If this number is much larger than the other parts(kike, weightEntry), 
+# the system may be indetermined in Jacobian
+punishmentInBarrier: 1e7
 initialLambda: 1e17
 lowerLambda: 1e10
 upperLambda: 1e30
 noiseModelSigma: 1e-3
-deltaInitialDogleg: 1
+deltaInitialDogleg: 1e1
+relativeErrorTolerance: 1e-3
