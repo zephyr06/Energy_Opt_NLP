@@ -1,3 +1,5 @@
+#pragma once
+
 #include <chrono>
 #include <math.h>
 
@@ -25,11 +27,13 @@ using namespace gtsam;
  **/
 float Barrier(float x)
 {
-    if (x >= 0)
+    if (x > 0)
         // return pow(x, 2);
-        return log(x);
-    else
+        return weightLogBarrier * log(x);
+    else if (x < 0)
         return punishmentInBarrier * pow(10, TASK_NUMBER - 3) * pow(1 - x, 1);
+    else // it basically means x=0
+        return weightLogBarrier * log(x + toleranceBarrier);
 }
 
 void UpdateTaskSetExecutionTime(TaskSet &taskSet, ComputationTimeVector executionTimeVec)
@@ -67,7 +71,7 @@ public:
         TaskSet taskSetCurr_ = tasks_;
         UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector);
 
-        int hyperPeriod = 0;
+        long long int hyperPeriod = 0;
         if (H)
             hyperPeriod = HyperPeriod(tasks_);
 
@@ -88,7 +92,7 @@ public:
             // approximate the Jacobian
             if (H)
             {
-                if (tasks_[i].deadline - responseTime >= 0)
+                if (tasks_[i].deadline - responseTime > 0)
                 {
                     jacobian(i, i) = -2 * hyperPeriod / tasks_[i].period * pow(tasks_[i].executionTime / executionTimeVector(i, 0), 3) * weightEnergy;
                     jacobian(i, i) -= 1 / (tasks_[i].deadline - responseTime);
@@ -97,13 +101,22 @@ public:
                         jacobian(i, j) = -1 / (tasks_[i].deadline - responseTime) * ceil(responseTime / tasks_[j].period);
                     }
                 }
-                else
+                else if (tasks_[i].deadline - responseTime <= 0)
                 {
                     jacobian(i, i) = -2 * hyperPeriod / tasks_[i].period * pow(tasks_[i].executionTime / executionTimeVector(i, 0), 3) * weightEnergy;
-                    jacobian(i, i) -= punishmentInBarrier * pow(10, TASK_NUMBER - 3) * -1;
+                    jacobian(i, i) += punishmentInBarrier * pow(10, TASK_NUMBER - 3) * 1;
                     for (int j = 0; j < i; j++)
                     {
                         jacobian(i, j) = punishmentInBarrier * pow(10, TASK_NUMBER - 3) * ceil(responseTime / tasks_[j].period);
+                    }
+                }
+                else // tasks_[i].deadline - responseTime == 0
+                {
+                    jacobian(i, i) = -2 * hyperPeriod / tasks_[i].period * pow(tasks_[i].executionTime / executionTimeVector(i, 0), 3) * weightEnergy;
+                    jacobian(i, i) -= 1 / (tasks_[i].deadline - responseTime + toleranceBarrier);
+                    for (int j = 0; j < i; j++)
+                    {
+                        jacobian(i, j) = -1 / (tasks_[i].deadline - responseTime + toleranceBarrier) * ceil(responseTime / tasks_[j].period);
                     }
                 }
             }
@@ -148,9 +161,9 @@ public:
             // The log barrier function makes the Jacobian very large already,
             // and so the update step should be small correspondingly
 
-            // *H = numericalDerivative11(f, executionTimeVector,
-            //                            deltaOptimizer);
-            *H = jacobian;
+            *H = numericalDerivative11(f, executionTimeVector,
+                                       deltaOptimizer);
+            // *H = jacobian;
 
             cout << "The current evaluation point is " << endl
                  << executionTimeVector << endl;
@@ -160,7 +173,8 @@ public:
                  << jacobian << endl;
             cout << "The current error is " << endl
                  << err << endl
-                 << err.norm() << endl;
+                 << err.norm() << endl
+                 << endl;
         }
         return err;
     }
@@ -210,21 +224,27 @@ float OptimizeTaskSet(TaskSet &tasks)
     // we can already terminate; the corresponding minimal of relative error is
     // approximately 2e-3;
 
-    // LevenbergMarquardtParams params;
-    // params.setlambdaInitial(initialLambda);
-    // params.setVerbosityLM("SUMMARY");
-    // params.setlambdaLowerBound(lowerLambda);
-    // params.setlambdaUpperBound(upperLambda);
-    // params.setRelativeErrorTol(relativeErrorTolerance);
-    // LevenbergMarquardtOptimizer optimizer(graph, initialEstimate, params);
-    DoglegParams params;
-    params.setVerbosityDL("DELTA");
-    params.setDeltaInitial(deltaInitialDogleg);
-    params.setRelativeErrorTol(relativeErrorTolerance);
-
-    DoglegOptimizer optimizer(graph, initialEstimate, params);
-
-    Values result = optimizer.optimize();
+    Values result;
+    if (optimizerType == 1)
+    {
+        DoglegParams params;
+        params.setVerbosityDL("DELTA");
+        params.setDeltaInitial(deltaInitialDogleg);
+        params.setRelativeErrorTol(relativeErrorTolerance);
+        DoglegOptimizer optimizer(graph, initialEstimate, params);
+        result = optimizer.optimize();
+    }
+    else if (optimizerType == 2)
+    {
+        LevenbergMarquardtParams params;
+        params.setlambdaInitial(initialLambda);
+        params.setVerbosityLM("SUMMARY");
+        params.setlambdaLowerBound(lowerLambda);
+        params.setlambdaUpperBound(upperLambda);
+        params.setRelativeErrorTol(relativeErrorTolerance);
+        LevenbergMarquardtOptimizer optimizer(graph, initialEstimate, params);
+        result = optimizer.optimize();
+    }
 
     ComputationTimeVector optComp = result.at<ComputationTimeVector>(key);
     cout << "After optimization, the computation time vector is " << optComp << endl;

@@ -5,7 +5,9 @@
 #include "../sources/Tasks.h"
 #include "../sources/ResponseTimeAnalysis.h"
 #include "../sources/Parameters.h"
+#include "../sources/Optimize.h"
 
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 TEST(ReadTaskSet, p1)
 {
 
@@ -24,6 +26,16 @@ TEST(parameters, a1)
         throw;
     cout << "The task number is " << TASK_NUMBER << endl;
 }
+TEST(parameters, a2)
+{
+    int a = 3;
+    MatrixXd A(a, a);
+    A << 1, 2, 3, 4, 5, 6, 7, 8, 9;
+    MatrixXd B = A;
+    MatrixXd C = A * B;
+    CHECK_EQUAL(30, C(0, 0));
+}
+
 int main()
 {
     TestResult tr;

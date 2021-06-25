@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Tasks.h"
 
 template <typename T>
@@ -6,6 +8,22 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
     const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
     const vector<T> executionTimeHigh = GetParameter<T>(tasksHighPriority, "executionTime");
     int N = periodHigh.size();
+
+    if (beginTime < 0)
+    {
+        cout << red << "During optimization, some variables drop below 0\n"
+             << def << endl;
+        throw;
+    }
+    for (int i = 0; i < int(executionTimeHigh.size()); i++)
+    {
+        if (executionTimeHigh[i] < 0)
+        {
+            cout << red << "During optimization, some variables drop below 0\n"
+                 << def << endl;
+            throw;
+        }
+    }
 
     if (Utilization(tasksHighPriority) > 1.0)
     {

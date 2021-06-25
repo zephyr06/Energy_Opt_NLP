@@ -1,15 +1,23 @@
 %YAML:1.0
 
-# TASK_NUMBER: 3
-deltaOptimizer: 1e-3
-weightEnergy: 1e4
 
+deltaOptimizer: 1e-3
+weightEnergy: 1e-3
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
-punishmentInBarrier: 1e7
-initialLambda: 1e17
-lowerLambda: 1e10
-upperLambda: 1e30
+punishmentInBarrier: 1e3
 noiseModelSigma: 1e-3
-deltaInitialDogleg: 1e1
 relativeErrorTolerance: 1e-3
+toleranceBarrier: 1e-6
+
+
+punishmentFrequency: 1e1
+weightLogBarrier: 1
+optimizerType: 1 # 1 means dogleg, 2 means LM
+
+deltaInitialDogleg: 1e1
+
+initialLambda: 1e8
+lowerLambda: 1e1
+upperLambda: 1e30
+

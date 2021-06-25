@@ -1,4 +1,6 @@
 #include <iostream>
+#pragma once
+
 #include <filesystem>
 #include <fstream>
 #include <dirent.h>
@@ -35,7 +37,7 @@ vector<string> ReadFilesInDirectory(const char *path)
 
 void BatchOptimize()
 {
-    const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData";
+    const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
     vector<float> energySaveRatioVec;
     vector<float> runTime;
 
@@ -45,7 +47,7 @@ void BatchOptimize()
         string delimiter = "-";
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
-            string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + file;
+            string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
             TaskSet taskSet1 = ReadTaskSet(path, "RM");
             auto start = chrono::high_resolution_clock::now();
             float res = OptimizeTaskSet(taskSet1);

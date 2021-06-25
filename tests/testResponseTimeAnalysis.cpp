@@ -4,7 +4,7 @@
 TEST(hyperPeriod, RTA)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
-    int periodActual = HyperPeriod(task_set);
+    long long int periodActual = HyperPeriod(task_set);
     int periodExpect = 1278900;
     CHECK_EQUAL(periodExpect, periodActual);
 }

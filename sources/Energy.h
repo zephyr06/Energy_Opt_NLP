@@ -1,3 +1,5 @@
+#pragma once
+
 #include <gtsam/base/numericalDerivative.h>
 #include <gtsam/geometry/Point3.h>
 #include <gtsam/inference/Key.h>
@@ -25,13 +27,16 @@ const float EstimateEnergyTask(const Task &task, float frequency)
     scalar, energy consumption of the task if it runs at the given frequency
 */
 {
-    return task.executionTime * pow(frequency, 2) * weightEnergy;
+    if (frequency <= 1 + deltaOptimizer)
+        return task.executionTime * pow(frequency, 2) * weightEnergy;
+    else
+        return task.executionTime * punishmentFrequency * weightEnergy;
 }
 
 ErrElement EstimateEnergyTaskSet(const TaskSet &taskSet, const ComputationTimeVector &executionTimeVector)
 {
     int N = taskSet.size();
-    int hp = HyperPeriod(taskSet);
+    long long int hp = HyperPeriod(taskSet);
     ErrElement res;
     for (int i = 0; i < N; i++)
     {

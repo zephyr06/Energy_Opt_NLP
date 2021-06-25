@@ -20,9 +20,10 @@ TEST(ComputationFactor, a1)
 {
     // global optimzal result: 143 20 185
 
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_n3_v1.csv";
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     auto start = chrono::high_resolution_clock::now();

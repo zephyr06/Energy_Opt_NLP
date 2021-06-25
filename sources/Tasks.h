@@ -9,9 +9,14 @@
 
 #include <CppUnitLite/TestHarness.h>
 
+#include "colormod.h"
+
+#include "Parameters.h"
 using namespace std;
 
 #define TaskSet vector<Task>
+Color::Modifier red(Color::FG_RED);
+Color::Modifier def(Color::FG_DEFAULT);
 
 class Task
 {
@@ -40,7 +45,8 @@ public:
     {
         if (dataInLine.size() != 5)
         {
-            cout << "The length of dataInLine in Task constructor is wrong! Must be 5!\n";
+            cout << red << "The length of dataInLine in Task constructor is wrong! Must be 5!\n"
+                 << def;
             throw;
         }
 
@@ -89,7 +95,8 @@ vector<T> GetParameter(const TaskSet &taskset, string parameterType)
             parameterList.push_back((T)(taskset[i].offset));
         else
         {
-            cout << "parameterType in GetParameter is not recognized!\n";
+            cout << red << "parameterType in GetParameter is not recognized!\n"
+                 << def;
             throw;
         }
     }
@@ -113,19 +120,33 @@ float Utilization(const TaskSet &tasks)
     return utilization;
 }
 
-int HyperPeriod(const TaskSet &tasks)
+// Recursive function to return gcd of a and b
+long long gcd(long long int a, long long int b)
+{
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
+
+// Function to return LCM of two numbers
+long int lcm(long int a, long int b)
+{
+    return (a / gcd(a, b)) * b;
+}
+
+long long int HyperPeriod(const TaskSet &tasks)
 {
     int N = tasks.size();
     if (N == 0)
     {
-        cout << "Empty task set in HyperPeriod()!\n";
+        cout << red << "Empty task set in HyperPeriod()!\n";
         throw;
     }
     else
     {
-        int hyper = tasks[0].period;
+        long int hyper = tasks[0].period;
         for (int i = 1; i < N; i++)
-            hyper = boost::integer::lcm(hyper, tasks[i].period);
+            hyper = lcm(hyper, tasks[i].period);
         return hyper;
     }
 }
@@ -142,7 +163,8 @@ TaskSet Reorder(TaskSet tasks, string priorityType)
     }
     else
     {
-        cout << "Unrecognized priorityType in Reorder!\n";
+        cout << red << "Unrecognized priorityType in Reorder!\n"
+             << def;
         throw;
     }
     return tasks;
@@ -178,14 +200,23 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
             dataInLine.erase(dataInLine.begin());
             taskSet.push_back(Task(dataInLine));
         }
+
+        if (taskSet.size() != TASK_NUMBER)
+        {
+            cout << red << "The number of tasks in the dataset is not consistent with system settings\b" << def;
+            throw;
+        }
+
         TaskSet ttt(taskSet);
         ttt = Reorder(ttt, priorityType);
+
         cout << "Finish reading the data file succesfully!\n";
         return ttt;
     }
     else
     {
-        cout << "The path does not exist in ReadTaskSet!\n";
+        cout << red << "The path does not exist in ReadTaskSet!\n"
+             << def;
         throw;
     }
 }

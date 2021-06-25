@@ -18,15 +18,17 @@ do
 	--deadline_portion 1 --utilization_total 0.5 --desperate_mode 0 --directory "$dataset"
 	
 	# modify TASK_NUMBER in sources/parameters.h
-	
+	python Modify_task_number.py --task_number $jobNumber
 
 	# Optimize energy consumption
-	make ../build/testBatch.run
+	cd ../build
+	make -j4
+	./tests/testBatch1
+	cd ../Visualization
+	sleep 5
 done
 
 # visualize the result
 schedulability_py="schedulability_$title.py"
-python $schedulability_py --x_label "Number of tasks" --y_label "Schedulable task sets" \
---type "schedulability" --title "$title"
 python $schedulability_py --x_label "Number of tasks" --y_label "Energy saving ratio" \
 --type "energy" --title "$title"
