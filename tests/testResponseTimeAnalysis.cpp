@@ -49,34 +49,39 @@ TEST(RTA, RTA3)
     CHECK_EQUAL(rta1Expect, rta1Actual);
 }
 
-TEST(RTA, float)
+TEST(RTA, ResponseTimeAnalysisWarm)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
     float delta = 1e-4;
     float rta3Expect = 282 + delta * 1;
     TaskSet hp({task_set[0], task_set[1]});
     task_set[2].executionTime += delta;
-    CHECK_EQUAL(rta3Expect, ResponseTimeAnalysisWarm<float>(rta3Expect - 100, task_set[2], hp));
+    float rta3Actual = ResponseTimeAnalysisWarm<float>(rta3Expect - 100, task_set[2], hp);
+    CHECK_EQUAL(rta3Expect, rta3Actual);
+    cout << "RTA "
+         << "ResponseTimeAnalysisWarm"
+         << " passed\n";
 }
-// TEST(RTA, float2)
-// {
-//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
-//     float delta = 1e-8;
-//     float rta3Expect = 282 + delta * 2;
-//     TaskSet hp({task_set[0], task_set[1]});
-//     task_set[2].executionTime += delta;
-//     DOUBLES_EQUAL(rta3Expect, ResponseTimeAnalysisWarm<float>(rta3Expect - 100, task_set[2], hp), delta / 10);
-// }
 
 TEST(Schedulability, p1)
 {
     string path2 = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-    bool schedulable = CheckSchedulability<int>(ReadTaskSet(path2, "RM"));
+    auto task_set = ReadTaskSet(path2, "RM");
+    bool schedulable = CheckSchedulability<int>(task_set);
     if (not schedulable)
     {
         cout << "The test set in schedulablability test didn't pass!\n";
         throw;
     }
+}
+TEST(RTA, ResponseTimeOfTaskSetHard)
+{
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
+
+    int rta3Expect = 282;
+    TaskSet hp({task_set[0], task_set[1]});
+    int rta3Actual = int(ResponseTimeOfTaskSetHard(task_set)(2, 0));
+    CHECK_EQUAL(rta3Expect, rta3Actual);
 }
 
 int main()

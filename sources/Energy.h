@@ -12,11 +12,7 @@
 
 #include "Tasks.h"
 #include "Parameters.h"
-
-typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
-typedef Eigen::Matrix<double, TASK_NUMBER, TASK_NUMBER> JacobianOpt;
-typedef Eigen::Matrix<double, TASK_NUMBER, 1> ErrElement;
-
+#include "Declaration.h"
 const float EstimateEnergyTask(const Task &task, float frequency)
 /**
  * @brief Estimate energy consumption of a single task;
@@ -27,17 +23,35 @@ const float EstimateEnergyTask(const Task &task, float frequency)
     scalar, energy consumption of the task if it runs at the given frequency
 */
 {
-    if (frequency <= 1 + deltaOptimizer)
+    if (frequency <= 1 + deltaOptimizer && frequency > 0)
         return task.executionTime * pow(frequency, 2) * weightEnergy;
     else
         return task.executionTime * punishmentFrequency * weightEnergy;
 }
 
-ErrElement EstimateEnergyTaskSet(const TaskSet &taskSet, const ComputationTimeVector &executionTimeVector)
+// ErrElement EstimateEnergyTaskSet(const TaskSet &taskSet, const ComputationTimeVector &executionTimeVector)
+// {
+//     int N = taskSet.size();
+//     long long int hp = HyperPeriod(taskSet);
+//     ErrElement res;
+//     for (int i = 0; i < N; i++)
+//     {
+//         float frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
+//         res(i, 0) = hp / taskSet[i].period *
+//                     EstimateEnergyTask(taskSet[i], frequencyRunTime);
+//     }
+//     return res;
+// }
+
+VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic &executionTimeVector)
 {
     int N = taskSet.size();
+    int n = executionTimeVector.rows();
+
     long long int hp = HyperPeriod(taskSet);
-    ErrElement res;
+    MatrixDynamic res;
+    res.resize(n, 1);
+
     for (int i = 0; i < N; i++)
     {
         float frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);

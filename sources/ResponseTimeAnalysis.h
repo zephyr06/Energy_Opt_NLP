@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tasks.h"
+#include "Declaration.h"
 
 template <typename T>
 T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
@@ -21,7 +22,8 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
         {
             cout << red << "During optimization, some variables drop below 0\n"
                  << def << endl;
-            throw;
+            // throw;
+            return INT32_MAX;
         }
     }
 
@@ -77,4 +79,24 @@ bool CheckSchedulability(const TaskSet &taskSet)
             return false;
     }
     return true;
+}
+
+VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
+{
+    int N = tasks.size();
+    VectorDynamic res;
+    res.resize(N, 1);
+
+    vector<Task> hpTasks;
+    for (int i = 0; i < N; i++)
+    {
+        res(i, 0) = ResponseTimeAnalysis<float>(tasks[i], hpTasks);
+        if (res(i, 0) > tasks[i].deadline)
+        {
+            cout << "The given task set is not schedulable!\n";
+            throw;
+        }
+        hpTasks.push_back(tasks[i]);
+    }
+    return res;
 }

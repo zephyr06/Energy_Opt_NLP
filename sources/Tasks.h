@@ -201,11 +201,11 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
             taskSet.push_back(Task(dataInLine));
         }
 
-        if (taskSet.size() != TASK_NUMBER)
-        {
-            cout << red << "The number of tasks in the dataset is not consistent with system settings\b" << def;
-            throw;
-        }
+        // if (taskSet.size() != TASK_NUMBER)
+        // {
+        //     cout << red << "The number of tasks in the dataset is not consistent with system settings\b" << def;
+        //     throw;
+        // }
 
         TaskSet ttt(taskSet);
         ttt = Reorder(ttt, priorityType);

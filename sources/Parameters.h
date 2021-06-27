@@ -10,6 +10,7 @@ cv::FileStorage ConfigParameters("/home/zephyr/Programming/Energy_Opt_NLP/source
 
 using namespace std;
 // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
+// int TASK_NUMBER_DYNAMIC = 3;
 const int TASK_NUMBER = 3;
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double punishmentInBarrier = (double)ConfigParameters["punishmentInBarrier"];
@@ -26,3 +27,4 @@ const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
 const int optimizerType = (int)ConfigParameters["optimizerType"];
 const double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];
 const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency"];
+const string testDataSetName = (string)ConfigParameters["testDataSetName"];
