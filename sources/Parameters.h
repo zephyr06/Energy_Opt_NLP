@@ -21,7 +21,7 @@ const double upperLambda = (double)ConfigParameters["upperLambda"];
 
 const double noiseModelSigma = (double)ConfigParameters["noiseModelSigma"];
 const double deltaInitialDogleg = (double)ConfigParameters["deltaInitialDogleg"];
-const double weightEnergy = (double)ConfigParameters["weightEnergy"];
+double weightEnergy = (double)ConfigParameters["weightEnergy"];
 const double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTolerance"];
 const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
 const int optimizerType = (int)ConfigParameters["optimizerType"];
