@@ -1,5 +1,6 @@
 #include "../sources/Optimize.h"
 #include "/home/zephyr/Library/eigen/Eigen/Core"
+int TASK_NUMBER_DYNAMIC = 2;
 class ComputationFactorTEST : public NoiseModelFactor1<VectorDynamic>
 {
 public:
@@ -17,13 +18,14 @@ public:
             for (int j = 0; j < i; j++)
                 hpTasks.push_back(tasks_[j]);
 
-            responseTimeBase_[i] = ResponseTimeAnalysis<float>(tasks_[i], hpTasks);
+            responseTimeBase_[i] = ResponseTimeAnalysis<double>(tasks_[i], hpTasks);
         }
     }
 
     Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
     {
         VectorDynamic err;
+
         err.resize(variablesNumber * 2, 1);
         for (int i = 0; i < variablesNumber; i++)
         {
@@ -51,7 +53,7 @@ public:
         //     for (int j = 0; j < i; j++)
         //         hpTasks.push_back(taskSetCurr_[j]);
 
-        //     float responseTime = ResponseTimeAnalysisWarm<float>(responseTimeBase_[i], taskCurr_, hpTasks);
+        //     double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeBase_[i], taskCurr_, hpTasks);
 
         //     err(i, 0) += Barrier(tasks_[i].deadline - responseTime);
         // approximate the Jacobian
@@ -133,7 +135,7 @@ VectorDynamic InitializeOptimizationTEST(const TaskSet &tasks)
 /**
  * Perform optimization for one task set
  **/
-float OptimizeTaskSetTEST(TaskSet &tasks)
+double OptimizeTaskSetTEST(TaskSet &tasks)
 {
     // test schedulability
     if (!CheckSchedulability<int>(tasks))

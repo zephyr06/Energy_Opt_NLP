@@ -52,11 +52,11 @@ TEST(RTA, RTA3)
 TEST(RTA, ResponseTimeAnalysisWarm)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
-    float delta = 1e-4;
-    float rta3Expect = 282 + delta * 1;
+    double delta = 1e-4;
+    double rta3Expect = 282 + delta * 1;
     TaskSet hp({task_set[0], task_set[1]});
     task_set[2].executionTime += delta;
-    float rta3Actual = ResponseTimeAnalysisWarm<float>(rta3Expect - 100, task_set[2], hp);
+    double rta3Actual = ResponseTimeAnalysisWarm<double>(rta3Expect - 100, task_set[2], hp);
     CHECK_EQUAL(rta3Expect, rta3Actual);
     cout << "RTA "
          << "ResponseTimeAnalysisWarm"

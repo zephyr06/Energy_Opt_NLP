@@ -30,7 +30,7 @@ def Read_batch_analyze_energy(path):
             continue
         parameter = line[1:-2].split(',')
         # total number of task sets, total schedulable task sets
-        data = np.vstack([data, np.array([float(parameter[0])])])
+        data = np.vstack([data, np.array([double(parameter[0])])])
 
     return data
 
@@ -44,7 +44,7 @@ def Read_time_file(path):
         if line[0:4] == "user":
             time_str = line[1:-2].split('\t')[1]
             minute = np.int(time_str.split('m')[0])
-            seconds = np.float(time_str.split('m')[1][:-1])
+            seconds = np.double(time_str.split('m')[1][:-1])
             data = np.vstack([data, np.array([minute * 60 + seconds])])
 
     return data

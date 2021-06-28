@@ -40,7 +40,7 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
     {
         T responseTime = taskCurr.executionTime;
         for (int i = 0; i < N; i++)
-            responseTime += ceil(responseTimeBefore / float(periodHigh[i])) * executionTimeHigh[i];
+            responseTime += ceil(responseTimeBefore / double(periodHigh[i])) * executionTimeHigh[i];
         if (responseTime == responseTimeBefore)
         {
             stop_flag = true;
@@ -90,11 +90,12 @@ VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
     vector<Task> hpTasks;
     for (int i = 0; i < N; i++)
     {
-        res(i, 0) = ResponseTimeAnalysis<float>(tasks[i], hpTasks);
+        res(i, 0) = ResponseTimeAnalysis<double>(tasks[i], hpTasks);
         if (res(i, 0) > tasks[i].deadline)
         {
             cout << "The given task set is not schedulable!\n";
-            throw;
+            res(0, 0) = -1;
+            return res;
         }
         hpTasks.push_back(tasks[i]);
     }

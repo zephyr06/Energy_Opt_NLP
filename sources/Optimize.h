@@ -29,7 +29,7 @@ using namespace gtsam;
 /**
  * barrier function for the optimization
  **/
-float Barrier(float x)
+double Barrier(double x)
 {
     if (x > 0)
         // return pow(x, 2);
@@ -62,16 +62,16 @@ MatrixDynamic NumericalDerivativeDynamic(boost::function<VectorDynamic(const Vec
         VectorDynamic resPlus;
         resPlus.resize(mOfJacobian, 1);
         resPlus = h(xDelta);
-        cout << "resPlus" << endl
-             << resPlus << endl;
+        // cout << "resPlus" << endl
+        //      << resPlus << endl;
 
         xDelta(i, 0) = xDelta(i, 0) - 2 * deltaOptimizer;
         VectorDynamic resMinus;
         resMinus.resize(mOfJacobian, 1);
         resMinus = h(xDelta);
 
-        cout << "resMinus" << endl
-             << resMinus << endl;
+        // cout << "resMinus" << endl
+        //      << resMinus << endl;
         for (int j = 0; j < mOfJacobian; j++)
         {
             jacobian(j, i) = (resPlus(j, 0) - resMinus(j, 0)) / 2 / deltaOptimizer;
@@ -117,16 +117,44 @@ public:
             {
                 hpTasks.push_back(taskSetCurr_[i]);
             }
-            cout << "The response time and deadline for each task is: " << endl;
+            // cout << "The response time and deadline for each task is: " << endl;
             for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             {
                 // energy part
-                float frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
+                double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                 // barrier function part
-                float responseTime = ResponseTimeAnalysisWarm<float>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
-                cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
+                double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
+                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime - taskSetCurr_[i].executionTime);
+                hpTasks.push_back(taskSetCurr_[i]);
+            }
+            return err;
+        };
+        boost::function<Matrix(const VectorDynamic &)> f2 =
+            [this](const VectorDynamic &executionTimeVector)
+        {
+            VectorDynamic err;
+            err.resize(numberOfTasksNeedOptimize, 1);
+            TaskSet taskSetCurr_ = tasks_;
+            UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
+
+            vector<Task> hpTasks;
+            for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
+            {
+                hpTasks.push_back(taskSetCurr_[i]);
+            }
+            // cout << "The response time and deadline for each task is: " << endl;
+            for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+            {
+                // energy part
+                double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
+                err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
+                // barrier function part
+                double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
+                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
                 hpTasks.push_back(taskSetCurr_[i]);
             }
             return err;
@@ -155,10 +183,10 @@ public:
         //         int a = 1;
         //     }
         //     // energy part
-        //     float frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
+        //     double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
         //     err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
         //     // barrier function part
-        //     float responseTime = ResponseTimeAnalysisWarm<float>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+        //     double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
         //     cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
         //     err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
         //     hpTasks.push_back(taskSetCurr_[i]);
@@ -168,9 +196,9 @@ public:
         if (H)
         {
 
-            *H = NumericalDerivativeDynamic(f, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
+            *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = jacobian;
-
+            cout << endl;
             cout << "The current evaluation point is " << endl
                  << executionTimeVector << endl;
             cout << "The Jacobian is " << endl
@@ -182,14 +210,34 @@ public:
                  << endl
                  << err.norm() << endl
                  << endl;
+
+            TaskSet taskSetCurr_ = tasks_;
+            UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
+            vector<Task> hpTasks;
+            for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
+            {
+                hpTasks.push_back(taskSetCurr_[i]);
+            }
+            cout << "The response time and deadline for each task is: " << endl;
+            for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+            {
+                // energy part
+                // double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
+                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
+                // barrier function part
+                double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
+                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
+                hpTasks.push_back(taskSetCurr_[i]);
+            }
         }
-        cout << "The current evaluation point is " << endl
-             << executionTimeVector << endl
-             << endl;
-        cout << "The current error is " << endl
-             << err << endl
-             << err.norm() << endl
-             << endl;
+        // cout << "The current evaluation point is " << endl
+        //      << executionTimeVector << endl
+        //      << endl;
+        // cout << "The current error is " << endl
+        //      << err << endl
+        //      << err.norm() << endl
+        //      << endl;
         return err;
     }
 };
@@ -276,20 +324,21 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
     VectorDynamic optComp = result.at<VectorDynamic>(key);
     cout << "After optimization, the computation time vector is " << optComp << endl;
     ClampComputationTime(optComp);
+    cout << "After clamp, the computation time vector is " << optComp << endl;
     return optComp;
 }
 
 /**
  * Perform optimization for one task set
  **/
-float OptimizeTaskSet(TaskSet &tasks)
+double OptimizeTaskSetOneIte(TaskSet &tasks)
 {
     int N = tasks.size();
-    // adjust some parameters based on scale
-    weightEnergy = weightEnergy / pow(10, int(N / 6));
 
     // this function also checks schedulability
     VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard(tasks);
+    if (responseTimeInitial(0, 0) == -1)
+        return -2;
     VectorDynamic initialExecutionTime;
     initialExecutionTime.resize(N, 1);
     for (int i = 0; i < N; i++)
@@ -315,6 +364,8 @@ float OptimizeTaskSet(TaskSet &tasks)
         // formulate new computationTime
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             computationTimeVector(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
+
+        cout << "After one iteration, the computation time is " << computationTimeVector << endl;
 
         // check optimization results to see if there are tasks to remove further
         int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(tasks, computationTimeVector, lastTaskDoNotNeedOptimize, responseTimeInitial);
@@ -350,8 +401,57 @@ float OptimizeTaskSet(TaskSet &tasks)
     }
     else
     {
+        // TODO: in this case, add more loops to try different values of weightEnergy
         cout << "Unfeasible!" << endl;
         return -1;
     }
     return 0;
+}
+
+double OptimizeTaskSet(TaskSet &tasks)
+{
+    double weightEnergyRef = weightEnergy;
+
+    long long int hyperPeriod = HyperPeriod(tasks);
+
+    // adjust some parameters based on scale
+    weightEnergy = weightEnergy / log10(hyperPeriod);
+
+    for (int i = 0; i < weightEnergyMaxOrder; i++)
+    {
+        weightEnergy = weightEnergyRef * pow(10, i);
+        cout << "Current weightEnergy is " << weightEnergy << endl;
+        try
+        {
+            double res = OptimizeTaskSetOneIte(tasks);
+            if (res != -1)
+            {
+                weightEnergy = weightEnergyRef;
+                return res;
+            }
+        }
+        catch (...)
+        {
+            ;
+        }
+
+        weightEnergy = weightEnergyRef * pow(10, -1 * i);
+        cout << "Current weightEnergy is " << weightEnergy << endl;
+        try
+        {
+            double res = OptimizeTaskSetOneIte(tasks);
+            if (res != -1)
+            {
+                weightEnergy = weightEnergyRef;
+                return res;
+            }
+        }
+        catch (...)
+        {
+            ;
+        }
+    }
+
+    weightEnergy = weightEnergyRef;
+    return -1;
 }

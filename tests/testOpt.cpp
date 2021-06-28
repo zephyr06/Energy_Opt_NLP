@@ -109,9 +109,9 @@ TEST(OptimizeTaskSet, a1)
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
-    float res = OptimizeTaskSet(taskSet1);
+    double res = OptimizeTaskSet(taskSet1);
     cout << "The energy saving ratio is " << res << endl;
-    if (not assert_equal<float>(0.71, res, 0.01))
+    if (not assert_equal<double>(0.71, res, 0.01))
         throw;
 }
 */
@@ -123,13 +123,13 @@ TEST(OptimizeTaskSet, a2)
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
-    TaskSet taskSet1 = ReadTaskSet(path, "RM");
+        TaskSet taskSet1 = ReadTaskSet(path, "RM");
     auto start = chrono::high_resolution_clock::now();
-    float res = OptimizeTaskSet(taskSet1);
+    double res = OptimizeTaskSet(taskSet1);
     cout << "The energy saving ratio is " << res << endl;
     auto stop = chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-    cout << "The time taken is: " << float(duration.count()) / 1e6 << "seconds" << endl;
+    cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
 }
 int main()
 {

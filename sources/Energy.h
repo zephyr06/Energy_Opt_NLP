@@ -13,7 +13,7 @@
 #include "Tasks.h"
 #include "Parameters.h"
 #include "Declaration.h"
-const float EstimateEnergyTask(const Task &task, float frequency)
+const double EstimateEnergyTask(const Task &task, double frequency)
 /**
  * @brief Estimate energy consumption of a single task;
     all tasks' default frequency is 1, which is also the maximum frequency;
@@ -23,10 +23,26 @@ const float EstimateEnergyTask(const Task &task, float frequency)
     scalar, energy consumption of the task if it runs at the given frequency
 */
 {
-    if (frequency <= 1 + deltaOptimizer && frequency > 0)
+    if (frequency * (task.executionTime - 1e-3) <= task.executionTime + 1e-6 && frequency > 0)
         return task.executionTime * pow(frequency, 2) * weightEnergy;
     else
-        return task.executionTime * punishmentFrequency * weightEnergy;
+        return task.executionTime * pow(frequency, 2) * weightEnergy * punishmentFrequency;
+}
+const double EstimateEnergyTaskBasedComputation(const Task &task, double computationTime)
+/**
+ * @brief Estimate energy consumption of a single task;
+    all tasks' default frequency is 1, which is also the maximum frequency;
+ * @param
+    frequency is defined as f = C_0 / C_real
+    @return
+    scalar, energy consumption of the task if it runs at the given frequency
+*/
+{
+    double frequency = computationTime / task.executionTime;
+    if (computationTime >= task.executionTime - deltaOptimizer)
+        return task.executionTime * pow(frequency, 2) * weightEnergy;
+    else
+        return task.executionTime * pow(frequency, 2) * weightEnergy * punishmentFrequency;
 }
 
 // ErrElement EstimateEnergyTaskSet(const TaskSet &taskSet, const ComputationTimeVector &executionTimeVector)
@@ -36,7 +52,7 @@ const float EstimateEnergyTask(const Task &task, float frequency)
 //     ErrElement res;
 //     for (int i = 0; i < N; i++)
 //     {
-//         float frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
+//         double frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
 //         res(i, 0) = hp / taskSet[i].period *
 //                     EstimateEnergyTask(taskSet[i], frequencyRunTime);
 //     }
@@ -54,7 +70,7 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic 
 
     for (int i = 0; i < N; i++)
     {
-        float frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
+        double frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
         res(i, 0) = hp / taskSet[i].period *
                     EstimateEnergyTask(taskSet[i], frequencyRunTime);
     }
