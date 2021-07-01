@@ -8,14 +8,14 @@ weightEnergyMaxOrder: 20
 weightEnergy: 1e-1
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
-punishmentInBarrier: 1e6
+punishmentInBarrier: 1e8
 noiseModelSigma: 1e-3
 relativeErrorTolerance: 1e-3
 toleranceBarrier: 1e-6
 
 
 punishmentFrequency: 10
-weightLogBarrier: -1
+weightLogBarrier: 1
 optimizerType: 1 # 1 means dogleg, 2 means LM
 
 deltaInitialDogleg: 1e1

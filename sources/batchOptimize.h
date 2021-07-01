@@ -56,12 +56,12 @@ void BatchOptimize()
             auto stop = chrono::high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
             double timeTaken = double(duration.count()) / 1e6;
-            if (res >= 0)
+            if (res >= 0 && res <= 1)
             {
                 energySaveRatioVec.push_back(res);
                 runTime.push_back(timeTaken);
             }
-            else if (res == -1)
+            else if (res == -1 || res > 1)
             {
                 errorFiles.push_back(file);
             }
@@ -80,6 +80,7 @@ void BatchOptimize()
     ofstream outfile1, outfile2;
     outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/Visualization/data_buffer_energy_task_number.txt", std::ios_base::app);
     outfile1 << avEnergy << endl;
+    cout << "Average energy saving ratio is " << avEnergy << endl;
     outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/Visualization/time_task_number.txt", std::ios_base::app);
     outfile2 << aveTime << endl;
 

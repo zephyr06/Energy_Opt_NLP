@@ -80,6 +80,31 @@ MatrixDynamic NumericalDerivativeDynamic(boost::function<VectorDynamic(const Vec
     return jacobian;
 }
 
+MatrixDynamic NumericalDerivativeDynamicUpper(boost::function<VectorDynamic(const VectorDynamic &)> h,
+                                              VectorDynamic x, double deltaOptimizer, int mOfJacobian)
+{
+    int n = x.rows();
+    MatrixDynamic jacobian;
+    jacobian.resize(mOfJacobian, n);
+    VectorDynamic currErr = h(x);
+
+    for (int i = 0; i < n; i++)
+    {
+        VectorDynamic xDelta = x;
+        xDelta(i, 0) = xDelta(i, 0) + deltaOptimizer;
+        VectorDynamic resPlus;
+        resPlus.resize(mOfJacobian, 1);
+        resPlus = h(xDelta);
+        // cout << "resPlus" << endl
+        //      << resPlus << endl;
+        for (int j = 0; j < mOfJacobian; j++)
+        {
+            jacobian(j, i) = (resPlus(j, 0) - currErr(j, 0)) / deltaOptimizer;
+        }
+    }
+    return jacobian;
+}
+
 class ComputationFactor : public NoiseModelFactor1<VectorDynamic>
 {
 public:
@@ -152,7 +177,7 @@ public:
                 double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                 // barrier function part
-                double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                // double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
                 // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
                 // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
                 hpTasks.push_back(taskSetCurr_[i]);
@@ -195,7 +220,7 @@ public:
 
         if (H)
         {
-
+            // *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = jacobian;
             cout << endl;
