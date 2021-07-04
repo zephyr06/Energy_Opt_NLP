@@ -4,7 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <math.h>
-#include <filesystem>
+// #include <filesystem>
 #include <boost/integer/common_factor.hpp>
 
 #include <CppUnitLite/TestHarness.h>
@@ -25,7 +25,7 @@ public:
     int offset;
     int period;
     int overhead;
-    float executionTime;
+    double executionTime;
     int deadline;
 
     // initializer
@@ -33,7 +33,7 @@ public:
     Task() : offset(0), period(0),
              overhead(0), executionTime(0.0),
              deadline(0) {}
-    Task(int offset, int period, int overhead, float executionTime,
+    Task(int offset, int period, int overhead, double executionTime,
          int deadline) : offset(offset), period(period),
                          overhead(overhead), executionTime(executionTime),
                          deadline(deadline) {}
@@ -63,9 +63,9 @@ public:
              << deadline << " The overhead is " << overhead << " The offset is " << offset << endl;
     }
 
-    float utilization()
+    double utilization()
     {
-        return float(executionTime) / period;
+        return double(executionTime) / period;
     }
 
     int slack()
@@ -108,15 +108,19 @@ static bool comparePeriod(Task task1, Task task2)
 {
     return task1.period < task2.period;
 };
+bool compareUtilization(Task task1, Task task2)
+{
+    return task1.utilization() < task2.utilization();
+};
 
-float Utilization(const TaskSet &tasks)
+double Utilization(const TaskSet &tasks)
 {
     vector<int> periodHigh = GetParameter<int>(tasks, "period");
-    vector<float> executionTimeHigh = GetParameter<float>(tasks, "executionTime");
+    vector<double> executionTimeHigh = GetParameter<double>(tasks, "executionTime");
     int N = periodHigh.size();
-    float utilization = 0;
+    double utilization = 0;
     for (int i = 0; i < N; i++)
-        utilization += float(executionTimeHigh[i]) / periodHigh[i];
+        utilization += double(executionTimeHigh[i]) / periodHigh[i];
     return utilization;
 }
 
@@ -156,6 +160,10 @@ TaskSet Reorder(TaskSet tasks, string priorityType)
     if (priorityType == "RM")
     {
         sort(tasks.begin(), tasks.end(), comparePeriod);
+    }
+    else if (priorityType == "utilization")
+    {
+        sort(tasks.begin(), tasks.end(), compareUtilization);
     }
     else if (priorityType == "orig")
     {
@@ -201,11 +209,11 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
             taskSet.push_back(Task(dataInLine));
         }
 
-        if (taskSet.size() != TASK_NUMBER)
-        {
-            cout << red << "The number of tasks in the dataset is not consistent with system settings\b" << def;
-            throw;
-        }
+        // if (taskSet.size() != TASK_NUMBER)
+        // {
+        //     cout << red << "The number of tasks in the dataset is not consistent with system settings\b" << def;
+        //     throw;
+        // }
 
         TaskSet ttt(taskSet);
         ttt = Reorder(ttt, priorityType);

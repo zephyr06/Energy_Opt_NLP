@@ -1,7 +1,6 @@
 #include <iostream>
 #pragma once
 
-#include <filesystem>
 #include <fstream>
 #include <dirent.h>
 #include <sys/types.h>
@@ -10,7 +9,7 @@
 #include "Optimize.h"
 using namespace std::chrono;
 
-double Average(vector<float> &data)
+double Average(vector<double> &data)
 {
     double sum = 0;
     for (int i = 0; i < int(data.size()); i++)
@@ -38,9 +37,10 @@ vector<string> ReadFilesInDirectory(const char *path)
 void BatchOptimize()
 {
     const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
-    vector<float> energySaveRatioVec;
-    vector<float> runTime;
+    vector<double> energySaveRatioVec;
+    vector<double> runTime;
 
+    vector<string> errorFiles;
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
         cout << file << endl;
@@ -50,21 +50,25 @@ void BatchOptimize()
             string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
             TaskSet taskSet1 = ReadTaskSet(path, "RM");
             auto start = chrono::high_resolution_clock::now();
-            float res = OptimizeTaskSet(taskSet1);
+            double res = OptimizeTaskSet(taskSet1);
             // cout << "The energy saving ratio is " << res << endl;
             auto stop = chrono::high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
-            float timeTaken = float(duration.count()) / 1e6;
-            if (res != -1)
+            double timeTaken = double(duration.count()) / 1e6;
+            if (res >= 0 && res <= 1)
             {
                 energySaveRatioVec.push_back(res);
                 runTime.push_back(timeTaken);
             }
+            else if (res == -1 || res > 1)
+            {
+                errorFiles.push_back(file);
+            }
         }
     }
 
-    float avEnergy = -1;
-    float aveTime = -1;
+    double avEnergy = -1;
+    double aveTime = -1;
     int n = runTime.size();
     if (n != 0)
     {
@@ -75,8 +79,14 @@ void BatchOptimize()
     ofstream outfile1, outfile2;
     outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/Visualization/data_buffer_energy_task_number.txt", std::ios_base::app);
     outfile1 << avEnergy << endl;
+    cout << "Average energy saving ratio is " << avEnergy << endl;
     outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/Visualization/time_task_number.txt", std::ios_base::app);
     outfile2 << aveTime << endl;
+
+    cout << endl;
+    for (auto &file : errorFiles)
+        cout << file << endl;
+    cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
 
     return;
 }

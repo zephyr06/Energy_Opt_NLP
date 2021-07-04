@@ -8,12 +8,20 @@ can we bound the incremental response time analysis?
 2. test with scale
 how to limit the boundary, i.e., the computation time can only increase
 
+2. weight issue
+3. test-n3-v11: 
+- optiaml result is just 1, so make sure that whatever happens, the variables will not decrease during optimization
+- the "eliminate" procedure should be able to detect this and freeze variables
+- how to evaluate Jacobian matrix appropriately for this test case?
+
 2. incremental optimization
+
 3. DAG optimization
 0. What are the unique features of global result, how can we guide the optimization algorithm to find it by changing some settings
 0. add weight to barrier function, and see whether it can guide better
 1. how to optimize when it's close to the scheduling boundary
 - probably a two-phase method; whenever some tasks reach their boundary, we freeze all the hp variables and remove them from the variable set; however, what kind of optimality can we guarantee in that case? how do we know whether the freezed variables already reach their optimal solution? In essence, the previous optimization iterations update variables following a consistent proportion, while the direction is given by GN method;
+- -how to decide when to eliminate these variables? 
 
 
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tasks.h"
+#include "Declaration.h"
 
 template <typename T>
 T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
@@ -21,7 +22,8 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
         {
             cout << red << "During optimization, some variables drop below 0\n"
                  << def << endl;
-            throw;
+            // throw;
+            return INT32_MAX;
         }
     }
 
@@ -38,7 +40,7 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
     {
         T responseTime = taskCurr.executionTime;
         for (int i = 0; i < N; i++)
-            responseTime += ceil(responseTimeBefore / float(periodHigh[i])) * executionTimeHigh[i];
+            responseTime += ceil(responseTimeBefore / double(periodHigh[i])) * executionTimeHigh[i];
         if (responseTime == responseTimeBefore)
         {
             stop_flag = true;
@@ -63,7 +65,7 @@ T ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
 }
 
 template <typename T>
-bool CheckSchedulability(const TaskSet &taskSet)
+bool CheckSchedulability(const TaskSet &taskSet, bool whetherPrint = false)
 {
     int N = taskSet.size();
     for (int i = 0; i < N; i++)
@@ -72,9 +74,31 @@ bool CheckSchedulability(const TaskSet &taskSet)
         vector<Task>::const_iterator last = taskSet.begin() + i;
         TaskSet hpTasks(first, last);
         T rta = ResponseTimeAnalysis<T>(taskSet[i], hpTasks);
-        cout << "response time for task " << i << " is " << rta << endl;
+        if (whetherPrint)
+            cout << "response time for task " << i << " is " << rta << " and deadline is " << taskSet[i].deadline << endl;
         if (rta > min(taskSet[i].deadline, taskSet[i].period))
             return false;
     }
     return true;
+}
+
+VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
+{
+    int N = tasks.size();
+    VectorDynamic res;
+    res.resize(N, 1);
+
+    vector<Task> hpTasks;
+    for (int i = 0; i < N; i++)
+    {
+        res(i, 0) = ResponseTimeAnalysis<double>(tasks[i], hpTasks);
+        if (res(i, 0) > tasks[i].deadline)
+        {
+            cout << "The given task set is not schedulable!\n";
+            res(0, 0) = -1;
+            return res;
+        }
+        hpTasks.push_back(tasks[i]);
+    }
+    return res;
 }
