@@ -65,7 +65,7 @@ T ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
 }
 
 template <typename T>
-bool CheckSchedulability(const TaskSet &taskSet)
+bool CheckSchedulability(const TaskSet &taskSet, bool whetherPrint = false)
 {
     int N = taskSet.size();
     for (int i = 0; i < N; i++)
@@ -74,7 +74,8 @@ bool CheckSchedulability(const TaskSet &taskSet)
         vector<Task>::const_iterator last = taskSet.begin() + i;
         TaskSet hpTasks(first, last);
         T rta = ResponseTimeAnalysis<T>(taskSet[i], hpTasks);
-        cout << "response time for task " << i << " is " << rta << endl;
+        if (whetherPrint)
+            cout << "response time for task " << i << " is " << rta << " and deadline is " << taskSet[i].deadline << endl;
         if (rta > min(taskSet[i].deadline, taskSet[i].period))
             return false;
     }

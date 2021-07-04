@@ -1,6 +1,6 @@
 %YAML:1.0
 
-testDataSetName: test_n3_v10
+testDataSetName: test_n3_v9
 
 deltaOptimizer: 1e-3
 weightEnergyMinOrder: -10
@@ -23,4 +23,9 @@ deltaInitialDogleg: 1e1
 initialLambda: 1e8
 lowerLambda: 1e1
 upperLambda: 1e30
+
+
+granularityInBF:1
+readTaskMode: utilization
+toleranceInOuterLoop: 2.0
 

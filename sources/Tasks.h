@@ -4,7 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <math.h>
-#include <filesystem>
+// #include <filesystem>
 #include <boost/integer/common_factor.hpp>
 
 #include <CppUnitLite/TestHarness.h>
@@ -108,6 +108,10 @@ static bool comparePeriod(Task task1, Task task2)
 {
     return task1.period < task2.period;
 };
+bool compareUtilization(Task task1, Task task2)
+{
+    return task1.utilization() < task2.utilization();
+};
 
 double Utilization(const TaskSet &tasks)
 {
@@ -156,6 +160,10 @@ TaskSet Reorder(TaskSet tasks, string priorityType)
     if (priorityType == "RM")
     {
         sort(tasks.begin(), tasks.end(), comparePeriod);
+    }
+    else if (priorityType == "utilization")
+    {
+        sort(tasks.begin(), tasks.end(), compareUtilization);
     }
     else if (priorityType == "orig")
     {

@@ -26,6 +26,8 @@
 using namespace std;
 using namespace gtsam;
 
+#define numberOfTasksNeedOptimize (N - lastTaskDoNotNeedOptimize - 1)
+
 /**
  * barrier function for the optimization
  **/
@@ -110,7 +112,7 @@ class ComputationFactor : public NoiseModelFactor1<VectorDynamic>
 public:
     TaskSet tasks_;
     int lastTaskDoNotNeedOptimize;
-    int numberOfTasksNeedOptimize;
+    // int numberOfTasksNeedOptimize;
     VectorDynamic responseTimeInitial;
     int N;
     long long int hyperPeriod;
@@ -122,7 +124,7 @@ public:
                                                 responseTimeInitial(responseTimeInitial)
     {
         N = tasks_.size();
-        numberOfTasksNeedOptimize = N - lastTaskDoNotNeedOptimize - 1;
+        // numberOfTasksNeedOptimize = N - lastTaskDoNotNeedOptimize - 1;
         hyperPeriod = HyperPeriod(tasks_);
         cout << "The hypeprperiod is " << hyperPeriod << endl;
     }
@@ -291,14 +293,19 @@ void ClampComputationTime(VectorDynamic &comp)
  * N-1 means all tasks do not need optimization
  **/
 int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTimeVector, int endSearchAt,
-                              VectorDynamic computationTimeWarmStart, double tolerance = deltaOptimizer)
+                              VectorDynamic computationTimeWarmStart, double tolerance = toleranceInOuterLoop)
 {
+    // update the tasks with the new optimal computationTimeVector
+    TaskSet tasksCurr = tasks;
+    UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
+
     int N = tasks.size();
     vector<Task> hpTasks = tasks;
     for (int i = N - 1; i >= 0; i--)
     {
         hpTasks.pop_back();
-        if (abs(ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasks[i], hpTasks) - tasks[i].deadline) < tolerance)
+        double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
+        if (abs(rt - tasks[i].deadline) <= tolerance)
             return i;
     }
     return -1;
@@ -307,7 +314,7 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
 VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate, VectorDynamic &responseTimeInitial)
 {
     int N = tasks.size();
-    int numberOfTasksNeedOptimize = N - lastTaskDoNotNeedOptimize - 1;
+    // int numberOfTasksNeedOptimize = N - lastTaskDoNotNeedOptimize - 1;
 
     // build the factor graph
     auto model = noiseModel::Isotropic::Sigma(numberOfTasksNeedOptimize, noiseModelSigma);
@@ -369,22 +376,23 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
     for (int i = 0; i < N; i++)
         initialExecutionTime(i, 0) = tasks[i].executionTime;
     int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, 0, responseTimeInitial);
-    int numberOfTasksNeedOptimize = N - (lastTaskDoNotNeedOptimize + 1);
+    // int numberOfTasksNeedOptimize = N - (lastTaskDoNotNeedOptimize + 1);
 
     bool stop = false;
     VectorDynamic optComp;
     VectorDynamic computationTimeVector = initialExecutionTime;
 
     int numberOfIteration = 0;
+    TaskSet tasksDuringOpt = tasks;
     while (not stop)
     {
         VectorDynamic initialEstimate;
         initialEstimate.resize(numberOfTasksNeedOptimize, 1);
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-            initialEstimate(i - lastTaskDoNotNeedOptimize - 1, 0) = tasks[i].executionTime;
+            initialEstimate(i - lastTaskDoNotNeedOptimize - 1, 0) = computationTimeVector(i, 0);
 
         // perform optimization
-        optComp = UnitOptimization(tasks, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+        optComp = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
 
         // formulate new computationTime
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
@@ -393,11 +401,18 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         cout << "After one iteration, the computation time is " << computationTimeVector << endl;
 
         // check optimization results to see if there are tasks to remove further
-        int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(tasks, computationTimeVector, lastTaskDoNotNeedOptimize, responseTimeInitial);
+        int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(tasksDuringOpt, computationTimeVector, lastTaskDoNotNeedOptimize, responseTimeInitial);
         if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize || lastTaskDoNotNeedOptimizeAfterOpt == N - 1)
             stop = true;
         else
+        {
             lastTaskDoNotNeedOptimize = lastTaskDoNotNeedOptimizeAfterOpt;
+            for (int i = 0; i <= lastTaskDoNotNeedOptimize; i++)
+            {
+                tasksDuringOpt[i].executionTime = computationTimeVector(i, 0);
+            }
+        }
+
         numberOfIteration++;
         if (numberOfIteration > N)
         {
