@@ -1,16 +1,16 @@
 %YAML:1.0
 
-testDataSetName: test_n3_v9
+testDataSetName: test_n3_v15
 
-deltaOptimizer: 1e-3
+deltaOptimizer: 1e0
 weightEnergyMinOrder: -10
-weightEnergyMaxOrder: 20
+weightEnergyMaxOrder: 4
 weightEnergy: 1e-1
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
-punishmentInBarrier: 1e8
+punishmentInBarrier: 1e6
 noiseModelSigma: 1e-3
-relativeErrorTolerance: 1e-3
+relativeErrorTolerance: 1e-2
 toleranceBarrier: 1e-6
 
 
@@ -26,6 +26,6 @@ upperLambda: 1e30
 
 
 granularityInBF:1
-readTaskMode: utilization
+readTaskMode: RM
 toleranceInOuterLoop: 2.0
 

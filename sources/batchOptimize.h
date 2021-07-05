@@ -48,7 +48,7 @@ void BatchOptimize()
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
             string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
-            TaskSet taskSet1 = ReadTaskSet(path, "RM");
+            TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
             auto start = chrono::high_resolution_clock::now();
             double res = OptimizeTaskSet(taskSet1);
             // cout << "The energy saving ratio is " << res << endl;
