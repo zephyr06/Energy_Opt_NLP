@@ -14,8 +14,8 @@ def Read_batch_analyze(path):
 def plot_energy(data, parameter_list, title, x_label, y_label):
     fig, ax = plt.subplots()
     # the shape of data is (1, N)
-    plt.plot(parameter_list, data, color='red', linestyle='dashed', marker='|',
-             markerfacecolor='red', markersize=10)
+    plt.plot(parameter_list, data, color='red', linestyle='dashed', marker='_',
+             markerfacecolor='g', markersize=10)
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -37,12 +37,15 @@ if __name__ == "__main__":
                         help='schedulability or energy')
     parser.add_argument('--title', type=str, default="task_number",  # task_number  utilization  constrained
                         help='title of the saved figure')
+    parser.add_argument('--task_number', type=int, default="x",
+                        help='task_number')                        
     args = parser.parse_args()
     x_label = args.x_label
     y_label = args.y_label
     type_runtime = args.type
     title = args.title
     time_file = "time_" + title + ".txt"
+    task_number = args.task_number
 
     data_path = "data_buffer_energy_" + title + ".txt"
     energy_saving_ratio = Read_batch_analyze(data_path)
@@ -50,7 +53,7 @@ if __name__ == "__main__":
     time_path = "time_task_number.txt"
     time_list = Read_batch_analyze(time_path)
 
-    task_number_list = range(3, 10 + 1)
+    task_number_list = range(3, task_number + 1)
 
     plot_energy(energy_saving_ratio, task_number_list, "energy_" + title, x_label, y_label)
 
