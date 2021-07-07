@@ -2,6 +2,7 @@
 
 title="task_number"
 
+
 # clear buffer file content
 data_buffer_energy="data_buffer_energy_$title.txt"
 > $data_buffer_energy

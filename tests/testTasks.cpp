@@ -11,7 +11,7 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 TEST(ReadTaskSet, p1)
 {
 
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v1.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v1.csv";
 
     TaskSet taskset1 = ReadTaskSet(path, "RM");
 
@@ -20,12 +20,7 @@ TEST(ReadTaskSet, p1)
     CHECK_EQUAL(880, taskset1[2].period);
     CHECK_EQUAL(2, taskset1[0].overhead);
 }
-TEST(parameters, a1)
-{
-    if (TASK_NUMBER == 0)
-        throw;
-    cout << "The task number is " << TASK_NUMBER << endl;
-}
+
 TEST(parameters, a2)
 {
     int a = 3;
