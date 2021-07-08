@@ -1,10 +1,10 @@
 %YAML:1.0
 
-testDataSetName: test_n3_v8
+testDataSetName: test_n3_v11
 
 deltaOptimizer: 1e-2
 weightEnergyMinOrder: -10
-weightEnergyMaxOrder: 10
+weightEnergyMaxOrder: 1
 weightEnergy: 1e-3
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
@@ -16,7 +16,7 @@ toleranceBarrier: 1e-6
 
 punishmentFrequency: 10
 weightLogBarrier: 1
-optimizerType: 2 # 1 means dogleg, 2 means LM
+optimizerType: 1 # 1 means dogleg, 2 means LM
 
 deltaInitialDogleg: 1e1
 
@@ -29,5 +29,5 @@ granularityInBF:1
 readTaskMode: RM
 toleranceInOuterLoop: 2.0
 
-debugMode: 0
+debugMode: 1
 

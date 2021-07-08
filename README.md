@@ -2,8 +2,7 @@
 This repo implements energy optimization for real-time systems based on nonlinear programming, and explores special structure to achieve efficient optimization.
 
 # RoadMap/TODO
-1. warm start on response time during optimization;
-can we bound the incremental response time analysis?
+
 
 2. test with scale
 how to limit the boundary, i.e., the computation time can only increase
@@ -38,3 +37,6 @@ long long int issue
 log barrier function may return inf if responseTime equals deadline
 -- clamp the minimum value that log can take as input; if it is 0, we'll return log(0 + toleranceBarrier/100);
 -- However, the gradient should be very large at this point, to warn the optimizer not to move further
+
+1. warm start on response time during optimization;
+can we bound the incremental response time analysis?

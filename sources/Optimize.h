@@ -180,7 +180,8 @@ public:
                 valueGlobalOpt = currentEnergyConsumption / weightEnergy;
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     vectorGlobalOpt(i, 0) = executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
-                cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
+                if (debugMode)
+                    cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
             }
 
             return err;
@@ -359,7 +360,7 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
 double OptimizeTaskSetOneIte(TaskSet &tasks)
 {
     int N = tasks.size();
-    vectorGlobalOpt.resize(N, 1);
+    // vectorGlobalOpt.resize(N, 1);
 
     // this function also checks schedulability
     VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard(tasks);
@@ -392,10 +393,10 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
 
         // formulate new computationTime
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-            computationTimeVector(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
-        if (debugMode == 1)
+            computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
 
-            cout << "After one iteration, the computation time is " << computationTimeVector << endl;
+        if (debugMode == 1)
+            cout << "After one iteration, the computation time is " << computationTimeVectorLocalOpt << endl;
 
         // check optimization results to see if there are tasks to remove further
         int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(tasksDuringOpt, computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
