@@ -201,10 +201,10 @@ public:
                 double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                 // barrier function part
-                double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                // double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
                 // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
-                err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
-                hpTasks.push_back(taskSetCurr_[i]);
+                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
+                // hpTasks.push_back(taskSetCurr_[i]);
             }
             return err;
         };
@@ -479,9 +479,11 @@ double OptimizeTaskSet(TaskSet &tasks)
             cout << red << "Catch some error" << def << endl;
         }
         cout << "The recorded value: " << valueGlobalOpt << endl;
+        cout << "The recorded vector: " << vectorGlobalOpt << endl;
     }
 
     TaskSet tasks2 = tasks;
+    ClampComputationTime(vectorGlobalOpt);
     UpdateTaskSetExecutionTime(tasks2, vectorGlobalOpt);
     bool a = CheckSchedulability<int>(tasks2);
     if (a)
@@ -503,7 +505,7 @@ double OptimizeTaskSet(TaskSet &tasks)
         double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
         double afterEnergyCost = EstimateEnergyTaskSet(tasks, vectorGlobalOpt).sum();
 
-        cout << "The recorded vector ratio: " << valueGlobalOpt * weightEnergy / initialEnergyCost << endl;
+        // cout << "The recorded vector ratio: " << valueGlobalOpt * weightEnergy / initialEnergyCost << endl;
         return afterEnergyCost / initialEnergyCost;
     }
     return -1;
