@@ -40,9 +40,17 @@ double Barrier(double x)
         // return pow(x, 2);
         return weightLogBarrier * log(x);
     else if (x < 0)
+    {
+        if (TASK_NUMBER == 0)
+        {
+            cout << red << "Please set TASK_NUMBER!" << def << endl;
+            throw;
+        }
         return punishmentInBarrier * pow(10, TASK_NUMBER - 3) * pow(1 - x, 1);
+    }
     else // it basically means x=0
-        return weightLogBarrier * log(x + toleranceBarrier);
+        return weightLogBarrier *
+               log(x + toleranceBarrier);
 }
 
 void UpdateTaskSetExecutionTime(TaskSet &taskSet, VectorDynamic executionTimeVec, int lastTaskDoNotNeedOptimize = -1)
@@ -75,8 +83,6 @@ MatrixDynamic NumericalDerivativeDynamic(boost::function<VectorDynamic(const Vec
         resMinus.resize(mOfJacobian, 1);
         resMinus = h(xDelta);
 
-        // cout << "resMinus" << endl
-        //      << resMinus << endl;
         for (int j = 0; j < mOfJacobian; j++)
         {
             jacobian(j, i) = (resPlus(j, 0) - resMinus(j, 0)) / 2 / deltaOptimizer;
@@ -100,8 +106,6 @@ MatrixDynamic NumericalDerivativeDynamicUpper(boost::function<VectorDynamic(cons
         VectorDynamic resPlus;
         resPlus.resize(mOfJacobian, 1);
         resPlus = h(xDelta);
-        // cout << "resPlus" << endl
-        //      << resPlus << endl;
         for (int j = 0; j < mOfJacobian; j++)
         {
             jacobian(j, i) = (resPlus(j, 0) - currErr(j, 0)) / deltaOptimizer;
@@ -119,7 +123,6 @@ public:
     VectorDynamic responseTimeInitial;
     int N;
     long long int hyperPeriod;
-    ComputationTimeVector responseTimeBase_;
 
     ComputationFactor(Key key, TaskSet &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic responseTimeInitial,
                       SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
@@ -127,9 +130,11 @@ public:
                                                 responseTimeInitial(responseTimeInitial)
     {
         N = tasks_.size();
+        TASK_NUMBER = N;
         // numberOfTasksNeedOptimize = N - lastTaskDoNotNeedOptimize - 1;
         hyperPeriod = HyperPeriod(tasks_);
-        cout << "The hypeprperiod is " << hyperPeriod << endl;
+        if (debugMode == 1)
+            cout << "The hypeprperiod is " << hyperPeriod << endl;
     }
 
     Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
@@ -200,11 +205,6 @@ public:
                 // energy part
                 double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
-                // barrier function part
-                // double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
-                // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
-                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
-                // hpTasks.push_back(taskSetCurr_[i]);
             }
             return err;
         };
@@ -217,18 +217,21 @@ public:
             *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = jacobian;
-            cout << endl;
-            cout << "The current evaluation point is " << endl
-                 << executionTimeVector << endl;
-            cout << "The Jacobian is " << endl
-                 << *H << endl;
-            // cout << "The approximated Jacobian is " << endl
-            //      << jacobian << endl;
-            cout << "The current error is " << endl
-                 << err << endl
-                 << endl
-                 << err.norm() << endl
-                 << endl;
+            if (debugMode == 1)
+            {
+                cout << endl;
+                cout << "The current evaluation point is " << endl
+                     << executionTimeVector << endl;
+                cout << "The Jacobian is " << endl
+                     << *H << endl;
+                // cout << "The approximated Jacobian is " << endl
+                //      << jacobian << endl;
+                cout << "The current error is " << endl
+                     << err << endl
+                     << endl
+                     << err.norm() << endl
+                     << endl;
+            }
 
             TaskSet taskSetCurr_ = tasks_;
             UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
@@ -237,7 +240,8 @@ public:
             {
                 hpTasks.push_back(taskSetCurr_[i]);
             }
-            cout << "The response time and deadline for each task is: " << endl;
+            if (debugMode == 1)
+                cout << "The response time and deadline for each task is: " << endl;
             for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             {
                 // energy part
@@ -245,7 +249,8 @@ public:
                 // err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                 // barrier function part
                 double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
-                cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
+                if (debugMode == 1)
+                    cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
                 // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
                 hpTasks.push_back(taskSetCurr_[i]);
             }
@@ -298,7 +303,7 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
 VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate, VectorDynamic &responseTimeInitial)
 {
     int N = tasks.size();
-    // int numberOfTasksNeedOptimize = N - lastTaskDoNotNeedOptimize - 1;
+    TASK_NUMBER = N;
 
     // build the factor graph
     auto model = noiseModel::Isotropic::Sigma(numberOfTasksNeedOptimize, noiseModelSigma);
@@ -327,7 +332,8 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
     {
         LevenbergMarquardtParams params;
         params.setlambdaInitial(initialLambda);
-        params.setVerbosityLM("SUMMARY");
+        if (debugMode == 1)
+            params.setVerbosityLM("SUMMARY");
         params.setlambdaLowerBound(lowerLambda);
         params.setlambdaUpperBound(upperLambda);
         params.setRelativeErrorTol(relativeErrorTolerance);
@@ -336,9 +342,14 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
     }
 
     VectorDynamic optComp = result.at<VectorDynamic>(key);
-    cout << "After optimization, the computation time vector is " << optComp << endl;
+    if (debugMode == 1)
+    {
+        cout << "After optimization, the computation time vector is " << optComp << endl;
+    }
+
     ClampComputationTime(optComp);
-    cout << "After clamp, the computation time vector is " << optComp << endl;
+    if (debugMode == 1)
+        cout << "After clamp, the computation time vector is " << optComp << endl;
     return optComp;
 }
 
@@ -381,10 +392,10 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
 
         // formulate new computationTime
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-            computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
-        // vectorGlobalOpt = computationTimeVectorLocalOpt;
+            computationTimeVector(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
+        if (debugMode == 1)
 
-        cout << "After one iteration, the computation time is " << computationTimeVectorLocalOpt << endl;
+            cout << "After one iteration, the computation time is " << computationTimeVector << endl;
 
         // check optimization results to see if there are tasks to remove further
         int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(tasksDuringOpt, computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
@@ -412,14 +423,18 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
     bool a = CheckSchedulability<int>(tasks2);
     if (a)
     {
-        cout << "The task set is schedulable after optimization\n";
-        cout << endl;
-        cout << "The original task set is: " << endl;
-        for (int i = 0; i < N; i++)
+        if (debugMode == 1)
         {
-            cout << i << " ";
-            tasks[i].print();
+            cout << "The task set is schedulable after optimization\n";
+            cout << endl;
+            cout << "The original task set is: " << endl;
+            for (int i = 0; i < N; i++)
+            {
+                cout << i << " ";
+                tasks[i].print();
+            }
         }
+
         double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
         double afterEnergyCost = EstimateEnergyTaskSet(tasks, computationTimeVectorLocalOpt).sum();
 
@@ -448,7 +463,8 @@ double OptimizeTaskSet(TaskSet &tasks)
     for (int i = 0; i < weightEnergyMaxOrder; i++)
     {
         weightEnergy = weightEnergyRef * pow(10, i);
-        cout << "Current weightEnergy is " << weightEnergy << endl;
+        if (debugMode == 1)
+            cout << "Current weightEnergy is " << weightEnergy << endl;
         try
         {
             double res = OptimizeTaskSetOneIte(tasks);
@@ -464,7 +480,8 @@ double OptimizeTaskSet(TaskSet &tasks)
         }
 
         weightEnergy = weightEnergyRef * pow(10, -1 * i);
-        cout << "Current weightEnergy is " << weightEnergy << endl;
+        if (debugMode == 1)
+            cout << "Current weightEnergy is " << weightEnergy << endl;
         try
         {
             double res = OptimizeTaskSetOneIte(tasks);

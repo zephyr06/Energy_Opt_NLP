@@ -91,7 +91,7 @@ if __name__ == "__main__":
     numJobSet = args.num_tasksets
     numJobsPerSet = args.num_job
     deadline_portion = args.deadline_portion
-    utilization_total = np.float(args.utilization_total)
+    utilization_total = float(args.utilization_total)
     desperate_mode = int(args.desperate_mode)
     desperate_portion = args.desperate_portion
     overhead_max = int(args.overhead_max)

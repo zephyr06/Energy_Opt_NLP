@@ -13,6 +13,6 @@
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
 
-typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
-typedef Eigen::Matrix<double, TASK_NUMBER, TASK_NUMBER> JacobianOpt;
-typedef Eigen::Matrix<double, TASK_NUMBER, 1> ErrElement;
+// typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
+// typedef Eigen::Matrix<double, TASK_NUMBER, TASK_NUMBER> JacobianOpt;
+// typedef Eigen::Matrix<double, TASK_NUMBER, 1> ErrElement;

@@ -23,7 +23,7 @@ const double EstimateEnergyTask(const Task &task, double frequency)
     scalar, energy consumption of the task if it runs at the given frequency
 */
 {
-    if (frequency * (task.executionTime - 1e-3) <= task.executionTime + 1e-6 && frequency > 0)
+    if (frequency <= task.executionTime / (task.executionTime - 1e-3))
         return task.executionTime * pow(frequency, 2) * weightEnergy;
     else
         return task.executionTime * pow(frequency, 2) * weightEnergy * punishmentFrequency;
