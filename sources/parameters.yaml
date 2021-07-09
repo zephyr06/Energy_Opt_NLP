@@ -1,6 +1,6 @@
 %YAML:1.0
 
-testDataSetName: test_n3_v11
+testDataSetName: test_n20_v2
 
 deltaOptimizer: 1e-2
 weightEnergyMinOrder: -10
@@ -12,6 +12,7 @@ punishmentInBarrier: 1e6
 noiseModelSigma: 1e-3
 relativeErrorTolerance: 1e-2
 toleranceBarrier: 1e-6
+eliminateTol: 1e0
 
 
 punishmentFrequency: 10
@@ -26,8 +27,8 @@ upperLambda: 1e30
 
 
 granularityInBF:1
-readTaskMode: RM
-toleranceInOuterLoop: 2.0
+readTaskMode: orig
+toleranceInOuterLoop: 1.0
 
 debugMode: 1
 

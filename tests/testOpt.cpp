@@ -114,14 +114,14 @@ TEST(OptimizeTaskSet, a1)
     if (not assert_equal<double>(0.71, res, 0.01))
         throw;
 }
-*/
+
 TEST(OptimizeTaskSet, OptimizeTaskSetOneIte)
 {
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
     TaskSet taskSet1 = ReadTaskSet(path, "utilization");
     auto start = chrono::high_resolution_clock::now();
@@ -133,14 +133,14 @@ TEST(OptimizeTaskSet, OptimizeTaskSetOneIte)
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
 }
-
+*/
 TEST(OptimizeTaskSet, a2)
 {
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
     TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
     auto start = chrono::high_resolution_clock::now();

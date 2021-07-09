@@ -7,6 +7,10 @@ This repo implements energy optimization for real-time systems based on nonlinea
 2. test with scale
 how to limit the boundary, i.e., the computation time can only increase
 
+2. n20-v2
+float-point has a big influence for large task sets
+LM doesn't work while Dogleg does
+optimization stops even though it is not near the boundary
 2. weight issue
 
 

@@ -256,13 +256,6 @@ public:
                 hpTasks.push_back(taskSetCurr_[i]);
             }
         }
-        // cout << "The current evaluation point is " << endl
-        //      << executionTimeVector << endl
-        //      << endl;
-        // cout << "The current error is " << endl
-        //      << err << endl
-        //      << err.norm() << endl
-        //      << endl;
         return err;
     }
 };
@@ -288,15 +281,15 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
     UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
 
     int N = tasks.size();
-    vector<Task> hpTasks = tasks;
+    vector<Task> hpTasks = tasksCurr;
     for (int i = N - 1; i >= 0; i--)
     {
         hpTasks.pop_back();
-        tasksCurr[i].executionTime += deltaOptimizer;
+        tasksCurr[i].executionTime += eliminateTol;
         double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
         if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline)
             return i;
-        tasksCurr[i].executionTime -= deltaOptimizer;
+        tasksCurr[i].executionTime -= eliminateTol;
     }
     return -1;
 }
@@ -348,7 +341,6 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
         cout << "After optimization, the computation time vector is " << optComp << endl;
     }
 
-    ClampComputationTime(optComp);
     if (debugMode == 1)
         cout << "After clamp, the computation time vector is " << optComp << endl;
     return optComp;
@@ -395,11 +387,16 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
 
+        // find variables to eliminate
+        int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(tasksDuringOpt,
+                                                                          computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
+        ClampComputationTime(computationTimeVectorLocalOpt);
+
         if (debugMode == 1)
             cout << "After one iteration, the computation time is " << computationTimeVectorLocalOpt << endl;
 
         // check optimization results to see if there are tasks to remove further
-        int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(tasksDuringOpt, computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
+
         if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize || lastTaskDoNotNeedOptimizeAfterOpt == N - 1)
             stop = true;
         else
