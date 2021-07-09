@@ -9,10 +9,13 @@ how to limit the boundary, i.e., the computation time can only increase
 
 2. n20-v2
 float-point has a big influence for large task sets
-LM doesn't work while Dogleg does
-optimization stops even though it is not near the boundary
-2. weight issue
-
+eliminate during optimization
+2. weight issue, summarize why do we need to control weight
+- be large, otherwise variables may go backwards when they are near the boundary
+- not be too large, otherwise the schedulability constraints lose effects, can be circumvented by increasing punishment coefficient correspondingly
+- be small, because we want the barrier gradient to guide the optimization process towards the global optimal more??
+3. n20-v3
+weight cannot be too large
 
 2. incremental optimization
 

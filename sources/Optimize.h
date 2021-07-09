@@ -341,8 +341,8 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
         cout << "After optimization, the computation time vector is " << optComp << endl;
     }
 
-    if (debugMode == 1)
-        cout << "After clamp, the computation time vector is " << optComp << endl;
+    // if (debugMode == 1)
+    //     cout << "After clamp, the computation time vector is " << optComp << endl;
     return optComp;
 }
 

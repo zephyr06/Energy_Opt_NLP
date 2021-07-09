@@ -13,7 +13,8 @@ using namespace std;
 // int TASK_NUMBER_DYNAMIC = 10;
 int TASK_NUMBER = 0;
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
-const double punishmentInBarrier = (double)ConfigParameters["punishmentInBarrier"];
+double weightEnergy = (double)ConfigParameters["weightEnergy"];
+double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
 
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
@@ -21,7 +22,6 @@ const double upperLambda = (double)ConfigParameters["upperLambda"];
 
 const double noiseModelSigma = (double)ConfigParameters["noiseModelSigma"];
 const double deltaInitialDogleg = (double)ConfigParameters["deltaInitialDogleg"];
-double weightEnergy = (double)ConfigParameters["weightEnergy"];
 
 const int weightEnergyMinOrder = (int)ConfigParameters["weightEnergyMinOrder"];
 const int weightEnergyMaxOrder = (int)ConfigParameters["weightEnergyMaxOrder"];
