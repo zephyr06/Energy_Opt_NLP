@@ -145,7 +145,7 @@ TEST(OptimizeTaskSet, a2)
     TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
     auto start = chrono::high_resolution_clock::now();
     double res = OptimizeTaskSet(taskSet1);
-    cout << "The energy saving ratio is " << res << endl;
+    cout << blue << "The energy saving ratio is " << res << def << endl;
     auto stop = chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;

@@ -11,7 +11,7 @@ time_file="time_$title.txt"
 dataset="../TaskData/$title"
 
 
-for jobNumber in {3..$MaxTaskNumber}
+for jobNumber in {3..20}
 do
 	echo "$title iteration is: $jobNumber"
 	# generate task set

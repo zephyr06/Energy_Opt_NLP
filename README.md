@@ -6,6 +6,8 @@ This repo implements energy optimization for real-time systems based on nonlinea
 
 2. test with scale
 how to limit the boundary, i.e., the computation time can only increase
+LM will probably have a much worse performance than DL?
+scale issue, why does it perform worse with larger task sets?
 
 2. n20-v2
 float-point has a big influence for large task sets

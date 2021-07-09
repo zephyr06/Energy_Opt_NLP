@@ -493,8 +493,11 @@ double OptimizeTaskSet(TaskSet &tasks)
         {
             cout << red << "Catch some error" << def << endl;
         }
-        cout << "The recorded value: " << valueGlobalOpt << endl;
-        cout << "The recorded vector: " << vectorGlobalOpt << endl;
+        if (debugMode == 1)
+        {
+            cout << "The recorded value: " << valueGlobalOpt << endl;
+            cout << "The recorded vector: " << vectorGlobalOpt << endl;
+        }
     }
 
     TaskSet tasks2 = tasks;
@@ -503,16 +506,19 @@ double OptimizeTaskSet(TaskSet &tasks)
     bool a = CheckSchedulability<int>(tasks2);
     if (a)
     {
-        cout << "The task set is schedulable after optimization\n";
-        cout << endl;
-        cout << "The original task set is: " << endl;
         int N = tasks.size();
-        for (int i = 0; i < N; i++)
+        if (debugMode == 1)
         {
-            cout << i << " ";
-            tasks[i].print();
-        }
+            cout << "The task set is schedulable after optimization\n";
+            cout << endl;
+            cout << "The original task set is: " << endl;
 
+            for (int i = 0; i < N; i++)
+            {
+                cout << i << " ";
+                tasks[i].print();
+            }
+        }
         VectorDynamic initialExecutionTime;
         initialExecutionTime.resize(N, 1);
         for (int i = 0; i < N; i++)

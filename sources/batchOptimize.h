@@ -43,7 +43,8 @@ void BatchOptimize()
     vector<string> errorFiles;
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
-        cout << file << endl;
+        if (debugMode)
+            cout << file << endl;
         string delimiter = "-";
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
@@ -79,8 +80,11 @@ void BatchOptimize()
     ofstream outfile1, outfile2;
     outfile1.open("/home/lab/Programming/Energy_Opt_NLP/Visualization/data_buffer_energy_task_number.txt", std::ios_base::app);
     outfile1 << avEnergy << endl;
-    cout << "Average energy saving ratio is " << avEnergy << endl;
-    cout << "Average time consumed is " << aveTime << endl;
+    if (debugMode)
+    {
+        cout << "Average energy saving ratio is " << avEnergy << endl;
+        cout << "Average time consumed is " << aveTime << endl;
+    }
 
     outfile2.open("/home/lab/Programming/Energy_Opt_NLP/Visualization/time_task_number.txt", std::ios_base::app);
     outfile2 << aveTime << endl;
@@ -88,7 +92,8 @@ void BatchOptimize()
     cout << endl;
     for (auto &file : errorFiles)
         cout << file << endl;
-    cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
+    if (debugMode)
+        cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
 
     return;
 }
