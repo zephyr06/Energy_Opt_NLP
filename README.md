@@ -28,7 +28,10 @@ weight cannot be too large
 0. add weight to barrier function, and see whether it can guide better
 
 
-
+# Research topic
+1. how to round float point to int
+- it should be applied every time after elimination
+2. can we decide priority assignment from energy otpimization part? i.e., we decide priority assignment that make the task set both schedulable, and more energy efficient by fully using the processor resource
 
 # Solved
 order of variables in GTSAM, should the Jacobian be a upper or a lower triangular matrix?
