@@ -19,10 +19,7 @@ eliminate during optimization
 3. n20-v3
 weight cannot be too large
 
-4. n3-v20
-should we clamp before eliminate, or eliminate before clamp?
-- if we eliminate first, and then clamp, the variables may become "do not need clamp" because they actually decrease
- if we clamp first, and then eliminate?
+
 
 2. incremental optimization
 
@@ -63,3 +60,8 @@ can we bound the incremental response time analysis?
 1. how to optimize when it's close to the scheduling boundary
 - probably a two-phase method; whenever some tasks reach their boundary, we freeze all the hp variables and remove them from the variable set; however, what kind of optimality can we guarantee in that case? how do we know whether the freezed variables already reach their optimal solution? In essence, the previous optimization iterations update variables following a consistent proportion, while the direction is given by GN method;
 - -how to decide when to eliminate these variables? 
+
+4. n3-v20
+should we clamp before eliminate, or eliminate before clamp?
+- if we eliminate first, and then clamp, the variables may become "do not need clamp" because they actually decrease
+ if we clamp first, and then eliminate, nothing happens
