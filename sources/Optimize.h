@@ -387,10 +387,11 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
 
+        ClampComputationTime(computationTimeVectorLocalOpt);
+
         // find variables to eliminate
         int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(tasksDuringOpt,
                                                                           computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
-        ClampComputationTime(computationTimeVectorLocalOpt);
 
         if (debugMode == 1)
             cout << "After one iteration, the computation time is " << computationTimeVectorLocalOpt << endl;
@@ -411,7 +412,8 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         numberOfIteration++;
         if (numberOfIteration > N)
         {
-            cout << "Iteration number error!\n";
+            cout << red << "Iteration number error!\n"
+                 << def << endl;
             throw;
         }
     }

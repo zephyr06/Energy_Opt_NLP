@@ -19,6 +19,11 @@ eliminate during optimization
 3. n20-v3
 weight cannot be too large
 
+4. n3-v20
+should we clamp before eliminate, or eliminate before clamp?
+- if we eliminate first, and then clamp, the variables may become "do not need clamp" because they actually decrease
+ if we clamp first, and then eliminate?
+
 2. incremental optimization
 
 3. DAG optimization

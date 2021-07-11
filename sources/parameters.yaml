@@ -1,11 +1,11 @@
 %YAML:1.0
 
-testDataSetName: test_n20_v2
+testDataSetName: test_n3_v20
 
 deltaOptimizer: 1e-2
 weightEnergyMinOrder: -10
 weightEnergyMaxOrder: 1
-weightEnergy: 1e-3
+weightEnergy: 1e6
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
 
@@ -15,7 +15,7 @@ punishmentInBarrier: 1e9
 noiseModelSigma: 1e-3
 relativeErrorTolerance: 1e-2
 toleranceBarrier: 1e-6
-eliminateTol: 1e0
+eliminateTol: 1e1
 
 
 punishmentFrequency: 10

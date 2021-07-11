@@ -98,8 +98,8 @@ if __name__ == "__main__":
 
     outputDirectory = args.directory
     jobSetName = args.jobset_name
-    period_min = args.period_min
-    period_max = args.period_max
+    period_min = int(args.period_min)
+    period_max = int(args.period_max)
     utilization_min_per_job = args.utilization_min_per_job
 
     overhead_min = 0
@@ -151,7 +151,7 @@ if __name__ == "__main__":
                     desperate_mode_ref = desperate_mode_ref - 1
                 else:
                     deadline = random.randint(execution_time + 1, int((period_curr + 1) * deadline_portion + 1))
-
+                deadline = min(deadline, period_curr)
                 # Write Job Info
                 f.write(
                     str(jobNumber) + ',' + str(offset) + ',' + str(period_curr) + ',' + str(overhead_job) + ',' + str(
