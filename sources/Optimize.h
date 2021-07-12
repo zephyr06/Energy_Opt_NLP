@@ -122,7 +122,6 @@ public:
     // int numberOfTasksNeedOptimize;
     VectorDynamic responseTimeInitial;
     int N;
-    long long int hyperPeriod;
 
     ComputationFactor(Key key, TaskSet &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic responseTimeInitial,
                       SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
@@ -132,9 +131,6 @@ public:
         N = tasks_.size();
         TASK_NUMBER = N;
         // numberOfTasksNeedOptimize = N - lastTaskDoNotNeedOptimize - 1;
-        hyperPeriod = HyperPeriod(tasks_);
-        if (debugMode == 1)
-            cout << "The hypeprperiod is " << hyperPeriod << endl;
     }
 
     Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
@@ -161,7 +157,7 @@ public:
             {
                 // energy part
                 double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
-                err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
+                err(i - (lastTaskDoNotNeedOptimize + 1), 0) = 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                 currentEnergyConsumption += err(i - (lastTaskDoNotNeedOptimize + 1), 0);
                 // barrier function part
                 double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
@@ -205,7 +201,7 @@ public:
             {
                 // energy part
                 double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
-                err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
+                err(i - (lastTaskDoNotNeedOptimize + 1), 0) = 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
             }
             return err;
         };
@@ -274,7 +270,7 @@ void ClampComputationTime(VectorDynamic &comp)
  * N-1 means all tasks do not need optimization
  **/
 int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTimeVector, int endSearchAt,
-                              VectorDynamic computationTimeWarmStart, double tolerance = toleranceInOuterLoop)
+                              VectorDynamic computationTimeWarmStart, double tolerance = eliminateVariableThreshold)
 {
     // update the tasks with the new optimal computationTimeVector
     TaskSet tasksCurr = tasks;
@@ -490,12 +486,11 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
 double OptimizeTaskSet(TaskSet &tasks)
 {
 
-    long long int hyperPeriod = HyperPeriod(tasks);
     vectorGlobalOpt.resize(tasks.size(), 1);
     vectorGlobalOpt.setZero();
 
     // adjust some parameters based on scale
-    weightEnergy = weightEnergy / log10(hyperPeriod);
+    weightEnergy = weightEnergy;
     double res = OptimizeTaskSetOneIte(tasks);
     return res;
     // TaskSet tasks2 = tasks;

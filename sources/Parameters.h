@@ -35,6 +35,6 @@ const string testDataSetName = (string)ConfigParameters["testDataSetName"];
 
 const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
-const double toleranceInOuterLoop = (double)ConfigParameters["toleranceInOuterLoop"];
+const double eliminateVariableThreshold = (double)ConfigParameters["eliminateVariableThreshold"];
 const int debugMode = (int)ConfigParameters["debugMode"];
 double eliminateTol = (double)ConfigParameters["eliminateTol"];

@@ -64,14 +64,13 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic 
     int N = taskSet.size();
     int n = executionTimeVector.rows();
 
-    long long int hp = HyperPeriod(taskSet);
     MatrixDynamic res;
     res.resize(n, 1);
 
     for (int i = 0; i < N; i++)
     {
         double frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
-        res(i, 0) = hp / taskSet[i].period *
+        res(i, 0) = 1.0 / taskSet[i].period *
                     EstimateEnergyTask(taskSet[i], frequencyRunTime);
     }
     return res;
