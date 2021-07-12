@@ -11,7 +11,7 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 TEST(ReadTaskSet, p1)
 {
 
-    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v1.csv";
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v1.csv";
 
     TaskSet taskset1 = ReadTaskSet(path, "RM");
 

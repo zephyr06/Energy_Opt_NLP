@@ -180,7 +180,7 @@ public:
                 valueGlobalOpt = currentEnergyConsumption / weightEnergy;
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     vectorGlobalOpt(i, 0) = executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
-                if (debugMode)
+                if (debugMode == 1)
                     cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
             }
 
@@ -479,27 +479,27 @@ double OptimizeTaskSet(TaskSet &tasks)
             cout << red << "Catch some error" << def << endl;
         }
 
-        weightEnergy = weightEnergyRef * pow(10, -1 * i);
-        if (debugMode == 1)
-            cout << "Current weightEnergy is " << weightEnergy << endl;
-        try
-        {
-            double res = OptimizeTaskSetOneIte(tasks);
-            if (res != -1)
-            {
-                weightEnergy = weightEnergyRef;
-                return res;
-            }
-        }
-        catch (...)
-        {
-            cout << red << "Catch some error" << def << endl;
-        }
-        if (debugMode == 1)
-        {
-            cout << "The recorded value: " << valueGlobalOpt << endl;
-            cout << "The recorded vector: " << vectorGlobalOpt << endl;
-        }
+        // weightEnergy = weightEnergyRef * pow(10, -1 * i);
+        // if (debugMode == 1)
+        //     cout << "Current weightEnergy is " << weightEnergy << endl;
+        // try
+        // {
+        //     double res = OptimizeTaskSetOneIte(tasks);
+        //     if (res != -1)
+        //     {
+        //         weightEnergy = weightEnergyRef;
+        //         return res;
+        //     }
+        // }
+        // catch (...)
+        // {
+        //     cout << red << "Catch some error" << def << endl;
+        // }
+        // if (debugMode == 1)
+        // {
+        //     cout << "The recorded value: " << valueGlobalOpt << endl;
+        //     cout << "The recorded vector: " << vectorGlobalOpt << endl;
+        // }
     }
 
     TaskSet tasks2 = tasks;

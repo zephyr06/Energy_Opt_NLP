@@ -6,7 +6,7 @@
 
 #include <opencv2/core/core.hpp>
 
-cv::FileStorage ConfigParameters("/home/lab/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
+cv::FileStorage ConfigParameters("/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
 
 using namespace std;
 // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
@@ -37,4 +37,4 @@ const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
 const double toleranceInOuterLoop = (double)ConfigParameters["toleranceInOuterLoop"];
 const int debugMode = (int)ConfigParameters["debugMode"];
-const double eliminateTol = (double)ConfigParameters["eliminateTol"];
+double eliminateTol = (double)ConfigParameters["eliminateTol"];
