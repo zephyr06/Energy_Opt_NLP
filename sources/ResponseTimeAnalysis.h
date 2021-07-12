@@ -92,11 +92,11 @@ VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
     for (int i = 0; i < N; i++)
     {
         res(i, 0) = ResponseTimeAnalysis<double>(tasks[i], hpTasks);
-        if (debugMode)
+        if (debugMode == 1)
             cout << res(i, 0) << endl;
         if (res(i, 0) > tasks[i].deadline)
         {
-            if (debugMode)
+            if (debugMode == 1)
                 cout << "The given task set is not schedulable!\n";
             res(0, 0) = -1;
             return res;

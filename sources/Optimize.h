@@ -373,6 +373,7 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
 
     int numberOfIteration = 0;
     TaskSet tasksDuringOpt = tasks;
+    const double weightEnergyRef = weightEnergy;
     while (not stop)
     {
         VectorDynamic initialEstimate;
@@ -381,11 +382,48 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
             initialEstimate(i - lastTaskDoNotNeedOptimize - 1, 0) = computationTimeVectorLocalOpt(i, 0);
 
         // perform optimization
-        optComp = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
 
-        // formulate new computationTime
-        for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-            computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
+        for (int i = 0; i < weightEnergyMaxOrder; i++)
+        {
+            weightEnergy = weightEnergyRef * pow(10, -1 * i);
+            if (debugMode == 1)
+                cout << "Current weightEnergy is " << weightEnergy << endl;
+            try
+            {
+                optComp = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+                // formulate new computationTime
+                for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+                    computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
+
+                weightEnergy = weightEnergyRef;
+            }
+            catch (...)
+            {
+                cout << red << "Catch some error, most probably indetermined Jacobian error" << def << endl;
+                computationTimeVectorLocalOpt = vectorGlobalOpt;
+            }
+            // weightEnergy = weightEnergyRef * pow(10, -1 * i);
+            // if (debugMode == 1)
+            //     cout << "Current weightEnergy is " << weightEnergy << endl;
+            // try
+            // {
+            //     double res = OptimizeTaskSetOneIte(tasks);
+            //     if (res != -1)
+            //     {
+            //         weightEnergy = weightEnergyRef;
+            //         return res;
+            //     }
+            // }
+            // catch (...)
+            // {
+            //     cout << red << "Catch some error" << def << endl;
+            // }
+            // if (debugMode == 1)
+            // {
+            //     cout << "The recorded value: " << valueGlobalOpt << endl;
+            //     cout << "The recorded vector: " << vectorGlobalOpt << endl;
+            // }
+        }
 
         ClampComputationTime(computationTimeVectorLocalOpt);
 
@@ -451,7 +489,6 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
 
 double OptimizeTaskSet(TaskSet &tasks)
 {
-    const double weightEnergyRef = weightEnergy;
 
     long long int hyperPeriod = HyperPeriod(tasks);
     vectorGlobalOpt.resize(tasks.size(), 1);
@@ -459,77 +496,36 @@ double OptimizeTaskSet(TaskSet &tasks)
 
     // adjust some parameters based on scale
     weightEnergy = weightEnergy / log10(hyperPeriod);
+    double res = OptimizeTaskSetOneIte(tasks);
+    return res;
+    // TaskSet tasks2 = tasks;
+    // ClampComputationTime(vectorGlobalOpt);
+    // UpdateTaskSetExecutionTime(tasks2, vectorGlobalOpt);
+    // bool a = CheckSchedulability<int>(tasks2);
+    // if (a)
+    // {
+    //     int N = tasks.size();
+    //     if (debugMode == 1)
+    //     {
+    //         cout << "The task set is schedulable after optimization\n";
+    //         cout << endl;
+    //         cout << "The original task set is: " << endl;
 
-    for (int i = 0; i < weightEnergyMaxOrder; i++)
-    {
-        weightEnergy = weightEnergyRef * pow(10, i);
-        if (debugMode == 1)
-            cout << "Current weightEnergy is " << weightEnergy << endl;
-        try
-        {
-            double res = OptimizeTaskSetOneIte(tasks);
-            if (res != -1)
-            {
-                weightEnergy = weightEnergyRef;
-                return res;
-            }
-        }
-        catch (...)
-        {
-            cout << red << "Catch some error" << def << endl;
-        }
+    //         for (int i = 0; i < N; i++)
+    //         {
+    //             cout << i << " ";
+    //             tasks[i].print();
+    //         }
+    //     }
+    //     VectorDynamic initialExecutionTime;
+    //     initialExecutionTime.resize(N, 1);
+    //     for (int i = 0; i < N; i++)
+    //         initialExecutionTime(i, 0) = tasks[i].executionTime;
+    //     double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
+    //     double afterEnergyCost = EstimateEnergyTaskSet(tasks, vectorGlobalOpt).sum();
 
-        // weightEnergy = weightEnergyRef * pow(10, -1 * i);
-        // if (debugMode == 1)
-        //     cout << "Current weightEnergy is " << weightEnergy << endl;
-        // try
-        // {
-        //     double res = OptimizeTaskSetOneIte(tasks);
-        //     if (res != -1)
-        //     {
-        //         weightEnergy = weightEnergyRef;
-        //         return res;
-        //     }
-        // }
-        // catch (...)
-        // {
-        //     cout << red << "Catch some error" << def << endl;
-        // }
-        // if (debugMode == 1)
-        // {
-        //     cout << "The recorded value: " << valueGlobalOpt << endl;
-        //     cout << "The recorded vector: " << vectorGlobalOpt << endl;
-        // }
-    }
+    //     // cout << "The recorded vector ratio: " << valueGlobalOpt * weightEnergy / initialEnergyCost << endl;
+    //     return afterEnergyCost / initialEnergyCost;
 
-    TaskSet tasks2 = tasks;
-    ClampComputationTime(vectorGlobalOpt);
-    UpdateTaskSetExecutionTime(tasks2, vectorGlobalOpt);
-    bool a = CheckSchedulability<int>(tasks2);
-    if (a)
-    {
-        int N = tasks.size();
-        if (debugMode == 1)
-        {
-            cout << "The task set is schedulable after optimization\n";
-            cout << endl;
-            cout << "The original task set is: " << endl;
-
-            for (int i = 0; i < N; i++)
-            {
-                cout << i << " ";
-                tasks[i].print();
-            }
-        }
-        VectorDynamic initialExecutionTime;
-        initialExecutionTime.resize(N, 1);
-        for (int i = 0; i < N; i++)
-            initialExecutionTime(i, 0) = tasks[i].executionTime;
-        double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
-        double afterEnergyCost = EstimateEnergyTaskSet(tasks, vectorGlobalOpt).sum();
-
-        // cout << "The recorded vector ratio: " << valueGlobalOpt * weightEnergy / initialEnergyCost << endl;
-        return afterEnergyCost / initialEnergyCost;
-    }
-    return -1;
+    // return -1;
 }

@@ -135,7 +135,7 @@ long long gcd(long long int a, long long int b)
 }
 
 // Function to return LCM of two numbers
-long int lcm(long int a, long int b)
+long long int lcm(long long int a, long long int b)
 {
     return (a / gcd(a, b)) * b;
 }
@@ -150,9 +150,16 @@ long long int HyperPeriod(const TaskSet &tasks)
     }
     else
     {
-        long int hyper = tasks[0].period;
+        long long int hyper = tasks[0].period;
         for (int i = 1; i < N; i++)
+        {
             hyper = lcm(hyper, tasks[i].period);
+            if (hyper < 0 || hyper > LLONG_MAX)
+            {
+                cout << red << "The hyper-period over flows!" << def << endl;
+                throw;
+            }
+        }
         return hyper;
     }
 }
@@ -213,7 +220,7 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
 
         TaskSet ttt(taskSet);
         ttt = Reorder(ttt, priorityType);
-        if (debugMode)
+        if (debugMode == 1)
             cout << "Finish reading the data file succesfully!\n";
         return ttt;
     }

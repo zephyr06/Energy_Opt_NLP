@@ -3,7 +3,7 @@
 
 TEST(energy, tasks)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv";
     auto taskSet = ReadTaskSet(path, "RM");
 
     VectorDynamic comp;
