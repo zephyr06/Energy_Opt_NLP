@@ -12,10 +12,11 @@ using namespace std;
 // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
 // int TASK_NUMBER_DYNAMIC = 10;
 int TASK_NUMBER = 0;
-const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 double weightEnergy = (double)ConfigParameters["weightEnergy"];
 double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
 
+const double eliminateTol = (double)ConfigParameters["eliminateTol"];
+const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
 const double upperLambda = (double)ConfigParameters["upperLambda"];
@@ -37,4 +38,3 @@ const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
 const double eliminateVariableThreshold = (double)ConfigParameters["eliminateVariableThreshold"];
 const int debugMode = (int)ConfigParameters["debugMode"];
-double eliminateTol = (double)ConfigParameters["eliminateTol"];

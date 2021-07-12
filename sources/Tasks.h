@@ -76,6 +76,13 @@ public:
     }
 };
 
+void Print(TaskSet &tasks)
+{
+    cout << "The task set is printed as follows" << endl;
+    for (auto &task : tasks)
+        task.print();
+}
+
 template <typename T>
 vector<T> GetParameter(const TaskSet &taskset, string parameterType)
 {

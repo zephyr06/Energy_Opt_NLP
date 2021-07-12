@@ -139,6 +139,7 @@ public:
         boost::function<Matrix(const VectorDynamic &)> f =
             [this](const VectorDynamic &executionTimeVector)
         {
+            cout << "executionTimeVector in f() is " << executionTimeVector << endl;
             bool flagSchedulable = true;
             double currentEnergyConsumption = 0;
 
@@ -370,6 +371,11 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
     int numberOfIteration = 0;
     TaskSet tasksDuringOpt = tasks;
     const double weightEnergyRef = weightEnergy;
+
+    //for debug
+    if (tasks[0].period == 120 && tasks[1].period == 170 && tasks[0].deadline == 48)
+        int a = 1;
+
     while (not stop)
     {
         VectorDynamic initialEstimate;
@@ -428,7 +434,10 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
                                                                           computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
 
         if (debugMode == 1)
-            cout << "After one iteration, the computation time is " << computationTimeVectorLocalOpt << endl;
+        {
+            cout << "After one iteration, the computationTimeVectorLocalOpt is " << computationTimeVectorLocalOpt << endl;
+            cout << "After one iteration, the vectorGlobalOpt is " << vectorGlobalOpt << endl;
+        }
 
         // check optimization results to see if there are tasks to remove further
 
@@ -448,6 +457,8 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         {
             cout << red << "Iteration number error!\n"
                  << def << endl;
+            if (debugMode == 1)
+                Print(tasks);
             throw;
         }
     }
@@ -488,6 +499,7 @@ double OptimizeTaskSet(TaskSet &tasks)
 
     vectorGlobalOpt.resize(tasks.size(), 1);
     vectorGlobalOpt.setZero();
+    valueGlobalOpt = INT64_MAX;
 
     // adjust some parameters based on scale
     weightEnergy = weightEnergy;
