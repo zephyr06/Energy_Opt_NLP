@@ -211,7 +211,7 @@ public:
 
         if (H)
         {
-            *H = NumericalDerivativeDynamicUpper(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
+            *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = jacobian;
             if (debugMode == 1)
@@ -504,34 +504,4 @@ double OptimizeTaskSet(TaskSet &tasks)
     weightEnergy = weightEnergy;
     double res = OptimizeTaskSetOneIte(tasks);
     return res;
-    // TaskSet tasks2 = tasks;
-    // ClampComputationTime(vectorGlobalOpt);
-    // UpdateTaskSetExecutionTime(tasks2, vectorGlobalOpt);
-    // bool a = CheckSchedulability<int>(tasks2);
-    // if (a)
-    // {
-    //     int N = tasks.size();
-    //     if (debugMode == 1)
-    //     {
-    //         cout << "The task set is schedulable after optimization\n";
-    //         cout << endl;
-    //         cout << "The original task set is: " << endl;
-
-    //         for (int i = 0; i < N; i++)
-    //         {
-    //             cout << i << " ";
-    //             tasks[i].print();
-    //         }
-    //     }
-    //     VectorDynamic initialExecutionTime;
-    //     initialExecutionTime.resize(N, 1);
-    //     for (int i = 0; i < N; i++)
-    //         initialExecutionTime(i, 0) = tasks[i].executionTime;
-    //     double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
-    //     double afterEnergyCost = EstimateEnergyTaskSet(tasks, vectorGlobalOpt).sum();
-
-    //     // cout << "The recorded vector ratio: " << valueGlobalOpt * weightEnergy / initialEnergyCost << endl;
-    //     return afterEnergyCost / initialEnergyCost;
-
-    // return -1;
 }

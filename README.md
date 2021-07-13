@@ -3,32 +3,21 @@ This repo implements energy optimization for real-time systems based on nonlinea
 
 # RoadMap/TODO
 
-
 2. test with scale
 how to limit the boundary, i.e., the computation time can only increase
 LM will probably have a much worse performance than DL?
-scale issue, why does it perform worse with larger task sets?
 
 2. n20-v2
-float-point has a big influence for large task sets
 eliminate during optimization
-2. weight issue, summarize why do we need to control weight
-- be large, otherwise variables may go backwards when they are near the boundary
-- not be too large, otherwise the schedulability constraints lose effects, can be circumvented by increasing punishment coefficient correspondingly
-- be small, because we want the barrier gradient to guide the optimization process towards the global optimal more??
-3. n20-v3
-weight cannot be too large
-
-
-
 
 2. incremental optimization
+- only single-side can be achieved
 
 3. DAG optimization
 4. what kind of optimality can we guarantee
 
 0. What are the unique features of global result, how can we guide the optimization algorithm to find it by changing some settings
-0. add weight to barrier function, and see whether it can guide better
+
 
 
 # Research topic
@@ -66,3 +55,14 @@ can we bound the incremental response time analysis?
 should we clamp before eliminate, or eliminate before clamp?
 - if we eliminate first, and then clamp, the variables may become "do not need clamp" because they actually decrease
  if we clamp first, and then eliminate, nothing happens
+
+ 2. weight issue, summarize why do we need to control weight
+- be large, otherwise variables may go backwards when they are near the boundary
+- not be too large, otherwise the schedulability constraints lose effects, can be circumvented by increasing punishment coefficient correspondingly
+- be small, because we want the barrier gradient to guide the optimization process towards the global optimal more??
+-> adopt traditional interior-point method
+
+3. n20-v3
+weight cannot be too large
+
+scale issue, why does it perform worse with larger task sets?
