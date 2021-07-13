@@ -6,7 +6,7 @@ if __name__ == "__main__":
                         help='task number')
     args = parser.parse_args()
     task_number = args.task_number
-    path = "/home/lab/Programming/Energy_Opt_NLP/sources/Parameters.h"
+    path = "/home/zephyr/Programming/Energy_Opt_NLP/sources/Parameters.h"
     file = open(path,'r')
     lines = file.readlines()
     line_task_number=lines[12]
