@@ -139,7 +139,6 @@ public:
         boost::function<Matrix(const VectorDynamic &)> f =
             [this](const VectorDynamic &executionTimeVector)
         {
-            cout << "executionTimeVector in f() is " << executionTimeVector << endl;
             bool flagSchedulable = true;
             double currentEnergyConsumption = 0;
 
@@ -177,8 +176,8 @@ public:
                 valueGlobalOpt = currentEnergyConsumption / weightEnergy;
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     vectorGlobalOpt(i, 0) = executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
-                if (debugMode == 1)
-                    cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
+                // if (debugMode == 1)
+                //     cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
             }
 
             return err;
@@ -212,7 +211,7 @@ public:
 
         if (H)
         {
-            *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
+            *H = NumericalDerivativeDynamicUpper(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = jacobian;
             if (debugMode == 1)
@@ -372,9 +371,9 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
     TaskSet tasksDuringOpt = tasks;
     const double weightEnergyRef = weightEnergy;
 
-    //for debug
-    if (tasks[0].period == 120 && tasks[1].period == 170 && tasks[0].deadline == 48)
-        int a = 1;
+    // //for debug
+    // if (tasks[0].period == 120 && tasks[1].period == 170 && tasks[0].deadline == 48)
+    //     int a = 1;
 
     while (not stop)
     {
@@ -401,7 +400,7 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
             }
             catch (...)
             {
-                cout << red << "Catch some error, most probably indetermined Jacobian error" << def << endl;
+                cout << green << "Catch some error, most probably indetermined Jacobian error" << def << endl;
                 computationTimeVectorLocalOpt = vectorGlobalOpt;
             }
             // weightEnergy = weightEnergyRef * pow(10, -1 * i);
