@@ -345,19 +345,36 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
 /**
  * Perform optimization for one task set
  **/
-double OptimizeTaskSetOneIte(TaskSet &tasks)
+pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic &initial)
 {
     int N = tasks.size();
     // vectorGlobalOpt.resize(N, 1);
 
+    VectorDynamic dummy;
+    dummy.resize(1, 1);
+    dummy.setZero();
     // this function also checks schedulability
     VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard(tasks);
     if (responseTimeInitial(0, 0) == -1)
-        return -2;
+        return make_pair(-2, dummy);
     VectorDynamic initialExecutionTime;
-    initialExecutionTime.resize(N, 1);
-    for (int i = 0; i < N; i++)
-        initialExecutionTime(i, 0) = tasks[i].executionTime;
+    if (initial.sum() != 0)
+    {
+        if (initial.rows() == N)
+            initialExecutionTime = initial;
+        else
+        {
+            cout << red << "Input parameter error!" << def << endl;
+            throw;
+        }
+    }
+    else
+    {
+        initialExecutionTime.resize(N, 1);
+        for (int i = 0; i < N; i++)
+            initialExecutionTime(i, 0) = tasks[i].executionTime;
+    }
+
     int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, 0, responseTimeInitial);
     // int numberOfTasksNeedOptimize = N - (lastTaskDoNotNeedOptimize + 1);
 
@@ -482,26 +499,50 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
         double afterEnergyCost = EstimateEnergyTaskSet(tasks, computationTimeVectorLocalOpt).sum();
 
-        return afterEnergyCost / initialEnergyCost;
+        return make_pair(afterEnergyCost / initialEnergyCost, computationTimeVectorLocalOpt);
     }
     else
     {
         // TODO: in this case, add more loops to try different values of weightEnergy
         cout << "Unfeasible!" << endl;
-        return -1;
+
+        return make_pair(-1, dummy);
     }
-    return 0;
+    return make_pair(0, dummy);
+}
+
+bool checkConvergenceInterior(double oldRes, double newRes)
+{
+    double diff = newRes - oldRes;
+    if (diff / oldRes < convergTolInterior)
+        return true;
+    else
+        return false;
 }
 
 double OptimizeTaskSet(TaskSet &tasks)
 {
-
-    vectorGlobalOpt.resize(tasks.size(), 1);
+    int N = tasks.size();
+    vectorGlobalOpt.resize(N, 1);
     vectorGlobalOpt.setZero();
     valueGlobalOpt = INT64_MAX;
 
-    // adjust some parameters based on scale
-    weightEnergy = weightEnergy;
-    double res = OptimizeTaskSetOneIte(tasks);
-    return res;
+    // iterations
+    double oldRes = 1.0, newRes = 0;
+    VectorDynamic initial;
+    initial.resize(N, 1);
+    initial.setZero();
+    weightEnergy = minWeightToBegin;
+    do
+    {
+        auto res = OptimizeTaskSetOneIte(tasks, initial);
+        newRes = res.first;
+        initial = res.second;
+        weightEnergy *= weightStep;
+        eliminateTol /= eliminateStep;
+        cout << "After one iteration of IPM, the current ratio is " << newRes << endl;
+        cout << "The computationTimeVector is " << initial << endl;
+    } while (not checkConvergenceInterior(oldRes, newRes));
+
+    return newRes;
 }

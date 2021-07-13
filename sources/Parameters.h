@@ -14,8 +14,8 @@ using namespace std;
 int TASK_NUMBER = 0;
 double weightEnergy = (double)ConfigParameters["weightEnergy"];
 double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
+double eliminateTol = (double)ConfigParameters["eliminateTol"];
 
-const double eliminateTol = (double)ConfigParameters["eliminateTol"];
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
@@ -38,3 +38,7 @@ const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
 const double eliminateVariableThreshold = (double)ConfigParameters["eliminateVariableThreshold"];
 const int debugMode = (int)ConfigParameters["debugMode"];
+const double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
+const double convergTolInterior = (double)ConfigParameters["convergTolInterior"];
+const double weightStep = (double)ConfigParameters["weightStep"];
+const double eliminateStep = (double)ConfigParameters["eliminateStep"];
