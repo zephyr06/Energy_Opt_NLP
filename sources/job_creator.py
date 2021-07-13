@@ -82,7 +82,7 @@ if __name__ == "__main__":
                         help='Job set prefix name - optional (default:aperiodic-set)')
     # parser.add_argument('--job_lambda',     type=float, default=0.5, help='Job arrival rate: lambda [type:float range:0.001 to 1.0] - optional (default:0.5)')
     parser.add_argument('--period_min', type=str, default=10, help='Minimum job period, - optional (default:100)')
-    parser.add_argument('--period_max', type=str, default=100, help='Maximum job period, - optional (default:100)')
+    parser.add_argument('--period_max', type=str, default=1000, help='Maximum job period, - optional (default:100)')
     parser.add_argument('--utilization_min_per_job', type=str, default=0.03,
                         help='Minimum job utilization factor, - optional (default:0.03)')
     args = parser.parse_args()
