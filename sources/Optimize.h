@@ -274,20 +274,20 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
                               VectorDynamic computationTimeWarmStart, double tolerance = eliminateVariableThreshold)
 {
     // update the tasks with the new optimal computationTimeVector
-    TaskSet tasksCurr = tasks;
-    UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
-    // cout << "eliminateTol" << eliminateTol << endl;
-    int N = tasks.size();
-    vector<Task> hpTasks = tasksCurr;
-    for (int i = N - 1; i >= 0; i--)
-    {
-        hpTasks.pop_back();
-        tasksCurr[i].executionTime += eliminateTol;
-        double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
-        if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline)
-            return i;
-        tasksCurr[i].executionTime -= eliminateTol;
-    }
+    // TaskSet tasksCurr = tasks;
+    // UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
+    // // cout << "eliminateTol" << eliminateTol << endl;
+    // int N = tasks.size();
+    // vector<Task> hpTasks = tasksCurr;
+    // for (int i = N - 1; i >= 0; i--)
+    // {
+    //     hpTasks.pop_back();
+    //     tasksCurr[i].executionTime += eliminateTol;
+    //     double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
+    //     if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline)
+    //         return i;
+    //     tasksCurr[i].executionTime -= eliminateTol;
+    // }
     return -1;
 }
 
@@ -341,6 +341,63 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
     // if (debugMode == 1)
     //     cout << "After clamp, the computation time vector is " << optComp << endl;
     return optComp;
+}
+
+bool checkConvergenceInterior(double oldRes, double newRes)
+{
+    double relDiff = (oldRes - newRes) / oldRes;
+    if (relDiff < -1e-5)
+    {
+        cout << red << "After one iteration, performance drops!" << def << endl;
+        return true;
+    }
+    else if (relDiff < convergTolInterior)
+        return true;
+
+    else
+        return false;
+}
+
+/**
+ * tasksDuringOpt's tasks are already updated with latest executionTime
+ */
+VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate, VectorDynamic &responseTimeInitial)
+{
+    if (not enableIPM)
+    {
+        return UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+    }
+
+    int N = tasksDuringOpt.size();
+    VectorDynamic dummy;
+    dummy.resize(1, 0);
+    dummy.setZero();
+    double oldRes = 0;
+    for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+        oldRes += 1.0 / tasksDuringOpt[i].period *
+                  EstimateEnergyTask(tasksDuringOpt[i], 1.0);
+    double newRes = oldRes;
+
+    // iterations
+
+    VectorDynamic initial;
+    initial.resize(N, 1);
+    initial.setZero();
+    weightEnergy = minWeightToBegin;
+    do
+    {
+        oldRes = newRes;
+        VectorDynamic variNew = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+        newRes = 0;
+        for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+            newRes += 1.0 / tasksDuringOpt[i].period *
+                      EstimateEnergyTask(tasksDuringOpt[i], tasksDuringOpt[i].executionTime / variNew(i, 0));
+        weightEnergy *= weightStep;
+        initial = variNew;
+        cout << "After one iteration of IPM, the current ratio is " << newRes << endl;
+        cout << "The computationTimeVector is " << initial << endl;
+    } while (not checkConvergenceInterior(oldRes, newRes));
+    return initial;
 }
 
 /**
@@ -409,7 +466,7 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
                 cout << "Current weightEnergy is " << weightEnergy << endl;
             try
             {
-                optComp = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+                optComp = UnitOptimizationIPM(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
                 // formulate new computationTime
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
@@ -469,7 +526,7 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
             // eliminateTol /= 10;
             // stop = true;
             // this will cause iteration number next!
-            ;
+            stop = true;
         }
         else if (lastTaskDoNotNeedOptimizeAfterOpt == N - 1)
             stop = true;
@@ -527,21 +584,6 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
         return make_pair(-1, dummy);
     }
     return make_pair(0, dummy);
-}
-
-bool checkConvergenceInterior(double oldRes, double newRes)
-{
-    double relDiff = (oldRes - newRes) / oldRes;
-    if (relDiff < -1e-5)
-    {
-        cout << red << "After one iteration, performance drops!" << def << endl;
-        return true;
-    }
-    else if (relDiff < convergTolInterior)
-        return true;
-
-    else
-        return false;
 }
 
 double OptimizeTaskSet(TaskSet &tasks)

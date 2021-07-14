@@ -26,6 +26,7 @@ const double deltaInitialDogleg = (double)ConfigParameters["deltaInitialDogleg"]
 
 const int weightEnergyMinOrder = (int)ConfigParameters["weightEnergyMinOrder"];
 const int weightEnergyMaxOrder = (int)ConfigParameters["weightEnergyMaxOrder"];
+const int enableIPM = (int)ConfigParameters["enableIPM"];
 
 const double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTolerance"];
 const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];

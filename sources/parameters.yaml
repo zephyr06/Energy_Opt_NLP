@@ -1,15 +1,16 @@
 %YAML:1.0
 
-testDataSetName: test_n10_v2
+testDataSetName: test_n20_v6
 
 deltaOptimizer: 1e-6
 weightEnergyMinOrder: -10
 weightEnergyMaxOrder: 1
 weightEnergy: 1e20
 minWeightToBegin: 1e3
-weightStep: 1e0
+weightStep: 1e3
 eliminateTol: 0.1
 eliminateStep: 10
+enableIPM: 0
 
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
