@@ -233,8 +233,9 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
     }
     else
     {
-        cout << red << "The path does not exist in ReadTaskSet!\n"
-             << def;
+        cout << red << "The path does not exist in ReadTaskSet!" << endl
+             << path
+             << def << endl;
         throw;
     }
 }

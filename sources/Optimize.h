@@ -276,7 +276,7 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
     // update the tasks with the new optimal computationTimeVector
     TaskSet tasksCurr = tasks;
     UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
-
+    // cout << "eliminateTol" << eliminateTol << endl;
     int N = tasks.size();
     vector<Task> hpTasks = tasksCurr;
     for (int i = N - 1; i >= 0; i--)
@@ -375,7 +375,7 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
         for (int i = 0; i < N; i++)
             initialExecutionTime(i, 0) = tasks[i].executionTime;
     }
-
+    // cout<<"initialExecutionTime "<<initialExecutionTime<<endl;
     int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, 0, responseTimeInitial);
     // int numberOfTasksNeedOptimize = N - (lastTaskDoNotNeedOptimize + 1);
 
@@ -393,7 +393,7 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
     // if (tasks[0].period == 120 && tasks[1].period == 170 && tasks[0].deadline == 48)
     //     int a = 1;
 
-    while (not stop)
+    while (not stop && numberOfTasksNeedOptimize > 0)
     {
         VectorDynamic initialEstimate;
         initialEstimate.resize(numberOfTasksNeedOptimize, 1);
@@ -454,11 +454,24 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
         {
             cout << "After one iteration, the computationTimeVectorLocalOpt is " << computationTimeVectorLocalOpt << endl;
             cout << "After one iteration, the vectorGlobalOpt is " << vectorGlobalOpt << endl;
+
+            TaskSet tasks2 = tasks;
+            for (int i = 0; i < N; i++)
+                tasks2[i].executionTime = computationTimeVectorLocalOpt(i, 0);
+            VectorDynamic ttt = ResponseTimeOfTaskSetHard(tasks2);
         }
 
         // check optimization results to see if there are tasks to remove further
 
-        if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize || lastTaskDoNotNeedOptimizeAfterOpt == N - 1)
+        if (lastTaskDoNotNeedOptimizeAfterOpt != N - 1 && lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
+        {
+            // weightEnergy *= weightStep;
+            // eliminateTol /= 10;
+            // stop = true;
+            // this will cause iteration number next!
+            ;
+        }
+        else if (lastTaskDoNotNeedOptimizeAfterOpt == N - 1)
             stop = true;
         else
         {
@@ -497,7 +510,11 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
             }
         }
 
-        double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
+        VectorDynamic initialExecutionTime0;
+        initialExecutionTime0.resize(N, 1);
+        for (int i = 0; i < N; i++)
+            initialExecutionTime0(i, 0) = tasks[i].executionTime;
+        double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime0).sum();
         double afterEnergyCost = EstimateEnergyTaskSet(tasks, computationTimeVectorLocalOpt).sum();
 
         return make_pair(afterEnergyCost / initialEnergyCost, computationTimeVectorLocalOpt);
@@ -514,13 +531,13 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
 
 bool checkConvergenceInterior(double oldRes, double newRes)
 {
-    double diff = oldRes - newRes;
-    if (diff < 0)
+    double relDiff = (oldRes - newRes) / oldRes;
+    if (relDiff < -1e-5)
     {
         cout << red << "After one iteration, performance drops!" << def << endl;
         return true;
     }
-    else if (diff / oldRes < convergTolInterior)
+    else if (relDiff < convergTolInterior)
         return true;
 
     else

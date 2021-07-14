@@ -6,7 +6,7 @@
 
 #include <opencv2/core/core.hpp>
 
-cv::FileStorage ConfigParameters("/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
+cv::FileStorage ConfigParameters("/home/lab/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
 
 using namespace std;
 // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
