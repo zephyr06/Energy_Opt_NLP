@@ -90,12 +90,12 @@ VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
 
     vector<Task> hpTasks;
     if (debugMode == 1)
-        cout << "RTA analysis" << endl;
+        cout << "RTA analysis (responseTime, deadline)" << endl;
     for (int i = 0; i < N; i++)
     {
         res(i, 0) = ResponseTimeAnalysis<double>(tasks[i], hpTasks);
         if (debugMode == 1)
-            cout << res(i, 0) << endl;
+            cout << res(i, 0) << ", " << tasks[i].deadline << endl;
         if (res(i, 0) > tasks[i].deadline)
         {
             if (debugMode == 1)

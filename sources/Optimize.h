@@ -392,7 +392,7 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
     // if (tasks[0].period == 120 && tasks[1].period == 170 && tasks[0].deadline == 48)
     //     int a = 1;
 
-    while (not stop)
+    while (not stop && numberOfTasksNeedOptimize > 0)
     {
         VectorDynamic initialEstimate;
         initialEstimate.resize(numberOfTasksNeedOptimize, 1);
