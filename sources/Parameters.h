@@ -13,7 +13,7 @@ using namespace std;
 // int TASK_NUMBER_DYNAMIC = 10;
 int TASK_NUMBER = 0;
 double weightEnergy = (double)ConfigParameters["weightEnergy"];
-double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
+double punishmentInBarrier = (double)ConfigParameters["punishmentInBarrier"];
 double eliminateTol = (double)ConfigParameters["eliminateTol"];
 
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];

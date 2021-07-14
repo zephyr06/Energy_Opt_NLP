@@ -258,9 +258,10 @@ public:
 
 void ClampComputationTime(VectorDynamic &comp)
 {
-    int n = comp.rows();
-    for (int i = 0; i < n; i++)
-        comp(i, 0) = int(comp(i, 0));
+    // int n = comp.rows();
+    // for (int i = 0; i < n; i++)
+    //     comp(i, 0) = int(comp(i, 0));
+    ;
 }
 
 /**
@@ -513,9 +514,15 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
 
 bool checkConvergenceInterior(double oldRes, double newRes)
 {
-    double diff = newRes - oldRes;
-    if (diff / oldRes < convergTolInterior)
+    double diff = oldRes - newRes;
+    if (diff < 0)
+    {
+        cout << red << "After one iteration, performance drops!" << def << endl;
         return true;
+    }
+    else if (diff / oldRes < convergTolInterior)
+        return true;
+
     else
         return false;
 }
@@ -528,13 +535,14 @@ double OptimizeTaskSet(TaskSet &tasks)
     valueGlobalOpt = INT64_MAX;
 
     // iterations
-    double oldRes = 1.0, newRes = 0;
+    double oldRes = 1.0, newRes = 1.0;
     VectorDynamic initial;
     initial.resize(N, 1);
     initial.setZero();
     weightEnergy = minWeightToBegin;
     do
     {
+        oldRes = newRes;
         auto res = OptimizeTaskSetOneIte(tasks, initial);
         newRes = res.first;
         initial = res.second;

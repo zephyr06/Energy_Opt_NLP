@@ -6,10 +6,10 @@ deltaOptimizer: 1e-6
 weightEnergyMinOrder: -10
 weightEnergyMaxOrder: 1
 weightEnergy: 1e20
-minWeightToBegin: 1e3
-weightStep: 1e2
+minWeightToBegin: 1e2
+weightStep: 1e3
 eliminateTol: 10
-eliminateStep: 100000
+eliminateStep: 1000
 
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
@@ -39,5 +39,5 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 1
+debugMode: 0
 
