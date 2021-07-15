@@ -5,6 +5,7 @@
 #include "../sources/Optimize.h"
 using namespace std::chrono;
 /**
+
 TEST(FindTaskDoNotNeedOptimize, A1)
 {
     string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
@@ -137,25 +138,8 @@ TEST(FindTaskDoNotNeedOptimize, a1)
     if (index != 2)
         throw;
 }
-TEST(UnitOptimizationIPM, a1)
-{
-    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v21.csv";
-    TaskSet tasks = ReadTaskSet(path, "RM");
-    VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");
-    eliminateTol = 1;
-    enableIPM = 1;
-    VectorDynamic initial;
-    initial.resize(1, 1);
-    initial << initialExecution(2, 0);
-    VectorDynamic res = UnitOptimizationIPM(tasks, 1, initial, initialExecution, initialExecution);
-    cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
-    if (abs(res(0, 0) - 230) < 0.1)
-    {
-        throw;
-    }
-}
-*/
-TEST(OptimizeTaskSet, OptimizeTaskSetOneIte)
+
+TEST(OptimizeTaskSetOneIte, a2)
 {
     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
@@ -166,14 +150,33 @@ TEST(OptimizeTaskSet, OptimizeTaskSetOneIte)
          << path << endl
          << endl;
     TaskSet taskSet1 = ReadTaskSet(path, "utilization");
-    auto start = chrono::high_resolution_clock::now();
+    minWeightToBegin = 1e3;
     double res = OptimizeTaskSet(taskSet1);
-    if (not assert_equal<double>(0.295, res, 0.2))
+    if (not assert_equal<double>(0.295, res, 0.02))
         throw;
-    cout << "The energy saving ratio is " << res << endl;
-    auto stop = chrono::high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
+    cout << "The energy saving ratio in OptimizeTaskSet-OptimizeTaskSetOneIte is " << res << endl;
+}
+
+* */
+
+TEST(UnitOptimizationIPM, a1)
+{
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v21.csv";
+    TaskSet tasks = ReadTaskSet(path, "RM");
+    VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");
+    eliminateTol = 1;
+    // enableIPM = 1;
+    vectorGlobalOpt.resize(3, 1);
+    VectorDynamic initial;
+    initial.resize(1, 1);
+    initial << initialExecution(2, 0);
+    VectorDynamic res = UnitOptimizationIPM(tasks, 1, initial, initialExecution, initialExecution);
+    cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
+    if (not(abs(res(0, 0) - 230) < 0.1))
+    {
+        cout << "Error in UnitOptimizationIPM-a1" << endl;
+        throw;
+    }
 }
 // TEST(OptimizeTaskSet, a2)
 // {

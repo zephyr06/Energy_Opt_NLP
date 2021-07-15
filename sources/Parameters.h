@@ -15,6 +15,7 @@ int TASK_NUMBER = 0;
 double weightEnergy = (double)ConfigParameters["weightEnergy"];
 double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
 double eliminateTol = (double)ConfigParameters["eliminateTol"];
+double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
 
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
@@ -39,7 +40,7 @@ const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
 const double eliminateVariableThreshold = (double)ConfigParameters["eliminateVariableThreshold"];
 const int debugMode = (int)ConfigParameters["debugMode"];
-const double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
+
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double weightStep = (double)ConfigParameters["weightStep"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];

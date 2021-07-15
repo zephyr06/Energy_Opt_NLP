@@ -1,16 +1,16 @@
 %YAML:1.0
 
-testDataSetName: test_n20_v7
+testDataSetName: test_n20_v8
 
 deltaOptimizer: 1e-5
 weightEnergyMinOrder: -10
 weightEnergyMaxOrder: 1
 weightEnergy: 1e2
 minWeightToBegin: 1e8
-weightStep: 1e1
+weightStep: 1e2
 eliminateTol: 1e-1
 eliminateStep: 10
-enableIPM: 1
+enableIPM: 0
 iterationNumIPM_Max: 10
 
 # If this number is much larger than the other parts(kike, weightEntry), 
@@ -20,8 +20,8 @@ iterationNumIPM_Max: 10
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
-relativeErrorTolerance: 1e-3
-relErrorTolIPM: 1e-5
+relativeErrorTolerance: 1e-4
+relErrorTolIPM: 1e-6
 xTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
@@ -33,7 +33,7 @@ optimizerType: 1 # 1 means dogleg, 2 means LM
 
 deltaInitialDogleg: 1e1
 
-initialLambda: 1e1
+initialLambda: 1e15
 lowerLambda: 1e-5
 upperLambda: 1e30
 

@@ -369,14 +369,29 @@ bool checkConvergenceInterior(double oldY, VectorDynamic oldX, double newY, Vect
 VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeedOptimize,
                                   VectorDynamic &initialEstimate,
                                   VectorDynamic &responseTimeInitial,
-                                  VectorDynamic &computationTimeVectorLocalOpt)
+                                  VectorDynamic computationTimeVectorLocalOpt)
 {
+    int N = tasksDuringOpt.size();
+    VectorDynamic initialVar = initialEstimate;
+    VectorDynamic variNew = initialVar;
+    weightEnergy = minWeightToBegin;
     if (not enableIPM)
     {
-        return UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+        try
+        {
+            variNew = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize,
+                                       initialVar, responseTimeInitial);
+        }
+        catch (...)
+        {
+            cout << green << "Catch some error, most probably indetermined Jacobian error" << def << endl;
+            computationTimeVectorLocalOpt = vectorGlobalOpt;
+            for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+                variNew(i - lastTaskDoNotNeedOptimize - 1, 0) = vectorGlobalOpt(i, 0);
+        }
+        return variNew;
     }
 
-    int N = tasksDuringOpt.size();
     double resOld = EstimateEnergyTaskSet(tasksDuringOpt, initialEstimate,
                                           lastTaskDoNotNeedOptimize)
                         .sum() /
@@ -385,16 +400,13 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
     double initialEnergy = resOld;
 
     // iterations
-    VectorDynamic initialVar = initialEstimate;
-    VectorDynamic variNew = initialVar;
-    weightEnergy = minWeightToBegin;
-
     int iterationNumIPM = 0;
     do
     {
         // Problem:
         // - batch doesn't work, while opt does?
-        cout << "Current weightEnergy " << weightEnergy << endl;
+        if (debugMode == 1)
+            cout << "Current weightEnergy " << weightEnergy << endl;
         resOld = resNew;
         initialVar = variNew;
         try
@@ -414,9 +426,9 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
                  weightEnergy;
         weightEnergy *= weightStep;
         punishmentInBarrier *= weightStep;
-
-        cout << "After one iteration of inside IPM, the current ratio is "
-             << resNew / initialEnergy << " Iteration number is " << iterationNumIPM << endl;
+        if (debugMode == 1)
+            cout << "After one iteration of inside IPM, the current ratio is "
+                 << resNew / initialEnergy << " Iteration number is " << iterationNumIPM << endl;
         iterationNumIPM++;
     } while (!checkConvergenceInterior(resOld, initialVar, resNew, variNew, relErrorTolIPM, xTolIPM) &&
              lastTaskDoNotNeedOptimize ==
@@ -473,9 +485,18 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         ClampComputationTime(computationTimeVectorLocalOpt);
 
         // find variables to eliminate
-        int lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
-            tasksDuringOpt,
-            computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
+        int adjustEliminateTol = 0;
+        // cout << eliminateTol << endl;
+        int lastTaskDoNotNeedOptimizeAfterOpt;
+        while (adjustEliminateTol < 10)
+        {
+            lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
+                tasksDuringOpt,
+                computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
+            if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
+                eliminateTol *= eliminateStep;
+            adjustEliminateTol++;
+        }
 
         if (debugMode == 1)
         {
@@ -544,5 +565,9 @@ double OptimizeTaskSet(TaskSet &tasks)
     valueGlobalOpt = INT64_MAX;
     weightEnergy = minWeightToBegin;
 
-    return OptimizeTaskSetOneIte(tasks);
+    double eliminateTolRef = eliminateTol;
+
+    double res = OptimizeTaskSetOneIte(tasks);
+    eliminateTol = eliminateTolRef;
+    return res;
 }

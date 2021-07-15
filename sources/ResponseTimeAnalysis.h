@@ -6,6 +6,7 @@
 template <typename T>
 T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
 {
+    // if(tasksHighPriority[0].deadline==760830 )
     const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
     const vector<T> executionTimeHigh = GetParameter<T>(tasksHighPriority, "executionTime");
     int N = periodHigh.size();
@@ -19,7 +20,7 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
     else if (isnan(taskCurr.executionTime))
     {
         cout << red << "Nan executionTime detected" << def << endl;
-        throw;
+        throw "Nan";
     }
     for (int i = 0; i < int(executionTimeHigh.size()); i++)
     {
