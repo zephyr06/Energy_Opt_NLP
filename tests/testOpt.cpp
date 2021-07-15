@@ -4,7 +4,7 @@
 
 #include "../sources/Optimize.h"
 using namespace std::chrono;
-
+/**
 TEST(FindTaskDoNotNeedOptimize, A1)
 {
     string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
@@ -88,38 +88,20 @@ TEST(unitOptimization, a1)
         throw;
 }
 
-// TEST(OptimizeTaskSet, a1)
-// {
-//     string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+TEST(OptimizeTaskSet, a1)
+{
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
-//     TaskSet taskSet1 = ReadTaskSet(path, "RM");
-//     double res = OptimizeTaskSet(taskSet1);
-//     cout << "The energy saving ratio is " << res << endl;
-//     if (not assert_equal<double>(0.71, res, 0.01))
-//         throw;
-// }
+    TaskSet taskSet1 = ReadTaskSet(path, "RM");
+    double res = OptimizeTaskSet(taskSet1);
+    cout << "The energy saving ratio is " << res << endl;
+    if (not assert_equal<double>(0.71, res, 0.01))
+        throw;
+}
 
-// TEST(OptimizeTaskSet, OptimizeTaskSetOneIte)
-// {
-//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-//     string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
-//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
-
-//     TaskSet taskSet1 = ReadTaskSet(path, "utilization");
-//     auto start = chrono::high_resolution_clock::now();
-//     double res = OptimizeTaskSet(taskSet1);
-//     if (not assert_equal<double>(0.295, res, 0.1))
-//         throw;
-//     cout << "The energy saving ratio is " << res << endl;
-//     auto stop = chrono::high_resolution_clock::now();
-//     auto duration = duration_cast<microseconds>(stop - start);
-//     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
-// }
 TEST(checkConvergenceInterior, a1)
 {
     double oldY = 1;
@@ -161,11 +143,37 @@ TEST(UnitOptimizationIPM, a1)
     TaskSet tasks = ReadTaskSet(path, "RM");
     VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");
     eliminateTol = 1;
+    enableIPM = 1;
     VectorDynamic initial;
     initial.resize(1, 1);
     initial << initialExecution(2, 0);
     VectorDynamic res = UnitOptimizationIPM(tasks, 1, initial, initialExecution, initialExecution);
     cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
+    if (abs(res(0, 0) - 230) < 0.1)
+    {
+        throw;
+    }
+}
+*/
+TEST(OptimizeTaskSet, OptimizeTaskSetOneIte)
+{
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+    cout << endl
+         << path << endl
+         << endl;
+    TaskSet taskSet1 = ReadTaskSet(path, "utilization");
+    auto start = chrono::high_resolution_clock::now();
+    double res = OptimizeTaskSet(taskSet1);
+    if (not assert_equal<double>(0.295, res, 0.2))
+        throw;
+    cout << "The energy saving ratio is " << res << endl;
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
 }
 // TEST(OptimizeTaskSet, a2)
 // {

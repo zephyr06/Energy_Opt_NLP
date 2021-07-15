@@ -284,6 +284,7 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
         hpTasks.pop_back();
         tasksCurr[i].executionTime += eliminateTol;
         double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
+        // cout << "rt is " << rt << " deadline is " << tasks[i].deadline << endl;
         if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline)
             return i;
         tasksCurr[i].executionTime -= eliminateTol;
@@ -374,26 +375,7 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
     {
         return UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
     }
-    // for (int i = 0; i < weightEnergyMaxOrder; i++)
-    //         {
-    //             weightEnergy = weightEnergyRef * pow(10, -1 * i);
-    //             if (debugMode == 1)
-    //                 cout << "Current weightEnergy is " << weightEnergy << endl;
-    //             try
-    //             {
-    //                 optComp = UnitOptimizationIPM(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
-    //                 // formulate new computationTime
-    //                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-    //                     computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
 
-    //                 weightEnergy = weightEnergyRef;
-    //             }
-    //             catch (...)
-    //             {
-    //                 cout << green << "Catch some error, most probably indetermined Jacobian error" << def << endl;
-    //                 computationTimeVectorLocalOpt = vectorGlobalOpt;
-    //             }
-    //         }
     int N = tasksDuringOpt.size();
     double resOld = EstimateEnergyTaskSet(tasksDuringOpt, initialEstimate,
                                           lastTaskDoNotNeedOptimize)
@@ -406,22 +388,27 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
     VectorDynamic initialVar = initialEstimate;
     VectorDynamic variNew = initialVar;
     weightEnergy = minWeightToBegin;
-    // if (tasksDuringOpt[19].deadline == 9280 && tasksDuringOpt[18].deadline == 8180)
-    // {
-    //     int a = 1;
-    // }
+
     int iterationNumIPM = 0;
     do
     {
         // Problem:
-        // - UnitOptimization's initial has not been updated
-        // - lastTaskDoNotNeedOptimize has not been updated after optimization
-        // - batch doesn't work, while opt does
+        // - batch doesn't work, while opt does?
         cout << "Current weightEnergy " << weightEnergy << endl;
         resOld = resNew;
         initialVar = variNew;
-        variNew = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize,
-                                   initialVar, responseTimeInitial);
+        try
+        {
+            variNew = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize,
+                                       initialVar, responseTimeInitial);
+        }
+        catch (...)
+        {
+            cout << green << "Catch some error, most probably indetermined Jacobian error" << def << endl;
+            computationTimeVectorLocalOpt = vectorGlobalOpt;
+            for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+                variNew(i - lastTaskDoNotNeedOptimize - 1, 0) = vectorGlobalOpt(i, 0);
+        }
 
         resNew = EstimateEnergyTaskSet(tasksDuringOpt, variNew, lastTaskDoNotNeedOptimize).sum() /
                  weightEnergy;
