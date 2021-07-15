@@ -7,11 +7,11 @@ using namespace std::chrono;
 
 TEST(OptimizeTaskSet, a2)
 {
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+    // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
     TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
     auto start = chrono::high_resolution_clock::now();

@@ -59,7 +59,8 @@ const double EstimateEnergyTaskBasedComputation(const Task &task, double computa
 //     return res;
 // }
 
-VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic &executionTimeVector)
+VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic &executionTimeVector,
+                                    int lastTaskDoNotNeedOptimize = -1)
 {
     if (executionTimeVector.sum() != 0)
     {
@@ -69,11 +70,12 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic 
         MatrixDynamic res;
         res.resize(n, 1);
 
-        for (int i = 0; i < N; i++)
+        for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
         {
-            double frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
-            res(i, 0) = 1.0 / taskSet[i].period *
-                        EstimateEnergyTask(taskSet[i], frequencyRunTime);
+            double frequencyRunTime = taskSet[i].executionTime /
+                                      executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
+            res(i - lastTaskDoNotNeedOptimize - 1, 0) = 1.0 / taskSet[i].period *
+                                                        EstimateEnergyTask(taskSet[i], frequencyRunTime);
         }
         return res;
     }

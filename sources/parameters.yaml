@@ -5,12 +5,12 @@ testDataSetName: test_n20_v7
 deltaOptimizer: 1e-5
 weightEnergyMinOrder: -10
 weightEnergyMaxOrder: 1
-weightEnergy: 1e20
+weightEnergy: 1e2
 minWeightToBegin: 1e2
 weightStep: 1e1
-eliminateTol: 1
+eliminateTol: 1e-1
 eliminateStep: 10
-enableIPM: 0
+enableIPM: 1
 iterationNumIPM_Max: 10
 
 # If this number is much larger than the other parts(kike, weightEntry), 
@@ -21,7 +21,8 @@ punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
 relativeErrorTolerance: 1e-3
-relErrorTolIPM: 1e-3
+relErrorTolIPM: 1e-5
+xTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
 
@@ -41,5 +42,5 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 1
+debugMode: 0
 

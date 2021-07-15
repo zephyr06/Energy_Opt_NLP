@@ -367,7 +367,8 @@ bool checkConvergenceInterior(double oldY, VectorDynamic oldX, double newY, Vect
  */
 VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeedOptimize,
                                   VectorDynamic &initialEstimate,
-                                  VectorDynamic &responseTimeInitial)
+                                  VectorDynamic &responseTimeInitial,
+                                  VectorDynamic &computationTimeVectorLocalOpt)
 {
     if (not enableIPM)
     {
@@ -395,7 +396,8 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
     //         }
     int N = tasksDuringOpt.size();
     double resOld = EstimateEnergyTaskSet(tasksDuringOpt, initialEstimate,
-                                          lastTaskDoNotNeedOptimize) /
+                                          lastTaskDoNotNeedOptimize)
+                        .sum() /
                     weightEnergy;
     double resNew = resOld;
     double initialEnergy = resOld;
@@ -421,7 +423,7 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
         variNew = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize,
                                    initialVar, responseTimeInitial);
 
-        resNew = EstimateEnergyTaskSet(tasksDuringOpt, variNew, lastTaskDoNotNeedOptimize) /
+        resNew = EstimateEnergyTaskSet(tasksDuringOpt, variNew, lastTaskDoNotNeedOptimize).sum() /
                  weightEnergy;
         weightEnergy *= weightStep;
         punishmentInBarrier *= weightStep;
@@ -429,13 +431,13 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
         cout << "After one iteration of inside IPM, the current ratio is "
              << resNew / initialEnergy << " Iteration number is " << iterationNumIPM << endl;
         iterationNumIPM++;
-    } while (not checkConvergenceInterior(resOld, initialVar, resNew, variNew) &&
-             lastTaskDoNotNeedOptimize == FindTaskDoNotNeedOptimize(
-                                              tasksDuringOpt,
-                                              computationTimeVectorLocalOpt,
-                                              lastTaskDoNotNeedOptimize, responseTimeInitial) &&
+    } while (!checkConvergenceInterior(resOld, initialVar, resNew, variNew, relErrorTolIPM, xTolIPM) &&
+             lastTaskDoNotNeedOptimize ==
+                 FindTaskDoNotNeedOptimize(tasksDuringOpt,
+                                           computationTimeVectorLocalOpt,
+                                           lastTaskDoNotNeedOptimize, responseTimeInitial) &&
              iterationNumIPM <= iterationNumIPM_Max);
-    return initialVar;
+    return variNew;
 }
 
 /**
@@ -475,7 +477,8 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
 
         // perform optimization
         VectorDynamic optComp = UnitOptimizationIPM(tasksDuringOpt, lastTaskDoNotNeedOptimize,
-                                                    initialEstimateDuringOpt, responseTimeInitial);
+                                                    initialEstimateDuringOpt, responseTimeInitial,
+                                                    computationTimeVectorLocalOpt);
         // formulate new computationTime
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);

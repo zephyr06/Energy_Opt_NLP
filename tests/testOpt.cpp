@@ -7,7 +7,7 @@ using namespace std::chrono;
 
 TEST(FindTaskDoNotNeedOptimize, A1)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet tasks = ReadTaskSet(path, "RM");
 
     int N = tasks.size();
@@ -53,7 +53,7 @@ TEST(NumericalDerivativeDynamic, A1)
 
 TEST(UpdateTaskSetExecutionTime, A1)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     VectorDynamic executionTimeVec;
     executionTimeVec.resize(1, 1);
@@ -65,7 +65,7 @@ TEST(UpdateTaskSetExecutionTime, A1)
 
 TEST(unitOptimization, a1)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     int N = taskSet1.size();
 
@@ -88,27 +88,27 @@ TEST(unitOptimization, a1)
         throw;
 }
 
-TEST(OptimizeTaskSet, a1)
-{
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+// TEST(OptimizeTaskSet, a1)
+// {
+//     string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
-    TaskSet taskSet1 = ReadTaskSet(path, "RM");
-    double res = OptimizeTaskSet(taskSet1);
-    cout << "The energy saving ratio is " << res << endl;
-    if (not assert_equal<double>(0.71, res, 0.01))
-        throw;
-}
+//     TaskSet taskSet1 = ReadTaskSet(path, "RM");
+//     double res = OptimizeTaskSet(taskSet1);
+//     cout << "The energy saving ratio is " << res << endl;
+//     if (not assert_equal<double>(0.71, res, 0.01))
+//         throw;
+// }
 
 // TEST(OptimizeTaskSet, OptimizeTaskSetOneIte)
 // {
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-//     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+//     string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
 //     TaskSet taskSet1 = ReadTaskSet(path, "utilization");
 //     auto start = chrono::high_resolution_clock::now();
@@ -141,7 +141,7 @@ TEST(checkConvergenceInterior, a1)
 }
 TEST(FindTaskDoNotNeedOptimize, a1)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "utilization");
     VectorDynamic initialExecution = GetParameterVD<int>(taskSet1, "executionTime");
     eliminateTol = 3;
@@ -155,13 +155,25 @@ TEST(FindTaskDoNotNeedOptimize, a1)
     if (index != 2)
         throw;
 }
+TEST(UnitOptimizationIPM, a1)
+{
+    string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v21.csv";
+    TaskSet tasks = ReadTaskSet(path, "RM");
+    VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");
+    eliminateTol = 1;
+    VectorDynamic initial;
+    initial.resize(1, 1);
+    initial << initialExecution(2, 0);
+    VectorDynamic res = UnitOptimizationIPM(tasks, 1, initial, initialExecution, initialExecution);
+    cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
+}
 // TEST(OptimizeTaskSet, a2)
 // {
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-//     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+//     string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+//     // string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
 //     TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
 //     auto start = chrono::high_resolution_clock::now();
