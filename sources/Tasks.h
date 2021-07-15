@@ -12,6 +12,7 @@
 #include "colormod.h"
 
 #include "Parameters.h"
+#include "Declaration.h"
 using namespace std;
 
 #define TaskSet vector<Task>
@@ -102,6 +103,35 @@ vector<T> GetParameter(const TaskSet &taskset, string parameterType)
             parameterList.push_back((T)(taskset[i].deadline));
         else if (parameterType == "offset")
             parameterList.push_back((T)(taskset[i].offset));
+        else
+        {
+            cout << red << "parameterType in GetParameter is not recognized!\n"
+                 << def;
+            throw;
+        }
+    }
+    return parameterList;
+}
+template <typename T>
+VectorDynamic GetParameterVD(const TaskSet &taskset, string parameterType)
+{
+    uint N = taskset.size();
+    VectorDynamic parameterList;
+    parameterList.resize(N, 1);
+    parameterList.setZero();
+
+    for (uint i = 0; i < N; i++)
+    {
+        if (parameterType == "period")
+            parameterList(i, 0) = ((T)(taskset[i].period));
+        else if (parameterType == "executionTime")
+            parameterList(i, 0) = ((T)(taskset[i].executionTime));
+        else if (parameterType == "overhead")
+            parameterList(i, 0) = ((T)(taskset[i].overhead));
+        else if (parameterType == "deadline")
+            parameterList(i, 0) = ((T)(taskset[i].deadline));
+        else if (parameterType == "offset")
+            parameterList(i, 0) = ((T)(taskset[i].offset));
         else
         {
             cout << red << "parameterType in GetParameter is not recognized!\n"

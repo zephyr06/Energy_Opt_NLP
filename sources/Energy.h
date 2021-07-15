@@ -79,15 +79,21 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic 
     }
     else
     {
-        int N = taskSet.size();
-        MatrixDynamic res;
-        res.resize(N, 1);
-        for (int i = 0; i < N; i++)
-        {
-            double frequencyRunTime = 1.0;
-            res(i, 0) = 1.0 / taskSet[i].period *
-                        EstimateEnergyTask(taskSet[i], frequencyRunTime);
-        }
-        return res;
+        cout << "Input error in EstimateEnergyTaskSet" << endl;
+        throw;
     }
+}
+VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet)
+{
+
+    int N = taskSet.size();
+    MatrixDynamic res;
+    res.resize(N, 1);
+    for (int i = 0; i < N; i++)
+    {
+        double frequencyRunTime = 1.0;
+        res(i, 0) = 1.0 / taskSet[i].period *
+                    EstimateEnergyTask(taskSet[i], frequencyRunTime);
+    }
+    return res;
 }
