@@ -6,11 +6,11 @@ deltaOptimizer: 1e-6
 weightEnergyMinOrder: -10
 weightEnergyMaxOrder: 1
 weightEnergy: 1e20
-minWeightToBegin: 1e3
-weightStep: 1e3
+minWeightToBegin: 1e2
+weightStep: 1e1
 eliminateTol: 0.1
 eliminateStep: 10
-enableIPM: 0
+enableIPM: 1
 
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
@@ -20,7 +20,7 @@ punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
 relativeErrorTolerance: 1e-3
-convergTolInterior: 1e-3
+relErrorTolIPM: 1e-2
 toleranceBarrier: 1e-6
 
 

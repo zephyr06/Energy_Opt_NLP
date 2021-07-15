@@ -6,14 +6,14 @@
 
 #include <opencv2/core/core.hpp>
 
-cv::FileStorage ConfigParameters("/home/lab/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
+cv::FileStorage ConfigParameters("/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
 
 using namespace std;
 // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
 // int TASK_NUMBER_DYNAMIC = 10;
 int TASK_NUMBER = 0;
 double weightEnergy = (double)ConfigParameters["weightEnergy"];
-double punishmentInBarrier = (double)ConfigParameters["punishmentInBarrier"];
+double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
 double eliminateTol = (double)ConfigParameters["eliminateTol"];
 
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
@@ -40,6 +40,6 @@ const int granularityInBF = (int)ConfigParameters["granularityInBF"];
 const double eliminateVariableThreshold = (double)ConfigParameters["eliminateVariableThreshold"];
 const int debugMode = (int)ConfigParameters["debugMode"];
 const double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
-const double convergTolInterior = (double)ConfigParameters["convergTolInterior"];
+const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double weightStep = (double)ConfigParameters["weightStep"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];

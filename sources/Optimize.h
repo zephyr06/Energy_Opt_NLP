@@ -351,7 +351,7 @@ bool checkConvergenceInterior(double oldRes, double newRes)
         cout << red << "After one iteration, performance drops!" << def << endl;
         return true;
     }
-    else if (relDiff < convergTolInterior)
+    else if (relDiff < relErrorTolIPM)
         return true;
 
     else
@@ -370,13 +370,14 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
 
     int N = tasksDuringOpt.size();
     VectorDynamic dummy;
-    dummy.resize(1, 0);
+    dummy.resize(1, 1);
     dummy.setZero();
     double oldRes = 0;
     for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
         oldRes += 1.0 / tasksDuringOpt[i].period *
                   EstimateEnergyTask(tasksDuringOpt[i], 1.0);
     double newRes = oldRes;
+    double initialEnergy = oldRes / weightEnergy;
 
     // iterations
 
@@ -387,14 +388,18 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
     do
     {
         oldRes = newRes;
-        VectorDynamic variNew = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+        VectorDynamic variNew = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize,
+                                                 initialEstimate, responseTimeInitial);
         newRes = 0;
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             newRes += 1.0 / tasksDuringOpt[i].period *
-                      EstimateEnergyTask(tasksDuringOpt[i], tasksDuringOpt[i].executionTime / variNew(i, 0));
+                      EstimateEnergyTask(tasksDuringOpt[i],
+                                         tasksDuringOpt[i].executionTime / variNew(i, 0)) /
+                      weightEnergy;
         weightEnergy *= weightStep;
+        punishmentInBarrier *= weightStep;
         initial = variNew;
-        cout << "After one iteration of IPM, the current ratio is " << newRes << endl;
+        cout << "After one iteration of inside IPM, the current ratio is " << newRes / initialEnergy << endl;
         cout << "The computationTimeVector is " << initial << endl;
     } while (not checkConvergenceInterior(oldRes, newRes));
     return initial;
@@ -594,22 +599,22 @@ double OptimizeTaskSet(TaskSet &tasks)
     valueGlobalOpt = INT64_MAX;
 
     // iterations
-    double oldRes = 1.0, newRes = 1.0;
+    // double oldRes = 1.0, newRes = 1.0;
     VectorDynamic initial;
     initial.resize(N, 1);
     initial.setZero();
-    weightEnergy = minWeightToBegin;
-    do
-    {
-        oldRes = newRes;
-        auto res = OptimizeTaskSetOneIte(tasks, initial);
-        newRes = res.first;
-        initial = res.second;
-        weightEnergy *= weightStep;
-        eliminateTol /= eliminateStep;
-        cout << "After one iteration of IPM, the current ratio is " << newRes << endl;
-        cout << "The computationTimeVector is " << initial << endl;
-    } while (not checkConvergenceInterior(oldRes, newRes));
+    // weightEnergy = minWeightToBegin;
+    // do
+    // {
+    //     oldRes = newRes;
+    //     auto res = OptimizeTaskSetOneIte(tasks, initial);
+    //     newRes = res.first;
+    //     initial = res.second;
+    //     weightEnergy *= weightStep;
+    //     eliminateTol /= eliminateStep;
+    //     cout << "After one iteration of IPM, the current ratio is " << newRes << endl;
+    //     cout << "The computationTimeVector is " << initial << endl;
+    // } while (not checkConvergenceInterior(oldRes, newRes));
 
-    return newRes;
+    return OptimizeTaskSetOneIte(tasks, initial).first;
 }
