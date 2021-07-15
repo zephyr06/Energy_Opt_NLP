@@ -261,7 +261,7 @@ void ClampComputationTime(VectorDynamic &comp)
     // int n = comp.rows();
     // for (int i = 0; i < n; i++)
     //     comp(i, 0) = int(comp(i, 0));
-    ;
+    return;
 }
 
 /**
@@ -274,20 +274,20 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
                               VectorDynamic computationTimeWarmStart, double tolerance = eliminateVariableThreshold)
 {
     // update the tasks with the new optimal computationTimeVector
-    // TaskSet tasksCurr = tasks;
-    // UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
-    // // cout << "eliminateTol" << eliminateTol << endl;
-    // int N = tasks.size();
-    // vector<Task> hpTasks = tasksCurr;
-    // for (int i = N - 1; i >= 0; i--)
-    // {
-    //     hpTasks.pop_back();
-    //     tasksCurr[i].executionTime += eliminateTol;
-    //     double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
-    //     if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline)
-    //         return i;
-    //     tasksCurr[i].executionTime -= eliminateTol;
-    // }
+    TaskSet tasksCurr = tasks;
+    UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
+    // cout << "eliminateTol" << eliminateTol << endl;
+    int N = tasks.size();
+    vector<Task> hpTasks = tasksCurr;
+    for (int i = N - 1; i >= 0; i--)
+    {
+        hpTasks.pop_back();
+        tasksCurr[i].executionTime += eliminateTol;
+        double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
+        if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline)
+            return i;
+        tasksCurr[i].executionTime -= eliminateTol;
+    }
     return -1;
 }
 
@@ -385,23 +385,36 @@ VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeed
     initial.resize(N, 1);
     initial.setZero();
     weightEnergy = minWeightToBegin;
+    if (tasksDuringOpt[19].deadline == 9280 && tasksDuringOpt[18].deadline == 8180)
+    {
+        int a = 1;
+    }
     do
     {
+        // Problem:
+        // - UnitOptimization's initial has not been updated
+        // - lastTaskDoNotNeedOptimize has not been updated after optimization
+        // - batch doesn't work, while opt does
+        cout << "Current weightEnergy " << weightEnergy << endl;
         oldRes = newRes;
         VectorDynamic variNew = UnitOptimization(tasksDuringOpt, lastTaskDoNotNeedOptimize,
                                                  initialEstimate, responseTimeInitial);
+        initial = variNew;
+        ClampComputationTime(variNew);
+
         newRes = 0;
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             newRes += 1.0 / tasksDuringOpt[i].period *
                       EstimateEnergyTask(tasksDuringOpt[i],
-                                         tasksDuringOpt[i].executionTime / variNew(i, 0)) /
+                                         tasksDuringOpt[i].executionTime / variNew(i - lastTaskDoNotNeedOptimize - 1, 0)) /
                       weightEnergy;
         weightEnergy *= weightStep;
         punishmentInBarrier *= weightStep;
-        initial = variNew;
+
         cout << "After one iteration of inside IPM, the current ratio is " << newRes / initialEnergy << endl;
-        cout << "The computationTimeVector is " << initial << endl;
-    } while (not checkConvergenceInterior(oldRes, newRes));
+        // cout << "The computationTimeVector is " << initial << endl;
+        lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasksDuringOpt, initialExecutionTime, 0, responseTimeInitial)
+    } while (not checkConvergenceInterior(oldRes, newRes) || lastTaskDoNotNeedOptimize == N - 1);
     return initial;
 }
 
@@ -440,6 +453,8 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
     // cout<<"initialExecutionTime "<<initialExecutionTime<<endl;
     int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, 0, responseTimeInitial);
     // int numberOfTasksNeedOptimize = N - (lastTaskDoNotNeedOptimize + 1);
+    if (lastTaskDoNotNeedOptimize == N - 1)
+        return make_pair(1.0, dummy);
 
     bool stop = false;
     VectorDynamic optComp;
@@ -483,27 +498,6 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
                 cout << green << "Catch some error, most probably indetermined Jacobian error" << def << endl;
                 computationTimeVectorLocalOpt = vectorGlobalOpt;
             }
-            // weightEnergy = weightEnergyRef * pow(10, -1 * i);
-            // if (debugMode == 1)
-            //     cout << "Current weightEnergy is " << weightEnergy << endl;
-            // try
-            // {
-            //     double res = OptimizeTaskSetOneIte(tasks);
-            //     if (res != -1)
-            //     {
-            //         weightEnergy = weightEnergyRef;
-            //         return res;
-            //     }
-            // }
-            // catch (...)
-            // {
-            //     cout << red << "Catch some error" << def << endl;
-            // }
-            // if (debugMode == 1)
-            // {
-            //     cout << "The recorded value: " << valueGlobalOpt << endl;
-            //     cout << "The recorded vector: " << vectorGlobalOpt << endl;
-            // }
         }
 
         ClampComputationTime(computationTimeVectorLocalOpt);
@@ -530,7 +524,7 @@ pair<double, VectorDynamic> OptimizeTaskSetOneIte(TaskSet &tasks, VectorDynamic 
             // weightEnergy *= weightStep;
             // eliminateTol /= 10;
             // stop = true;
-            // this will cause iteration number next!
+            // this will cause iteration number error next!
             stop = true;
         }
         else if (lastTaskDoNotNeedOptimizeAfterOpt == N - 1)
@@ -603,7 +597,7 @@ double OptimizeTaskSet(TaskSet &tasks)
     VectorDynamic initial;
     initial.resize(N, 1);
     initial.setZero();
-    // weightEnergy = minWeightToBegin;
+    weightEnergy = minWeightToBegin;
     // do
     // {
     //     oldRes = newRes;

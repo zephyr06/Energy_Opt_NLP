@@ -1,14 +1,14 @@
 %YAML:1.0
 
-testDataSetName: test_n20_v6
+testDataSetName: test_n20_v7
 
-deltaOptimizer: 1e-6
+deltaOptimizer: 1e-5
 weightEnergyMinOrder: -10
 weightEnergyMaxOrder: 1
 weightEnergy: 1e20
 minWeightToBegin: 1e2
 weightStep: 1e1
-eliminateTol: 0.1
+eliminateTol: 1
 eliminateStep: 10
 enableIPM: 1
 
@@ -20,7 +20,7 @@ punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
 relativeErrorTolerance: 1e-3
-relErrorTolIPM: 1e-2
+relErrorTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
 
@@ -40,5 +40,5 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 0
+debugMode: 1
 

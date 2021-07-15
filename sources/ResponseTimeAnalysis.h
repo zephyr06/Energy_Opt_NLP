@@ -16,6 +16,11 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
              << def << endl;
         throw;
     }
+    else if (isnan(taskCurr.executionTime))
+    {
+        cout << red << "Nan executionTime detected" << def << endl;
+        throw;
+    }
     for (int i = 0; i < int(executionTimeHigh.size()); i++)
     {
         if (executionTimeHigh[i] < 0)
