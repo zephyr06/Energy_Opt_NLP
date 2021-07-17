@@ -211,7 +211,10 @@ public:
 
         if (H)
         {
-            *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
+            if (exactJacobian)
+                *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
+            else
+                *H = NumericalDerivativeDynamicUpper(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = jacobian;
             if (debugMode == 1)
@@ -314,7 +317,8 @@ VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, Ve
     if (optimizerType == 1)
     {
         DoglegParams params;
-        params.setVerbosityDL("DELTA");
+        if (debugMode == 1)
+            params.setVerbosityDL("VERBOSE");
         params.setDeltaInitial(deltaInitialDogleg);
         params.setRelativeErrorTol(relativeErrorTolerance);
         DoglegOptimizer optimizer(graph, initialEstimateFG, params);

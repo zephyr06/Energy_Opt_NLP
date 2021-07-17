@@ -3,15 +3,15 @@
 testDataSetName: test_n20_v8
 
 deltaOptimizer: 1e-5
-weightEnergyMinOrder: -10
-weightEnergyMaxOrder: 1
-weightEnergy: 1e2
-minWeightToBegin: 1e8
+
+minWeightToBegin: 1e3
 weightStep: 1e2
 eliminateTol: 1e-1
 eliminateStep: 10
 enableIPM: 0
 iterationNumIPM_Max: 10
+exactJacobian: 0
+weightLogBarrier: 0
 
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
@@ -20,7 +20,7 @@ iterationNumIPM_Max: 10
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
-relativeErrorTolerance: 1e-4
+relativeErrorTolerance: 1e-3
 relErrorTolIPM: 1e-6
 xTolIPM: 1e-3
 toleranceBarrier: 1e-6
@@ -28,7 +28,7 @@ toleranceBarrier: 1e-6
 
 
 punishmentFrequency: 10
-weightLogBarrier: 1
+
 optimizerType: 1 # 1 means dogleg, 2 means LM
 
 deltaInitialDogleg: 1e1
@@ -43,4 +43,9 @@ readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
 debugMode: 0
+
+# something not used 
+weightEnergyMinOrder: -10
+weightEnergyMaxOrder: 1
+weightEnergy: 1e8
 

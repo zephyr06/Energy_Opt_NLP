@@ -6,7 +6,7 @@
 
 #include <opencv2/core/core.hpp>
 
-cv::FileStorage ConfigParameters("/home/lab/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
+cv::FileStorage ConfigParameters("/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
 
 using namespace std;
 // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
@@ -16,7 +16,9 @@ double weightEnergy = (double)ConfigParameters["weightEnergy"];
 double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
 double eliminateTol = (double)ConfigParameters["eliminateTol"];
 double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
+int enableIPM = (int)ConfigParameters["enableIPM"];
 
+const int exactJacobian = (int)ConfigParameters["exactJacobian"];
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
@@ -25,9 +27,7 @@ const double upperLambda = (double)ConfigParameters["upperLambda"];
 const double noiseModelSigma = (double)ConfigParameters["noiseModelSigma"];
 const double deltaInitialDogleg = (double)ConfigParameters["deltaInitialDogleg"];
 
-const int weightEnergyMinOrder = (int)ConfigParameters["weightEnergyMinOrder"];
 const int weightEnergyMaxOrder = (int)ConfigParameters["weightEnergyMaxOrder"];
-int enableIPM = (int)ConfigParameters["enableIPM"];
 
 const double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTolerance"];
 const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
