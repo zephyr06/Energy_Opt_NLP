@@ -150,9 +150,9 @@ if __name__ == "__main__":
                     deadline = random.randint(execution_time + 1, int((execution_time + 1) * (1 + desperate_portion)))
                     desperate_mode_ref = desperate_mode_ref - 1
                 else:
-                    deadline = random.randint(execution_time + 1, int((period_curr + 1) * deadline_portion + 1))
+                    # deadline = random.randint(execution_time + 1, int((period_curr + 1) * deadline_portion + 1))
                     # deadline = round(0.5*(execution_time+period_curr))
-                    # deadline = period_curr
+                    deadline = period_curr
                 deadline = min(deadline, period_curr)
                 # Write Job Info
                 f.write(
