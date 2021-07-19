@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     outputDirectory = args.directory
     jobSetName = args.jobset_name
-    period_min = int(args.period_min)
+    period_min = int(args.period_min)/10
     period_max = int(args.period_max)/10
     utilization_min_per_job = args.utilization_min_per_job
 

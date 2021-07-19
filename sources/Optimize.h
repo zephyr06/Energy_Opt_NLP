@@ -53,14 +53,6 @@ double Barrier(double x)
                log(x + toleranceBarrier);
 }
 
-void UpdateTaskSetExecutionTime(TaskSet &taskSet, VectorDynamic executionTimeVec, int lastTaskDoNotNeedOptimize = -1)
-{
-    int N = taskSet.size();
-
-    for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-        taskSet[i].executionTime = executionTimeVec(i - lastTaskDoNotNeedOptimize - 1, 0);
-}
-
 MatrixDynamic NumericalDerivativeDynamic(boost::function<VectorDynamic(const VectorDynamic &)> h,
                                          VectorDynamic x, double deltaOptimizer, int mOfJacobian)
 {
@@ -259,12 +251,86 @@ public:
     }
 };
 
-void ClampComputationTime(VectorDynamic &comp)
+// ------------------ two convenient functions for ClampComputationTime
+double JacobianInClamp(TaskSet &tasks, VectorDynamic &comp, int i)
 {
-    // int n = comp.rows();
-    // for (int i = 0; i < n; i++)
-    //     comp(i, 0) = int(comp(i, 0));
-    return;
+    return 1.0 / tasks[i].period * pow(double(tasks[i].executionTime) / comp(i, 0), 3);
+};
+
+// to sort from the biggest to smallest
+bool comparePair(const pair<int, double> &p1, const pair<int, double> &p2)
+{
+    return (p1.second > p2.second);
+}
+// ------------------
+VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize, string roundType = roundTypeInClamp)
+{
+    int n = comp.rows();
+    for (int i = 0; i < n; i++)
+        comp(i, 0) = int(comp(i, 0));
+    if (roundType == "rough")
+    {
+        return comp;
+    }
+    else if (roundType == "fine")
+    {
+        int N = tasks.size();
+        VectorDynamic warmStart = ResponseTimeOfTaskSetHard(tasks, comp);
+
+        vector<pair<int, double>> objectiveVec;
+        // objectiveVec.reserve(N);
+        for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+        {
+            objectiveVec.push_back(make_pair(i, JacobianInClamp(tasks, comp, i)));
+        }
+        sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
+        int minEliminate = INT32_MAX;
+
+        int iterationNumber = 0;
+        TaskSet taskDuringOpt = tasks;
+        UpdateTaskSetExecutionTime(taskDuringOpt, comp, lastTaskDoNotNeedOptimize);
+        while (objectiveVec.size() > 0)
+        {
+            int currentIndex = objectiveVec[0].first;
+
+            // try to round up, if success, keep the loop; otherwise, eliminate it and high priority tasks
+            // can be speeded up, if necessary, by binary search
+            comp(currentIndex, 0) += 1;
+            taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
+
+            if (not CheckSchedulability<int>(taskDuringOpt, warmStart, false))
+            {
+                comp(currentIndex, 0) -= 1;
+                taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
+                minEliminate = currentIndex;
+                for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
+                {
+                    if (objectiveVec[i].first <= minEliminate)
+                    {
+                        objectiveVec.erase(objectiveVec.begin() + i);
+                    }
+                }
+            }
+            else
+            {
+                ;
+            }
+            iterationNumber++;
+            if (iterationNumber > 100)
+            {
+                cout << red << "iterationNumber error in Clamp!" << def << endl;
+                // throw;
+                break;
+            }
+        };
+    }
+    else
+    {
+        cout << "input error in ClampComputationTime" << endl;
+        throw;
+    }
+
+    return comp;
 }
 
 /**
@@ -486,20 +552,20 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
 
-        ClampComputationTime(computationTimeVectorLocalOpt);
-
+        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, lastTaskDoNotNeedOptimize, "rough");
+        // cout << computationTimeVectorLocalOpt << endl;
         // find variables to eliminate
-        int adjustEliminateTol = 0;
+        int adjustEliminateTolNum = 0;
         // cout << eliminateTol << endl;
         int lastTaskDoNotNeedOptimizeAfterOpt;
-        while (adjustEliminateTol < 10)
+        while (adjustEliminateTolNum < 10)
         {
             lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
                 tasksDuringOpt,
                 computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
             if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
                 eliminateTol *= eliminateStep;
-            adjustEliminateTol++;
+            adjustEliminateTolNum++;
         }
 
         if (debugMode == 1)
@@ -545,7 +611,11 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
                 tasks[i].print();
             }
         }
-
+        if (debugMode == 1)
+            cout << "computationTimeVectorLocalOpt before Clamp fine: " << computationTimeVectorLocalOpt << endl;
+        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, -1, roundTypeInClamp);
+        if (debugMode == 1)
+            cout << "computationTimeVectorLocalOpt after Clamp fine: " << computationTimeVectorLocalOpt << endl;
         double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
         double afterEnergyCost = EstimateEnergyTaskSet(tasks, computationTimeVectorLocalOpt).sum();
         return afterEnergyCost / initialEnergyCost;

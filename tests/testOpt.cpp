@@ -157,43 +157,81 @@ TEST(OptimizeTaskSetOneIte, a2)
     cout << "The energy saving ratio in OptimizeTaskSet-OptimizeTaskSetOneIte is " << res << endl;
 }
 
+
+TEST(ClampComputationTime, a1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    TaskSet taskSet1 = ReadTaskSet(path, "RM");
+    int N = taskSet1.size();
+
+    int lastTaskDoNotNeedOptimize = 1;
+    eliminateTol = 10;
+
+    VectorDynamic initialEstimate;
+    initialEstimate.resize(numberOfTasksNeedOptimize, 1);
+    initialEstimate << 62;
+
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard(taskSet1);
+    vectorGlobalOpt.resize(N, 1);
+    VectorDynamic res1 = UnitOptimization(taskSet1, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+    cout << endl;
+    cout << endl;
+    cout << endl;
+    cout << endl;
+    cout << endl;
+    cout << res1 << endl;
+    // 204 corresponds to RT of 319, which should be the best we can get because of the clamp function
+    if (not(abs(205 - res1(0, 0)) < 1))
+        throw;
+    eliminateTol = 1;
+}
+
+TEST(ClampComputationTime, a2)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v22.csv";
+    TaskSet taskSet1 = ReadTaskSet(path, "RM");
+    int N = taskSet1.size();
+
+    double res = OptimizeTaskSet(taskSet1);
+}
 * */
 
-TEST(UnitOptimizationIPM, a1)
-{
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v21.csv";
-    TaskSet tasks = ReadTaskSet(path, "RM");
-    VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");
-    eliminateTol = 1;
-    // enableIPM = 1;
-    vectorGlobalOpt.resize(3, 1);
-    VectorDynamic initial;
-    initial.resize(1, 1);
-    initial << initialExecution(2, 0);
-    VectorDynamic res = UnitOptimizationIPM(tasks, 1, initial, initialExecution, initialExecution);
-    cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
-    if (not(abs(res(0, 0) - 230) < 0.1))
-    {
-        cout << "Error in UnitOptimizationIPM-a1" << endl;
-        throw;
-    }
-}
-// TEST(OptimizeTaskSet, a2)
+// TEST(UnitOptimizationIPM, a1)
 // {
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
-//     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-//     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
-
-//     TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
-//     auto start = chrono::high_resolution_clock::now();
-//     double res = OptimizeTaskSet(taskSet1);
-//     cout << blue << "The energy saving ratio is " << res << def << endl;
-//     auto stop = chrono::high_resolution_clock::now();
-//     auto duration = duration_cast<microseconds>(stop - start);
-//     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
+//     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v21.csv";
+//     TaskSet tasks = ReadTaskSet(path, "RM");
+//     VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");
+//     eliminateTol = 1;
+//     // enableIPM = 1;
+//     vectorGlobalOpt.resize(3, 1);
+//     VectorDynamic initial;
+//     initial.resize(1, 1);
+//     initial << initialExecution(2, 0);
+//     VectorDynamic res = UnitOptimizationIPM(tasks, 1, initial, initialExecution, initialExecution);
+//     cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
+//     if (not(abs(res(0, 0) - 230) < 0.1))
+//     {
+//         cout << "Error in UnitOptimizationIPM-a1" << endl;
+//         throw;
+//     }
 // }
+
+TEST(OptimizeTaskSet, a2)
+{
+    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
+    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
+    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
+    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
+
+    TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
+    auto start = chrono::high_resolution_clock::now();
+    double res = OptimizeTaskSet(taskSet1);
+    cout << blue << "The energy saving ratio is " << res << def << endl;
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
+}
 
 int main()
 {

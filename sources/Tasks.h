@@ -66,7 +66,7 @@ public:
              << deadline << " The overhead is " << overhead << " The offset is " << offset << endl;
     }
 
-    double utilization()
+    double utilization() const
     {
         return double(executionTime) / period;
     }
@@ -268,4 +268,12 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
              << def << endl;
         throw;
     }
+}
+
+void UpdateTaskSetExecutionTime(TaskSet &taskSet, VectorDynamic executionTimeVec, int lastTaskDoNotNeedOptimize = -1)
+{
+    int N = taskSet.size();
+
+    for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+        taskSet[i].executionTime = executionTimeVec(i - lastTaskDoNotNeedOptimize - 1, 0);
 }

@@ -1,18 +1,18 @@
 %YAML:1.0
 
-testDataSetName: test_n20_v8
+testDataSetName: test_n20_v9
 
 deltaOptimizer: 1e-5
 
 minWeightToBegin: 1e3
 weightStep: 1e2
 eliminateTol: 1e-1
-eliminateStep: 10
+eliminateStep: 2
 enableIPM: 0
 iterationNumIPM_Max: 10
 exactJacobian: 0
 weightLogBarrier: 0
-
+roundTypeInClamp: "rough"
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
 
@@ -20,7 +20,7 @@ weightLogBarrier: 0
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
-relativeErrorTolerance: 1e-3
+relativeErrorTolerance: 1e-5
 relErrorTolIPM: 1e-6
 xTolIPM: 1e-3
 toleranceBarrier: 1e-6

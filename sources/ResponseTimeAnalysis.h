@@ -33,7 +33,7 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
         }
     }
 
-    if (Utilization(tasksHighPriority) > 1.0)
+    if (Utilization(tasksHighPriority) + taskCurr.utilization() >= 1.0)
     {
         // cout << "The given task set is unschedulable\n";
         return INT32_MAX;
@@ -88,6 +88,24 @@ bool CheckSchedulability(const TaskSet &taskSet, bool whetherPrint = false)
     return true;
 }
 
+template <typename T>
+bool CheckSchedulability(const TaskSet &taskSet, VectorDynamic warmStart, bool whetherPrint = false)
+{
+    int N = taskSet.size();
+    for (int i = 0; i < N; i++)
+    {
+        TaskSet::const_iterator first = taskSet.begin();
+        vector<Task>::const_iterator last = taskSet.begin() + i;
+        TaskSet hpTasks(first, last);
+        T rta = ResponseTimeAnalysisWarm<T>(warmStart(i, 0), taskSet[i], hpTasks);
+        if (whetherPrint)
+            cout << "response time for task " << i << " is " << rta << " and deadline is " << taskSet[i].deadline << endl;
+        if (rta > min(taskSet[i].deadline, taskSet[i].period))
+            return false;
+    }
+    return true;
+}
+
 VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
 {
     int N = tasks.size();
@@ -112,4 +130,15 @@ VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
         hpTasks.push_back(tasks[i]);
     }
     return res;
+}
+
+VectorDynamic ResponseTimeOfTaskSetHard(TaskSet tasks, VectorDynamic comp)
+{
+    if (comp.rows() != int(tasks.size()))
+    {
+        cout << "Size mismatch error!" << endl;
+        throw;
+    }
+    UpdateTaskSetExecutionTime(tasks, comp);
+    return ResponseTimeOfTaskSetHard(tasks);
 }
