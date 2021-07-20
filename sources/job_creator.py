@@ -62,13 +62,13 @@ if __name__ == "__main__":
     # import arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_tasksets', type=int, default=10,
-                        help='Number of job sets to be created [type:INT range:1 to N] - optional (default:1)')
+                        help='Number of job sets to be created [type:INT range:1 to N] - optiona')
     parser.add_argument('--num_job', type=int, default=3,
-                        help='Number of jobs in each job sets [type:INT range:1 to N] - optional (default:100)')
+                        help='Number of jobs in each job sets [type:INT range:1 to N] - optional')
     parser.add_argument('--deadline_portion', type=float, default=1.0,
-                        help='the portion of task deadline w.r.t. task period - optional (default:1.0)')
+                        help='the portion of task deadline w.r.t. task period - optional')
     parser.add_argument('--utilization_total', type=str, default=0.5,
-                        help='Total job utilization, - optional (default:0.5)')
+                        help='Total job utilization, - optional)')
     parser.add_argument('--desperate_mode', type=str, default=0,
                         help='Whether desperate mode, 1 or 0')
     parser.add_argument('--desperate_portion', type=float, default=0.1,
@@ -77,14 +77,14 @@ if __name__ == "__main__":
                         help='maximum preemption overhead for each task')
     # *************************************************************************************
     parser.add_argument('--directory', type=str, default='../TaskData/task_number',
-                        help='Output Directory - optional (default:~/SRTG_jobCreator)')
+                        help='Output Directory - optional')
     parser.add_argument('--jobset_name', type=str, default='periodic-set',
-                        help='Job set prefix name - optional (default:aperiodic-set)')
+                        help='Job set prefix name - optional')
     # parser.add_argument('--job_lambda',     type=float, default=0.5, help='Job arrival rate: lambda [type:float range:0.001 to 1.0] - optional (default:0.5)')
-    parser.add_argument('--period_min', type=str, default=100, help='Minimum job period, - optional (default:100)')
-    parser.add_argument('--period_max', type=str, default=10000, help='Maximum job period, - optional (default:100)')
+    parser.add_argument('--period_min', type=str, default=100, help='Minimum job period, - optional')
+    parser.add_argument('--period_max', type=str, default=10000, help='Maximum job period, - optional')
     parser.add_argument('--utilization_min_per_job', type=str, default=0.03,
-                        help='Minimum job utilization factor, - optional (default:0.03)')
+                        help='Minimum job utilization factor, - optional')
     args = parser.parse_args()
 
     # get arguments
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     outputDirectory = args.directory
     jobSetName = args.jobset_name
-    period_min = int(args.period_min)
+    period_min = int(args.period_min)/10
     period_max = int(args.period_max)/10
     utilization_min_per_job = args.utilization_min_per_job
 

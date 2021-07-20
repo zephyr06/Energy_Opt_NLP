@@ -6,6 +6,7 @@
 template <typename T>
 T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
 {
+    // if(tasksHighPriority[0].deadline==760830 )
     const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
     const vector<T> executionTimeHigh = GetParameter<T>(tasksHighPriority, "executionTime");
     int N = periodHigh.size();
@@ -15,6 +16,11 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
         cout << red << "During optimization, some variables drop below 0\n"
              << def << endl;
         throw;
+    }
+    else if (isnan(taskCurr.executionTime))
+    {
+        cout << red << "Nan executionTime detected" << def << endl;
+        throw "Nan";
     }
     for (int i = 0; i < int(executionTimeHigh.size()); i++)
     {
@@ -27,7 +33,7 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
         }
     }
 
-    if (Utilization(tasksHighPriority) > 1.0)
+    if (Utilization(tasksHighPriority) + taskCurr.utilization() >= 1.0)
     {
         // cout << "The given task set is unschedulable\n";
         return INT32_MAX;
@@ -82,6 +88,24 @@ bool CheckSchedulability(const TaskSet &taskSet, bool whetherPrint = false)
     return true;
 }
 
+template <typename T>
+bool CheckSchedulability(const TaskSet &taskSet, VectorDynamic warmStart, bool whetherPrint = false)
+{
+    int N = taskSet.size();
+    for (int i = 0; i < N; i++)
+    {
+        TaskSet::const_iterator first = taskSet.begin();
+        vector<Task>::const_iterator last = taskSet.begin() + i;
+        TaskSet hpTasks(first, last);
+        T rta = ResponseTimeAnalysisWarm<T>(warmStart(i, 0), taskSet[i], hpTasks);
+        if (whetherPrint)
+            cout << "response time for task " << i << " is " << rta << " and deadline is " << taskSet[i].deadline << endl;
+        if (rta > min(taskSet[i].deadline, taskSet[i].period))
+            return false;
+    }
+    return true;
+}
+
 VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
 {
     int N = tasks.size();
@@ -90,12 +114,12 @@ VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
 
     vector<Task> hpTasks;
     if (debugMode == 1)
-        cout << "RTA analysis" << endl;
+        cout << "RTA analysis (responseTime, deadline)" << endl;
     for (int i = 0; i < N; i++)
     {
         res(i, 0) = ResponseTimeAnalysis<double>(tasks[i], hpTasks);
         if (debugMode == 1)
-            cout << res(i, 0) << endl;
+            cout << res(i, 0) << ", " << tasks[i].deadline << endl;
         if (res(i, 0) > tasks[i].deadline)
         {
             if (debugMode == 1)
@@ -106,4 +130,15 @@ VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
         hpTasks.push_back(tasks[i]);
     }
     return res;
+}
+
+VectorDynamic ResponseTimeOfTaskSetHard(TaskSet tasks, VectorDynamic comp)
+{
+    if (comp.rows() != int(tasks.size()))
+    {
+        cout << "Size mismatch error!" << endl;
+        throw;
+    }
+    UpdateTaskSetExecutionTime(tasks, comp);
+    return ResponseTimeOfTaskSetHard(tasks);
 }

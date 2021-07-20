@@ -59,17 +59,41 @@ const double EstimateEnergyTaskBasedComputation(const Task &task, double computa
 //     return res;
 // }
 
-VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic &executionTimeVector)
+VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic &executionTimeVector,
+                                    int lastTaskDoNotNeedOptimize = -1)
 {
+    if (executionTimeVector.sum() != 0)
+    {
+        int N = taskSet.size();
+        int n = executionTimeVector.rows();
+
+        MatrixDynamic res;
+        res.resize(n, 1);
+
+        for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+        {
+            double frequencyRunTime = taskSet[i].executionTime /
+                                      executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
+            res(i - lastTaskDoNotNeedOptimize - 1, 0) = 1.0 / taskSet[i].period *
+                                                        EstimateEnergyTask(taskSet[i], frequencyRunTime);
+        }
+        return res;
+    }
+    else
+    {
+        cout << "Input error in EstimateEnergyTaskSet" << endl;
+        throw;
+    }
+}
+VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet)
+{
+
     int N = taskSet.size();
-    int n = executionTimeVector.rows();
-
     MatrixDynamic res;
-    res.resize(n, 1);
-
+    res.resize(N, 1);
     for (int i = 0; i < N; i++)
     {
-        double frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
+        double frequencyRunTime = 1.0;
         res(i, 0) = 1.0 / taskSet[i].period *
                     EstimateEnergyTask(taskSet[i], frequencyRunTime);
     }

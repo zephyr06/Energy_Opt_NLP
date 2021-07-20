@@ -12,6 +12,7 @@
 #include "colormod.h"
 
 #include "Parameters.h"
+#include "Declaration.h"
 using namespace std;
 
 #define TaskSet vector<Task>
@@ -65,7 +66,7 @@ public:
              << deadline << " The overhead is " << overhead << " The offset is " << offset << endl;
     }
 
-    double utilization()
+    double utilization() const
     {
         return double(executionTime) / period;
     }
@@ -102,6 +103,35 @@ vector<T> GetParameter(const TaskSet &taskset, string parameterType)
             parameterList.push_back((T)(taskset[i].deadline));
         else if (parameterType == "offset")
             parameterList.push_back((T)(taskset[i].offset));
+        else
+        {
+            cout << red << "parameterType in GetParameter is not recognized!\n"
+                 << def;
+            throw;
+        }
+    }
+    return parameterList;
+}
+template <typename T>
+VectorDynamic GetParameterVD(const TaskSet &taskset, string parameterType)
+{
+    uint N = taskset.size();
+    VectorDynamic parameterList;
+    parameterList.resize(N, 1);
+    parameterList.setZero();
+
+    for (uint i = 0; i < N; i++)
+    {
+        if (parameterType == "period")
+            parameterList(i, 0) = ((T)(taskset[i].period));
+        else if (parameterType == "executionTime")
+            parameterList(i, 0) = ((T)(taskset[i].executionTime));
+        else if (parameterType == "overhead")
+            parameterList(i, 0) = ((T)(taskset[i].overhead));
+        else if (parameterType == "deadline")
+            parameterList(i, 0) = ((T)(taskset[i].deadline));
+        else if (parameterType == "offset")
+            parameterList(i, 0) = ((T)(taskset[i].offset));
         else
         {
             cout << red << "parameterType in GetParameter is not recognized!\n"
@@ -233,8 +263,17 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
     }
     else
     {
-        cout << red << "The path does not exist in ReadTaskSet!\n"
-             << def;
+        cout << red << "The path does not exist in ReadTaskSet!" << endl
+             << path
+             << def << endl;
         throw;
     }
+}
+
+void UpdateTaskSetExecutionTime(TaskSet &taskSet, VectorDynamic executionTimeVec, int lastTaskDoNotNeedOptimize = -1)
+{
+    int N = taskSet.size();
+
+    for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+        taskSet[i].executionTime = executionTimeVec(i - lastTaskDoNotNeedOptimize - 1, 0);
 }

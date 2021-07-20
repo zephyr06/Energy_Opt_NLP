@@ -1,16 +1,18 @@
 %YAML:1.0
 
-testDataSetName: test_n10_v2
+testDataSetName: test_n20_v9
 
-deltaOptimizer: 1e-6
-weightEnergyMinOrder: -10
-weightEnergyMaxOrder: 1
-weightEnergy: 1e20
-minWeightToBegin: 1e3
+deltaOptimizer: 1e-5
+
+minWeightToBegin: 1e8
 weightStep: 1e2
-eliminateTol: 10
-eliminateStep: 100000
-
+eliminateTol: 1e0
+eliminateStep: 2
+enableIPM: 0
+iterationNumIPM_Max: 10
+exactJacobian: 0
+weightLogBarrier: 0
+roundTypeInClamp: "rough"
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
 
@@ -18,19 +20,20 @@ eliminateStep: 100000
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
-relativeErrorTolerance: 1e-8
-convergTolInterior: 1e-8
+relativeErrorTolerance: 1e-5
+relErrorTolIPM: 1e-6
+xTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
 
 
 punishmentFrequency: 10
-weightLogBarrier: 1
+
 optimizerType: 1 # 1 means dogleg, 2 means LM
 
 deltaInitialDogleg: 1e1
 
-initialLambda: 1e1
+initialLambda: 1e15
 lowerLambda: 1e-5
 upperLambda: 1e30
 
@@ -39,5 +42,10 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 1
+debugMode: 0
+
+# something not used 
+weightEnergyMinOrder: -10
+weightEnergyMaxOrder: 1
+weightEnergy: 1e8
 
