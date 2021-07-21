@@ -225,26 +225,27 @@ public:
                      << endl;
             }
 
-            TaskSet taskSetCurr_ = tasks_;
-            UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
-            vector<Task> hpTasks;
-            for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
-            {
-                hpTasks.push_back(taskSetCurr_[i]);
-            }
             if (debugMode == 1)
-                cout << "The response time and deadline for each task is: " << endl;
-            for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             {
-                // energy part
-                // double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
-                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
-                // barrier function part
-                double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
-                if (debugMode == 1)
+                TaskSet taskSetCurr_ = tasks_;
+                UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
+                vector<Task> hpTasks;
+                for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
+                {
+                    hpTasks.push_back(taskSetCurr_[i]);
+                }
+                cout << "The response time and deadline for each task is: " << endl;
+                for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+                {
+                    // energy part
+                    // double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
+                    // err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
+                    // barrier function part
+                    double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
                     cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
-                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
-                hpTasks.push_back(taskSetCurr_[i]);
+                    // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
+                    hpTasks.push_back(taskSetCurr_[i]);
+                }
             }
         }
         return err;
