@@ -36,6 +36,7 @@ const double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];
 const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency"];
 const string testDataSetName = (string)ConfigParameters["testDataSetName"];
 const string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
+const string RTA_TYPE = (string)ConfigParameters["RTA_TYPE"];
 
 
 const string readTaskMode = (string)ConfigParameters["readTaskMode"];
