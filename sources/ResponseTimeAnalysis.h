@@ -36,6 +36,8 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
     if (Utilization(tasksHighPriority) + taskCurr.utilization() >= 1.0)
     {
         // cout << "The given task set is unschedulable\n";
+        if (debugMode == 1)
+            cout << "Unschedulable system detected, return response time as INT32_MAX" << endl;
         return INT32_MAX;
     }
 
