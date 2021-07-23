@@ -1,5 +1,6 @@
 #include <CppUnitLite/TestHarness.h>
 #include "../sources/WAP/RTA_WAP.h"
+#include "../sources/WAP/Generate_A_P.h"
 
 TEST(ResponseTimeWAP, BlockingTime)
 {
@@ -78,6 +79,120 @@ TEST(busyPeriod, a1)
     {
         if (GetBusyPeriod(tasks, A, P, i) != busyPeriodExpect[i])
             cout << "Error in busyPeriod-a1" << i << endl;
+    }
+}
+
+TEST(GenerateAP, a1)
+{
+    // test_data_N3 in python version
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v26.csv";
+    TaskSet tasks = ReadTaskSet(path, "orig");
+    int N = tasks.size();
+    SquareMatrix A_actual = GenerateZeroMatrix(N);
+    SquareMatrix P_actual = GenerateZeroMatrix(N);
+
+    SquareMatrix A_expect = GenerateZeroMatrix(N);
+    SquareMatrix P_expect = GenerateZeroMatrix(N);
+
+    bool success = GenerateAP_InWAP(tasks, A_actual, P_actual);
+    if (success)
+    {
+        if (A_actual.isApprox(A_expect) && P_actual.isApprox(P_expect))
+        {
+            ;
+        }
+        else
+        {
+            cout << "Error in GenerateAP-a1" << endl;
+        }
+    }
+    else
+        cout << "Error in GenerateAP-a1" << endl;
+}
+
+TEST(GenerateAP, a2)
+{
+    // test_data_N3 in python version
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v27.csv";
+    TaskSet tasks = ReadTaskSet(path, "orig");
+    int N = tasks.size();
+    SquareMatrix A_actual = GenerateZeroMatrix(N);
+    SquareMatrix P_actual = GenerateZeroMatrix(N);
+
+    SquareMatrix A_expect;
+    A_expect.resize(N, N);
+    A_expect << 0, 0, 0,
+        0, 0, 0,
+        0, 0, 0;
+    SquareMatrix P_expect;
+    P_expect.resize(N, N);
+    P_expect << 0, 1, 1,
+        0, 0, 0,
+        0, 0, 0;
+
+    bool success = GenerateAP_InWAP(tasks, A_actual, P_actual);
+    if (success)
+    {
+        if (A_actual.isApprox(A_expect) && P_actual.isApprox(P_expect))
+        {
+            ;
+        }
+        else
+        {
+            cout << "Error in GenerateAP-a2" << endl;
+        }
+    }
+    else
+        cout << "Error in GenerateAP-a2-flag" << endl;
+}
+
+TEST(GenerateAP, a3)
+{
+    // test_data_N3 in python version
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v28.csv";
+    TaskSet tasks = ReadTaskSet(path, "orig");
+    int N = tasks.size();
+    SquareMatrix A_actual = GenerateZeroMatrix(N);
+    SquareMatrix P_actual = GenerateZeroMatrix(N);
+
+    SquareMatrix A_expect;
+    A_expect.resize(N, N);
+    A_expect << 0, 0, 0,
+        0, 0, 0,
+        0, 0, 0;
+    SquareMatrix P_expect;
+    P_expect.resize(N, N);
+    P_expect << 0, 0, 0,
+        0, 0, 1,
+        0, 0, 0;
+
+    bool success = GenerateAP_InWAP(tasks, A_actual, P_actual);
+    if (success)
+    {
+        cout << "Error in GenerateAP-a3" << endl;
+    }
+    else
+        ;
+}
+
+TEST(OPT, WAP)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v28.csv";
+    TaskSet tasks = ReadTaskSet(path, "orig");
+    int N = tasks.size();
+
+    A_Global = GenerateZeroMatrix(N);
+    P_Global = GenerateZeroMatrix(N);
+
+    bool success = GenerateAP_InWAP(tasks, A_Global, P_Global);
+    success = 1;
+    if (success)
+    {
+        ;
+    }
+    else
+    {
+        cout << "Test failed in OPT-WAP because the task set is not schedulable" << endl;
     }
 }
 

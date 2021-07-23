@@ -11,8 +11,13 @@
 #include <gtsam/nonlinear/Values.h>
 #include <gtsam/base/Testable.h>
 
+#include "../Parameters.h"
+
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> SquareMatrix;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
+
+SquareMatrix A_Global;
+SquareMatrix P_Global;
 
 SquareMatrix GenerateZeroMatrix(int N)
 {

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Declare_WAP.h"
 #include "../ResponseTimeAnalysis.h"
 
@@ -12,7 +14,7 @@
  * @param index 
  * @return double the blocking time
  */
-double BlockingTime(TaskSet tasks, SquareMatrix A, SquareMatrix P, int index)
+double BlockingTime(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index)
 {
     int N = tasks.size();
     double blockTime = 0;
@@ -38,7 +40,7 @@ double BlockingTime(TaskSet tasks, SquareMatrix A, SquareMatrix P, int index)
  * @param index 
  * @return TaskSet 
  */
-TaskSet UpdateHpWap(TaskSet &tasks, SquareMatrix A, SquareMatrix P, int index)
+TaskSet UpdateHpWap(TaskSet &tasks, SquareMatrix &A, SquareMatrix &P, int index)
 {
     TaskSet tasksUpdate;
 
@@ -72,7 +74,7 @@ TaskSet UpdateHpWap(TaskSet &tasks, SquareMatrix A, SquareMatrix P, int index)
  * @param P 
  * @return double 
  */
-double GetBusyPeriod(TaskSet tasks, SquareMatrix A, SquareMatrix P, int index)
+double GetBusyPeriod(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index)
 {
     TaskSet tasksUpdate = UpdateHpWap(tasks, A, P, index);
     TaskSet hpTasks;
@@ -97,7 +99,7 @@ double GetBusyPeriod(TaskSet tasks, SquareMatrix A, SquareMatrix P, int index)
  * @param block 
  * @return double 
  */
-double ResponseTimeWapGivenBlock(TaskSet tasks, SquareMatrix A, SquareMatrix P, int index, double block)
+double ResponseTimeWapGivenBlock(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index, double block)
 {
 
     double busyPeriod = GetBusyPeriod(tasks, A, P, index);
@@ -129,8 +131,27 @@ double ResponseTimeWapGivenBlock(TaskSet tasks, SquareMatrix A, SquareMatrix P, 
  * @param index 
  * @return double 
  */
-double ResponseTimeWAP(TaskSet tasks, SquareMatrix A, SquareMatrix P, int index)
+double ResponseTimeWAP(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index)
 {
     double block = BlockingTime(tasks, A, P, index);
     return ResponseTimeWapGivenBlock(tasks, A, P, index, block);
+}
+
+/**
+ * @brief check schedulability for a task set based on WAP analysis model
+ * 
+ * @param tasks 
+ * @param A 
+ * @param P 
+ * @return true 
+ * @return false 
+ */
+bool CheckSchedulability(TaskSet tasks, SquareMatrix &A, SquareMatrix &P)
+{
+    for (int i = 0; i < int(tasks.size()); i++)
+    {
+        if (ResponseTimeWAP(tasks, A, P, i) > tasks[i].deadline)
+            return false;
+    }
+    return true;
 }
