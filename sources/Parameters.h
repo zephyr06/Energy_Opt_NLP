@@ -18,6 +18,8 @@ double eliminateTol = (double)ConfigParameters["eliminateTol"];
 double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
 int enableIPM = (int)ConfigParameters["enableIPM"];
 
+const int fully_preemptive = (int)ConfigParameters["fully_preemptive"];
+
 const int exactJacobian = (int)ConfigParameters["exactJacobian"];
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
@@ -37,7 +39,6 @@ const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency
 const string testDataSetName = (string)ConfigParameters["testDataSetName"];
 const string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
 const string RTA_TYPE = (string)ConfigParameters["RTA_TYPE"];
-
 
 const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];

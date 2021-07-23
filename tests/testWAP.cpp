@@ -185,15 +185,25 @@ TEST(OPT, WAP)
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v27.csv";
     TaskSet tasks = ReadTaskSet(path, "orig");
     int N = tasks.size();
+    bool success;
+    if (not fully_preemptive)
+    {
+        A_Global = GenerateZeroMatrix(N);
+        P_Global = GenerateZeroMatrix(N);
+        cout << "A" << endl
+             << A_Global << endl
+             << "P" << endl
+             << P_Global << endl;
+        success = GenerateAP_InWAP(tasks, A_Global, P_Global);
+        // success = 1;
+    }
+    else
+    {
+        success = 1;
+        A_Global = GenerateZeroMatrix(N);
+        P_Global = GenerateOneMatrix(N);
+    }
 
-    A_Global = GenerateZeroMatrix(N);
-    P_Global = GenerateZeroMatrix(N);
-    cout << "A" << endl
-         << A_Global << endl
-         << "P" << endl
-         << P_Global << endl;
-    bool success = GenerateAP_InWAP(tasks, A_Global, P_Global);
-    // success = 1;
     if (success)
     {
         cout << "A" << endl
