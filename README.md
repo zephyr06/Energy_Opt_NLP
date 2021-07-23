@@ -18,6 +18,7 @@ eliminate during optimization
 
 0. What are the unique features of global result, how can we guide the optimization algorithm to find it by changing some settings
 
+5. add responseTimeInitial to Clamp in the main branch
 
 
 # Research topic

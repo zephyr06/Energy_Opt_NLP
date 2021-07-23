@@ -1,7 +1,11 @@
 #include <CppUnitLite/TestHarness.h>
 #include "../sources/WAP/RTA_WAP.h"
 #include "../sources/WAP/Generate_A_P.h"
+#include "../sources/Optimize.h"
 
+#include <chrono>
+
+using namespace std::chrono;
 TEST(ResponseTimeWAP, BlockingTime)
 {
     // test_data_n3_v2 in python version
@@ -177,21 +181,38 @@ TEST(GenerateAP, a3)
 
 TEST(OPT, WAP)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v28.csv";
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
+    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v27.csv";
     TaskSet tasks = ReadTaskSet(path, "orig");
     int N = tasks.size();
 
     A_Global = GenerateZeroMatrix(N);
     P_Global = GenerateZeroMatrix(N);
-
+    cout << "A" << endl
+         << A_Global << endl
+         << "P" << endl
+         << P_Global << endl;
     bool success = GenerateAP_InWAP(tasks, A_Global, P_Global);
-    success = 1;
+    // success = 1;
     if (success)
     {
-        ;
+        cout << "A" << endl
+             << A_Global << endl
+             << "P" << endl
+             << P_Global << endl;
+        auto start = chrono::high_resolution_clock::now();
+        double res = OptimizeTaskSet(tasks);
+        cout << blue << "The energy saving ratio is " << res << def << endl;
+        auto stop = chrono::high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cout << "The time taken is: " << double(duration.count()) / 1e6 << " seconds" << endl;
     }
     else
     {
+        cout << "A" << endl
+             << A_Global << endl
+             << "P" << endl
+             << P_Global << endl;
         cout << "Test failed in OPT-WAP because the task set is not schedulable" << endl;
     }
 }

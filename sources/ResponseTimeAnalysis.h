@@ -2,6 +2,7 @@
 
 #include "Tasks.h"
 #include "Declaration.h"
+#include "WAP/Declare_WAP.h"
 
 template <typename T>
 T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
@@ -36,8 +37,8 @@ T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSe
     if (Utilization(tasksHighPriority) + taskCurr.utilization() >= 1.0)
     {
         // cout << "The given task set is unschedulable\n";
-        if (debugMode == 1)
-            cout << "Unschedulable system detected, return response time as INT32_MAX" << endl;
+        // if (debugMode == 1)
+        //     cout << "Unschedulable system detected, return response time as INT32_MAX" << endl;
         return INT32_MAX;
     }
 
@@ -106,41 +107,4 @@ bool CheckSchedulability(const TaskSet &taskSet, VectorDynamic warmStart, bool w
             return false;
     }
     return true;
-}
-
-VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
-{
-    int N = tasks.size();
-    VectorDynamic res;
-    res.resize(N, 1);
-
-    vector<Task> hpTasks;
-    if (debugMode == 1)
-        cout << "RTA analysis (responseTime, deadline)" << endl;
-    for (int i = 0; i < N; i++)
-    {
-        res(i, 0) = ResponseTimeAnalysis<double>(tasks[i], hpTasks);
-        if (debugMode == 1)
-            cout << res(i, 0) << ", " << tasks[i].deadline << endl;
-        if (res(i, 0) > tasks[i].deadline)
-        {
-            if (debugMode == 1)
-                cout << "The given task set is not schedulable!\n";
-            res(0, 0) = -1;
-            return res;
-        }
-        hpTasks.push_back(tasks[i]);
-    }
-    return res;
-}
-
-VectorDynamic ResponseTimeOfTaskSetHard(TaskSet tasks, VectorDynamic comp)
-{
-    if (comp.rows() != int(tasks.size()))
-    {
-        cout << "Size mismatch error!" << endl;
-        throw;
-    }
-    UpdateTaskSetExecutionTime(tasks, comp);
-    return ResponseTimeOfTaskSetHard(tasks);
 }

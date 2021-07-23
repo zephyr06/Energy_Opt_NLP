@@ -74,15 +74,15 @@ TEST(Schedulability, p1)
         throw;
     }
 }
-TEST(RTA, ResponseTimeOfTaskSetHard)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
+// TEST(RTA, ResponseTimeOfTaskSetHard)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
 
-    int rta3Expect = 282;
-    TaskSet hp({task_set[0], task_set[1]});
-    int rta3Actual = int(ResponseTimeOfTaskSetHard(task_set)(2, 0));
-    CHECK_EQUAL(rta3Expect, rta3Actual);
-}
+//     int rta3Expect = 282;
+//     TaskSet hp({task_set[0], task_set[1]});
+//     int rta3Actual = int(ResponseTimeOfTaskSetHard(task_set)(2, 0));
+//     CHECK_EQUAL(rta3Expect, rta3Actual);
+// }
 
 int main()
 {

@@ -90,6 +90,43 @@ double GetBusyPeriod(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index)
 }
 
 /**
+ * @brief overloaded function for ResponseTimeWapGivenBlock, which considers warmStart
+ * 
+ * @param tasks 
+ * @param A 
+ * @param P 
+ * @param index 
+ * @param block 
+ * @param warmStart 
+ * @return double 
+ */
+double ResponseTimeWapGivenBlock(TaskSet tasks, SquareMatrix &A, SquareMatrix &P,
+                                 int index, double block, double warmStart)
+{
+
+    double busyPeriod = GetBusyPeriod(tasks, A, P, index);
+    if (busyPeriod == INT32_MAX)
+        return INT32_MAX;
+
+    Task taskCurr = tasks[index];
+    taskCurr.executionTime += block;
+    TaskSet tasksUpdate = UpdateHpWap(tasks, A, P, index);
+    TaskSet hpTasks;
+    for (int i = 0; i < index; i++)
+        hpTasks.push_back(tasksUpdate[i]);
+
+    double worstRT = ResponseTimeAnalysisWarm<double>(warmStart, taskCurr, hpTasks);
+    for (int i = 1; i < int(ceil(busyPeriod / tasks[index].period)); i++)
+    {
+        taskCurr.executionTime += tasks[index].executionTime;
+        double responseTime_q = ResponseTimeAnalysis<double>(taskCurr, hpTasks);
+        worstRT = max(worstRT, responseTime_q - (i * taskCurr.period));
+    }
+
+    return worstRT;
+}
+
+/**
  * @brief Given block time for one task, estimate its response time using standard RTA
  * 
  * @param tasks; accept a copy rather than reference of the task set!!
@@ -99,27 +136,26 @@ double GetBusyPeriod(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index)
  * @param block 
  * @return double 
  */
-double ResponseTimeWapGivenBlock(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index, double block)
+double ResponseTimeWapGivenBlock(TaskSet tasks, SquareMatrix &A, SquareMatrix &P,
+                                 int index, double block)
 {
+    return ResponseTimeWapGivenBlock(tasks, A, P, index, block, tasks[index].executionTime);
+}
 
-    double busyPeriod = GetBusyPeriod(tasks, A, P, index);
-
-    Task taskCurr = tasks[index];
-    taskCurr.executionTime += block;
-    TaskSet tasksUpdate = UpdateHpWap(tasks, A, P, index);
-    TaskSet hpTasks;
-    for (int i = 0; i < index; i++)
-        hpTasks.push_back(tasksUpdate[i]);
-
-    double worstRT = ResponseTimeAnalysis<double>(taskCurr, hpTasks);
-    for (int i = 1; i < int(ceil(busyPeriod / tasks[index].period)); i++)
-    {
-        taskCurr.executionTime += tasks[index].executionTime;
-        double responseTime_q = ResponseTimeAnalysis<double>(taskCurr, hpTasks);
-        worstRT = max(worstRT, responseTime_q - (i * taskCurr.period));
-    }
-
-    return worstRT;
+/**
+ * @brief overloaded function for ResponseTimeWAP, which considers warmStart 
+ * 
+ * @param tasks 
+ * @param A 
+ * @param P 
+ * @param index 
+ * @param warmStart 
+ * @return double 
+ */
+double ResponseTimeWAP(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index, double warmStart)
+{
+    double block = BlockingTime(tasks, A, P, index);
+    return ResponseTimeWapGivenBlock(tasks, A, P, index, block, warmStart);
 }
 
 /**
@@ -133,8 +169,27 @@ double ResponseTimeWapGivenBlock(TaskSet tasks, SquareMatrix &A, SquareMatrix &P
  */
 double ResponseTimeWAP(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int index)
 {
-    double block = BlockingTime(tasks, A, P, index);
-    return ResponseTimeWapGivenBlock(tasks, A, P, index, block);
+    return ResponseTimeWAP(tasks, A, P, index, tasks[index].executionTime);
+}
+
+/**
+ * @brief overload function
+ * 
+ * @param tasks 
+ * @param A 
+ * @param P 
+ * @param warmStart 
+ * @return true 
+ * @return false 
+ */
+bool CheckSchedulability(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, VectorDynamic &warmStart)
+{
+    for (int i = 0; i < int(tasks.size()); i++)
+    {
+        if (ResponseTimeWAP(tasks, A, P, i, warmStart(i, 0)) > tasks[i].deadline)
+            return false;
+    }
+    return true;
 }
 
 /**
@@ -148,10 +203,47 @@ double ResponseTimeWAP(TaskSet tasks, SquareMatrix &A, SquareMatrix &P, int inde
  */
 bool CheckSchedulability(TaskSet tasks, SquareMatrix &A, SquareMatrix &P)
 {
-    for (int i = 0; i < int(tasks.size()); i++)
+    VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
+    return CheckSchedulability(tasks, A, P, warmStart);
+}
+
+VectorDynamic ResponseTimeOfTaskSetHardWarmStart(TaskSet &tasks, VectorDynamic &warmStart)
+{
+    int N = tasks.size();
+    VectorDynamic res;
+    res.resize(N, 1);
+
+    if (debugMode == 1)
+        cout << "RTA analysis (responseTime, deadline)" << endl;
+    for (int i = 0; i < N; i++)
     {
-        if (ResponseTimeWAP(tasks, A, P, i) > tasks[i].deadline)
-            return false;
+        res(i, 0) = ResponseTimeWAP(tasks, A_Global, P_Global, i, warmStart(i, 0));
+        if (debugMode == 1)
+            cout << res(i, 0) << ", " << tasks[i].deadline << endl;
+        if (res(i, 0) > tasks[i].deadline)
+        {
+            if (debugMode == 1)
+                cout << "The given task set is not schedulable!\n";
+            res(0, 0) = -1;
+            return res;
+        }
     }
-    return true;
+    return res;
+}
+
+VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
+{
+    VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
+    return ResponseTimeOfTaskSetHardWarmStart(tasks, warmStart);
+}
+
+VectorDynamic ResponseTimeOfTaskSetHard(TaskSet tasks, VectorDynamic comp)
+{
+    if (comp.rows() != int(tasks.size()))
+    {
+        cout << "Size mismatch error!" << endl;
+        throw;
+    }
+    UpdateTaskSetExecutionTime(tasks, comp);
+    return ResponseTimeOfTaskSetHard(tasks);
 }

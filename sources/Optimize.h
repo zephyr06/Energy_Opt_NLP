@@ -22,6 +22,7 @@
 #include "ResponseTimeAnalysis.h"
 #include "Energy.h"
 #include "Parameters.h"
+#include "WAP/RTA_WAP.h"
 
 using namespace std;
 using namespace gtsam;
@@ -152,7 +153,7 @@ public:
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) = 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                 currentEnergyConsumption += err(i - (lastTaskDoNotNeedOptimize + 1), 0);
                 // barrier function part
-                double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                double responseTime = ResponseTimeWAP(taskSetCurr_, A_Global, P_Global, i, responseTimeInitial(i, 0));
                 // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
                 if (tasks_[i].deadline - responseTime < 0)
@@ -241,7 +242,7 @@ public:
                     // double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
                     // err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                     // barrier function part
-                    double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                    double responseTime = ResponseTimeWAP(taskSetCurr_, A_Global, P_Global, i, responseTimeInitial(i, 0));
                     cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
                     // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
                     hpTasks.push_back(taskSetCurr_[i]);
@@ -264,7 +265,9 @@ bool comparePair(const pair<int, double> &p1, const pair<int, double> &p2)
     return (p1.second > p2.second);
 }
 // ------------------
-VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize, string roundType = roundTypeInClamp)
+VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize,
+                                   VectorDynamic &responseTimeInitial,
+                                   string roundType = roundTypeInClamp)
 {
     int n = comp.rows();
     for (int i = 0; i < n; i++)
@@ -276,7 +279,7 @@ VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastT
     else if (roundType == "fine")
     {
         int N = tasks.size();
-        VectorDynamic warmStart = ResponseTimeOfTaskSetHard(tasks, comp);
+        // VectorDynamic warmStart = ResponseTimeOfTaskSetHard(tasks, comp);
 
         vector<pair<int, double>> objectiveVec;
         // objectiveVec.reserve(N);
@@ -299,7 +302,7 @@ VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastT
             comp(currentIndex, 0) += 1;
             taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
 
-            if (not CheckSchedulability<int>(taskDuringOpt, warmStart, false))
+            if (not CheckSchedulability(taskDuringOpt, A_Global, P_Global, responseTimeInitial))
             {
                 comp(currentIndex, 0) -= 1;
                 taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
@@ -353,7 +356,7 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
     {
         hpTasks.pop_back();
         tasksCurr[i].executionTime += eliminateTol;
-        double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
+        double rt = ResponseTimeWAP(tasksCurr, A_Global, P_Global, i, computationTimeWarmStart(i, 0));
         // cout << "rt is " << rt << " deadline is " << tasks[i].deadline << endl;
         if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline)
             return i;
@@ -539,6 +542,7 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
 
     do
     {
+        responseTimeInitial = ResponseTimeOfTaskSetHardWarmStart(tasksDuringOpt, responseTimeInitial);
         VectorDynamic initialEstimateDuringOpt;
         initialEstimateDuringOpt.resize(numberOfTasksNeedOptimize, 1);
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
@@ -553,7 +557,9 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
 
-        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, lastTaskDoNotNeedOptimize, "rough");
+        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt,
+                                                             tasks, lastTaskDoNotNeedOptimize,
+                                                             responseTimeInitial, "rough");
         // cout << computationTimeVectorLocalOpt << endl;
         // find variables to eliminate
         int adjustEliminateTolNum = 0;
@@ -599,7 +605,7 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
     } while (numberOfTasksNeedOptimize > 0);
 
     // performance evaluation
-    if (CheckSchedulability<int>(tasksDuringOpt))
+    if (CheckSchedulability<int>(tasksDuringOpt, responseTimeInitial))
     {
         if (debugMode == 1)
         {
@@ -614,7 +620,8 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         }
         if (debugMode == 1)
             cout << "computationTimeVectorLocalOpt before Clamp fine: " << computationTimeVectorLocalOpt << endl;
-        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, -1, roundTypeInClamp);
+        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, -1,
+                                                             responseTimeInitial, roundTypeInClamp);
         if (debugMode == 1)
             cout << "computationTimeVectorLocalOpt after Clamp fine: " << computationTimeVectorLocalOpt << endl;
         double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
