@@ -1,10 +1,23 @@
 #pragma once
 
 #include "Optimize.h"
+#include "WAP/Generate_A_P.h"
 
 double OptimizeTaskSetBf3(TaskSet &tasks, int granularity = granularityInBF)
 {
     int N = tasks.size();
+
+    if (fully_preemptive)
+    {
+        A_Global = GenerateZeroMatrix(N);
+        P_Global = GenerateOneMatrix(N);
+    }
+    else
+    {
+        A_Global = GenerateZeroMatrix(N);
+        P_Global = GenerateZeroMatrix(N);
+        bool success = GenerateAP_InWAP(tasks, A_Global, P_Global);
+    }
 
     // this function also checks schedulability
     VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard(tasks);
@@ -35,7 +48,7 @@ double OptimizeTaskSetBf3(TaskSet &tasks, int granularity = granularityInBF)
                 executionTimeVector << firstTaskExe, secondTaskExe, thirdTaskExe;
                 TaskSet taskSetCurr_ = tasks;
                 UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector);
-                if (CheckSchedulability<int>(taskSetCurr_))
+                if (CheckSchedulability(taskSetCurr_, A_Global, P_Global))
                 {
                     double energyCurr = EstimateEnergyTaskSet(tasks, executionTimeVector).sum();
                     if (energyCurr < minEnergy)

@@ -1,7 +1,7 @@
 %YAML:1.0
 
-testDataSetName: test_n20_v8
-RTA_TYPE: "WAP"
+testDataSetName: test_n3_v24
+
 fully_preemptive: 1
 deltaOptimizer: 1e-5
 
@@ -13,7 +13,7 @@ enableIPM: 0
 iterationNumIPM_Max: 10
 exactJacobian: 0
 weightLogBarrier: 0
-roundTypeInClamp: "rough"
+roundTypeInClamp: "fine"
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
 
@@ -21,7 +21,7 @@ roundTypeInClamp: "rough"
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
-relativeErrorTolerance: 1e-3
+relativeErrorTolerance: 1e-5
 relErrorTolIPM: 1e-6
 xTolIPM: 1e-3
 toleranceBarrier: 1e-6
@@ -39,14 +39,24 @@ lowerLambda: 1e-5
 upperLambda: 1e30
 
 
-granularityInBF:1
+granularityInBF:10
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 0
+debugMode: 1
+
+
+
+
+
+
+
+
+
 
 # something not used 
 weightEnergyMinOrder: -10
 weightEnergyMaxOrder: 1
 weightEnergy: 1e8
+RTA_TYPE: "WAP"
 

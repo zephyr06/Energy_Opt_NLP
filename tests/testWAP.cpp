@@ -183,7 +183,7 @@ TEST(OPT, WAP)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v27.csv";
-    TaskSet tasks = ReadTaskSet(path, "orig");
+    TaskSet tasks = ReadTaskSet(path, "RM");
     int N = tasks.size();
     bool success;
     if (not fully_preemptive)
