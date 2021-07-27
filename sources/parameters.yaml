@@ -1,12 +1,12 @@
 %YAML:1.0
 
-testDataSetName: test_n20_v9
+testDataSetName: test_n2_v1
 
 deltaOptimizer: 1e-5
 
 minWeightToBegin: 1e8
 weightStep: 1e2
-eliminateTol: 1e0
+eliminateTol: 1e-1
 eliminateStep: 2
 enableIPM: 0
 iterationNumIPM_Max: 10
@@ -42,7 +42,7 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 0
+debugMode: 1
 
 # something not used 
 weightEnergyMinOrder: -10
