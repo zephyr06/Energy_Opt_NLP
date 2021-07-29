@@ -286,34 +286,58 @@ VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastT
         int iterationNumber = 0;
         TaskSet taskDuringOpt = tasks;
         UpdateTaskSetExecutionTime(taskDuringOpt, comp, lastTaskDoNotNeedOptimize);
+
+        if (debugMode == 1)
+        {
+            cout << "before binary search, here is the task set" << endl;
+            for (int i = 0; i < N; i++)
+                taskDuringOpt[i].print();
+        }
+
+        // int left = 0, right = 0;
         while (objectiveVec.size() > 0)
         {
             int currentIndex = objectiveVec[0].first;
 
             // try to round up, if success, keep the loop; otherwise, eliminate it and high priority tasks
             // can be speeded up, if necessary, by binary search
-            comp(currentIndex, 0) += 1;
-            taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
+            int left = comp(currentIndex, 0);
+            int right = taskDuringOpt[currentIndex].deadline;
+            for (int j = 0; j < currentIndex; j++)
+                right -= taskDuringOpt[j].executionTime;
+            int ref = comp(currentIndex, 0);
 
-            if (not CheckSchedulability(taskDuringOpt, A_Global, P_Global, responseTimeInitial))
+            while (left <= right)
             {
-                comp(currentIndex, 0) -= 1;
-                taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
-                minEliminate = currentIndex;
-                for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
+                int mid = (left + right) / 2;
+
+                taskDuringOpt[currentIndex].executionTime = mid;
+
+                if (not CheckSchedulability(taskDuringOpt, A_Global, P_Global, responseTimeInitial))
                 {
-                    if (objectiveVec[i].first <= minEliminate)
+                    taskDuringOpt[currentIndex].executionTime = ref;
+                    comp(currentIndex, 0) = ref;
+                    taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
+                    minEliminate = currentIndex;
+                    for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
                     {
-                        objectiveVec.erase(objectiveVec.begin() + i);
+                        if (objectiveVec[i].first <= minEliminate)
+                        {
+                            objectiveVec.erase(objectiveVec.begin() + i);
+                        }
                     }
+                    right = mid - 1;
+                }
+                else
+                {
+                    comp(currentIndex, 0) = mid;
+                    taskDuringOpt[currentIndex].executionTime = mid;
+                    left = mid + 1;
                 }
             }
-            else
-            {
-                ;
-            }
+
             iterationNumber++;
-            if (iterationNumber > 100)
+            if (iterationNumber > N)
             {
                 cout << red << "iterationNumber error in Clamp!" << def << endl;
                 // throw;
@@ -635,6 +659,8 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
 
 /**
  * initialize all the global variables
+ * 
+ * !!Note, it is the callee's responsibility to make sure A_Global, P_Global is initialized!!
  */
 double OptimizeTaskSet(TaskSet &tasks)
 {
@@ -643,8 +669,8 @@ double OptimizeTaskSet(TaskSet &tasks)
     vectorGlobalOpt.setZero();
     valueGlobalOpt = INT64_MAX;
     weightEnergy = minWeightToBegin;
-    A_Global = GenerateZeroMatrix(N);
-    P_Global = GenerateZeroMatrix(N);
+    // A_Global = GenerateZeroMatrix(N);
+    // P_Global = GenerateZeroMatrix(N);
 
     double eliminateTolRef = eliminateTol;
 

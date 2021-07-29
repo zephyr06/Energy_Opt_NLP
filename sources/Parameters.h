@@ -19,6 +19,7 @@ double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
 int enableIPM = (int)ConfigParameters["enableIPM"];
 
 const int fully_preemptive = (int)ConfigParameters["fully_preemptive"];
+const int granulairyInClamp = (int)ConfigParameters["granulairyInClamp"];
 
 const int exactJacobian = (int)ConfigParameters["exactJacobian"];
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];

@@ -122,7 +122,7 @@ double ResponseTimeWapGivenBlock(TaskSet tasks, SquareMatrix &A, SquareMatrix &P
         taskCurr.executionTime += tasks[index].executionTime;
         // double responseTime_q = ResponseTimeAnalysis<double>(taskCurr, hpTasks);
         double responseTime_q = ResponseTimeAnalysisWarm<double>(prevRT, taskCurr, hpTasks);
-        prevRT = responseTime_q - (i * taskCurr.period);
+        prevRT = max(tasks[index].executionTime + block, responseTime_q - (i * taskCurr.period));
         worstRT = max(worstRT, responseTime_q - (i * taskCurr.period));
     }
 

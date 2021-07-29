@@ -1,6 +1,6 @@
 %YAML:1.0
 
-testDataSetName: test_n3_v28
+testDataSetName: test_n10_v5
 
 fully_preemptive: 1
 deltaOptimizer: 1e-5
@@ -13,12 +13,13 @@ enableIPM: 0
 iterationNumIPM_Max: 10
 exactJacobian: 0
 weightLogBarrier: 0
-roundTypeInClamp: "fine"
+roundTypeInClamp: "rough"
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
 
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e6
+granulairyInClamp: 100
 
 noiseModelSigma: 1e-3
 relativeErrorTolerance: 1e-5
@@ -43,7 +44,7 @@ granularityInBF:10
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 1
+debugMode: 0
 
 
 

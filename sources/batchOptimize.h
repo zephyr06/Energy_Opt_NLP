@@ -7,6 +7,8 @@
 #include <chrono>
 
 #include "Optimize.h"
+#include "WAP/RTA_WAP.h"
+#include "WAP/Generate_A_P.h"
 using namespace std::chrono;
 
 double Average(vector<double> &data)
@@ -50,6 +52,11 @@ void BatchOptimize()
         {
             string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
             TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
+
+            int N = taskSet1.size();
+            A_Global = GenerateZeroMatrix(N);
+            P_Global = GenerateZeroMatrix(N);
+            bool success = GenerateAP_InWAP(taskSet1, A_Global, P_Global);
             auto start = chrono::high_resolution_clock::now();
             double res = OptimizeTaskSet(taskSet1);
             // cout << "The energy saving ratio is " << res << endl;

@@ -128,7 +128,7 @@ bool AssignAP_LogicForOneTask(int indexCurr, TaskSet &tasks, SquareMatrix &A, Sq
     sort(vecForLP.begin(), vecForLP.end(), compareInWAP);
 
     bool success = false;
-    int indexFirstAvailable = -1;
+    int indexFirstAvailable_vecForLP = -1;
 
     // first step, find the first entry in list_for_sort that makes task_curr_id schedulable
     for (int i = 0; i < int(vecForLP.size()); i++)
@@ -136,12 +136,12 @@ bool AssignAP_LogicForOneTask(int indexCurr, TaskSet &tasks, SquareMatrix &A, Sq
         if (ResponseTimeWapGivenBlock(tasks, A, P, indexCurr, vecForLP[i].value) <= tasks[indexCurr].deadline)
         {
             success = true;
-            indexFirstAvailable = i;
+            indexFirstAvailable_vecForLP = i;
             break;
         }
     }
 
-    if (indexFirstAvailable == -1)
+    if (indexFirstAvailable_vecForLP == -1)
     {
         //The current task cannot tolerate any block from lp tasks
         //Let's try if all block items are 0, will it be schedulable
@@ -168,7 +168,7 @@ bool AssignAP_LogicForOneTask(int indexCurr, TaskSet &tasks, SquareMatrix &A, Sq
 
     vector<bool> decidedIndex(N, false);
     // first iteration, go through entries that can tolerate block or preempt
-    for (int l = indexFirstAvailable; l < int(vecForLP.size()); l++)
+    for (int l = indexFirstAvailable_vecForLP; l < int(vecForLP.size()); l++)
     {
         int realTaskIndex = vecForLP[l].index;
         if (vecForLP[l].pattern == "block" && decidedIndex[realTaskIndex] == false)
@@ -186,13 +186,13 @@ bool AssignAP_LogicForOneTask(int indexCurr, TaskSet &tasks, SquareMatrix &A, Sq
     }
 
     // second iteration, go through entries that cannot tolerate block or preempt
-    for (int i = 0; i < indexFirstAvailable; i++)
+    for (int i = 0; i < indexFirstAvailable_vecForLP; i++)
     {
         if (decidedIndex[vecForLP[i].index] == false)
         {
-            A(indexCurr, i) = 1;
-            P(indexCurr, i) = 0;
-            decidedIndex[i] = true;
+            A(indexCurr, vecForLP[i].index) = 1;
+            P(indexCurr, vecForLP[i].index) = 0;
+            decidedIndex[vecForLP[i].index] = true;
         }
     }
     return true;

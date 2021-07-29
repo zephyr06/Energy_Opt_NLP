@@ -20,6 +20,8 @@ eliminate during optimization
 
 5. add responseTimeInitial to Clamp in the main branch
 
+6. There are still bugs in WAP, observed in 9-taskset.
+
 
 # Research topic
 1. how to round float point to int
