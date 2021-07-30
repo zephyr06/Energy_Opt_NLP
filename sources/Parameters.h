@@ -18,7 +18,10 @@ double eliminateTol = (double)ConfigParameters["eliminateTol"];
 double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
 int enableIPM = (int)ConfigParameters["enableIPM"];
 
+const int enableMaxComputation = (int)ConfigParameters["enableMaxComputation"];
 const int exactJacobian = (int)ConfigParameters["exactJacobian"];
+const double computationBound = (double)ConfigParameters["computationBound"];
+
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];

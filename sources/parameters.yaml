@@ -2,14 +2,16 @@
 
 runMode: compare
 
-testDataSetName: test_n5_v5
+testDataSetName: test_n5_v8
 
 deltaOptimizer: 1e-5
 
+
+enableMaxComputation: 1
 minWeightToBegin: 1e9
 weightStep: 1e2
 eliminateTol: 1e-1
-eliminateStep: 2
+eliminateStep: 3
 enableIPM: 0
 iterationNumIPM_Max: 10
 exactJacobian: 0
@@ -28,7 +30,7 @@ xTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
 
-
+computationBound: 2.0
 punishmentFrequency: 10
 
 optimizerType: 1 # 1 means dogleg, 2 means LM
@@ -44,7 +46,7 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 1
+debugMode: 0
 
 # something not used 
 weightEnergyMinOrder: -10

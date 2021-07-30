@@ -155,7 +155,11 @@ public:
                 double responseTime = ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
                 // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
-                if (tasks_[i].deadline - responseTime < 0)
+                if (enableMaxComputation)
+                    err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime * 2 -
+                                                                           executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1), 0));
+                if (tasks_[i].deadline - responseTime < 0 ||
+                    executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1) > tasks_[i].executionTime * 2))
                     flagSchedulable = false;
                 // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime - taskSetCurr_[i].executionTime);
                 hpTasks.push_back(taskSetCurr_[i]);
@@ -263,6 +267,27 @@ bool comparePair(const pair<int, double> &p1, const pair<int, double> &p2)
 {
     return (p1.second > p2.second);
 }
+
+/**
+ * @brief whether tasksCurr's computation time is within given bound of tasksRef
+ * 
+ * @param tasksRef 
+ * @param tasksCurr 
+ * @return true 
+ * @return false 
+ */
+bool WithInBound(const TaskSet &tasksRef, const TaskSet &tasksCurr)
+{
+    int N = tasksRef.size();
+    for (int i = 0; i < N; i++)
+    {
+        if (tasksRef[i].executionTime * 2 < tasksCurr[i].executionTime)
+            return false;
+        if (tasksRef[i].executionTime > tasksCurr[i].executionTime)
+            return false;
+    }
+    return true;
+}
 // ------------------
 VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize,
                                    VectorDynamic &responseTimeInitial, string roundType = roundTypeInClamp)
@@ -307,9 +332,15 @@ VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastT
             // try to round up, if success, keep the loop; otherwise, eliminate it and high priority tasks
             // can be speeded up, if necessary, by binary search
             int left = comp(currentIndex, 0);
-            int right = taskDuringOpt[currentIndex].deadline;
-            for (int j = 0; j < currentIndex; j++)
-                right -= taskDuringOpt[j].executionTime;
+            int right = min(taskDuringOpt[currentIndex].deadline,
+                            int(tasks[currentIndex].executionTime * computationBound));
+            // for (int j = 0; j < currentIndex; j++)
+            //     right -= taskDuringOpt[j].executionTime;
+            if (left > right)
+            {
+                cout << "left > right error in clamp!" << endl;
+                throw;
+            }
             int ref = comp(currentIndex, 0);
 
             while (left <= right)
@@ -318,7 +349,8 @@ VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastT
 
                 taskDuringOpt[currentIndex].executionTime = mid;
 
-                if (not CheckSchedulability<int>(taskDuringOpt, responseTimeInitial))
+                if ((not CheckSchedulability<int>(taskDuringOpt, responseTimeInitial)) ||
+                    not WithInBound(tasks, taskDuringOpt))
                 {
                     taskDuringOpt[currentIndex].executionTime = ref;
                     comp(currentIndex, 0) = ref;
@@ -333,10 +365,23 @@ VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastT
                     }
                     right = mid - 1;
                 }
+                else if (left == right)
+                {
+                    minEliminate = currentIndex;
+                    for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
+                    {
+                        if (objectiveVec[i].first <= minEliminate)
+                        {
+                            objectiveVec.erase(objectiveVec.begin() + i);
+                        }
+                    }
+                    break;
+                }
                 else
                 {
                     comp(currentIndex, 0) = mid;
                     taskDuringOpt[currentIndex].executionTime = mid;
+                    ref = mid;
                     left = mid + 1;
                 }
             }
@@ -380,7 +425,8 @@ int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTim
         tasksCurr[i].executionTime += eliminateTol;
         double rt = ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
         // cout << "rt is " << rt << " deadline is " << tasks[i].deadline << endl;
-        if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline)
+        if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
+            computationTimeVector(i, 0) + tolerance > tasks[i].executionTime * 2)
             return i;
         tasksCurr[i].executionTime -= eliminateTol;
     }
@@ -616,7 +662,7 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         numberOfIteration++;
         if (numberOfIteration > N)
         {
-            cout << red << "!\n"
+            cout << red << "numberOfIteration error!\n"
                  << def << endl;
             if (debugMode == 1)
                 Print(tasks);
