@@ -51,7 +51,9 @@ if __name__ == "__main__":
             deadline = txt2data(deadline_txt)[1:]
             computation_time= txt2data(computation_time_txt)[1:]
 
-            target_file_name=targetDataSet+"/"+"periodic-set-"+str(index)+"-syntheticJobs.csv"
+            target_file_name=targetDataSet+"/"+"periodic-set-"+file[4:-4]+"-syntheticJobs.csv"
+            # print(file[4:-4])
+            # print(file)
             with open(target_file_name,"w+") as f:
                 f.write('JobID,Offset,Period,Overhead,ExecutionTime,DeadLine (From Yecheng)\n')
 

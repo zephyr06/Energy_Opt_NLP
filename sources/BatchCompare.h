@@ -127,6 +127,7 @@ void BatchCompare()
             {
                 energySaveRatioVec.push_back(res / (baselineResult.second / 1e9));
                 runTime.push_back(timeTaken / baselineResult.first);
+                cout << "One compare: " << res / (baselineResult.second / 1e9) << endl;
             }
             else if (res == -1 || res > 1)
             {
