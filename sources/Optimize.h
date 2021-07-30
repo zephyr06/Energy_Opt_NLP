@@ -264,7 +264,8 @@ bool comparePair(const pair<int, double> &p1, const pair<int, double> &p2)
     return (p1.second > p2.second);
 }
 // ------------------
-VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize, string roundType = roundTypeInClamp)
+VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize,
+                                   VectorDynamic &responseTimeInitial, string roundType = roundTypeInClamp)
 {
     int n = comp.rows();
     for (int i = 0; i < n; i++)
@@ -276,7 +277,7 @@ VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastT
     else if (roundType == "fine")
     {
         int N = tasks.size();
-        VectorDynamic warmStart = ResponseTimeOfTaskSetHard(tasks, comp);
+        // VectorDynamic warmStart = ResponseTimeOfTaskSetHard(tasks, comp);
 
         vector<pair<int, double>> objectiveVec;
         // objectiveVec.reserve(N);
@@ -290,34 +291,58 @@ VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastT
         int iterationNumber = 0;
         TaskSet taskDuringOpt = tasks;
         UpdateTaskSetExecutionTime(taskDuringOpt, comp, lastTaskDoNotNeedOptimize);
+
+        if (debugMode == 1)
+        {
+            cout << "before binary search, here is the task set" << endl;
+            for (int i = 0; i < N; i++)
+                taskDuringOpt[i].print();
+        }
+
+        // int left = 0, right = 0;
         while (objectiveVec.size() > 0)
         {
             int currentIndex = objectiveVec[0].first;
 
             // try to round up, if success, keep the loop; otherwise, eliminate it and high priority tasks
             // can be speeded up, if necessary, by binary search
-            comp(currentIndex, 0) += 1;
-            taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
+            int left = comp(currentIndex, 0);
+            int right = taskDuringOpt[currentIndex].deadline;
+            for (int j = 0; j < currentIndex; j++)
+                right -= taskDuringOpt[j].executionTime;
+            int ref = comp(currentIndex, 0);
 
-            if (not CheckSchedulability<int>(taskDuringOpt, warmStart, false))
+            while (left <= right)
             {
-                comp(currentIndex, 0) -= 1;
-                taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
-                minEliminate = currentIndex;
-                for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
+                int mid = (left + right) / 2;
+
+                taskDuringOpt[currentIndex].executionTime = mid;
+
+                if (not CheckSchedulability<int>(taskDuringOpt, responseTimeInitial))
                 {
-                    if (objectiveVec[i].first <= minEliminate)
+                    taskDuringOpt[currentIndex].executionTime = ref;
+                    comp(currentIndex, 0) = ref;
+                    taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
+                    minEliminate = currentIndex;
+                    for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
                     {
-                        objectiveVec.erase(objectiveVec.begin() + i);
+                        if (objectiveVec[i].first <= minEliminate)
+                        {
+                            objectiveVec.erase(objectiveVec.begin() + i);
+                        }
                     }
+                    right = mid - 1;
+                }
+                else
+                {
+                    comp(currentIndex, 0) = mid;
+                    taskDuringOpt[currentIndex].executionTime = mid;
+                    left = mid + 1;
                 }
             }
-            else
-            {
-                ;
-            }
+
             iterationNumber++;
-            if (iterationNumber > 100)
+            if (iterationNumber > N)
             {
                 cout << red << "iterationNumber error in Clamp!" << def << endl;
                 // throw;
@@ -553,7 +578,8 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
 
-        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, lastTaskDoNotNeedOptimize, "rough");
+        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks,
+                                                             lastTaskDoNotNeedOptimize, responseTimeInitial, "rough");
         // cout << computationTimeVectorLocalOpt << endl;
         // find variables to eliminate
         int adjustEliminateTolNum = 0;
@@ -590,7 +616,7 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         numberOfIteration++;
         if (numberOfIteration > N)
         {
-            cout << red << "Iteration number error!\n"
+            cout << red << "!\n"
                  << def << endl;
             if (debugMode == 1)
                 Print(tasks);
@@ -614,12 +640,26 @@ double OptimizeTaskSetOneIte(TaskSet &tasks)
         }
         if (debugMode == 1)
             cout << "computationTimeVectorLocalOpt before Clamp fine: " << computationTimeVectorLocalOpt << endl;
-        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, -1, roundTypeInClamp);
+        computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, -1,
+                                                             responseTimeInitial, roundTypeInClamp);
         if (debugMode == 1)
             cout << "computationTimeVectorLocalOpt after Clamp fine: " << computationTimeVectorLocalOpt << endl;
         double initialEnergyCost = EstimateEnergyTaskSet(tasks, initialExecutionTime).sum();
         double afterEnergyCost = EstimateEnergyTaskSet(tasks, computationTimeVectorLocalOpt).sum();
-        return afterEnergyCost / initialEnergyCost;
+        if (debugMode == 1)
+        {
+            cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
+            cout << "The variable after optimization is " << computationTimeVectorLocalOpt << endl;
+        }
+        if (runMode == "compare")
+            return afterEnergyCost / weightEnergy;
+        else if (runMode == "normal")
+            return afterEnergyCost / initialEnergyCost;
+        else
+        {
+            cout << red << "Unrecognized runMode!!" << def << endl;
+            throw;
+        }
     }
     else
     {

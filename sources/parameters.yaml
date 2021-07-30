@@ -1,6 +1,8 @@
 %YAML:1.0
 
-testDataSetName: test_n2_v1
+runMode: compare
+
+testDataSetName: test_n5_v3
 
 deltaOptimizer: 1e-5
 
@@ -12,7 +14,7 @@ enableIPM: 0
 iterationNumIPM_Max: 10
 exactJacobian: 0
 weightLogBarrier: 0
-roundTypeInClamp: "rough"
+roundTypeInClamp: "fine"
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
 
@@ -42,7 +44,7 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 1
+debugMode: 2
 
 # something not used 
 weightEnergyMinOrder: -10
