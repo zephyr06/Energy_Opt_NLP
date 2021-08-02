@@ -102,14 +102,17 @@ void BatchCompare()
 {
     const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
     vector<double> energySaveRatioVec;
-    vector<double> runTime;
+    vector<double> runTimeW, runTimeZ;
 
     vector<string> errorFiles;
+    string worstFile = "";
+    double worstValue = 0.0;
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
         if (debugMode)
             cout << file << endl;
         string delimiter = "-";
+
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
             string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
@@ -126,8 +129,20 @@ void BatchCompare()
             if (res >= 0 && res <= 1)
             {
                 energySaveRatioVec.push_back(res / (baselineResult.second / 1e9));
-                runTime.push_back(timeTaken / baselineResult.first);
-                cout << "One compare: " << res / (baselineResult.second / 1e9) << endl;
+                if (energySaveRatioVec.back() > worstValue)
+                {
+                    worstValue = energySaveRatioVec.back();
+                    worstFile = path;
+                }
+                runTimeW.push_back(timeTaken);
+                runTimeZ.push_back(baselineResult.first);
+
+                if (debugMode == 3)
+                    cout << "One compare: " << res / (baselineResult.second / 1e9) << endl;
+                ofstream outfileWrite;
+                outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/ResultFiles/N" + to_string(taskSet1.size()) + ".txt", std::ios_base::app);
+                outfileWrite << energySaveRatioVec.back() << endl;
+                outfileWrite.close();
             }
             else if (res == -1 || res > 1)
             {
@@ -138,25 +153,27 @@ void BatchCompare()
 
     double avEnergy = -1;
     double aveTime = -1;
-    int n = runTime.size();
+    int n = energySaveRatioVec.size();
     if (n != 0)
     {
         avEnergy = Average(energySaveRatioVec);
-        aveTime = Average(runTime);
+        aveTime = Average(runTimeW) / Average(runTimeZ);
     }
 
     ofstream outfile1, outfile2;
-    outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/Visualization/data_buffer_energy_task_number.txt", std::ios_base::app);
+    outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/data_buffer_energy_task_number.txt", std::ios_base::app);
     outfile1 << avEnergy << endl;
     // if (debugMode)
     // {
     cout << "Average energy optimization objective (NLP: MUA) ratio is " << avEnergy << endl;
+    cout << "The worst value is " << worstValue << endl;
+    cout << "The worst file is " << worstFile << endl;
     cout << "Average time consumed ratio (NLP: MUA) is " << aveTime << endl;
     cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
     // }
 
-    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/Visualization/time_task_number.txt", std::ios_base::app);
-    outfile2 << aveTime << endl;
+    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/time_task_number.txt", std::ios_base::app);
+    outfile2 << Average(runTimeW) << ", " << Average(runTimeZ) << endl;
     if (debugMode == 1)
         cout << endl;
     for (auto &file : errorFiles)

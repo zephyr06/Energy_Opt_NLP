@@ -25,7 +25,7 @@ punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e-3
 relativeErrorTolerance: 1e-5
-relErrorTolIPM: 1e-6
+relErrorTolIPM: 1e-5
 xTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
@@ -35,10 +35,10 @@ punishmentFrequency: 10
 
 optimizerType: 1 # 1 means dogleg, 2 means LM
 
-deltaInitialDogleg: 1e1
+deltaInitialDogleg: 1e10
 
-initialLambda: 1e15
-lowerLambda: 1e-5
+initialLambda: 1e10
+lowerLambda: 1e-15
 upperLambda: 1e30
 
 

@@ -41,6 +41,9 @@ void BatchOptimize()
     vector<double> runTime;
 
     vector<string> errorFiles;
+    ofstream outfileWrite;
+    outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/data_buffer_energy_task_number.txt", std::ios_base::app);
+
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
         if (debugMode)
@@ -60,6 +63,7 @@ void BatchOptimize()
             {
                 energySaveRatioVec.push_back(res);
                 runTime.push_back(timeTaken);
+                outfileWrite << energySaveRatioVec.back() << endl;
             }
             else if (res == -1 || res > 1)
             {
@@ -78,7 +82,7 @@ void BatchOptimize()
     }
 
     ofstream outfile1, outfile2;
-    outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/Visualization/data_buffer_energy_task_number.txt", std::ios_base::app);
+    outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/data_buffer_energy_task_number.txt", std::ios_base::app);
     outfile1 << avEnergy << endl;
     // if (debugMode)
     // {
@@ -87,7 +91,7 @@ void BatchOptimize()
     cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
     // }
 
-    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/Visualization/time_task_number.txt", std::ios_base::app);
+    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/time_task_number.txt", std::ios_base::app);
     outfile2 << aveTime << endl;
     if (debugMode == 1)
         cout << endl;
