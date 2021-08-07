@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from util_visua import Read_txt_file_1d
 
 def Read_txt_file_1d(path, func):
     """ read txt files, and return a list, each element contains one number"""
