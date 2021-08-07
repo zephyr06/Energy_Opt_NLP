@@ -41,4 +41,3 @@ if __name__ == "__main__":
     plt.savefig("Compare_run_time" + ".png", format='png')
     plt.show(block=False)
     plt.pause(3)
-    plt.show()
