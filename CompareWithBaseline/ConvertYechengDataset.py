@@ -21,10 +21,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--convertionNumber', type=int, default=5,
                         help='N')
-    parser.add_argument('--directory', type=str, default='/home/zephyr/Programming/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep',
+    parser.add_argument('--directory', type=str, default='/home/lab/Programming/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep',
                         help='O')
     parser.add_argument('--directoryWriteTo', type=str,
-                        default='/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number',
+                        default='/home/lab/Programming/Energy_Opt_NLP/TaskData/task_number',
                         help='O')
 
     args = parser.parse_args()

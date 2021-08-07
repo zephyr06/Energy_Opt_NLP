@@ -36,7 +36,7 @@ if __name__ == "__main__":
     plt.grid(linestyle="--")
     splot.set(xlabel="Task Number", ylabel="Runt-Time (seconds)")
     splot.set_xlim(4, None)
-    splot.set_ylim(1e-3, None)
+    splot.set_ylim(1e-3, 1e2)
     plt.savefig("Compare_run_time" + ".pdf", format='pdf')
     plt.savefig("Compare_run_time" + ".png", format='png')
     plt.show()
