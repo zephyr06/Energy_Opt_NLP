@@ -29,9 +29,10 @@ if __name__ == "__main__":
     # plt.show()
     dataset_pd = pd.DataFrame(data=data_2d,
                               index=range(5,21)).T
-    ax = sns.boxplot( data=dataset_pd, orient="v")
+    ax = sns.boxplot( data=dataset_pd, orient="v", fliersize=1, saturation=0.75, whis=1.5)
     ax.set(xlabel="Task Number", ylabel="Relative Gap (%)")
     plt.savefig("Compare_energy" + ".pdf", format='pdf')
     plt.savefig("Compare_energy" + ".png", format='png')
-    plt.show()
+    plt.show(block=False)
+    plt.pause(3)
     a=1

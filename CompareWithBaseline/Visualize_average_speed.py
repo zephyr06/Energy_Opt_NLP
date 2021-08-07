@@ -39,4 +39,6 @@ if __name__ == "__main__":
     splot.set_ylim(1e-3, None)
     plt.savefig("Compare_run_time" + ".pdf", format='pdf')
     plt.savefig("Compare_run_time" + ".png", format='png')
+    plt.show(block=False)
+    plt.pause(3)
     plt.show()
