@@ -64,7 +64,7 @@ int ExtractIndex(string path, string delimiter = "-")
  */
 pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
 {
-    string yechengRepoPath = "/home/lab/Programming/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + to_string(N) + "/";
+    string yechengRepoPath = "/home/zephyr/Programming/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + to_string(N) + "/";
 
     int index = ExtractIndex(pathInPeriodicDataset);
     string targetFilePathGP = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_GPResult.txt";
@@ -100,7 +100,7 @@ pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
 
 void BatchCompare()
 {
-    const char *pathDataset = "/home/lab/Programming/Energy_Opt_NLP/TaskData/task_number";
+    const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
     vector<double> energySaveRatioVec;
     vector<double> runTimeW, runTimeZ;
 
@@ -115,10 +115,10 @@ void BatchCompare()
 
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
-            string path = "/home/lab/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
+            string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
             TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
             auto start = chrono::high_resolution_clock::now();
-            double res = OptimizeTaskSet(taskSet1);
+            double res = Energy_Opt<RTA_LL>::OptimizeTaskSet(taskSet1);
             // cout << "The energy saving ratio is " << res << endl;
             auto stop = chrono::high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
@@ -140,7 +140,7 @@ void BatchCompare()
                 if (debugMode == 3)
                     cout << "One compare: " << res / (baselineResult.second / 1e9) << endl;
                 ofstream outfileWrite;
-                outfileWrite.open("/home/lab/Programming/Energy_Opt_NLP/CompareWithBaseline/ResultFiles/N" + to_string(taskSet1.size()) + ".txt", std::ios_base::app);
+                outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/ResultFiles/N" + to_string(taskSet1.size()) + ".txt", std::ios_base::app);
                 outfileWrite << energySaveRatioVec.back() << endl;
                 outfileWrite.close();
             }
@@ -161,7 +161,7 @@ void BatchCompare()
     }
 
     ofstream outfile1, outfile2;
-    outfile1.open("/home/lab/Programming/Energy_Opt_NLP/CompareWithBaseline/data_buffer_energy_task_number.txt", std::ios_base::app);
+    outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/data_buffer_energy_task_number.txt", std::ios_base::app);
     outfile1 << avEnergy << endl;
     // if (debugMode)
     // {
@@ -172,7 +172,7 @@ void BatchCompare()
     cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
     // }
 
-    outfile2.open("/home/lab/Programming/Energy_Opt_NLP/CompareWithBaseline/time_task_number.txt", std::ios_base::app);
+    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/time_task_number.txt", std::ios_base::app);
     outfile2 << Average(runTimeW) << ", " << Average(runTimeZ) << endl;
     if (debugMode == 1)
         cout << endl;
