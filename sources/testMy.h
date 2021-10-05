@@ -38,7 +38,7 @@ void AssertUnEqual(T expect, T actual)
 }
 void AssertEqualScalar(double expected, double actual, double tolerance = 1e-6)
 {
-    if (abs(expected - actual) < tolerance)
+    if (abs(expected - actual) / expected < tolerance)
         return;
     else
     {

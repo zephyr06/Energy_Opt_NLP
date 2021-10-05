@@ -1,5 +1,6 @@
 #include "../sources/Energy.h"
 #include "../sources/Declaration.h"
+#include "../sources/testMy.h"
 
 TEST(energy, tasks)
 {
@@ -11,9 +12,10 @@ TEST(energy, tasks)
     comp << 17, 12, 253;
 
     VectorDynamic energy1;
+    weightEnergy = 1e8;
     energy1 = EstimateEnergyTaskSet(taskSet, comp);
-    CHECK_EQUAL(48314, energy1(0, 0));
-    CHECK_EQUAL(31320, energy1(1, 0));
+    AssertEqualScalar(3777777.7778, energy1(0, 0));
+    AssertEqualScalar(2448979.5918, energy1(1, 0));
 }
 
 int main()

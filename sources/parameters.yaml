@@ -7,7 +7,7 @@ testDataSetName: test_n5_v8
 deltaOptimizer: 1e-5
 
 
-enableMaxComputation: 1
+enableMaxComputationTimeRestrict: 1
 minWeightToBegin: 1e9
 weightStep: 1e2
 eliminateTol: 1e-1
@@ -33,12 +33,12 @@ toleranceBarrier: 1e-6
 computationBound: 2.0
 punishmentFrequency: 10
 
-optimizerType: 1 # 1 means dogleg, 2 means LM
+optimizerType: 2 # 1 means dogleg, 2 means LM
 
 deltaInitialDogleg: 1e10
 
-initialLambda: 1e10
-lowerLambda: 1e-15
+initialLambda: 1e-5
+lowerLambda: 1e-20
 upperLambda: 1e30
 
 
@@ -46,7 +46,7 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 
-debugMode: 1
+debugMode: 0
 
 # something not used 
 weightEnergyMinOrder: -10

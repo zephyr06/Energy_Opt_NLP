@@ -9,7 +9,7 @@
 #include <Eigen/Dense>
 #include "Declaration.h"
 #include "Tasks.h"
-#include "ResponseTimeAnalysis.h"
+#include "RTA_LL.h"
 #include "Energy.h"
 #include "utils.h"
 
@@ -71,12 +71,14 @@ public:
                     err(i - (lastTaskDoNotNeedOptimize + 1), 0) = 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                     currentEnergyConsumption += err(i - (lastTaskDoNotNeedOptimize + 1), 0);
                     // barrier function part
-                    double responseTime = Schedul_Analysis::template ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                    double responseTime = Schedul_Analysis::ResponseTimeAnalysisWarm(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
                     // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
+
                     err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
-                    if (enableMaxComputation)
+                    if (enableMaxComputationTimeRestrict)
                         err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime * 2 -
                                                                                executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1), 0));
+
                     if (tasks_[i].deadline - responseTime < 0 ||
                         executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1) > tasks_[i].executionTime * 2))
                         flagSchedulable = false;
@@ -164,7 +166,7 @@ public:
                         // double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
                         // err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                         // barrier function part
-                        double responseTime = Schedul_Analysis::template ResponseTimeAnalysisWarm<double>(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                        double responseTime = Schedul_Analysis::ResponseTimeAnalysisWarm(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
                         cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
                         // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
                         hpTasks.push_back(taskSetCurr_[i]);
@@ -176,6 +178,7 @@ public:
     };
 
     // ------------------
+    // TODO: clamp turn 123.99 to 124 rather than 123
     static VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize,
                                               VectorDynamic &responseTimeInitial, string roundType = roundTypeInClamp)
     {
@@ -219,8 +222,13 @@ public:
                 // try to round up, if success, keep the loop; otherwise, eliminate it and high priority tasks
                 // can be speeded up, if necessary, by binary search
                 int left = comp(currentIndex, 0);
-                int right = min(taskDuringOpt[currentIndex].deadline,
-                                int(tasks[currentIndex].executionTime * computationBound));
+                // int right = min(taskDuringOpt[currentIndex].deadline,
+                //                 int(tasks[currentIndex].executionTime * computationBound));
+                int right = taskDuringOpt[currentIndex].deadline;
+                if (enableMaxComputationTimeRestrict)
+                {
+                    right = min(right, tasks[currentIndex].executionTime * computationBound);
+                }
                 // for (int j = 0; j < currentIndex; j++)
                 //     right -= taskDuringOpt[j].executionTime;
                 if (left > right)
@@ -236,7 +244,7 @@ public:
 
                     taskDuringOpt[currentIndex].executionTime = mid;
 
-                    if ((not Schedul_Analysis::template CheckSchedulability<int>(taskDuringOpt, responseTimeInitial)) ||
+                    if ((not CheckSchedulability<Schedul_Analysis>(taskDuringOpt, responseTimeInitial)) ||
                         not WithInBound(tasks, taskDuringOpt))
                     {
                         taskDuringOpt[currentIndex].executionTime = ref;
@@ -310,7 +318,7 @@ public:
         {
             hpTasks.pop_back();
             tasksCurr[i].executionTime += eliminateTol;
-            double rt = Schedul_Analysis::template ResponseTimeAnalysisWarm<double>(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
+            double rt = Schedul_Analysis::ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
             // cout << "rt is " << rt << " deadline is " << tasks[i].deadline << endl;
             if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
                 computationTimeVector(i, 0) + tolerance > tasks[i].executionTime * 2)
@@ -320,7 +328,9 @@ public:
         return -1;
     }
 
-    static VectorDynamic UnitOptimization(TaskSet &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate, VectorDynamic &responseTimeInitial)
+    static VectorDynamic UnitOptimization(TaskSet &tasks,
+                                          int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate,
+                                          VectorDynamic &responseTimeInitial)
     {
         int N = tasks.size();
         TASK_NUMBER = N;
@@ -354,7 +364,7 @@ public:
             LevenbergMarquardtParams params;
             params.setlambdaInitial(initialLambda);
             if (debugMode == 1)
-                params.setVerbosityLM("SUMMARY");
+                params.setVerbosityLM("DAMPED");
             params.setlambdaLowerBound(lowerLambda);
             params.setlambdaUpperBound(upperLambda);
             params.setRelativeErrorTol(relativeErrorTolerance);
@@ -543,7 +553,7 @@ public:
         } while (numberOfTasksNeedOptimize > 0);
 
         // performance evaluation
-        if (Schedul_Analysis::template CheckSchedulability<int>(tasksDuringOpt))
+        if (CheckSchedulability<Schedul_Analysis>(tasksDuringOpt))
         {
             if (debugMode == 1)
             {

@@ -17,6 +17,22 @@
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
 
+double min(double a, double b)
+{
+    if (a <= b)
+        return a;
+    else
+        return b;
+    return 0;
+}
+double max(double a, double b)
+{
+    if (a >= b)
+        return a;
+    else
+        return b;
+    return 0;
+}
 // typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
 // typedef Eigen::Matrix<double, TASK_NUMBER, TASK_NUMBER> JacobianOpt;
 // typedef Eigen::Matrix<double, TASK_NUMBER, 1> ErrElement;

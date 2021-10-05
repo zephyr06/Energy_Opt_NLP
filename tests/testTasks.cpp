@@ -3,7 +3,7 @@
 #include <CppUnitLite/TestHarness.h>
 
 #include "../sources/Tasks.h"
-#include "../sources/ResponseTimeAnalysis.h"
+#include "../sources/RTA_LL.h"
 #include "../sources/Parameters.h"
 #include "../sources/Optimize.h"
 

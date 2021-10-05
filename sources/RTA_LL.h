@@ -7,12 +7,11 @@
 class RTA_LL : public RTA_BASE
 {
 public:
-    template <typename T>
-    static T ResponseTimeAnalysisWarm(const T beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
+    static double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
     {
         // if(tasksHighPriority[0].deadline==760830 )
         const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
-        const vector<T> executionTimeHigh = GetParameter<T>(tasksHighPriority, "executionTime");
+        const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
         int N = periodHigh.size();
 
         if (beginTime < 0)
@@ -45,10 +44,10 @@ public:
 
         bool stop_flag = false;
 
-        T responseTimeBefore = beginTime;
+        double responseTimeBefore = beginTime;
         while (not stop_flag)
         {
-            T responseTime = taskCurr.executionTime;
+            double responseTime = taskCurr.executionTime;
             for (int i = 0; i < N; i++)
                 responseTime += ceil(responseTimeBefore / double(periodHigh[i])) * executionTimeHigh[i];
             if (responseTime == responseTimeBefore)
@@ -65,14 +64,13 @@ public:
         throw;
     }
 
-    template <typename T>
-    static T ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
+    static double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
     {
-        const vector<T> executionTimeHigh = GetParameter<T>(tasksHighPriority, "executionTime");
-        T executionTimeAll = taskCurr.executionTime;
+        const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
+        double executionTimeAll = taskCurr.executionTime;
         for (auto &task : tasksHighPriority)
             executionTimeAll += task.executionTime;
-        return ResponseTimeAnalysisWarm<T>(executionTimeAll, taskCurr, tasksHighPriority);
+        return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
     }
 
     static VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
@@ -86,13 +84,13 @@ public:
             cout << "RTA analysis (responseTime, deadline)" << endl;
         for (int i = 0; i < N; i++)
         {
-            res(i, 0) = ResponseTimeAnalysis<double>(tasks[i], hpTasks);
+            res(i, 0) = ResponseTimeAnalysis(tasks[i], hpTasks);
             if (debugMode == 1)
                 cout << res(i, 0) << ", " << tasks[i].deadline << endl;
-            if (res(i, 0) > tasks[i].deadline)
+            if (res(i, 0) > min(tasks[i].deadline, tasks[i].period))
             {
                 if (debugMode == 1)
-                    cout << "The given task set is not schedulable!\n";
+                    cout << "The current task set is not schedulable!\n";
                 res(0, 0) = -1;
                 return res;
             }
@@ -101,7 +99,7 @@ public:
         return res;
     }
 
-    static VectorDynamic ResponseTimeOfTaskSetHard(TaskSet tasks, VectorDynamic comp)
+    static VectorDynamic ResponseTimeOfTaskSetHardWarm(TaskSet tasks, VectorDynamic comp)
     {
         if (comp.rows() != int(tasks.size()))
         {
@@ -122,7 +120,7 @@ public:
 //         TaskSet::const_iterator first = taskSet.begin();
 //         vector<Task>::const_iterator last = taskSet.begin() + i;
 //         TaskSet hpTasks(first, last);
-//         T rta = ResponseTimeAnalysis<T>(taskSet[i], hpTasks);
+//         T rta = ResponseTimeAnalysis(taskSet[i], hpTasks);
 //         if (whetherPrint)
 //             cout << "response time for task " << i << " is " << rta << " and deadline is " << taskSet[i].deadline << endl;
 //         if (rta > min(taskSet[i].deadline, taskSet[i].period))
@@ -140,7 +138,7 @@ public:
 //         TaskSet::const_iterator first = taskSet.begin();
 //         vector<Task>::const_iterator last = taskSet.begin() + i;
 //         TaskSet hpTasks(first, last);
-//         T rta = ResponseTimeAnalysisWarm<T>(warmStart(i, 0), taskSet[i], hpTasks);
+//         T rta = ResponseTimeAnalysisWarm(warmStart(i, 0), taskSet[i], hpTasks);
 //         if (whetherPrint)
 //             cout << "response time for task " << i << " is " << rta << " and deadline is " << taskSet[i].deadline << endl;
 //         if (rta > min(taskSet[i].deadline, taskSet[i].period))
