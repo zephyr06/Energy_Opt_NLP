@@ -17,6 +17,9 @@
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
 
+extern MatrixDynamic A_Global;
+extern MatrixDynamic P_Global;
+
 double min(double a, double b)
 {
     if (a <= b)
@@ -32,6 +35,26 @@ double max(double a, double b)
     else
         return b;
     return 0;
+}
+
+inline MatrixDynamic GenerateZeroMatrix(int m, int n)
+{
+    MatrixDynamic M;
+    M.resize(m, n);
+    M.setZero();
+    return M;
+}
+inline MatrixDynamic GenerateOneMatrix(int m, int n)
+{
+    MatrixDynamic M;
+    M.resize(m, n);
+    M.setZero();
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+            M(i, j) = 1;
+    }
+    return M;
 }
 // typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
 // typedef Eigen::Matrix<double, TASK_NUMBER, TASK_NUMBER> JacobianOpt;

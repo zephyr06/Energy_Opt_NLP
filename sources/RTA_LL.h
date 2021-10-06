@@ -7,6 +7,25 @@
 class RTA_LL : public RTA_BASE
 {
 public:
+    static double RTA_Common(const TaskSet &tasks, int index)
+    {
+        TaskSet tasksHp;
+        for (int i = 0; i < index; i++)
+        {
+            tasksHp.push_back(tasks.at(i));
+        }
+        return ResponseTimeAnalysis(tasks.at(index), tasksHp);
+    }
+    static double RTA_Common_Warm(double beginTime, const TaskSet &tasks, int index)
+    {
+        TaskSet tasksHp;
+        for (int i = 0; i < index; i++)
+        {
+            tasksHp.push_back(tasks.at(i));
+        }
+        return ResponseTimeAnalysisWarm(beginTime, tasks.at(index), tasksHp);
+    }
+
     static double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
     {
         // if(tasksHighPriority[0].deadline==760830 )
@@ -71,43 +90,6 @@ public:
         for (auto &task : tasksHighPriority)
             executionTimeAll += task.executionTime;
         return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
-    }
-
-    static VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
-    {
-        int N = tasks.size();
-        VectorDynamic res;
-        res.resize(N, 1);
-
-        vector<Task> hpTasks;
-        if (debugMode == 1)
-            cout << "RTA analysis (responseTime, deadline)" << endl;
-        for (int i = 0; i < N; i++)
-        {
-            res(i, 0) = ResponseTimeAnalysis(tasks[i], hpTasks);
-            if (debugMode == 1)
-                cout << res(i, 0) << ", " << tasks[i].deadline << endl;
-            if (res(i, 0) > min(tasks[i].deadline, tasks[i].period))
-            {
-                if (debugMode == 1)
-                    cout << "The current task set is not schedulable!\n";
-                res(0, 0) = -1;
-                return res;
-            }
-            hpTasks.push_back(tasks[i]);
-        }
-        return res;
-    }
-
-    static VectorDynamic ResponseTimeOfTaskSetHardWarm(TaskSet tasks, VectorDynamic comp)
-    {
-        if (comp.rows() != int(tasks.size()))
-        {
-            cout << "Size mismatch error!" << endl;
-            throw;
-        }
-        UpdateTaskSetExecutionTime(tasks, comp);
-        return ResponseTimeOfTaskSetHard(tasks);
     }
 };
 

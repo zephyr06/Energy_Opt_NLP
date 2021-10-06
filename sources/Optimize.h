@@ -71,7 +71,8 @@ public:
                     err(i - (lastTaskDoNotNeedOptimize + 1), 0) = 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                     currentEnergyConsumption += err(i - (lastTaskDoNotNeedOptimize + 1), 0);
                     // barrier function part
-                    double responseTime = Schedul_Analysis::ResponseTimeAnalysisWarm(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                    double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
+                    // double responseTime = Schedul_Analysis::ResponseTimeAnalysisWarm(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
                     // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
 
                     err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
@@ -166,7 +167,9 @@ public:
                         // double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
                         // err(i - (lastTaskDoNotNeedOptimize + 1), 0) = hyperPeriod / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                         // barrier function part
-                        double responseTime = Schedul_Analysis::ResponseTimeAnalysisWarm(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+
+                        double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
+                        // double responseTime = Schedul_Analysis::ResponseTimeAnalysisWarm(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
                         cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
                         // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
                         hpTasks.push_back(taskSetCurr_[i]);
@@ -192,7 +195,7 @@ public:
         else if (roundType == "fine")
         {
             int N = tasks.size();
-            // VectorDynamic warmStart = ResponseTimeOfTaskSetHard(tasks, comp);
+            // VectorDynamic warmStart = ResponseTimeOfTaskSetHard<Schedul_Analysis>(tasks, comp);
 
             vector<pair<int, double>> objectiveVec;
             // objectiveVec.reserve(N);
@@ -318,7 +321,9 @@ public:
         {
             hpTasks.pop_back();
             tasksCurr[i].executionTime += eliminateTol;
-            double rt = Schedul_Analysis::ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
+
+            double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
+            // double rt = Schedul_Analysis::ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
             // cout << "rt is " << rt << " deadline is " << tasks[i].deadline << endl;
             if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
                 computationTimeVector(i, 0) + tolerance > tasks[i].executionTime * 2)
@@ -473,7 +478,7 @@ public:
         // vectorGlobalOpt.resize(N, 1);
 
         // this function also checks schedulability
-        VectorDynamic responseTimeInitial = Schedul_Analysis::ResponseTimeOfTaskSetHard(tasks);
+        VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard<Schedul_Analysis>(tasks);
         if (responseTimeInitial(0, 0) == -1)
             return -2;
 
@@ -531,7 +536,7 @@ public:
                 TaskSet tasks2 = tasks;
                 for (int i = 0; i < N; i++)
                     tasks2[i].executionTime = computationTimeVectorLocalOpt(i, 0);
-                VectorDynamic ttt = Schedul_Analysis::ResponseTimeOfTaskSetHard(tasks2);
+                VectorDynamic ttt = ResponseTimeOfTaskSetHard<Schedul_Analysis>(tasks2);
             }
 
             // check optimization results to see if there are tasks to remove further

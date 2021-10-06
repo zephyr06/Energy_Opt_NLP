@@ -26,7 +26,7 @@ const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
 const double upperLambda = (double)ConfigParameters["upperLambda"];
-
+string priorityMode = (string)ConfigParameters["priorityMode"];
 const double noiseModelSigma = (double)ConfigParameters["noiseModelSigma"];
 const double deltaInitialDogleg = (double)ConfigParameters["deltaInitialDogleg"];
 
