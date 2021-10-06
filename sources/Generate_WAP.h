@@ -8,14 +8,20 @@ class DataMetaWAP
 {
 public:
     double value;
-    int id;
+    int index;
     char pattern;
-
-    DataMetaWAP(double value, int id, char pattern) : value(value), id(id), pattern(pattern) {}
+    /**
+     * @brief Construct a new Data Meta WAP object, this function is mainly used for GenerateWAP
+     * 
+     * @param value 
+     * @param index: this is not task id!!! 
+     * @param pattern 
+     */
+    DataMetaWAP(double value, int index, char pattern) : value(value), index(index), pattern(pattern) {}
 
     void print()
     {
-        cout << "The value of the entry is " << value << "\nThe id: " << id << "\nThe pattern: " << pattern << endl;
+        cout << "The value of the entry is " << value << "\nThe index (Not id): " << index << "\nThe pattern: " << pattern << endl;
     }
 };
 bool compareDataMetaWAP(DataMetaWAP &a, DataMetaWAP &b)
@@ -115,26 +121,26 @@ bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDyn
             DataMetaWAP entry = list4Sort[i];
             if (entry.pattern == 'a')
             {
-                A(index, entry.id) = 0;
-                P(index, entry.id) = 0;
-                decidedEntry[entry.id] = 1;
+                A(index, entry.index) = 0;
+                P(index, entry.index) = 0;
+                decidedEntry[entry.index] = 1;
             }
-            else if (entry.pattern == 'p' && decidedEntry[entry.id] == 0)
+            else if (entry.pattern == 'p' && decidedEntry[entry.index] == 0)
             {
-                A(index, entry.id) = 0;
-                P(index, entry.id) = 1;
-                decidedEntry[entry.id] = 1;
+                A(index, entry.index) = 0;
+                P(index, entry.index) = 1;
+                decidedEntry[entry.index] = 1;
             }
         }
         // second iteration, go through entries before the first entry found
         for (size_t i = 0; i < index_first_available; i++)
         {
             DataMetaWAP entry = list4Sort[i];
-            if (decidedEntry[entry.id] == 0)
+            if (decidedEntry[entry.index] == 0)
             {
-                A(index, entry.id) = 1;
-                P(index, entry.id) = 0;
-                decidedEntry[entry.id] = 1;
+                A(index, entry.index) = 1;
+                P(index, entry.index) = 0;
+                decidedEntry[entry.index] = 1;
             }
         }
         return true;
