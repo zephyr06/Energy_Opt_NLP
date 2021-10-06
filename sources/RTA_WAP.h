@@ -1,3 +1,4 @@
+#pragma once
 #include "RTA_LL.h"
 
 MatrixDynamic A_Global;

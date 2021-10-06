@@ -1,6 +1,7 @@
 #include <CppUnitLite/TestHarness.h>
 #include "../sources/RTA_LL.h"
 #include "../sources/RTA_WAP.h"
+#include "../sources/Generate_WAP.h"
 
 TEST(hyperPeriod, RTA)
 {
@@ -134,6 +135,92 @@ TEST(wap, v3)
     AssertEigenEqualVector(expect, actual);
 }
 
+TEST(GenerateWAP, v1)
+{
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+    int N = task_set.size();
+    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    auto sth = Generate_WAP(task_set);
+    MatrixDynamic actualA, actualP;
+    bool success;
+    std::tie(success, actualA, actualP) = sth;
+    AssertEigenEqualMatrix(expectA, actualA);
+    AssertEigenEqualMatrix(expectP, actualP);
+}
+TEST(GenerateWAP, v2)
+{
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v11.csv", "orig");
+    int N = task_set.size();
+    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    expectP << 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 1,
+        0, 0, 0, 0, 1,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0;
+    auto sth = Generate_WAP(task_set);
+    MatrixDynamic actualA, actualP;
+    bool success;
+    std::tie(success, actualA, actualP) = sth;
+    AssertEigenEqualMatrix(expectA, actualA);
+    AssertEigenEqualMatrix(expectP, actualP);
+}
+TEST(GenerateWAP, v3)
+{
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v5.csv", "orig");
+    int N = task_set.size();
+    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    expectP << 0, 1, 1, 1, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0;
+    auto sth = Generate_WAP(task_set);
+    MatrixDynamic actualA, actualP;
+    bool success;
+    std::tie(success, actualA, actualP) = sth;
+    AssertEigenEqualMatrix(expectA, actualA);
+    AssertEigenEqualMatrix(expectP, actualP);
+}
+TEST(GenerateWAP, v4)
+{
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v12.csv", "RM");
+    int N = task_set.size();
+    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    expectP << 0, 1, 0, 1, 1,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 1, 1,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0;
+    auto sth = Generate_WAP(task_set);
+    MatrixDynamic actualA, actualP;
+    bool success;
+    std::tie(success, actualA, actualP) = sth;
+    AssertEigenEqualMatrix(expectA, actualA);
+    AssertEigenEqualMatrix(expectP, actualP);
+}
+TEST(GenerateWAP, v5)
+{
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v13.csv", "RM");
+    int N = task_set.size();
+    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
+    expectA(2, 4) = 1;
+    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    expectP << 0, 1, 0, 1, 1,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0;
+    auto sth = Generate_WAP(task_set);
+    MatrixDynamic actualA, actualP;
+    bool success;
+    std::tie(success, actualA, actualP) = sth;
+    AssertEigenEqualMatrix(expectA, actualA);
+    AssertEigenEqualMatrix(expectP, actualP);
+}
 int main()
 {
     TestResult tr;
