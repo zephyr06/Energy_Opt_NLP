@@ -17,8 +17,10 @@
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
 
-extern MatrixDynamic A_Global;
-extern MatrixDynamic P_Global;
+// extern MatrixDynamic A_Global;
+// extern MatrixDynamic P_Global;
+MatrixDynamic A_Global;
+MatrixDynamic P_Global;
 
 double min(double a, double b)
 {

@@ -1,12 +1,12 @@
-#include <iostream>
 #pragma once
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <dirent.h>
 #include <sys/types.h>
 #include <chrono>
 
-#include "Optimize.h"
+#include "../sources/Optimize.h"
 using namespace std::chrono;
 
 double Average(vector<double> &data)

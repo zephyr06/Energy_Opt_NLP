@@ -1,4 +1,4 @@
-#include "../sources/batchOptimize.h"
+#include "../sources/WAPbatchOptimize.h"
 TEST(parameters, a1)
 {
     BatchOptimize();

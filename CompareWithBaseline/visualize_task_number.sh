@@ -26,8 +26,9 @@ do
 	# Optimize energy consumption
 	cd ../build
 	make -j4
-	./tests/testCompare1
-	cd ../CompareWithBaseline
+	./tests/LLCompare
+	#./tests/WAPBatchCompare
+	cd ../WAPCompare
 	sleep 1
 done
 

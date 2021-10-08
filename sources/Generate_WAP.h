@@ -161,16 +161,20 @@ tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
             return make_tuple(0, A, P);
         }
     }
-
+    A_Global = A;
+    P_Global = P;
     // check the last task
-
     if (RTA_WAP::RTA_Common(tasks, N - 1) <= tasks.at(N - 1).deadline)
     {
         return make_tuple(1, A, P);
     }
     else
     {
+        A_Global = GenerateZeroMatrix(0, 0);
+        P_Global = GenerateZeroMatrix(0, 0);
         return make_tuple(0, A, P);
     }
+    A_Global = GenerateZeroMatrix(0, 0);
+    P_Global = GenerateZeroMatrix(0, 0);
     return make_tuple(0, A, P);
 }

@@ -33,5 +33,7 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${CONVENIENCE_LIB_NAME} CppUnitLite)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
 
-add_subdirectory(tests)
 add_subdirectory(sources)
+add_subdirectory(scripts)
+add_subdirectory(tests)
+

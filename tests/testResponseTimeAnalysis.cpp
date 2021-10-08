@@ -145,12 +145,14 @@ TEST(GenerateWAP, v1)
     MatrixDynamic actualA, actualP;
     bool success;
     std::tie(success, actualA, actualP) = sth;
+    AssertBool(true, success);
     AssertEigenEqualMatrix(expectA, actualA);
-    AssertEigenEqualMatrix(expectP, actualP);
+    AssertEigenEqualMatrix(expectA, A_Global);
+    AssertEigenEqualMatrix(expectP, P_Global);
 }
 TEST(GenerateWAP, v2)
 {
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v11.csv", "orig");
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v11.csv", "RM");
     int N = task_set.size();
     MatrixDynamic expectA = GenerateZeroMatrix(N, N);
     MatrixDynamic expectP = GenerateZeroMatrix(N, N);
@@ -163,8 +165,17 @@ TEST(GenerateWAP, v2)
     MatrixDynamic actualA, actualP;
     bool success;
     std::tie(success, actualA, actualP) = sth;
-    AssertEigenEqualMatrix(expectA, actualA);
-    AssertEigenEqualMatrix(expectP, actualP);
+    AssertBool(true, success);
+    if (not success)
+    {
+        AssertEigenEqualMatrix(expectA, actualA);
+        AssertEigenEqualMatrix(expectP, actualP);
+    }
+    else
+    {
+        AssertEigenEqualMatrix(expectA, A_Global);
+        AssertEigenEqualMatrix(expectP, P_Global);
+    }
 }
 TEST(GenerateWAP, v3)
 {
@@ -181,8 +192,17 @@ TEST(GenerateWAP, v3)
     MatrixDynamic actualA, actualP;
     bool success;
     std::tie(success, actualA, actualP) = sth;
-    AssertEigenEqualMatrix(expectA, actualA);
-    AssertEigenEqualMatrix(expectP, actualP);
+    AssertBool(false, success);
+    if (not success)
+    {
+        AssertEigenEqualMatrix(expectA, actualA);
+        AssertEigenEqualMatrix(expectP, actualP);
+    }
+    else
+    {
+        AssertEigenEqualMatrix(expectA, A_Global);
+        AssertEigenEqualMatrix(expectP, P_Global);
+    }
 }
 TEST(GenerateWAP, v4)
 {
@@ -199,8 +219,17 @@ TEST(GenerateWAP, v4)
     MatrixDynamic actualA, actualP;
     bool success;
     std::tie(success, actualA, actualP) = sth;
-    AssertEigenEqualMatrix(expectA, actualA);
-    AssertEigenEqualMatrix(expectP, actualP);
+    AssertBool(true, success);
+    if (not success)
+    {
+        AssertEigenEqualMatrix(expectA, actualA);
+        AssertEigenEqualMatrix(expectP, actualP);
+    }
+    else
+    {
+        AssertEigenEqualMatrix(expectA, A_Global);
+        AssertEigenEqualMatrix(expectP, P_Global);
+    }
 }
 TEST(GenerateWAP, v5)
 {
@@ -218,8 +247,17 @@ TEST(GenerateWAP, v5)
     MatrixDynamic actualA, actualP;
     bool success;
     std::tie(success, actualA, actualP) = sth;
-    AssertEigenEqualMatrix(expectA, actualA);
-    AssertEigenEqualMatrix(expectP, actualP);
+    AssertBool(true, success);
+    if (not success)
+    {
+        AssertEigenEqualMatrix(expectA, actualA);
+        AssertEigenEqualMatrix(expectP, actualP);
+    }
+    else
+    {
+        AssertEigenEqualMatrix(expectA, A_Global);
+        AssertEigenEqualMatrix(expectP, P_Global);
+    }
 }
 int main()
 {

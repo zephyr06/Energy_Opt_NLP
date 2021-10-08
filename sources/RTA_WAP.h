@@ -1,8 +1,8 @@
 #pragma once
 #include "RTA_LL.h"
 
-MatrixDynamic A_Global;
-MatrixDynamic P_Global;
+// MatrixDynamic A_Global;
+// MatrixDynamic P_Global;
 
 class RTA_WAP : public RTA_BASE
 {

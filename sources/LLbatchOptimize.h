@@ -1,6 +1,5 @@
-#include <iostream>
 #pragma once
-
+#include <iostream>
 #include <fstream>
 #include <dirent.h>
 #include <sys/types.h>
