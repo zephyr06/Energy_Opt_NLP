@@ -55,6 +55,7 @@ public:
 
                 VectorDynamic err;
                 err.resize(numberOfTasksNeedOptimize, 1);
+                err.setZero();
                 TaskSet taskSetCurr_ = tasks_;
                 UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
 
@@ -64,11 +65,25 @@ public:
                     hpTasks.push_back(taskSetCurr_[i]);
                 }
                 // cout << "The response time and deadline for each task is: " << endl;
+                // for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+                int startIndex;
+                if (Schedul_Analysis::type() == "LL")
+                    ;
+                else if (Schedul_Analysis::type() == "WAP")
+                {
+                    for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
+                    {
+                        double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
+                        err(0, 0) += Barrier(tasks_[i].deadline - responseTime);
+                    }
+                }
+                else
+                    CoutError("Undefined type() in Schedul_Analysis, Optimize()!");
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                 {
                     // energy part
                     double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
-                    err(i - (lastTaskDoNotNeedOptimize + 1), 0) = 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
+                    err(i - (lastTaskDoNotNeedOptimize + 1), 0) += 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                     currentEnergyConsumption += err(i - (lastTaskDoNotNeedOptimize + 1), 0);
                     // barrier function part
                     double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
@@ -160,7 +175,7 @@ public:
                     {
                         hpTasks.push_back(taskSetCurr_[i]);
                     }
-                    cout << "The response time and deadline for each task is: " << endl;
+                    cout << Color::green << "The response time and deadline for each task is: " << Color::def << endl;
                     for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     {
                         // energy part
@@ -303,11 +318,11 @@ public:
     }
 
     /**
- * find the tasks that do not need to optimize;
- * i means i-th task do not need optimization,  while i+1, ..., N need
- * -1 means all tasks need optimization
- * N-1 means all tasks do not need optimization
- **/
+     * find the tasks that do not need to optimize;
+     * i means i-th task do not need optimization,  while i+1, ..., N need
+     * -1 means all tasks need optimization
+     * N-1 means all tasks do not need optimization
+     **/
     static int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTimeVector, int lastTaskDoNotNeedOptimize,
                                          VectorDynamic computationTimeWarmStart, double tolerance = eliminateVariableThreshold)
     {

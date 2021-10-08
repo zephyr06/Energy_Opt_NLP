@@ -75,7 +75,7 @@ VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
 
     vector<Task> hpTasks;
     if (debugMode == 1)
-        cout << "RTA analysis (responseTime, deadline)" << endl;
+        cout << Color::blue << "RTA analysis (responseTime, deadline)" << Color::def << endl;
     for (int i = 0; i < N; i++)
     {
         // res(i, 0) = Schedul_Analysis::ResponseTimeAnalysis(tasks[i], hpTasks);

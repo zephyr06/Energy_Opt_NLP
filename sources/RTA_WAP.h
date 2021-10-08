@@ -7,6 +7,10 @@
 class RTA_WAP : public RTA_BASE
 {
 public:
+    static string type()
+    {
+        return "WAP";
+    }
     // ******************** Standard interfaces to use ********************************** //
     static double RTA_Common_Warm(double beginTime, const TaskSet &tasks, int index)
     {

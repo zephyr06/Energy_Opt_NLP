@@ -7,6 +7,10 @@
 class RTA_LL : public RTA_BASE
 {
 public:
+    static string type()
+    {
+        return "LL";
+    }
     static double RTA_Common(const TaskSet &tasks, int index)
     {
         TaskSet tasksHp;
