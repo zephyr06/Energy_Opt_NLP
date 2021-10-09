@@ -1,37 +1,5 @@
 #pragma once
-#include <iostream>
-#include <fstream>
-#include <dirent.h>
-#include <sys/types.h>
-#include <chrono>
-
-#include "Optimize.h"
-using namespace std::chrono;
-
-double Average(vector<double> &data)
-{
-    double sum = 0;
-    for (int i = 0; i < int(data.size()); i++)
-        sum += data[i];
-    return sum / data.size();
-}
-
-vector<string> ReadFilesInDirectory(const char *path)
-{
-    vector<string> files;
-    DIR *dr;
-    struct dirent *en;
-    dr = opendir(path);
-    if (dr)
-    {
-        while ((en = readdir(dr)) != NULL)
-        {
-            files.push_back(en->d_name); //print all directory name
-        }
-        closedir(dr); //close all directory
-    }
-    return files;
-}
+#include "BatchTestutils.h"
 
 void BatchOptimize()
 {

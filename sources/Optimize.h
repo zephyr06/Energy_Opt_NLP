@@ -562,13 +562,14 @@ public:
             lastTaskDoNotNeedOptimize = lastTaskDoNotNeedOptimizeAfterOpt;
 
             numberOfIteration++;
-            if (numberOfIteration > N)
+            if (numberOfIteration > 4 * N)
             {
-                cout << red << "numberOfIteration error!\n"
-                     << def << endl;
-                if (debugMode == 1)
-                    Print(tasks);
-                throw;
+                // cout << red << "numberOfIteration error!\n"
+                //      << def << endl;
+                // if (debugMode == 1)
+                //     Print(tasks);
+                // throw;
+                CoutWarning("numberOfIteration reaches the maximum limits, the algorithm decides to give up!");
             }
         } while (numberOfTasksNeedOptimize > 0);
 
