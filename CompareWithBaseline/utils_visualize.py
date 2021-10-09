@@ -27,7 +27,7 @@ def Read_txt_file_1d(path, func):
         res.append(func(number))
     return np.array(res)
 
-def Read_all_result_files(taskSetNumber):
+def Read_all_result_files():
     # data_2d=np.empty((maxTaskNumber+1-minTaskNumber, taskSetNumber))
     data_2d={}
     for i in range(minTaskNumber, maxTaskNumber+1):
