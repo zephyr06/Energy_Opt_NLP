@@ -19,6 +19,7 @@ find_package(Boost 1.50 REQUIRED)
 find_package(CppUnitLite REQUIRED)
 find_package( OpenCV REQUIRED )
 include_directories(${Boost_INCLUDE_DIR})
+include_directories(includeMoe)
 
 # file(GLOB sources "*.cpp" "*.h")
 file(GLOB sources "sources/*.cpp" "sources/*.h")

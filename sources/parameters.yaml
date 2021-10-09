@@ -2,7 +2,7 @@
 
 runMode: compare
 
-testDataSetName: test_n5_v17
+testDataSetName: test_n5_v10
 
 deltaOptimizer: 1e-5
 
@@ -34,18 +34,18 @@ computationBound: 2.0
 punishmentFrequency: 10
 
 optimizerType: 1 # 1 means dogleg, 2 means LM
-
+randomInitialize: 0
 deltaInitialDogleg: 1e10
 
 initialLambda: 1e5
 lowerLambda: 1e-20
 upperLambda: 1e30
-
-
+coolingRateSA: 0.99
+temperatureSA: 100000
 granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
-
+SA_iteration: 1000000
 debugMode: 2
 
 # something not used 

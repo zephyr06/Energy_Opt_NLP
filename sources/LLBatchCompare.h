@@ -68,10 +68,10 @@ void BatchCompare()
     outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/data_buffer_energy_task_number.txt", std::ios_base::app);
     outfile1 << avEnergy << endl;
     cout << Color::blue << endl;
-    cout << "Average energy optimization objective (NLP: MUA) ratio is " << avEnergy << endl;
+    cout << "Average energy optimization objective (NLP: SA) ratio is " << avEnergy << endl;
     cout << "The worst value is " << worstValue << endl;
     cout << "The worst file is " << worstFile << endl;
-    cout << "Average time consumed ratio (NLP: MUA) is " << aveTime << endl;
+    cout << "Average time consumed ratio (NLP: SA) is " << aveTime << endl;
     cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
     cout << Color::def << endl;
 

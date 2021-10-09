@@ -30,7 +30,7 @@ public:
         return ResponseTimeAnalysisWarm(beginTime, tasks.at(index), tasksHp);
     }
 
-    static double ResponseTimeAnalysisWarm_util_nece(const double beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
+    static double ResponseTimeAnalysisWarm_util_nece(double beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
     {
         // if(tasksHighPriority[0].deadline==760830 )
         const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
@@ -39,9 +39,11 @@ public:
 
         if (beginTime < 0)
         {
-            cout << red << "During optimization, some variables drop below 0\n"
-                 << def << endl;
-            throw;
+            if (debugMode == 1)
+            {
+                CoutWarning("During optimization, some variables drop below 0\n");
+            }
+            beginTime = 0;
         }
         else if (isnan(taskCurr.executionTime))
         {

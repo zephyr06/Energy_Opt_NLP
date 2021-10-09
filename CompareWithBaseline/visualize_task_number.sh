@@ -16,7 +16,8 @@ do
 	echo "$title iteration is: $jobNumber"
 	> ResultFiles/N$jobNumber.txt
 	# generate task set
-	python ConvertYechengDataset.py --convertionNumber $jobNumber 
+
+  python ConvertYechengDataset.py --convertionNumber $jobNumber
 	# python ../sources/job_creator.py --num_tasksets $1 --num_job $jobNumber \
 	# --deadline_portion 1 --utilization_total 0.5 --desperate_mode 0 --directory "$dataset"
 	
@@ -25,10 +26,11 @@ do
 
 	# Optimize energy consumption
 	cd ../build
+
 	make -j4
 	./tests/LLCompare
 	#./tests/WAPBatchCompare
-	cd ../WAPCompare
+	cd ../CompareWithBaseline
 	sleep 1
 done
 

@@ -21,6 +21,19 @@ using namespace gtsam;
 double valueGlobalOpt = INT64_MAX;
 VectorDynamic vectorGlobalOpt;
 
+struct OptimizeResult
+{
+    double initialError;
+    double optimizeError;
+    VectorDynamic initialVariable;
+    VectorDynamic optimizeVariable;
+    OptimizeResult() : initialError(-1), optimizeError(-1)
+    {
+        ;
+    }
+    OptimizeResult(double ie, double oe, VectorDynamic iv, VectorDynamic ov) : initialError(ie), optimizeError(oe), initialVariable(iv), optimizeVariable(ov) {}
+};
+
 template <class Schedul_Analysis>
 class Energy_Opt
 {
@@ -43,78 +56,76 @@ public:
             TASK_NUMBER = N;
             // numberOfTasksNeedOptimize = N - lastTaskDoNotNeedOptimize - 1;
         }
-
-        Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
+        boost::function<Matrix(const VectorDynamic &)> f =
+            [this](const VectorDynamic &executionTimeVector)
         {
+            bool flagSchedulable = true;
+            double currentEnergyConsumption = 0;
 
-            boost::function<Matrix(const VectorDynamic &)> f =
-                [this](const VectorDynamic &executionTimeVector)
+            VectorDynamic err;
+            err.resize(numberOfTasksNeedOptimize, 1);
+            err.setZero();
+            TaskSet taskSetCurr_ = tasks_;
+            UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
+
+            vector<Task> hpTasks;
+            for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
             {
-                bool flagSchedulable = true;
-                double currentEnergyConsumption = 0;
-
-                VectorDynamic err;
-                err.resize(numberOfTasksNeedOptimize, 1);
-                err.setZero();
-                TaskSet taskSetCurr_ = tasks_;
-                UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
-
-                vector<Task> hpTasks;
+                hpTasks.push_back(taskSetCurr_[i]);
+            }
+            // cout << "The response time and deadline for each task is: " << endl;
+            // for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+            int startIndex;
+            if (Schedul_Analysis::type() == "LL")
+                ;
+            else if (Schedul_Analysis::type() == "WAP")
+            {
                 for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
                 {
-                    hpTasks.push_back(taskSetCurr_[i]);
-                }
-                // cout << "The response time and deadline for each task is: " << endl;
-                // for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-                int startIndex;
-                if (Schedul_Analysis::type() == "LL")
-                    ;
-                else if (Schedul_Analysis::type() == "WAP")
-                {
-                    for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
-                    {
-                        double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
-                        err(0, 0) += Barrier(tasks_[i].deadline - responseTime);
-                    }
-                }
-                else
-                    CoutError("Undefined type() in Schedul_Analysis, Optimize()!");
-                for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-                {
-                    // energy part
-                    double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
-                    err(i - (lastTaskDoNotNeedOptimize + 1), 0) += 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
-                    currentEnergyConsumption += err(i - (lastTaskDoNotNeedOptimize + 1), 0);
-                    // barrier function part
                     double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
-                    // double responseTime = Schedul_Analysis::ResponseTimeAnalysisWarm(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
-                    // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
-
-                    err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
-                    if (enableMaxComputationTimeRestrict)
-                        err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime * 2 -
-                                                                               executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1), 0));
-
-                    if (tasks_[i].deadline - responseTime < 0 ||
-                        executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1) > tasks_[i].executionTime * 2))
-                        flagSchedulable = false;
-                    // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime - taskSetCurr_[i].executionTime);
-                    hpTasks.push_back(taskSetCurr_[i]);
+                    err(0, 0) += Barrier(tasks_[i].deadline - responseTime);
                 }
+            }
+            else
+                CoutError("Undefined type() in Schedul_Analysis, Optimize()!");
+            for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+            {
+                // energy part
+                double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
+                err(i - (lastTaskDoNotNeedOptimize + 1), 0) += 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
+                currentEnergyConsumption += err(i - (lastTaskDoNotNeedOptimize + 1), 0);
+                // barrier function part
+                double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
+                // double responseTime = Schedul_Analysis::ResponseTimeAnalysisWarm(responseTimeInitial(i, 0), taskSetCurr_[i], hpTasks);
+                // cout << responseTime << ", " << taskSetCurr_[i].deadline << endl;
 
-                // check schedulability
-                if (flagSchedulable && currentEnergyConsumption / weightEnergy < valueGlobalOpt)
-                {
-                    // update globalOptVector
-                    valueGlobalOpt = currentEnergyConsumption / weightEnergy;
-                    for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-                        vectorGlobalOpt(i, 0) = executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
-                    // if (debugMode == 1)
-                    //     cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
-                }
+                err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
+                if (enableMaxComputationTimeRestrict)
+                    err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime * 2 -
+                                                                           executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1), 0));
 
-                return err;
-            };
+                if (tasks_[i].deadline - responseTime < 0 ||
+                    executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1) > tasks_[i].executionTime * 2))
+                    flagSchedulable = false;
+                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime - taskSetCurr_[i].executionTime);
+                hpTasks.push_back(taskSetCurr_[i]);
+            }
+
+            // check schedulability
+            if (flagSchedulable && currentEnergyConsumption / weightEnergy < valueGlobalOpt)
+            {
+                // update globalOptVector
+                valueGlobalOpt = currentEnergyConsumption / weightEnergy;
+                for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+                    vectorGlobalOpt(i, 0) = executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
+                // if (debugMode == 1)
+                //     cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
+            }
+
+            return err;
+        };
+        Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
+        {
 
             boost::function<Matrix(const VectorDynamic &)> f2 =
                 [this](const VectorDynamic &executionTimeVector)

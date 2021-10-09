@@ -17,11 +17,11 @@ double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishment
 double eliminateTol = (double)ConfigParameters["eliminateTol"];
 double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
 int enableIPM = (int)ConfigParameters["enableIPM"];
-
+const double coolingRateSA = (double)ConfigParameters["coolingRateSA"];
 int enableMaxComputationTimeRestrict = (int)ConfigParameters["enableMaxComputationTimeRestrict"];
 const int exactJacobian = (int)ConfigParameters["exactJacobian"];
 double computationBound = (double)ConfigParameters["computationBound"];
-
+const int temperatureSA = (int)ConfigParameters["temperatureSA"];
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
@@ -29,9 +29,9 @@ const double upperLambda = (double)ConfigParameters["upperLambda"];
 string priorityMode = (string)ConfigParameters["priorityMode"];
 const double noiseModelSigma = (double)ConfigParameters["noiseModelSigma"];
 const double deltaInitialDogleg = (double)ConfigParameters["deltaInitialDogleg"];
-
+const int randomInitialize = (int)ConfigParameters["randomInitialize"];
 const int weightEnergyMaxOrder = (int)ConfigParameters["weightEnergyMaxOrder"];
-
+const int SA_iteration = (int)ConfigParameters["SA_iteration"];
 const double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTolerance"];
 const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
 const int optimizerType = (int)ConfigParameters["optimizerType"];
