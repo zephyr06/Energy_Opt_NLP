@@ -30,7 +30,7 @@ public:
         return ResponseTimeAnalysisWarm(beginTime, tasks.at(index), tasksHp);
     }
 
-    static double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
+    static double ResponseTimeAnalysisWarm_util_nece(const double beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority)
     {
         // if(tasksHighPriority[0].deadline==760830 )
         const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
@@ -59,7 +59,7 @@ public:
             }
         }
 
-        if (Utilization(tasksHighPriority) + taskCurr.utilization() >= 1.0)
+        if (Utilization(tasksHighPriority) >= 1.0)
         {
             // cout << "The given task set is unschedulable\n";
             return INT32_MAX;
@@ -85,6 +85,17 @@ public:
         }
         cout << "RTA analysis stops unexpectedly!\n";
         throw;
+    }
+
+    static double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr,
+                                           const TaskSet &tasksHighPriority)
+    {
+        if (Utilization(tasksHighPriority) + taskCurr.utilization() >= 1.0)
+        {
+            // cout << "The given task set is unschedulable\n";
+            return INT32_MAX;
+        }
+        return ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHighPriority);
     }
 
     static double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)

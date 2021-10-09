@@ -92,15 +92,21 @@ public:
         return tasksHp;
     }
 
-    static double GetBusyPeriod(const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index)
+    static double GetBusyPeriod(const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index, double block = -1)
     {
         int N = tasks.size();
-        double block = BlockingTime(tasks, A, P, index);
-        double executionTimeEqui = block;
+        if (block == -1)
+            block = BlockingTime(tasks, A, P, index);
+
         TaskSet tasksHp = EquivalentHpTasks(tasks, A, P, index);
-        Task taskCurr = tasks.at(index);
-        tasksHp.push_back(taskCurr);
-        return RTA_LL::ResponseTimeAnalysis(tasks.at(index), tasksHp);
+
+        tasksHp.push_back(tasks.at(index));
+        Task task = tasks.at(index);
+        task.executionTime = block + tasks.at(index).executionTime;
+        double bp = RTA_LL::ResponseTimeAnalysisWarm_util_nece(task.executionTime, task, tasksHp);
+        if (bp == INT32_MAX)
+            return HyperPeriod(tasks);
+        return bp;
     }
 
     /**
@@ -123,7 +129,7 @@ public:
         Task taskCurr = tasks.at(index);
         // taskCurr.executionTime += block;
         TaskSet tasksHp = EquivalentHpTasks(tasks, A, P, index);
-        double busyPeriod = GetBusyPeriod(tasks, A, P, index);
+        double busyPeriod = GetBusyPeriod(tasks, A, P, index, block);
         if (busyPeriod == INT32_MAX)
         {
             // ???
@@ -131,10 +137,10 @@ public:
             return INT32_MAX;
         }
         double wcrt = 0;
-        for (int i = 0; i < ceil(busyPeriod / tasks[index].period); i++)
+        for (int i = 0; i <= ceil(busyPeriod / tasks[index].period); i++)
         {
             taskCurr.executionTime = (1 + i) * tasks.at(index).executionTime + block;
-            double instance_rt = RTA_LL::ResponseTimeAnalysisWarm(beginTime, taskCurr, tasksHp) - i * tasks.at(index).period;
+            double instance_rt = RTA_LL::ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHp) - i * tasks.at(index).period;
             wcrt = max(wcrt, instance_rt);
             if (wcrt > tasks.at(index).period)
                 return wcrt * 1000;
