@@ -8,7 +8,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=6,
+parser.add_argument('--maxTaskNumber', type=int, default=10,
                     help='Nmax')
 parser.add_argument('--taskSetNumber', type=int, default=100,
                     help='taskSetNumber')
@@ -33,7 +33,7 @@ def Read_all_result_files():
     for i in range(minTaskNumber, maxTaskNumber+1):
         file="ResultFiles/N"+str(i)+".txt"
         data_1d=Read_txt_file_1d(file, lambda x: (x-1)*100)
-        data_2d[i-5]=data_1d
+        data_2d[i]=data_1d
     return data_2d
 
 def Read_txt_file_2d(path, func, delimiter=','):
