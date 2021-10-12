@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 title="task_number"
-MaxTaskNumber=7
+MaxTaskNumber=20
 
 # clear buffer file content
 data_buffer_energy="data_buffer_energy_$title.txt"
@@ -11,7 +11,7 @@ time_file="time_$title.txt"
 dataset="../TaskData/$title"
 
 
-for jobNumber in {5..7}
+for jobNumber in {5..20}
 do
 	echo "$title iteration is: $jobNumber"
 	> ResultFiles/N$jobNumber.txt

@@ -18,7 +18,7 @@ do
 
 	# Optimize energy consumption
 	cd ../build
-	./tests/GenerateTaskSet --N $jobNumber --taskSetNumber 100 --totalUtilization 0.5 --NumberOfProcessor 1 --periodMin 100 --periodMax 10000
+	./tests/GenerateTaskSet --N $jobNumber --taskSetNumber 1000 --totalUtilization 0.5 --NumberOfProcessor 1 --periodMin 100 --periodMax 10000
 	make -j4
 #	./tests/LLCompare
 	./tests/WAPCompare
