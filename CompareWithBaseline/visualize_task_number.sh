@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 title="task_number"
-MaxTaskNumber=20
+MaxTaskNumber=7
 
 # clear buffer file content
 data_buffer_energy="data_buffer_energy_$title.txt"
@@ -11,7 +11,7 @@ time_file="time_$title.txt"
 dataset="../TaskData/$title"
 
 
-for jobNumber in {5..6}
+for jobNumber in {5..7}
 do
 	echo "$title iteration is: $jobNumber"
 	> ResultFiles/N$jobNumber.txt
@@ -35,5 +35,5 @@ do
 done
 
 # visualize the result
-python Visualize_distribution.py
-python Visualize_average_speed.py
+python Visualize_distribution.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --baseline "MUA" 
+python Visualize_average_speed.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --baseline "MUA" --ylim 1e2

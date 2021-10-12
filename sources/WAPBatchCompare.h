@@ -7,7 +7,7 @@ void BatchCompare()
 {
     const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
     vector<double> energySaveRatioVec;
-    vector<double> runTimeW, runTimeZ;
+    vector<double> runTimeW, runTimeSA;
 
     vector<string> errorFiles;
     string worstFile = "";
@@ -50,7 +50,7 @@ void BatchCompare()
                     worstFile = path;
                 }
                 runTimeW.push_back(timeTaken);
-                runTimeZ.push_back(durationSA);
+                runTimeSA.push_back(durationSA);
 
                 if (debugMode == 3)
                     cout << "One compare: " << res / (resSA.optimizeError / resSA.initialError) << endl;
@@ -72,7 +72,7 @@ void BatchCompare()
     if (n != 0)
     {
         avEnergy = Average(energySaveRatioVec);
-        aveTime = Average(runTimeW) / Average(runTimeZ);
+        aveTime = Average(runTimeW) / Average(runTimeSA);
     }
 
     ofstream outfile1, outfile2;
@@ -87,7 +87,7 @@ void BatchCompare()
     cout << Color::def << endl;
 
     outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/time_task_number.txt", std::ios_base::app);
-    outfile2 << Average(runTimeW) << ", " << Average(runTimeZ) << endl;
+    outfile2 << Average(runTimeW) << ", " << Average(runTimeSA) << endl;
     if (debugMode == 1)
         cout << endl;
     for (auto &file : errorFiles)

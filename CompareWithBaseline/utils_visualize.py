@@ -8,14 +8,20 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=10,
+parser.add_argument('--maxTaskNumber', type=int, default=6,
                     help='Nmax')
 parser.add_argument('--taskSetNumber', type=int, default=100,
                     help='taskSetNumber')
+parser.add_argument('--baseline', type=str, default="SA",
+                    help='baseline')
+parser.add_argument('--ylim', type=float, default=1e0,
+                    help='ylim')
 args = parser.parse_args()
 minTaskNumber = args.minTaskNumber
 maxTaskNumber = args.maxTaskNumber
 taskSetNumber = args.taskSetNumber
+baseline = args.baseline
+ylim=args.ylim
 
 def Read_txt_file_1d(path, func):
     """ read txt files, and return a list, each element contains one number"""
