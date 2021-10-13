@@ -222,7 +222,8 @@ long long int HyperPeriod(const TaskSet &tasks)
             {
                 // cout << Color::red <<  << Color::def << endl;
                 // throw;
-                CoutWarning("The hyper-period over flows!");
+                if (debugMode == 1)
+                    CoutWarning("The hyper-period over flows!");
                 return LLONG_MAX / 2;
             }
         }
