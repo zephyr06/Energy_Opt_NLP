@@ -60,8 +60,8 @@ public:
                 return INT32_MAX;
             }
         }
-
-        if (Utilization(tasksHighPriority) >= 1.0)
+        double utilAll = Utilization(tasksHighPriority);
+        if (utilAll >= 1.0 - utilTol)
         {
             // cout << "The given task set is unschedulable\n";
             return INT32_MAX;
@@ -70,6 +70,7 @@ public:
         bool stop_flag = false;
 
         double responseTimeBefore = beginTime;
+        int loopCount = 0;
         while (not stop_flag)
         {
             double responseTime = taskCurr.executionTime;
@@ -83,6 +84,11 @@ public:
             else
             {
                 responseTimeBefore = responseTime;
+            }
+            loopCount++;
+            if (loopCount > 10000)
+            {
+                CoutError("LoopCount error in RTA_LL");
             }
         }
         cout << "RTA analysis stops unexpectedly!\n";

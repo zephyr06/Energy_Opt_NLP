@@ -35,5 +35,5 @@ do
 done
 
 # visualize the result
-python Visualize_distribution.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --baseline "MUA" 
-python Visualize_average_speed.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --baseline "MUA" --ylim 1e2
+python Visualize_distribution.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --baseline "MUA-incremental" 
+python Visualize_average_speed.py --minTaskNumber 5 --baseline "MUA-incremental" --ylim 1e2 --maxTaskNumber $MaxTaskNumber

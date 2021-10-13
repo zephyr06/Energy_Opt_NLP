@@ -22,6 +22,7 @@ int enableMaxComputationTimeRestrict = (int)ConfigParameters["enableMaxComputati
 const int exactJacobian = (int)ConfigParameters["exactJacobian"];
 double computationBound = (double)ConfigParameters["computationBound"];
 const int temperatureSA = (int)ConfigParameters["temperatureSA"];
+const double utilTol = (double)ConfigParameters["utilTol"];
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
