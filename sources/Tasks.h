@@ -220,8 +220,10 @@ long long int HyperPeriod(const TaskSet &tasks)
             hyper = lcm(hyper, tasks[i].period);
             if (hyper < 0 || hyper > LLONG_MAX)
             {
-                cout << Color::red << "The hyper-period over flows!" << Color::def << endl;
-                throw;
+                // cout << Color::red <<  << Color::def << endl;
+                // throw;
+                CoutWarning("The hyper-period over flows!");
+                return LLONG_MAX / 2;
             }
         }
         return hyper;
