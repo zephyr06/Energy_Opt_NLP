@@ -41,7 +41,7 @@ weightDrawBegin = fs.getNode("weightDrawBegin").real()
 weightDrawEnd = fs.getNode("weightDrawEnd").real()
 
 data_number=int(np.log(weightDrawEnd/weightDrawBegin)/np.log(10))+1
-data_1d = Read_txt_file_1d(path, lambda x: x)
+data_1d = Read_txt_file_1d(path, lambda x: x) * 100.0
 data_x=[]
 for i in range(data_number):
     data_x.append(weightDrawBegin * np.power(10, i))
@@ -54,7 +54,7 @@ splot = sns.lineplot(data=df, x="index", y="weight_trajectory",  marker="*", mar
 # splot.set(yscale="log")
 splot.set(xscale="log")
 plt.grid(linestyle="--")
-splot.set(xlabel="Task Number", ylabel="Runt-Time (seconds)")
+splot.set(xlabel="weight w", ylabel="Energy saving ratio (%)")
 # splot.set_xlim(4, None)
 # splot.set_ylim(1e-3, ylim)
 plt.savefig("weight_task_number" + ".pdf", format='pdf')

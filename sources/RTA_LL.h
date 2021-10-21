@@ -58,7 +58,7 @@ public:
         {
             if (executionTimeHigh[i] < 0)
             {
-                if (debugMode == 1)
+                if (debugMode)
                 {
                     CoutWarning("During optimization, some variables drop below 0\n");
                 }
