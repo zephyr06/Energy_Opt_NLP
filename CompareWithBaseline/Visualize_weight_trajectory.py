@@ -40,7 +40,7 @@ fs = cv2.FileStorage("../sources/parameters.yaml", cv2.FILE_STORAGE_READ)
 weightDrawBegin = fs.getNode("weightDrawBegin").real()
 weightDrawEnd = fs.getNode("weightDrawEnd").real()
 
-data_number=int(np.log(weightDrawEnd/weightDrawBegin)/np.log(10))+1
+data_number=int(np.log(weightDrawEnd/weightDrawBegin)/np.log(10))
 data_1d = Read_txt_file_1d(path, lambda x: x) * 100.0
 data_x=[]
 for i in range(data_number):
@@ -55,7 +55,7 @@ splot = sns.lineplot(data=df, x="index", y="weight_trajectory",  marker="*", mar
 splot.set(xscale="log")
 plt.grid(linestyle="--")
 splot.set(xlabel="weight w", ylabel="Energy saving ratio (%)")
-# splot.set_xlim(4, None)
+splot.set_xlim(None, 1e5)
 # splot.set_ylim(1e-3, ylim)
 plt.savefig("weight_task_number" + ".pdf", format='pdf')
 plt.savefig("weight_task_number" +".png", format='png')

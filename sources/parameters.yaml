@@ -16,8 +16,8 @@ enableIPM: 0
 iterationNumIPM_Max: 10
 exactJacobian: 1
 weightLogBarrier: -1e6
-weightDrawBegin: 1e5
-weightDrawEnd: 1e-5
+weightDrawBegin: 1e-6
+weightDrawEnd: 1e5
 roundTypeInClamp: "fine"
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian

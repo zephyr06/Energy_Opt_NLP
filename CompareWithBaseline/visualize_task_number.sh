@@ -11,18 +11,13 @@ time_file="time_$title.txt"
 dataset="../TaskData/$title"
 
 
-for jobNumber in {20..20}
+for jobNumber in {5..20}
 do
 	echo "$title iteration is: $jobNumber"
 	> ResultFiles/N$jobNumber.txt
 	# generate task set
 
-  python ConvertYechengDataset.py --convertionNumber $jobNumber
-	# python ../sources/job_creator.py --num_tasksets $1 --num_job $jobNumber \
-	# --deadline_portion 1 --utilization_total 0.5 --desperate_mode 0 --directory "$dataset"
-	
-	# modify TASK_NUMBER in sources/parameters.h
-	# python Modify_task_number.py --task_number $jobNumber
+  	python ConvertYechengDataset.py --convertionNumber $jobNumber
 
 	# Optimize energy consumption
 	cd ../build
@@ -35,5 +30,5 @@ do
 done
 
 # visualize the result
-python Visualize_distribution.py --minTaskNumber 20 --maxTaskNumber $MaxTaskNumber --baseline "MUA-incremental" 
-python Visualize_average_speed.py --minTaskNumber 20 --baseline "MUA-incremental" --ylim 1e2 --maxTaskNumber $MaxTaskNumber
+python Visualize_distribution.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --baseline "MUA-incremental" 
+python Visualize_average_speed.py --minTaskNumber 5 --baseline "MUA-incremental" --ylim 1e2 --maxTaskNumber $MaxTaskNumber
