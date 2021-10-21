@@ -2,7 +2,7 @@
 
 runMode: compare
 
-testDataSetName: test_n20_v10
+testDataSetName: test_n20_v5
 
 deltaOptimizer: 1e-5
 
@@ -16,6 +16,8 @@ enableIPM: 0
 iterationNumIPM_Max: 10
 exactJacobian: 0
 weightLogBarrier: 0
+weightDrawBegin: 1e-7
+weightDrawEnd: 1e9
 roundTypeInClamp: "fine"
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
