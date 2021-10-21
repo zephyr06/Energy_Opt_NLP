@@ -2,7 +2,7 @@
 
 runMode: compare
 
-testDataSetName: test_n20_v5
+testDataSetName: test_n20_v11
 
 deltaOptimizer: 1e-5
 
@@ -14,10 +14,10 @@ eliminateTol: 1e-1
 eliminateStep: 3
 enableIPM: 0
 iterationNumIPM_Max: 10
-exactJacobian: 0
-weightLogBarrier: 0
+exactJacobian: 1
+weightLogBarrier: -1e7
 weightDrawBegin: 1e-7
-weightDrawEnd: 1e9
+weightDrawEnd: 1e5
 roundTypeInClamp: "fine"
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
@@ -48,7 +48,7 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 SA_iteration: 1000000
-debugMode: 1
+debugMode: 0
 utilTol: 0.001
 
 # something not used 

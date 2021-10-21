@@ -40,9 +40,10 @@ fs = cv2.FileStorage("../sources/parameters.yaml", cv2.FILE_STORAGE_READ)
 weightDrawBegin = fs.getNode("weightDrawBegin").real()
 weightDrawEnd = fs.getNode("weightDrawEnd").real()
 
+data_number=int(np.log(weightDrawEnd/weightDrawBegin)/np.log(10))+1
 data_1d = Read_txt_file_1d(path, lambda x: x)
 data_x=[]
-for i in range(int(np.log(weightDrawEnd/weightDrawBegin)/np.log(10))):
+for i in range(data_number):
     data_x.append(weightDrawBegin * np.power(10, i))
 
 df=pd.DataFrame({"index":data_x,"weight_trajectory":data_1d})

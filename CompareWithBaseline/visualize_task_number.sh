@@ -11,7 +11,7 @@ time_file="time_$title.txt"
 dataset="../TaskData/$title"
 
 
-for jobNumber in {5..20}
+for jobNumber in {20..20}
 do
 	echo "$title iteration is: $jobNumber"
 	> ResultFiles/N$jobNumber.txt
@@ -35,5 +35,5 @@ do
 done
 
 # visualize the result
-python Visualize_distribution.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --baseline "MUA-incremental" 
-python Visualize_average_speed.py --minTaskNumber 5 --baseline "MUA-incremental" --ylim 1e2 --maxTaskNumber $MaxTaskNumber
+python Visualize_distribution.py --minTaskNumber 20 --maxTaskNumber $MaxTaskNumber --baseline "MUA-incremental" 
+python Visualize_average_speed.py --minTaskNumber 20 --baseline "MUA-incremental" --ylim 1e2 --maxTaskNumber $MaxTaskNumber

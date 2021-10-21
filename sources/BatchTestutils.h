@@ -11,10 +11,17 @@ using namespace std::chrono;
 
 double Average(vector<double> &data)
 {
-    double sum = 0;
-    for (int i = 0; i < int(data.size()); i++)
-        sum += data[i];
-    return sum / data.size();
+    if (data.size())
+    {
+        double sum = 0;
+        for (int i = 0; i < int(data.size()); i++)
+            sum += data[i];
+        return sum / data.size();
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 vector<string> ReadFilesInDirectory(const char *path)

@@ -643,6 +643,9 @@ public:
         double eliminateTolRef = eliminateTol;
 
         double res = OptimizeTaskSetOneIte(tasks);
+        // Some variables become 0, which actually means a failure
+        if (isinf(res))
+            res = 10;
         eliminateTol = eliminateTolRef;
         return res;
     }

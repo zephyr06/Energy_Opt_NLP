@@ -25,7 +25,7 @@ TEST(OptimizeTaskSet, RTA_wap_V1)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
 
-    WriteWeightTrajectory(path);
+    WriteWeightTrajectory();
 }
 
 int main()

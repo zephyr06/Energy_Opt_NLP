@@ -50,13 +50,18 @@ public:
             cout << red << "Nan executionTime detected" << def << endl;
             throw "Nan";
         }
+        else if (taskCurr.executionTime < 0)
+        {
+            return INT32_MAX;
+        }
         for (int i = 0; i < int(executionTimeHigh.size()); i++)
         {
             if (executionTimeHigh[i] < 0)
             {
-                cout << red << "During optimization, some variables drop below 0\n"
-                     << def << endl;
-                // throw;
+                if (debugMode == 1)
+                {
+                    CoutWarning("During optimization, some variables drop below 0\n");
+                }
                 return INT32_MAX;
             }
         }
