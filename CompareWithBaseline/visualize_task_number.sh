@@ -20,7 +20,7 @@ do
   	python ConvertYechengDataset.py --convertionNumber $jobNumber
 
 	# Optimize energy consumption
-	cd ../build
+	cd ../release
 
 	make -j4
 	./tests/LLCompare
