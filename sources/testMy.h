@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <unordered_set>
 #include <unordered_map>
 #include <iostream>
 #include <bits/stdc++.h>
@@ -30,13 +31,15 @@ void CoutError(string message)
  * @param actual 
  */
 template <typename T>
-void AssertUnEqual(T expect, T actual)
+void AssertUnEqual(T expect, T actual, int lineNumber = 0)
 {
+    if (lineNumber != 0)
+        cout << Color::red << "Line Number: " << to_string(lineNumber) << Color::def << endl;
     std::cout << "Assertion failed!" << std::endl;
     cout << Color::red << "EXpect is " << expect << ", while the actual is " << actual << Color::def << endl;
     throw;
 }
-void AssertEqualScalar(double expected, double actual, double tolerance = 1e-6)
+void AssertEqualScalar(double expected, double actual, double tolerance = 1e-6, int lineNumber = 0)
 {
     if (expected != 0)
     {
@@ -44,6 +47,8 @@ void AssertEqualScalar(double expected, double actual, double tolerance = 1e-6)
             return;
         else
         {
+            if (lineNumber != 0)
+                cout << Color::red << "Line Number: " << to_string(lineNumber) << Color::def << endl;
             AssertUnEqual<double>(expected, actual);
         }
     }
@@ -54,15 +59,15 @@ void AssertEqualScalar(double expected, double actual, double tolerance = 1e-6)
     }
 }
 
-void AssertBool(bool expected, bool actual)
+void AssertBool(bool expected, bool actual, int lineNumber = 0)
 {
     if (expected != actual)
-        return AssertUnEqual<bool>(expected, actual);
+        return AssertUnEqual<bool>(expected, actual, lineNumber);
 }
 
 template <typename T>
 void AssertEqualVectorNoRepeat(const vector<T> &expected, const vector<T> &actual,
-                               double tolerance = 1e-6)
+                               double tolerance = 1e-6, int lineNumber = 0)
 {
     if (expected.size() != actual.size())
     {
@@ -70,8 +75,8 @@ void AssertEqualVectorNoRepeat(const vector<T> &expected, const vector<T> &actua
         AssertUnEqual(expected.size(), actual.size());
         return;
     }
-    size_t N = expected.size();
-    unordered_set<T> s;
+    // size_t N = expected.size();
+    std::unordered_set<T> s;
     for (size_t i = 0; i < expected.size(); i++)
         s.insert(expected.at(i));
     for (size_t i = 0; i < expected.size(); i++)
@@ -90,7 +95,7 @@ void AssertEqualVectorNoRepeat(const vector<T> &expected, const vector<T> &actua
 }
 
 void AssertEigenEqualVector(Eigen::Matrix<double, Eigen::Dynamic, 1> &expected,
-                            Eigen::Matrix<double, Eigen::Dynamic, 1> &actual)
+                            Eigen::Matrix<double, Eigen::Dynamic, 1> &actual, int lineNumber = 0)
 {
     int m = expected.rows();
     int n = expected.cols();
@@ -98,7 +103,7 @@ void AssertEigenEqualVector(Eigen::Matrix<double, Eigen::Dynamic, 1> &expected,
     {
         for (int j = 0; j < n; j++)
         {
-            AssertEqualScalar(expected(i, j), actual(i, j));
+            AssertEqualScalar(expected(i, j), actual(i, j), 1e-6, lineNumber);
         }
     }
 }

@@ -34,9 +34,10 @@ void WriteWeightTrajectory()
                 double res = Energy_Opt<RTA_LL>::OptimizeTaskSet(taskSet1);
                 auto stop = chrono::high_resolution_clock::now();
                 auto duration = duration_cast<microseconds>(stop - start);
-                double timeTaken = double(duration.count()) / 1e6;
                 if (isinf(res))
-                    int a = 1;
+                {
+                    cout << 1 << endl;
+                }
                 energySaveRatioVec.push_back(res);
                 // outfileWrite << energySaveRatioVec.back() << endl;
                 if (res == -1 || res > 1)
@@ -46,7 +47,6 @@ void WriteWeightTrajectory()
             }
         }
         double avEnergy = -1;
-        double aveTime = -1;
         if (energySaveRatioVec.size() != 0)
         {
             avEnergy = Average(energySaveRatioVec);

@@ -22,10 +22,10 @@ public:
      * @return double 
      */
     double RTA_Common_Warm(double beginTime, const TaskSet &tasks, int index);
-    double RTA_Common(const TaskSet &tasks, int index)
-    {
-        return RTA_Common_Warm(tasks.at(index).executionTime, tasks, index);
-    }
+    double RTA_Common(const TaskSet &tasks, int index);
+    // {
+    //     return RTA_Common_Warm(tasks.at(index).executionTime, tasks, index);
+    // }
 };
 
 template <class Schedul_Analysis>
@@ -46,7 +46,6 @@ bool CheckSchedulability(const TaskSet &tasks, VectorDynamic warmStart, bool whe
 template <class Schedul_Analysis>
 bool CheckSchedulability(const TaskSet &tasks, bool whetherPrint = false)
 {
-    int N = tasks.size();
     VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
     return CheckSchedulability<Schedul_Analysis>(tasks, warmStart, whetherPrint);
 }
