@@ -45,20 +45,6 @@ const double EstimateEnergyTaskBasedComputation(const Task &task, double computa
         return task.executionTime * pow(frequency, 2) * weightEnergy * punishmentFrequency;
 }
 
-// ErrElement EstimateEnergyTaskSet(const TaskSet &taskSet, const ComputationTimeVector &executionTimeVector)
-// {
-//     int N = taskSet.size();
-//     long long int hp = HyperPeriod(taskSet);
-//     ErrElement res;
-//     for (int i = 0; i < N; i++)
-//     {
-//         double frequencyRunTime = taskSet[i].executionTime / executionTimeVector(i, 0);
-//         res(i, 0) = hp / taskSet[i].period *
-//                     EstimateEnergyTask(taskSet[i], frequencyRunTime);
-//     }
-//     return res;
-// }
-
 VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic &executionTimeVector,
                                     int lastTaskDoNotNeedOptimize = -1)
 {
@@ -84,18 +70,4 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic 
         cout << "Input error in EstimateEnergyTaskSet" << endl;
         throw;
     }
-}
-VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet)
-{
-
-    int N = taskSet.size();
-    MatrixDynamic res;
-    res.resize(N, 1);
-    for (int i = 0; i < N; i++)
-    {
-        double frequencyRunTime = 1.0;
-        res(i, 0) = 1.0 / taskSet[i].period *
-                    EstimateEnergyTask(taskSet[i], frequencyRunTime);
-    }
-    return res;
 }

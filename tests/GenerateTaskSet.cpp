@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
     int periodMax = program.get<int>("--periodMax");
     int taskType = program.get<int>("--taskType");
     cout << "Task configuration: " << endl
-         << "the number of tasks in DAG(--N): " << N << endl
-         << "DAG_taskSetNumber(--taskSetNumber): " << DAG_taskSetNumber << endl
+         << "the number of tasks(--N): " << N << endl
+         << "taskSetNumber(--taskSetNumber): " << DAG_taskSetNumber << endl
          << "totalUtilization(--totalUtilization): " << totalUtilization << endl
          << "NumberOfProcessor(--NumberOfProcessor): " << numberOfProcessor << endl
          << "periodMin(--periodMin): " << periodMin << endl

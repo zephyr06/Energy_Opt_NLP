@@ -18,6 +18,8 @@ double eliminateTol = (double)ConfigParameters["eliminateTol"];
 double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
 double weightDrawBegin = (double)ConfigParameters["weightDrawBegin"];
 double weightDrawEnd = (double)ConfigParameters["weightDrawEnd"];
+
+int executionTimeModel = (int)ConfigParameters["executionTimeModel"];
 int enableIPM = (int)ConfigParameters["enableIPM"];
 const double coolingRateSA = (double)ConfigParameters["coolingRateSA"];
 int enableMaxComputationTimeRestrict = (int)ConfigParameters["enableMaxComputationTimeRestrict"];
