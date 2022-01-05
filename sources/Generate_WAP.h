@@ -82,7 +82,7 @@ bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDyn
     sort(list4Sort.begin(), list4Sort.end(), compareDataMetaWAP);
 
     bool success = false;
-    int index_first_available = -1;
+    size_t index_first_available = -1;
     for (size_t i = 0; i < list4Sort.size(); i++)
     {
         if (RTA_WAP::RTA_block(tasks, A, P, index, list4Sort[i].value) <= tasks.at(index).deadline)

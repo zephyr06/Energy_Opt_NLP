@@ -21,46 +21,42 @@ public:
      * @param index 
      * @return double 
      */
-    double RTA_Common(const TaskSet &tasks, int index);
     double RTA_Common_Warm(double beginTime, const TaskSet &tasks, int index);
-
-    // double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr, const TaskSet &tasksHighPriority);
-    // double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority);
+    double RTA_Common(const TaskSet &tasks, int index)
+    {
+        return RTA_Common_Warm(tasks.at(index).executionTime, tasks, index);
+    }
 };
 
 template <class Schedul_Analysis>
-bool CheckSchedulability(const TaskSet &taskSet, bool whetherPrint = false)
+bool CheckSchedulability(const TaskSet &tasks, VectorDynamic warmStart, bool whetherPrint = false)
 {
-    int N = taskSet.size();
+    int N = tasks.size();
     for (int i = 0; i < N; i++)
     {
-        TaskSet::const_iterator first = taskSet.begin();
-        vector<Task>::const_iterator last = taskSet.begin() + i;
-        TaskSet hpTasks(first, last);
-        // double rta = Schedul_Analysis::ResponseTimeAnalysis(taskSet[i], hpTasks);
-        double rta = Schedul_Analysis::RTA_Common(taskSet, i);
+        double rta = Schedul_Analysis::RTA_Common_Warm(warmStart(i, 0), tasks, i);
         if (whetherPrint)
-            cout << "response time for task " << i << " is " << rta << " and deadline is " << taskSet[i].deadline << endl;
-        if (rta > min(taskSet[i].deadline, taskSet[i].period))
+            cout << "response time for task " << i << " is " << rta << " and deadline is " << tasks[i].deadline << endl;
+        if (rta > min(tasks[i].deadline, tasks[i].period))
             return false;
     }
     return true;
 }
 
 template <class Schedul_Analysis>
-bool CheckSchedulability(const TaskSet &taskSet, VectorDynamic warmStart, bool whetherPrint = false)
+bool CheckSchedulability(const TaskSet &tasks, bool whetherPrint = false)
 {
-    int N = taskSet.size();
+    int N = tasks.size();
+    VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
+    return CheckSchedulability<Schedul_Analysis>(tasks, warmStart, whetherPrint);
+}
+
+bool CheckSchedulabilityDirect(const TaskSet &tasks, const VectorDynamic &rta)
+{
+    int N = tasks.size();
     for (int i = 0; i < N; i++)
     {
-        TaskSet::const_iterator first = taskSet.begin();
-        vector<Task>::const_iterator last = taskSet.begin() + i;
-        TaskSet hpTasks(first, last);
-        // double rta = Schedul_Analysis::ResponseTimeAnalysisWarm(warmStart(i, 0), taskSet[i], hpTasks);
-        double rta = Schedul_Analysis::RTA_Common_Warm(warmStart(i, 0), taskSet, i);
-        if (whetherPrint)
-            cout << "response time for task " << i << " is " << rta << " and deadline is " << taskSet[i].deadline << endl;
-        if (rta > min(taskSet[i].deadline, taskSet[i].period))
+        if (rta(i, 0) > min(tasks[i].deadline, tasks[i].period))
             return false;
     }
     return true;

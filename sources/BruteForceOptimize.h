@@ -7,8 +7,8 @@ double OptimizeTaskSetBf3(TaskSet &tasks, int granularity = granularityInBF)
     int N = tasks.size();
 
     // this function also checks schedulability
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard(tasks);
-    if (responseTimeInitial(0, 0) == -1)
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard<RTA_LL>(tasks);
+    if (!CheckSchedulabilityDirect(tasks, responseTimeInitial))
         return -2;
 
     double minEnergy = INT64_MAX;

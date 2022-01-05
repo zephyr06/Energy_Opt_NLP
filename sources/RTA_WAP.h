@@ -72,7 +72,7 @@ public:
      */
     static TaskSet EquivalentHpTasks(const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index)
     {
-        int N = tasks.size();
+        // int N = tasks.size();
         TaskSet tasksHp;
         tasksHp.reserve(index);
         for (int i = 0; i < index; i++)
@@ -94,7 +94,6 @@ public:
 
     static double GetBusyPeriod(const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index, double block = -1)
     {
-        int N = tasks.size();
         if (block == -1)
             block = BlockingTime(tasks, A, P, index);
 

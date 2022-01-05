@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(EnergyOptNLP CXX C)
 set (CMAKE_CXX_STANDARD 17)
-# set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Debug)
 
 # Find GTSAM components
 find_package(GTSAM REQUIRED) # Uses installed package
@@ -35,6 +35,5 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} CppUnitLite)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
 
 add_subdirectory(sources)
-add_subdirectory(scripts)
 add_subdirectory(tests)
 

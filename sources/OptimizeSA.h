@@ -10,11 +10,14 @@ OptimizeResult OptimizeSchedulingSA(TaskSet &tasks)
 {
     srand(0);
     int N = tasks.size();
-    auto hyperPeriod = HyperPeriod(tasks);
+    // auto hyperPeriod = HyperPeriod(tasks);
     int lastTaskDoNotNeedOptimize = -1;
     VectorDynamic initialEstimate = GetParameterVD<int>(tasks, "executionTime");
     VectorDynamic periods = GetParameterVD<int>(tasks, "period");
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard<RTA_WAP>(tasks);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard<RTA_LL>(tasks);
+    if (!CheckSchedulabilityDirect(tasks, responseTimeInitial))
+        return {INT_MAX, INT_MAX,
+                initialEstimate, initialEstimate};
     Symbol key('a', 0);
     auto model = noiseModel::Isotropic::Sigma(numberOfTasksNeedOptimize, noiseModelSigma);
     Energy_Opt<RTA_WAP>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,

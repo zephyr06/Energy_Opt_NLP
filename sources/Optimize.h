@@ -75,7 +75,7 @@ public:
             }
             // cout << "The response time and deadline for each task is: " << endl;
             // for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-            int startIndex;
+            // int startIndex;
             if (Schedul_Analysis::type() == "LL")
                 ;
             else if (Schedul_Analysis::type() == "WAP")
@@ -402,6 +402,18 @@ public:
             LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
             result = optimizer.optimize();
         }
+        else if (optimizerType == 3)
+        {
+            GaussNewtonParams params;
+            GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
+            result = optimizer.optimize();
+        }
+        else if (optimizerType == 4)
+        {
+            NonlinearOptimizerParams params;
+            NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
+            result = optimizer.optimize();
+        }
 
         VectorDynamic optComp = result.at<VectorDynamic>(key);
         if (debugMode == 1)
@@ -505,7 +517,7 @@ public:
 
         // this function also checks schedulability
         VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard<Schedul_Analysis>(tasks);
-        if (responseTimeInitial(0, 0) == -1)
+        if (!CheckSchedulabilityDirect(tasks, responseTimeInitial))
             return -2;
 
         VectorDynamic initialExecutionTime = GetParameterVD<int>(tasks, "executionTime");

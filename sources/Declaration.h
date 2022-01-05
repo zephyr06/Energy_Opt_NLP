@@ -8,6 +8,7 @@
 #include <gtsam/linear/VectorValues.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/NonlinearConjugateGradientOptimizer.h>
 #include <gtsam/nonlinear/DoglegOptimizer.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Values.h>
@@ -79,7 +80,13 @@ VectorDynamic Vector2Eigen(const vector<T> &input)
         res(i, 0) = input.at(i);
     return res;
 }
-
+inline VectorDynamic GenerateVectorDynamic(LLint N)
+{
+    VectorDynamic v;
+    v.resize(N, 1);
+    v.setZero();
+    return v;
+}
 // typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
 // typedef Eigen::Matrix<double, TASK_NUMBER, TASK_NUMBER> JacobianOpt;
 // typedef Eigen::Matrix<double, TASK_NUMBER, 1> ErrElement;
