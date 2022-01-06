@@ -5,7 +5,7 @@
  **/
 double Barrier(double x)
 {
-    if (x > 0)
+    if (x >= 0)
         // return pow(x, 2);
         return 0;
     else if (x < 0)

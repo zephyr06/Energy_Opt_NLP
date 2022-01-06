@@ -54,8 +54,7 @@ TEST(NumericalDerivativeDynamic, A1)
     MatrixDynamic H_Expect;
     H_Expect.resize(4, 2);
     H_Expect << 8, 0, 0, 10, 8, 0, 0, 10;
-    if (not assert_equal(H_Expect, H_Actual, 1e-3))
-        throw;
+    EXPECT(assert_equal(H_Expect, H_Actual, 1e-3));
 }
 
 TEST(UpdateTaskSetExecutionTime, A1)
@@ -191,8 +190,8 @@ TEST(OptimizeTaskSetOneIte, a2)
     enableMaxComputationTimeRestrict = 0;
     executionTimeModel = 1;
     double res = Opt_LL::OptimizeTaskSet(taskSet1);
-    AssertEqualScalar(0.12, res, 0.04, __LINE__);
-    if (not assert_equal<double>(0.12, res, 0.02))
+    AssertEqualScalar(0.28, res, 0.04, __LINE__);
+    if (not assert_equal<double>(0.28, res, 0.02))
         CoutWarning("One test case failed in performance!");
     cout << "The energy saving ratio in OptimizeTaskSet-OptimizeTaskSetOneIte is " << res << endl;
 }
