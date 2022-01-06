@@ -52,8 +52,10 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic 
 
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
         {
-            double frequencyRunTime = taskSet[i].executionTime /
-                                      executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
+            // double frequencyRunTime = taskSet[i].executionTime /
+            //                           executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
+            double frequencyRunTime = Execution2Frequency(executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0),
+                                                          taskSet[i]);
             res(i - lastTaskDoNotNeedOptimize - 1, 0) = 1.0 / taskSet[i].period *
                                                         EstimateEnergyTask(taskSet[i], frequencyRunTime);
         }

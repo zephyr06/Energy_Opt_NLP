@@ -5,8 +5,8 @@ runMode: compare
 testDataSetName: test_n5_v10
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-debugMode: 0
-executionTimeModel: 2
+debugMode: 1
+executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 100
 EnergyMode: 2
@@ -22,7 +22,7 @@ exactJacobian: 0
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: "fine"
+roundTypeInClamp: "rough"
 
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian

@@ -7,7 +7,7 @@ double Barrier(double x)
 {
     if (x > 0)
         // return pow(x, 2);
-        return weightLogBarrier * log(x);
+        return 0;
     else if (x < 0)
     {
         if (TASK_NUMBER == 0)
@@ -15,7 +15,7 @@ double Barrier(double x)
             cout << red << "Please set TASK_NUMBER!" << def << endl;
             throw;
         }
-        return punishmentInBarrier * pow(10, TASK_NUMBER - 3) * pow(1 - x, 1);
+        return punishmentInBarrier * pow(10, TASK_NUMBER - 3) * pow(-1 * x, 1);
     }
     else // it basically means x=0
         return weightLogBarrier *

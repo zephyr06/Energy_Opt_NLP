@@ -77,37 +77,34 @@ public:
             TaskSet taskSetCurr_ = tasks_;
             UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector, lastTaskDoNotNeedOptimize);
 
-            vector<Task> hpTasks;
-            for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
-            {
-                hpTasks.push_back(taskSetCurr_[i]);
-            }
-            // cout << "The response time and deadline for each task is: " << endl;
-            // for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-            // int startIndex;
             if (Schedul_Analysis::type() == "LL")
-                ;
+            {
+                for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
+                {
+                    double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
+                    err(i, 0) += Barrier(tasks_[i].deadline - responseTime);
+                }
+            }
             else if (Schedul_Analysis::type() == "WAP")
             {
                 for (int i = 0; i < lastTaskDoNotNeedOptimize + 1; i++)
                 {
                     double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
-                    err(0, 0) += Barrier(tasks_[i].deadline - responseTime);
+                    err(i, 0) += Barrier(tasks_[i].deadline - responseTime);
                 }
             }
             else
                 CoutError("Undefined type() in Schedul_Analysis, Optimize()!");
+
             for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             {
                 // energy part
-                // double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
                 double frequency = Execution2Frequency(taskSetCurr_[i].executionTime, tasks_[i]);
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) += 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                 currentEnergyConsumption += err(i - (lastTaskDoNotNeedOptimize + 1), 0);
 
                 // barrier function part
                 double responseTime = Schedul_Analysis::RTA_Common_Warm(responseTimeInitial(i, 0), taskSetCurr_, i);
-
                 err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].deadline - responseTime);
                 if (enableMaxComputationTimeRestrict)
                     err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime * 2 -
@@ -117,11 +114,8 @@ public:
                     (enableMaxComputationTimeRestrict &&
                      executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1), 0) > tasks_[i].executionTime * 2))
                     flagSchedulable = false;
-                // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime - taskSetCurr_[i].executionTime);
-                hpTasks.push_back(taskSetCurr_[i]);
             }
 
-            // check schedulability
             if (flagSchedulable && currentEnergyConsumption / weightEnergy < valueGlobalOpt)
             {
 
@@ -129,8 +123,6 @@ public:
                     vectorGlobalOpt(i, 0) = executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
                 // update globalOptVector
                 valueGlobalOpt = currentEnergyConsumption / weightEnergy;
-                // if (debugMode == 1)
-                //     cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
             }
 
             return err;
