@@ -79,6 +79,7 @@ TEST(unitOptimization, a1)
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     int N = taskSet1.size();
     optimizerType = 1;
+    EnergyMode = 1;
     int lastTaskDoNotNeedOptimize = 1;
 
     VectorDynamic initialEstimate;
@@ -103,6 +104,7 @@ TEST(OptimizeTaskSet, a1)
     enableMaxComputationTimeRestrict = 0;
     computationBound = 100;
     optimizerType = 1;
+    EnergyMode = 1;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
@@ -110,6 +112,7 @@ TEST(OptimizeTaskSet, a1)
 
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     computationBound = 100;
+    executionTimeModel = 1;
     double res = Opt_LL::OptimizeTaskSet(taskSet1);
     cout << "The energy saving ratio is " << res << endl;
     if (not assert_equal<double>(0.359257, res, 0.01))
@@ -121,6 +124,7 @@ TEST(checkConvergenceInterior, a1)
     enableMaxComputationTimeRestrict = 0;
     computationBound = 100;
     optimizerType = 1;
+    EnergyMode = 1;
     double oldY = 1;
     double newY = 1.01;
     VectorDynamic oldX;
@@ -143,6 +147,7 @@ TEST(FindTaskDoNotNeedOptimize, a1)
     enableMaxComputationTimeRestrict = 0;
     computationBound = 100;
     optimizerType = 1;
+    EnergyMode = 1;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "utilization");
     VectorDynamic initialExecution = GetParameterVD<int>(taskSet1, "executionTime");
@@ -175,6 +180,8 @@ TEST(OptimizeTaskSetOneIte, a2)
     TaskSet taskSet1 = ReadTaskSet(path, "utilization");
     minWeightToBegin = 1e3;
     optimizerType = 1;
+    EnergyMode = 1;
+    executionTimeModel = 1;
     double res = Opt_LL::OptimizeTaskSet(taskSet1);
     AssertEqualScalar(0.12, res, 0.04, __LINE__);
     if (not assert_equal<double>(0.12, res, 0.02))
@@ -193,6 +200,7 @@ TEST(ClampComputationTime, a1)
     int lastTaskDoNotNeedOptimize = 1;
     eliminateTol = 10;
     optimizerType = 1;
+    EnergyMode = 1;
 
     VectorDynamic initialEstimate;
     initialEstimate.resize(numberOfTasksNeedOptimize, 1);
@@ -234,6 +242,7 @@ TEST(UnitOptimizationIPM, a1)
     VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");
     eliminateTol = 1;
     optimizerType = 1;
+    EnergyMode = 1;
     // enableIPM = 1;
     vectorGlobalOpt.resize(3, 1);
     VectorDynamic initial;

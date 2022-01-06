@@ -13,6 +13,7 @@
 #include "Tasks.h"
 #include "Parameters.h"
 #include "Declaration.h"
+#include "FrequencyModel.h"
 const double EstimateEnergyTask(const Task &task, double frequency)
 /**
  * @brief Estimate energy consumption of a single task;
@@ -23,26 +24,19 @@ const double EstimateEnergyTask(const Task &task, double frequency)
     scalar, energy consumption of the task if it runs at the given frequency
 */
 {
+    double exec = Frequency2Execution(frequency, task);
+    double energy;
+    if (EnergyMode == 1)
+        energy = exec * (pow(frequency, 3));
+    else if (EnergyMode == 2)
+        energy = exec * (pow(frequency, 3) + pow(frequency, 2) + 5);
+    else
+        CoutError("Not recognized EnergyMode!");
+    energy *= weightEnergy;
     if (frequency <= task.executionTime / (task.executionTime - 1e-3))
-        return task.executionTime * pow(frequency, 2) * weightEnergy;
+        return energy;
     else
-        return task.executionTime * pow(frequency, 2) * weightEnergy * punishmentFrequency;
-}
-const double EstimateEnergyTaskBasedComputation(const Task &task, double computationTime)
-/**
- * @brief Estimate energy consumption of a single task;
-    all tasks' default frequency is 1, which is also the maximum frequency;
- * @param
-    frequency is defined as f = C_0 / C_real
-    @return
-    scalar, energy consumption of the task if it runs at the given frequency
-*/
-{
-    double frequency = computationTime / task.executionTime;
-    if (computationTime >= task.executionTime - deltaOptimizer)
-        return task.executionTime * pow(frequency, 2) * weightEnergy;
-    else
-        return task.executionTime * pow(frequency, 2) * weightEnergy * punishmentFrequency;
+        return energy * punishmentFrequency;
 }
 
 VectorDynamic EstimateEnergyTaskSet(const TaskSet &taskSet, const VectorDynamic &executionTimeVector,

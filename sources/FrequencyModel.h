@@ -23,3 +23,24 @@ double Execution2Frequency(double exec, const Task &task)
         CoutError("executionTimeModel not recognized! Accept: 1, 2");
     return -1;
 }
+/**
+ * @brief c = c_fix + c_var/f
+ * 
+ * @param exec 
+ * @param task 
+ * @return double 
+ */
+double Frequency2Execution(double frequency, const Task &task)
+{
+    if (executionTimeModel == 1)
+    {
+        return task.executionTime / frequency;
+    }
+    else if (executionTimeModel == 2)
+    {
+        return 0.1 * task.executionTime + 0.9 * task.executionTime / frequency;
+    }
+    else
+        CoutError("executionTimeModel not recognized! Accept: 1, 2");
+    return -1;
+}

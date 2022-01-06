@@ -6,7 +6,8 @@ TEST(energy, tasks)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv";
     auto taskSet = ReadTaskSet(path, "RM");
-
+    executionTimeModel = 1;
+    EnergyMode = 1;
     VectorDynamic comp;
     comp.resize(3, 1);
     comp << 17, 12, 253;
