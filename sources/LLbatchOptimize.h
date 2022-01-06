@@ -32,7 +32,7 @@ void BatchOptimize()
                 runTime.push_back(timeTaken);
                 outfileWrite << energySaveRatioVec.back() << endl;
             }
-            else if (res == -1 || res > 1)
+            else
             {
                 errorFiles.push_back(file);
             }
@@ -60,10 +60,12 @@ void BatchOptimize()
 
     outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/time_task_number.txt", std::ios_base::app);
     outfile2 << aveTime << endl;
-    if (debugMode == 1)
+    if (printFailureFile)
+    {
         cout << endl;
-    for (auto &file : errorFiles)
-        cout << file << endl;
+        for (auto &file : errorFiles)
+            cout << file << endl;
+    }
     // if (debugMode)
     cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
 

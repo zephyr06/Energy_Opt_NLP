@@ -35,6 +35,10 @@ int main(int argc, char *argv[])
         .default_value(500)
         .help("the maximum period of tasks in DAG")
         .scan<'i', int>();
+    program.add_argument("--deadlineType")
+        .default_value(0)
+        .help("type of tasksets, 0 means implicit, 1 means random")
+        .scan<'i', int>();
     program.add_argument("--taskType")
         .default_value(0)
         .help("type of tasksets, 0 means normal, 1 means DAG")
@@ -61,6 +65,7 @@ int main(int argc, char *argv[])
     int numberOfProcessor = program.get<int>("--NumberOfProcessor");
     int periodMin = program.get<int>("--periodMin");
     int periodMax = program.get<int>("--periodMax");
+    int deadlineType = program.get<int>("--deadlineType");
     int taskType = program.get<int>("--taskType");
     cout << "Task configuration: " << endl
          << "the number of tasks(--N): " << N << endl
@@ -69,6 +74,7 @@ int main(int argc, char *argv[])
          << "NumberOfProcessor(--NumberOfProcessor): " << numberOfProcessor << endl
          << "periodMin(--periodMin): " << periodMin << endl
          << "periodMax(--periodMax): " << periodMax << endl
+         << "deadlineType(--deadlineType), 1 means random, 0 means implicit: " << deadlineType << endl
          << endl;
 
     string outDirectory = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/";
@@ -81,7 +87,7 @@ int main(int argc, char *argv[])
             TaskSet tasks = GenerateTaskSet(N, totalUtilization,
                                             numberOfProcessor,
                                             periodMin,
-                                            periodMax);
+                                            periodMax, deadlineType);
             string fileName = "periodic-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".csv";
             ofstream myfile;
             myfile.open(outDirectory + fileName);

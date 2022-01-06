@@ -77,8 +77,12 @@ void BatchOptimize()
     for (auto &file : errorFiles)
         cout << file << endl;
     cout << "unschedulable files: " << endl;
-    for (auto &file : unschedulableFiles)
-        cout << file << endl;
+    if (printFailureFile)
+    {
+        cout << endl;
+        for (auto &file : errorFiles)
+            cout << file << endl;
+    }
     // if (debugMode)
     cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
     cout << "The total number of unschedulable files is " << unschedulableFiles.size() << endl;

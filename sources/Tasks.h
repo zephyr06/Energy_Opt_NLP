@@ -54,24 +54,10 @@ public:
                                                   overhead(overhead), executionTime(executionTime),
                                                   deadline(deadline), id(id),
                                                   processorId(processorId) { executionTimeOrg = executionTime; }
-    double priority()
-    {
-        if (priorityMode == "RM")
-        {
-            if (period > 0)
-                return 1.0 / period;
-            else
-                CoutError("Period parameter less or equal to 0!");
-        }
-        else if (priorityMode == "orig")
-            return id;
-        else
-            CoutError("Priority settings not recognized!");
-        return -1;
-    }
+
     /**
- * only used in ReadTaskSet because the input parameter's type is int
- **/
+     * only used in ReadTaskSet because the input parameter's type is int
+     **/
     Task(vector<int> dataInLine)
     {
         if (dataInLine.size() != 7)
@@ -183,6 +169,10 @@ bool compareUtilization(Task task1, Task task2)
 {
     return task1.utilization() < task2.utilization();
 };
+static bool compareDeadline(Task &task1, Task &task2)
+{
+    return task1.deadline < task2.deadline;
+};
 
 double Utilization(const TaskSet &tasks)
 {
@@ -245,6 +235,10 @@ TaskSet Reorder(TaskSet tasks, string priorityType)
     else if (priorityType == "utilization")
     {
         sort(tasks.begin(), tasks.end(), compareUtilization);
+    }
+    else if (priorityType == "deadline")
+    {
+        sort(tasks.begin(), tasks.end(), compareDeadline);
     }
     else if (priorityType == "orig")
     {

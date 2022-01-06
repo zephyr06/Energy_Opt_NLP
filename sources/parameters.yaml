@@ -5,11 +5,14 @@ runMode: normal
 testDataSetName: test_n3_v13
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-debugMode: 1
+debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 100
+elimIte: 000
 EnergyMode: 1
+exactJacobian: 0
+printFailureFile: 0
+readTaskMode: deadline
 
 enableMaxComputationTimeRestrict: 0
 MaxComputationTimeRestrict: 3
@@ -18,11 +21,11 @@ eliminateTol: 1e-1
 eliminateStep: 3
 
 iterationNumIPM_Max: 10
-exactJacobian: 0
+
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: "rough"
+roundTypeInClamp: "none"
 
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
@@ -36,10 +39,8 @@ relErrorTolIPM: 1e-5
 xTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
-priorityMode: RM
 computationBound: 2.0
 punishmentFrequency: 1
-
 
 randomInitialize: 0
 deltaInitialDogleg: 1e10
@@ -49,8 +50,8 @@ lowerLambda: 1e-20
 upperLambda: 1e30
 coolingRateSA: 0.99
 temperatureSA: 100000
-granularityInBF:1
-readTaskMode: utilization
+granularityInBF: 1
+
 eliminateVariableThreshold: 1.0
 SA_iteration: 1000000
 

@@ -19,6 +19,7 @@ double weightDrawBegin = (double)ConfigParameters["weightDrawBegin"];
 double weightDrawEnd = (double)ConfigParameters["weightDrawEnd"];
 double MaxComputationTimeRestrict = (double)ConfigParameters["MaxComputationTimeRestrict"];
 
+int printFailureFile = (int)ConfigParameters["printFailureFile"];
 int EnergyMode = (int)ConfigParameters["EnergyMode"];
 int elimIte = (int)ConfigParameters["elimIte"];
 int executionTimeModel = (int)ConfigParameters["executionTimeModel"];
@@ -33,7 +34,6 @@ const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
 const double upperLambda = (double)ConfigParameters["upperLambda"];
-string priorityMode = (string)ConfigParameters["priorityMode"];
 const double noiseModelSigma = (double)ConfigParameters["noiseModelSigma"];
 const double deltaInitialDogleg = (double)ConfigParameters["deltaInitialDogleg"];
 const int randomInitialize = (int)ConfigParameters["randomInitialize"];

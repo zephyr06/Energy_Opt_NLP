@@ -117,6 +117,12 @@ TEST(RTA, ResponseTimeAnalysisWarm)
          << " passed\n";
 }
 
+TEST(RTA_LL, v1)
+{
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n30_v2.csv", "RM");
+    AssertBool(true, CheckSchedulability<RTA_LL>(task_set, true));
+}
+
 // TEST(Schedulability, p1)
 // {
 //     string path2 = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";

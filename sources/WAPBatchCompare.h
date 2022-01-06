@@ -88,10 +88,12 @@ void BatchCompare()
 
     outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/time_task_number.txt", std::ios_base::app);
     outfile2 << Average(runTimeW) << ", " << Average(runTimeSA) << endl;
-    if (debugMode == 1)
+    if (printFailureFile)
+    {
         cout << endl;
-    for (auto &file : errorFiles)
-        cout << file << endl;
+        for (auto &file : errorFiles)
+            cout << file << endl;
+    }
     // if (debugMode)
     cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
 

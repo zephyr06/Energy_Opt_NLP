@@ -108,10 +108,19 @@ public:
 
             VectorDynamic responseTimeVec = ResponseTimeOfTaskSet<Schedul_Analysis>(taskDurOpt, responseTimeInitial);
 
-            boost::function<Matrix(const VectorDynamic &)> f =
-                [&responseTimeVec, &taskDurOpt, &energyVec, this](const VectorDynamic &executionTimeVector)
+            boost::function<Matrix(const VectorDynamic &)> f2 =
+                [this](const VectorDynamic &executionTimeVector)
             {
-                VectorDynamic err = energyVec;
+                TaskSet taskT = tasks_;
+                UpdateTaskSetExecutionTime(taskT, executionTimeVector, lastTaskDoNotNeedOptimize);
+                return EstimateEnergyTaskSet(taskT);
+            };
+
+            boost::function<Matrix(const VectorDynamic &)> f =
+                [&responseTimeVec, &taskDurOpt, &f2, this](const VectorDynamic &executionTimeVector)
+            {
+                VectorDynamic err = f2(executionTimeVector);
+
                 double currentEnergyConsumption = err.sum();
                 for (int i = 0; i < N; i++)
                 {
@@ -125,18 +134,14 @@ public:
                 return err;
             };
 
-            boost::function<Matrix(const VectorDynamic &)> f2 =
-                [this](const VectorDynamic &executionTimeVector)
-            {
-                TaskSet taskT = tasks_;
-                UpdateTaskSetExecutionTime(taskT, executionTimeVector, lastTaskDoNotNeedOptimize);
-                return EstimateEnergyTaskSet(taskT);
-            };
             VectorDynamic err;
             err = f(executionTimeVector);
             if (H)
             {
-                *H = NumericalDerivativeDynamicUpper(f2, executionTimeVector, deltaOptimizer, N);
+                if (exactJacobian)
+                    *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, N);
+                else
+                    *H = NumericalDerivativeDynamicUpper(f2, executionTimeVector, deltaOptimizer, N);
                 // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
                 // *H = jacobian;
                 if (debugMode == 1)
@@ -175,7 +180,8 @@ public:
     static VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize,
                                               VectorDynamic &responseTimeInitial, string roundType)
     {
-        return comp;
+        if (roundType == "none")
+            return comp;
         int n = comp.rows();
         for (int i = 0; i < n; i++)
             comp(i, 0) = int(comp(i, 0));
@@ -528,6 +534,7 @@ public:
  */
     static double OptimizeTaskSet(TaskSet &tasks)
     {
+        InitializeGlobalVector(tasks.size());
         double eliminateTolRef = eliminateTol;
 
         double res = OptimizeTaskSetOneIte(tasks);

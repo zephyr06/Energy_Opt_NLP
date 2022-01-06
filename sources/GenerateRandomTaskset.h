@@ -25,9 +25,23 @@ vector<double> Uunifast(int N, double utilAll)
     return utilVec;
 }
 
+/**
+ * @brief generate a random number within the range [a,b];
+ * a must be smaller than b
+ * 
+ * @param a 
+ * @param b 
+ * @return double 
+ */
+double RandRange(double a, double b)
+{
+    if (b < a)
+        CoutError("Range Error in RandRange");
+    return a + (b - a) * double(rand()) / RAND_MAX;
+}
 TaskSet GenerateTaskSet(int N, double totalUtilization,
                         int numberOfProcessor, int periodMin,
-                        int periodMax)
+                        int periodMax, int deadlineType = 0)
 {
     vector<double> utilVec = Uunifast(N, totalUtilization);
     TaskSet tasks;
@@ -37,11 +51,14 @@ TaskSet GenerateTaskSet(int N, double totalUtilization,
     {
 
         int periodCurr = (1 + rand() % periodMaxRatio) * periodMin;
+        double deadline = periodCurr;
+        if (deadlineType == 1)
+            deadline = RandRange(ceil(periodCurr * utilVec[i]), periodCurr);
         double randomRatio = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         Task task(0, periodCurr,
                   ceil(periodCurr * utilVec[i]) * 0.1 * randomRatio,
                   ceil(periodCurr * utilVec[i]),
-                  periodCurr, i,
+                  deadline, i,
                   rand() % numberOfProcessor);
         tasks.push_back(task);
     }

@@ -186,7 +186,9 @@ TEST(OptimizeTaskSetOneIte, a2)
     weightEnergy = 1e3;
     optimizerType = 1;
     EnergyMode = 1;
+    elimIte = 100;
     runMode = "normal";
+    exactJacobian = 0;
     enableMaxComputationTimeRestrict = 0;
     executionTimeModel = 1;
     double res = Opt_LL::OptimizeTaskSet(taskSet1);
