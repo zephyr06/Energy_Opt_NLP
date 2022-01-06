@@ -1,18 +1,18 @@
 %YAML:1.0
 
-runMode: compare
+runMode: normal
 
-testDataSetName: test_n5_v10
+testDataSetName: test_n3_v13
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
 debugMode: 1
-executionTimeModel: 2 # 1 is normal, 2 is more difficult
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 100
-EnergyMode: 2
+EnergyMode: 1
 
-enableMaxComputationTimeRestrict: 1
-minWeightToBegin: 1e9
+enableMaxComputationTimeRestrict: 0
+MaxComputationTimeRestrict: 3
 weightStep: 1e2
 eliminateTol: 1e-1
 eliminateStep: 3
@@ -50,7 +50,7 @@ upperLambda: 1e30
 coolingRateSA: 0.99
 temperatureSA: 100000
 granularityInBF:1
-readTaskMode: RM
+readTaskMode: utilization
 eliminateVariableThreshold: 1.0
 SA_iteration: 1000000
 

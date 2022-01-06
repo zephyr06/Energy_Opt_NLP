@@ -87,6 +87,3 @@ inline VectorDynamic GenerateVectorDynamic(LLint N)
     v.setZero();
     return v;
 }
-// typedef Eigen::Matrix<double, TASK_NUMBER, 1> ComputationTimeVector;
-// typedef Eigen::Matrix<double, TASK_NUMBER, TASK_NUMBER> JacobianOpt;
-// typedef Eigen::Matrix<double, TASK_NUMBER, 1> ErrElement;

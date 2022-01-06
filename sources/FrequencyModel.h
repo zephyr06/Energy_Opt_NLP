@@ -9,15 +9,15 @@
  * @return double 
  */
 
-double Execution2Frequency(double exec, const Task &task)
+double GetFrequency(const Task &task)
 {
     if (executionTimeModel == 1)
     {
-        return task.executionTime / exec;
+        return task.executionTimeOrg / task.executionTime;
     }
     else if (executionTimeModel == 2)
     {
-        return task.executionTime * 0.9 / (exec - task.executionTime * 0.1);
+        return task.executionTimeOrg * 0.9 / (task.executionTime - task.executionTimeOrg * 0.1);
     }
     else
         CoutError("executionTimeModel not recognized! Accept: 1, 2");
@@ -30,17 +30,7 @@ double Execution2Frequency(double exec, const Task &task)
  * @param task 
  * @return double 
  */
-double Frequency2Execution(double frequency, const Task &task)
+double Frequency2Execution(const Task &task)
 {
-    if (executionTimeModel == 1)
-    {
-        return task.executionTime / frequency;
-    }
-    else if (executionTimeModel == 2)
-    {
-        return 0.1 * task.executionTime + 0.9 * task.executionTime / frequency;
-    }
-    else
-        CoutError("executionTimeModel not recognized! Accept: 1, 2");
-    return -1;
+    return task.executionTime;
 }

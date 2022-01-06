@@ -2,6 +2,7 @@
 #include "../sources/RTA_LL.h"
 #include "../sources/RTA_WAP.h"
 #include "../sources/Generate_WAP.h"
+#include "../sources/testMy.h"
 
 TEST(hyperPeriod, RTA)
 {
@@ -49,6 +50,15 @@ TEST(RTA, RTA3)
     TaskSet hp3({});
     int rta1Actual = RTA_LL::ResponseTimeAnalysis(task_set[0], hp3);
     CHECK_EQUAL(rta1Expect, rta1Actual);
+}
+TEST(RTA, RTA4)
+{
+    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+
+    VectorDynamic expect = GenerateVectorDynamic(5);
+    expect << 10, 21, 33, 46, 60;
+    VectorDynamic actual = ResponseTimeOfTaskSet<RTA_LL>(task_set);
+    AssertEigenEqualVector(expect, actual);
 }
 TEST(GetBusyPeriod, v1)
 {
@@ -118,13 +128,13 @@ TEST(RTA, ResponseTimeAnalysisWarm)
 //         throw;
 //     }
 // }
-TEST(RTA, ResponseTimeOfTaskSetHard)
+TEST(RTA, ResponseTimeOfTaskSet)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
 
     int rta3Expect = 282;
     TaskSet hp({task_set[0], task_set[1]});
-    int rta3Actual = int(ResponseTimeOfTaskSetHard<RTA_LL>(task_set)(2, 0));
+    int rta3Actual = int(ResponseTimeOfTaskSet<RTA_LL>(task_set)(2, 0));
     CHECK_EQUAL(rta3Expect, rta3Actual);
 }
 
@@ -137,7 +147,7 @@ TEST(wap, v1)
     VectorDynamic expect;
     expect.resize(5, 1);
     expect << 10, 21, 33, 46, 60;
-    VectorDynamic actual = ResponseTimeOfTaskSetHard<RTA_WAP>(task_set);
+    VectorDynamic actual = ResponseTimeOfTaskSet<RTA_WAP>(task_set);
     AssertEigenEqualVector(expect, actual);
 }
 
@@ -150,7 +160,7 @@ TEST(wap, v2)
     VectorDynamic expect;
     expect.resize(5, 1);
     expect << 10, 31, 55, 82, 112;
-    VectorDynamic actual = ResponseTimeOfTaskSetHard<RTA_WAP>(task_set);
+    VectorDynamic actual = ResponseTimeOfTaskSet<RTA_WAP>(task_set);
     AssertEigenEqualVector(expect, actual);
 }
 
@@ -173,7 +183,7 @@ TEST(wap, v3)
     VectorDynamic expect;
     expect.resize(5, 1);
     expect << 10, 31, 54, 81, 110;
-    VectorDynamic actual = ResponseTimeOfTaskSetHard<RTA_WAP>(task_set);
+    VectorDynamic actual = ResponseTimeOfTaskSet<RTA_WAP>(task_set);
     AssertEigenEqualVector(expect, actual);
 }
 

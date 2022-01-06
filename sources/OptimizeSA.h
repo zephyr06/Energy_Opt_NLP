@@ -11,18 +11,19 @@ OptimizeResult OptimizeSchedulingSA(TaskSet &tasks)
 {
     srand(0);
     int N = tasks.size();
+    TASK_NUMBER = tasks.size();
     vectorGlobalOpt.resize(N, 1);
     vectorGlobalOpt.setZero();
     // auto hyperPeriod = HyperPeriod(tasks);
     int lastTaskDoNotNeedOptimize = -1;
     VectorDynamic initialEstimate = GetParameterVD<int>(tasks, "executionTime");
     VectorDynamic periods = GetParameterVD<int>(tasks, "period");
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard<RTA_LL>(tasks);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(tasks);
     if (!CheckSchedulabilityDirect(tasks, responseTimeInitial))
         return {INT_MAX, INT_MAX,
                 initialEstimate, initialEstimate};
     Symbol key('a', 0);
-    auto model = noiseModel::Isotropic::Sigma(numberOfTasksNeedOptimize, noiseModelSigma);
+    auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
     Energy_Opt<RTA_LL>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,
                                                  responseTimeInitial, model);
 
@@ -36,7 +37,7 @@ OptimizeResult OptimizeSchedulingSA(TaskSet &tasks)
                                {
                                    VectorDynamic startTimeVector = Vector2Eigen<double>(startTimeVec.genotype);
                                    VectorDynamic err;
-                                   err = factor.f(startTimeVector);
+                                   err = factor.evaluateError(startTimeVector);
                                    return err.norm() * -1;
                                });
 
@@ -61,6 +62,6 @@ OptimizeResult OptimizeSchedulingSA(TaskSet &tasks)
             << "time spent: " << diff.count() << " seconds" << std::endl;
     }
 
-    return {factor.f(initialEstimate).norm(), best_moe.fitness * -1,
+    return {factor.evaluateError(initialEstimate).norm(), best_moe.fitness * -1,
             initialEstimate, Vector2Eigen<double>(best_moe.genotype)};
 }

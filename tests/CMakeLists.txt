@@ -19,7 +19,7 @@ gtsamAddTestsGlob(EnergyOptNLP "test*.cpp" "testBF*" "${CONVENIENCE_LIB_NAME}")
 
 ADD_EXECUTABLE(GenerateTaskSet GenerateTaskSet.cpp)
 TARGET_LINK_LIBRARIES(GenerateTaskSet ${CONVENIENCE_LIB_NAME})
-ADD_EXECUTABLE(WriteWeightBatch tWeightBatch.cpp)
+ADD_EXECUTABLE(WriteWeightBatch tWriteWeightTrajectory.cpp)
 TARGET_LINK_LIBRARIES(WriteWeightBatch ${CONVENIENCE_LIB_NAME})
 
 ADD_EXECUTABLE(LLBatch1 LLBatch.cpp)

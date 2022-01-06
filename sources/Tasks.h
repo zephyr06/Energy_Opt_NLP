@@ -29,6 +29,7 @@ public:
     int offset;
     int period;
     int overhead;
+    double executionTimeOrg;
     double executionTime;
     int deadline;
     int id;
@@ -38,7 +39,7 @@ public:
 
     Task() : offset(0), period(0),
              overhead(0), executionTime(0.0),
-             deadline(0) {}
+             deadline(0) { executionTimeOrg = executionTime; }
     Task(int offset, int period, int overhead, double executionTime,
          int deadline) : offset(offset), period(period),
                          overhead(overhead), executionTime(executionTime),
@@ -46,12 +47,13 @@ public:
     {
         id = -1;
         processorId = -1;
+        executionTimeOrg = executionTime;
     }
     Task(int offset, int period, int overhead, double executionTime,
          int deadline, int id, int processorId) : offset(offset), period(period),
                                                   overhead(overhead), executionTime(executionTime),
                                                   deadline(deadline), id(id),
-                                                  processorId(processorId) {}
+                                                  processorId(processorId) { executionTimeOrg = executionTime; }
     double priority()
     {
         if (priorityMode == "RM")
@@ -85,6 +87,7 @@ public:
         executionTime = dataInLine[4];
         deadline = dataInLine[5];
         processorId = dataInLine[6];
+        executionTimeOrg = executionTime;
     }
 
     void print()
@@ -153,6 +156,8 @@ VectorDynamic GetParameterVD(const TaskSet &taskset, string parameterType)
             parameterList(i, 0) = ((T)(taskset[i].period));
         else if (parameterType == "executionTime")
             parameterList(i, 0) = ((T)(taskset[i].executionTime));
+        else if (parameterType == "executionTimeOrg")
+            parameterList(i, 0) = ((T)(taskset[i].executionTimeOrg));
         else if (parameterType == "overhead")
             parameterList(i, 0) = ((T)(taskset[i].overhead));
         else if (parameterType == "deadline")

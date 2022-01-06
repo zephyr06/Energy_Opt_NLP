@@ -19,6 +19,7 @@ TEST(OptimizeTaskSet, RTA_LL_V1)
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
     TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
+    InitializeGlobalVector(taskSet1.size());
     auto start = chrono::high_resolution_clock::now();
     double res = Energy_Opt<RTA_LL>::OptimizeTaskSet(taskSet1);
     cout << blue << "The energy saving ratio is " << res << def << endl;

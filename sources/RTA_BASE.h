@@ -59,29 +59,31 @@ bool CheckSchedulabilityDirect(const TaskSet &tasks, const VectorDynamic &rta)
 }
 
 template <class Schedul_Analysis>
-VectorDynamic ResponseTimeOfTaskSetHard(TaskSet &tasks)
+VectorDynamic ResponseTimeOfTaskSet(const TaskSet &tasks, const VectorDynamic &warmStart)
 {
     int N = tasks.size();
     VectorDynamic res;
     res.resize(N, 1);
 
-    vector<Task> hpTasks;
     if (debugMode == 1)
         cout << Color::blue << "RTA analysis (responseTime, deadline)" << Color::def << endl;
     for (int i = 0; i < N; i++)
     {
-        // res(i, 0) = Schedul_Analysis::ResponseTimeAnalysis(tasks[i], hpTasks);
-        res(i, 0) = Schedul_Analysis::RTA_Common(tasks, i);
+        res(i, 0) = Schedul_Analysis::RTA_Common_Warm(warmStart(i, 0), tasks, i);
         if (debugMode == 1)
             cout << res(i, 0) << ", " << tasks[i].deadline << endl;
         if (res(i, 0) > min(tasks[i].deadline, tasks[i].period))
         {
             if (debugMode == 1)
                 cout << "The current task set is not schedulable!\n";
-            res(0, 0) = -1;
-            return res;
         }
-        hpTasks.push_back(tasks[i]);
     }
     return res;
+}
+
+template <class Schedul_Analysis>
+VectorDynamic ResponseTimeOfTaskSet(const TaskSet &tasks)
+{
+    VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
+    return ResponseTimeOfTaskSet<Schedul_Analysis>(tasks, warmStart);
 }

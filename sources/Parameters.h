@@ -15,9 +15,9 @@ int TASK_NUMBER = 0;
 double weightEnergy = (double)ConfigParameters["weightEnergy"];
 double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
 double eliminateTol = (double)ConfigParameters["eliminateTol"];
-double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
 double weightDrawBegin = (double)ConfigParameters["weightDrawBegin"];
 double weightDrawEnd = (double)ConfigParameters["weightDrawEnd"];
+double MaxComputationTimeRestrict = (double)ConfigParameters["MaxComputationTimeRestrict"];
 
 int EnergyMode = (int)ConfigParameters["EnergyMode"];
 int elimIte = (int)ConfigParameters["elimIte"];
@@ -46,7 +46,7 @@ double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];
 const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency"];
 const string testDataSetName = (string)ConfigParameters["testDataSetName"];
 const string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
-const string runMode = (string)ConfigParameters["runMode"];
+string runMode = (string)ConfigParameters["runMode"];
 
 const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
