@@ -19,6 +19,7 @@ double minWeightToBegin = (double)ConfigParameters["minWeightToBegin"];
 double weightDrawBegin = (double)ConfigParameters["weightDrawBegin"];
 double weightDrawEnd = (double)ConfigParameters["weightDrawEnd"];
 
+int elimIte = (int)ConfigParameters["elimIte"];
 int executionTimeModel = (int)ConfigParameters["executionTimeModel"];
 int enableIPM = (int)ConfigParameters["enableIPM"];
 const double coolingRateSA = (double)ConfigParameters["coolingRateSA"];

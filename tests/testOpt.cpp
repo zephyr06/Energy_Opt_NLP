@@ -221,7 +221,7 @@ TEST(ClampComputationTime, a2)
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v22.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
 
-    double res = Opt_LL::OptimizeTaskSet(taskSet1);
+    // double res = Opt_LL::OptimizeTaskSet(taskSet1);
     // CoutWarning("One test case failed in performance!");
 }
 
@@ -239,7 +239,7 @@ TEST(UnitOptimizationIPM, a1)
     VectorDynamic initial;
     initial.resize(1, 1);
     initial << initialExecution(2, 0);
-    VectorDynamic res = Opt_LL::UnitOptimizationIPM(tasks, 1, initial, initialExecution, initialExecution);
+    VectorDynamic res = Opt_LL::UnitOptimizationIPM(tasks, tasks, 1, initial, initialExecution, initialExecution);
     cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
     AssertEqualScalar(230, res(0, 0), 1.1, __LINE__);
     if (not(abs(res(0, 0) - 230) < 0.1))

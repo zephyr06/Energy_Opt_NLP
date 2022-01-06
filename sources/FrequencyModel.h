@@ -9,7 +9,7 @@
  * @return double 
  */
 
-double Execution2Frequency(double exec, Task &task)
+double Execution2Frequency(double exec, const Task &task)
 {
     if (executionTimeModel == 1)
     {

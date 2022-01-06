@@ -35,6 +35,18 @@ struct OptimizeResult
     OptimizeResult(double ie, double oe, VectorDynamic iv, VectorDynamic ov) : initialError(ie), optimizeError(oe), initialVariable(iv), optimizeVariable(ov) {}
 };
 
+bool CheckExecutionTimeBound(VectorDynamic &exec, TaskSet &tasksOrg)
+{
+    if (not enableMaxComputationTimeRestrict)
+        return true;
+    for (uint i = 0; i < tasksOrg.size(); i++)
+    {
+        if (exec(i, 0) > tasksOrg[i].executionTime * 2)
+            return false;
+    }
+    return true;
+}
+
 template <class Schedul_Analysis>
 class Energy_Opt
 {
@@ -102,7 +114,8 @@ public:
                                                                            executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1), 0));
 
                 if (tasks_[i].deadline - responseTime < 0 ||
-                    executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1) > tasks_[i].executionTime * 2))
+                    (enableMaxComputationTimeRestrict &&
+                     executionTimeVector(i - (lastTaskDoNotNeedOptimize + 1), 0) > tasks_[i].executionTime * 2))
                     flagSchedulable = false;
                 // err(i - (lastTaskDoNotNeedOptimize + 1), 0) += Barrier(tasks_[i].executionTime - taskSetCurr_[i].executionTime);
                 hpTasks.push_back(taskSetCurr_[i]);
@@ -111,10 +124,11 @@ public:
             // check schedulability
             if (flagSchedulable && currentEnergyConsumption / weightEnergy < valueGlobalOpt)
             {
-                // update globalOptVector
-                valueGlobalOpt = currentEnergyConsumption / weightEnergy;
+
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     vectorGlobalOpt(i, 0) = executionTimeVector(i - lastTaskDoNotNeedOptimize - 1, 0);
+                // update globalOptVector
+                valueGlobalOpt = currentEnergyConsumption / weightEnergy;
                 // if (debugMode == 1)
                 //     cout << "vectorGlobalOpt is " << vectorGlobalOpt << endl;
             }
@@ -141,7 +155,7 @@ public:
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                 {
                     // energy part
-                    double frequency = tasks_[i].executionTime / taskSetCurr_[i].executionTime;
+                    double frequency = Execution2Frequency(taskSetCurr_[i].executionTime, tasks_[i]);
                     err(i - (lastTaskDoNotNeedOptimize + 1), 0) = 1.0 / tasks_[i].period * EstimateEnergyTask(tasks_[i], frequency);
                 }
                 return err;
@@ -400,12 +414,16 @@ public:
         else if (optimizerType == 3)
         {
             GaussNewtonParams params;
+            if (debugMode == 1)
+                params.setVerbosity("DELTA");
             GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
             result = optimizer.optimize();
         }
         else if (optimizerType == 4)
         {
             NonlinearOptimizerParams params;
+            if (debugMode == 1)
+                params.setVerbosity("DELTA");
             NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
             result = optimizer.optimize();
         }
@@ -428,7 +446,8 @@ public:
  * 
  * once elimination condition changes, the function returns
  */
-    static VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, int lastTaskDoNotNeedOptimize,
+    static VectorDynamic UnitOptimizationIPM(TaskSet &tasksDuringOpt, TaskSet &tasksOrg,
+                                             int lastTaskDoNotNeedOptimize,
                                              VectorDynamic &initialEstimate,
                                              VectorDynamic &responseTimeInitial,
                                              VectorDynamic computationTimeVectorLocalOpt)
@@ -451,6 +470,14 @@ public:
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     variNew(i - lastTaskDoNotNeedOptimize - 1, 0) = vectorGlobalOpt(i, 0);
             }
+            // if (not CheckSchedulability<Schedul_Analysis>(tasksDuringOpt, responseTimeInitial) ||
+            //     not CheckExecutionTimeBound(variNew, tasksOrg))
+            // {
+            //     computationTimeVectorLocalOpt = vectorGlobalOpt;
+            //     for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+            //         variNew(i - lastTaskDoNotNeedOptimize - 1, 0) = vectorGlobalOpt(i, 0);
+            // }
+
             return variNew;
         }
 
@@ -483,6 +510,13 @@ public:
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     variNew(i - lastTaskDoNotNeedOptimize - 1, 0) = vectorGlobalOpt(i, 0);
             }
+            if (not CheckSchedulability<Schedul_Analysis>(tasksDuringOpt, responseTimeInitial) ||
+                not CheckExecutionTimeBound(variNew, tasksOrg))
+            {
+                computationTimeVectorLocalOpt = vectorGlobalOpt;
+                for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+                    variNew(i - lastTaskDoNotNeedOptimize - 1, 0) = vectorGlobalOpt(i, 0);
+            }
 
             resNew = EstimateEnergyTaskSet(tasksDuringOpt, variNew, lastTaskDoNotNeedOptimize).sum() /
                      weightEnergy;
@@ -508,7 +542,6 @@ public:
     static double OptimizeTaskSetOneIte(TaskSet &tasks)
     {
         int N = tasks.size();
-        // vectorGlobalOpt.resize(N, 1);
 
         // this function also checks schedulability
         VectorDynamic responseTimeInitial = ResponseTimeOfTaskSetHard<Schedul_Analysis>(tasks);
@@ -527,7 +560,6 @@ public:
 
         int numberOfIteration = 0;
         TaskSet tasksDuringOpt = tasks;
-
         do
         {
             VectorDynamic initialEstimateDuringOpt;
@@ -537,16 +569,17 @@ public:
                     computationTimeVectorLocalOpt(i, 0);
 
             // perform optimization
-            VectorDynamic optComp = UnitOptimizationIPM(tasksDuringOpt, lastTaskDoNotNeedOptimize,
+            VectorDynamic optComp = UnitOptimizationIPM(tasksDuringOpt, tasks, lastTaskDoNotNeedOptimize,
                                                         initialEstimateDuringOpt, responseTimeInitial,
                                                         computationTimeVectorLocalOpt);
             // formulate new computationTime
             for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                 computationTimeVectorLocalOpt(i, 0) = optComp(i - lastTaskDoNotNeedOptimize - 1, 0);
+            computationTimeVectorLocalOpt = vectorGlobalOpt;
 
             computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks,
                                                                  lastTaskDoNotNeedOptimize, responseTimeInitial, "rough");
-            // cout << computationTimeVectorLocalOpt << endl;
+
             // find variables to eliminate
             int adjustEliminateTolNum = 0;
             // cout << eliminateTol << endl;
@@ -580,7 +613,7 @@ public:
             lastTaskDoNotNeedOptimize = lastTaskDoNotNeedOptimizeAfterOpt;
 
             numberOfIteration++;
-            if (numberOfIteration > 4 * N)
+            if (numberOfIteration > min(4 * N, elimIte))
             {
                 // cout << red << "numberOfIteration error!\n"
                 //      << def << endl;
@@ -588,6 +621,7 @@ public:
                 //     Print(tasks);
                 // throw;
                 CoutWarning("numberOfIteration reaches the maximum limits, the algorithm decides to give up!");
+                break;
             }
         } while (numberOfTasksNeedOptimize > 0);
 

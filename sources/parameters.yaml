@@ -2,23 +2,27 @@
 
 runMode: compare
 
-testDataSetName: test_n20_v11
-
+testDataSetName: test_n5_v10
+optimizerType: 3 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-executionTimeModel: 1
+debugMode: 0
+executionTimeModel: 2
+enableIPM: 0
+elimIte: 100
 
 enableMaxComputationTimeRestrict: 1
 minWeightToBegin: 1e9
 weightStep: 1e2
 eliminateTol: 1e-1
 eliminateStep: 3
-enableIPM: 0
+
 iterationNumIPM_Max: 10
 exactJacobian: 0
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
 roundTypeInClamp: "fine"
+
 # If this number is much larger than the other parts(kike, weightEntry), 
 # the system may be indetermined in Jacobian
 
@@ -35,7 +39,7 @@ priorityMode: RM
 computationBound: 2.0
 punishmentFrequency: 10
 
-optimizerType: 1 # 1 means dogleg, 2 means LM
+
 randomInitialize: 0
 deltaInitialDogleg: 1e10
 
@@ -48,7 +52,7 @@ granularityInBF:1
 readTaskMode: RM
 eliminateVariableThreshold: 1.0
 SA_iteration: 1000000
-debugMode: 0
+
 utilTol: 0.001
 
 # something not used 

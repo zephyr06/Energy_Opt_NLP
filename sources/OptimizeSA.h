@@ -3,13 +3,16 @@
 #include <cmath>
 #include <time.h>
 #include "Optimize.h"
+#include "RTA_LL.h"
 #include "RTA_WAP.h"
 #include "../includeMoe/moe/moe.hpp"
-
+template <class Schedul_Analysis>
 OptimizeResult OptimizeSchedulingSA(TaskSet &tasks)
 {
     srand(0);
     int N = tasks.size();
+    vectorGlobalOpt.resize(N, 1);
+    vectorGlobalOpt.setZero();
     // auto hyperPeriod = HyperPeriod(tasks);
     int lastTaskDoNotNeedOptimize = -1;
     VectorDynamic initialEstimate = GetParameterVD<int>(tasks, "executionTime");
@@ -20,8 +23,8 @@ OptimizeResult OptimizeSchedulingSA(TaskSet &tasks)
                 initialEstimate, initialEstimate};
     Symbol key('a', 0);
     auto model = noiseModel::Isotropic::Sigma(numberOfTasksNeedOptimize, noiseModelSigma);
-    Energy_Opt<RTA_WAP>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,
-                                                  responseTimeInitial, model);
+    Energy_Opt<RTA_LL>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,
+                                                 responseTimeInitial, model);
 
     moe::SimulatedAnnealing<double> moether(moe::SAParameters<double>()
                                                 .withTemperature(temperatureSA)
