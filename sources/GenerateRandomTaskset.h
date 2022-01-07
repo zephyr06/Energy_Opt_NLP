@@ -50,7 +50,8 @@ TaskSet GenerateTaskSet(int N, double totalUtilization,
     for (int i = 0; i < N; i++)
     {
 
-        int periodCurr = (1 + rand() % periodMaxRatio) * periodMin;
+        // int periodCurr = (1 + rand() % periodMaxRatio) * periodMin;
+        int periodCurr = RandRange(periodMin, periodMax);
         double deadline = periodCurr;
         if (deadlineType == 1)
             deadline = RandRange(ceil(periodCurr * utilVec[i]), periodCurr);

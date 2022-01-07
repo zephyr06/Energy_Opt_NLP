@@ -446,7 +446,7 @@ public:
             int adjustEliminateTolNum = 0;
             int lastTaskDoNotNeedOptimizeAfterOpt;
             double eliminateTolIte = eliminateTol;
-            while (adjustEliminateTolNum < 10)
+            while (adjustEliminateTolNum < adjustEliminateMaxIte)
             {
                 lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
                     tasks,
@@ -473,7 +473,7 @@ public:
             lastTaskDoNotNeedOptimize = lastTaskDoNotNeedOptimizeAfterOpt;
 
             numberOfIteration++;
-            if (numberOfIteration > min(4 * N, elimIte))
+            if (numberOfIteration > min(N, elimIte))
             {
                 CoutWarning("numberOfIteration reaches the maximum limits, the algorithm decides to give up!");
                 break;
