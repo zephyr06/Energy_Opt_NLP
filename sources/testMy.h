@@ -55,7 +55,11 @@ void AssertEqualScalar(double expected, double actual, double tolerance = 1e-6, 
     else
     {
         if (actual != 0)
+        {
+            if (lineNumber != 0)
+                cout << Color::red << "Line Number: " << to_string(lineNumber) << Color::def << endl;
             AssertUnEqual<double>(expected, actual);
+        }
     }
 }
 

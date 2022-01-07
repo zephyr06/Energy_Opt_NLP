@@ -306,7 +306,7 @@ public:
      * N-1 means all tasks do not need optimization
      **/
     static int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTimeVector, int lastTaskDoNotNeedOptimize,
-                                         VectorDynamic computationTimeWarmStart, double eliminateTolIte)
+                                         VectorDynamic &computationTimeWarmStart, double eliminateTolIte)
     {
         // update the tasks with the new optimal computationTimeVector
         TaskSet tasksCurr = tasks;
@@ -316,10 +316,16 @@ public:
         {
             tasksCurr[i].executionTime += eliminateGranularity;
 
-            double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-            if (abs(rt - tasks[i].deadline) <= eliminateTolIte ||
+            // we cannot use a more strict criteria in detecting schedulability,
+            //  because it may trigger early detection of termination
+
+            // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
+            bool schedulable = CheckSchedulability<Schedul_Analysis>(tasksCurr,
+                                                                     computationTimeWarmStart,
+                                                                     debugMode, 0);
+            if ((!schedulable) ||
                 (enableMaxComputationTimeRestrict &&
-                 computationTimeVector(i, 0) + eliminateGranularity > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
+                 computationTimeVector(i, 0) + eliminateTolIte > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
                 return i;
             // recover tasksCurr[i].executionTime
             tasksCurr[i].executionTime -= eliminateGranularity;
@@ -361,7 +367,7 @@ public:
         {
             LevenbergMarquardtParams params;
             params.setlambdaInitial(initialLambda);
-            if (debugMode == 1)
+            if (debugMode > 1 && debugMode < 5)
                 params.setVerbosityLM("SUMMARY");
             params.setlambdaLowerBound(lowerLambda);
             params.setlambdaUpperBound(upperLambda);
@@ -374,12 +380,14 @@ public:
             GaussNewtonParams params;
             if (debugMode == 1)
                 params.setVerbosity("DELTA");
+            params.setRelativeErrorTol(relativeErrorTolerance);
             GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
             result = optimizer.optimize();
         }
         else if (optimizerType == 4)
         {
             NonlinearOptimizerParams params;
+            params.setRelativeErrorTol(relativeErrorTolerance);
             if (debugMode == 1)
                 params.setVerbosity("DELTA");
             NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
@@ -411,7 +419,8 @@ public:
             return -2;
 
         VectorDynamic initialExecutionTime = GetParameterVD<int>(tasks, "executionTimeOrg");
-        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, -1, responseTimeInitial, eliminateTol);
+        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime,
+                                                                  -1, responseTimeInitial, eliminateTol);
 
         // its size is always N
         VectorDynamic computationTimeVectorLocalOpt = initialExecutionTime;
@@ -444,7 +453,9 @@ public:
             // formulate new computationTime
             computationTimeVectorLocalOpt = vectorGlobalOpt;
             computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks,
-                                                                 lastTaskDoNotNeedOptimize, responseTimeInitial, roundTypeInClamp);
+                                                                 lastTaskDoNotNeedOptimize,
+                                                                 responseTimeInitial, roundTypeInClamp);
+            UpdateTaskSetExecutionTime(tasks, computationTimeVectorLocalOpt);
 
             // find variables to eliminate
             int adjustEliminateTolNum = 0;
@@ -457,6 +468,8 @@ public:
                     computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial, eliminateTolIte);
                 if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
                     eliminateTolIte *= eliminateStep;
+                else
+                    break;
                 adjustEliminateTolNum++;
             }
             if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
@@ -473,7 +486,6 @@ public:
                 VectorDynamic ttt = ResponseTimeOfTaskSet<Schedul_Analysis>(tasks2);
             }
 
-            UpdateTaskSetExecutionTime(tasks, computationTimeVectorLocalOpt);
             lastTaskDoNotNeedOptimize = lastTaskDoNotNeedOptimizeAfterOpt;
 
             numberOfIteration++;
@@ -513,7 +525,7 @@ public:
                 cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
                 cout << "The variable after optimization is " << computationTimeVectorLocalOpt << endl;
             }
-            if (debugMode == 1)
+            if (debugMode >= 2)
             {
                 // verify whether elimination is successful
                 if (CheckSchedulability<Schedul_Analysis>(tasks))
@@ -525,7 +537,9 @@ public:
                         if (enableMaxComputationTimeRestrict &&
                             tasks[tasks.size() - 1].executionTime <
                                 tasks[tasks.size() - 1].executionTimeOrg * MaxComputationTimeRestrict)
-                            CoutWarning("Elimination failed in final verfication!");
+                            CoutWarning("Elimination failed in final verfication, \
+                            eliminateTolIte used before is " +
+                                        to_string(eliminateTolIte));
                     }
                     tasks[tasks.size() - 1].executionTime -= 0.1;
                 }

@@ -27,6 +27,47 @@ TEST(FindTaskDoNotNeedOptimize, A1)
     int indexActual = Opt_LL::FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, 0, responseTimeInitial, eliminateTol);
     CHECK_EQUAL(indexExpect, indexActual);
 }
+
+TEST(FindTaskDoNotNeedOptimize, a1)
+{
+    enableMaxComputationTimeRestrict = 0;
+    computationBound = 100;
+    optimizerType = 1;
+    EnergyMode = 1;
+    eliminateTol = 0.1;
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
+    TaskSet taskSet1 = ReadTaskSet(path, "utilization");
+    InitializeGlobalVector(taskSet1.size());
+    VectorDynamic initialExecution = GetParameterVD<int>(taskSet1, "executionTime");
+    double eliminateTol_t = eliminateTol;
+    eliminateGranularity = 3.1;
+    int index = Opt_LL::FindTaskDoNotNeedOptimize(taskSet1, initialExecution, 0, initialExecution, 1);
+    AssertEqualScalar(0, index, 0.00001, __LINE__);
+    eliminateGranularity = 198.1;
+    index = Opt_LL::FindTaskDoNotNeedOptimize(taskSet1, initialExecution, 0, initialExecution, 1);
+    AssertEqualScalar(2, index, 1e-6, __LINE__);
+    eliminateTol = eliminateTol_t;
+}
+TEST(FindTaskDoNotNeedOptimize, a2)
+{
+    runMode = "normal";
+    enableMaxComputationTimeRestrict = 0;
+    computationBound = 100;
+    optimizerType = 1;
+    EnergyMode = 2;
+    executionTimeModel = 2;
+    eliminateTol = 0.1;
+    exactJacobian = 0;
+    eliminateGranularity = 0.1;
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v8.csv";
+    TaskSet taskSet1 = ReadTaskSet(path, "RM");
+    InitializeGlobalVector(taskSet1.size());
+    VectorDynamic initialExecution = GetParameterVD<int>(taskSet1, "executionTime");
+    initialExecution << 10.7515, 84.5303, 1232.2664, 96.768, 34.85, 243.83, 600.18, 305.87, 25.12, 37.92;
+
+    int index = Opt_LL::FindTaskDoNotNeedOptimize(taskSet1, initialExecution, -1, initialExecution, 0.1);
+    AssertEqualScalar(5, index, 1e-6, __LINE__);
+}
 TEST(NumericalDerivativeDynamic, A1)
 {
     // NumericalDerivativeDynamic
@@ -72,6 +113,30 @@ TEST(UpdateTaskSetExecutionTime, A1)
         throw;
 }
 
+TEST(checkConvergenceInterior, a1)
+{
+    enableMaxComputationTimeRestrict = 0;
+    computationBound = 100;
+    optimizerType = 1;
+    EnergyMode = 1;
+    double oldY = 1;
+    double newY = 1.01;
+    VectorDynamic oldX;
+    oldX.resize(2, 1);
+    oldX << 4, 5;
+    VectorDynamic newX = oldX;
+    newX(0, 0) = 4.5;
+    if (not checkConvergenceInterior(oldY, oldX, newY, newX, 1e-1, 1e-1))
+    {
+        cout << "Wrong in checkConvergenceInterior\n";
+    }
+    newX(0, 0) = 4.5 + 1e-6;
+    if (not checkConvergenceInterior(oldY, oldX, newY, newX, 1e-3, 1e-1))
+    {
+        cout << "Wrong in checkConvergenceInterior\n";
+    }
+}
+// ******************** performance tests ****************************
 TEST(unitOptimization, a1)
 {
     enableMaxComputationTimeRestrict = 0;
@@ -123,53 +188,6 @@ TEST(OptimizeTaskSet, a1)
     cout << "The energy saving ratio is " << res << endl;
     if (not assert_equal<double>(0.713, res, 0.01))
         CoutError("One test case failed in performance!");
-}
-
-TEST(checkConvergenceInterior, a1)
-{
-    enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
-    optimizerType = 1;
-    EnergyMode = 1;
-    double oldY = 1;
-    double newY = 1.01;
-    VectorDynamic oldX;
-    oldX.resize(2, 1);
-    oldX << 4, 5;
-    VectorDynamic newX = oldX;
-    newX(0, 0) = 4.5;
-    if (not checkConvergenceInterior(oldY, oldX, newY, newX, 1e-1, 1e-1))
-    {
-        cout << "Wrong in checkConvergenceInterior\n";
-    }
-    newX(0, 0) = 4.5 + 1e-6;
-    if (not checkConvergenceInterior(oldY, oldX, newY, newX, 1e-3, 1e-1))
-    {
-        cout << "Wrong in checkConvergenceInterior\n";
-    }
-}
-TEST(FindTaskDoNotNeedOptimize, a1)
-{
-    enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
-    optimizerType = 1;
-    EnergyMode = 1;
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
-    TaskSet taskSet1 = ReadTaskSet(path, "utilization");
-    InitializeGlobalVector(taskSet1.size());
-    VectorDynamic initialExecution = GetParameterVD<int>(taskSet1, "executionTime");
-    double eliminateTol_t = eliminateTol;
-    eliminateTol = 3;
-    int index = Opt_LL::FindTaskDoNotNeedOptimize(taskSet1, initialExecution, 0, initialExecution, 1);
-    if (index != 0)
-    {
-        throw;
-    }
-    eliminateTol = 198;
-    index = Opt_LL::FindTaskDoNotNeedOptimize(taskSet1, initialExecution, 0, initialExecution, 1);
-    if (index != 2)
-        throw;
-    eliminateTol = eliminateTol_t;
 }
 
 TEST(OptimizeTaskSetOneIte, a2)

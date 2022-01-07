@@ -25,8 +25,20 @@ public:
     double RTA_Common(const TaskSet &tasks, int index);
 };
 
+/**
+ * @brief 
+ * 
+ * @tparam Schedul_Analysis 
+ * @param tasks 
+ * @param warmStart 
+ * @param whetherPrint 
+ * @param tol positive value, makes schedulability check more strict
+ * @return true: system is schedulable
+ * @return false: system is not schedulable
+ */
 template <class Schedul_Analysis>
-bool CheckSchedulability(const TaskSet &tasks, VectorDynamic warmStart, bool whetherPrint = false)
+bool CheckSchedulability(const TaskSet &tasks, VectorDynamic warmStart,
+                         bool whetherPrint = false, double tol = 0)
 {
     int N = tasks.size();
     for (int i = 0; i < N; i++)
@@ -34,9 +46,11 @@ bool CheckSchedulability(const TaskSet &tasks, VectorDynamic warmStart, bool whe
         double rta = Schedul_Analysis::RTA_Common_Warm(warmStart(i, 0), tasks, i);
         if (whetherPrint)
             cout << "response time for task " << i << " is " << rta << " and deadline is " << tasks[i].deadline << endl;
-        if (rta > min(tasks[i].deadline, tasks[i].period))
+        if (rta + tol > min(tasks[i].deadline, tasks[i].period))
             return false;
     }
+    if (whetherPrint)
+        cout << endl;
     return true;
 }
 

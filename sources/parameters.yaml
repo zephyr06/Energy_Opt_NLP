@@ -2,25 +2,25 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_n10_v6
+testDataSetName: test_n10_v8
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-debugMode: 5
+debugMode: 0
 executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 1000
+elimIte: 000
 EnergyMode: 2
 exactJacobian: 0
 printFailureFile: 0
 readTaskMode: RM
 
-enableMaxComputationTimeRestrict: 1
-MaxComputationTimeRestrict: 3
+enableMaxComputationTimeRestrict: 0
+MaxComputationTimeRestrict: 8
 weightStep: 1e2
 eliminateTol: 1e-1
 eliminateGranularity: 1e-1
 eliminateStep: 4
-adjustEliminateMaxIte: 20
+adjustEliminateMaxIte: 10
 
 
 weightLogBarrier: 0
@@ -32,7 +32,7 @@ roundTypeInClamp: "none"
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e0
-relativeErrorTolerance: 1e-5
+relativeErrorTolerance: 1e-7
 relErrorTolIPM: 1e-5
 xTolIPM: 1e-3
 toleranceBarrier: 1e-6
@@ -43,7 +43,7 @@ punishmentFrequency: 10
 randomInitialize: 0
 deltaInitialDogleg: 1e10
 
-initialLambda: 1e5
+initialLambda: 1e-1
 lowerLambda: 1e-20
 upperLambda: 1e30
 coolingRateSA: 0.99
