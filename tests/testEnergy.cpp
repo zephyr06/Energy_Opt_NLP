@@ -48,6 +48,13 @@ TEST(GetFrequency, tasks2)
 
     AssertEqualScalar(0.9 / 1.9, GetFrequency(tasks[0]));
 }
+TEST(Jacobian, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+    executionTimeModel = 2;
+    EnergyMode = 2;
+}
 // TEST(EstimateEnergyTaskSet, v1)
 // {
 //     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v12.csv";

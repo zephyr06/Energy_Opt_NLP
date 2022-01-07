@@ -314,14 +314,15 @@ public:
         int N = tasks.size();
         for (int i = N - 1; i >= 0; i--)
         {
-            tasksCurr[i].executionTime += eliminateTol;
+            tasksCurr[i].executionTime += eliminateGranularity;
 
             double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
             if (abs(rt - tasks[i].deadline) <= eliminateTolIte ||
                 (enableMaxComputationTimeRestrict &&
-                 computationTimeVector(i, 0) + eliminateTolIte > tasks[i].executionTime * MaxComputationTimeRestrict))
+                 computationTimeVector(i, 0) + eliminateGranularity > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
                 return i;
-            // tasksCurr[i].executionTime -= eliminateTol;
+            // recover tasksCurr[i].executionTime
+            tasksCurr[i].executionTime -= eliminateGranularity;
         }
         return -1;
     }
@@ -508,6 +509,23 @@ public:
             {
                 cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
                 cout << "The variable after optimization is " << computationTimeVectorLocalOpt << endl;
+            }
+            if (debugMode == 1)
+            {
+                // verify whether elimination is successful
+                if (CheckSchedulability<Schedul_Analysis>(tasks))
+                {
+                    tasks[tasks.size() - 1].executionTime += 0.1;
+
+                    if (CheckSchedulability<Schedul_Analysis>(tasks))
+                    {
+                        if (enableMaxComputationTimeRestrict &&
+                            tasks[tasks.size() - 1].executionTime <
+                                tasks[tasks.size() - 1].executionTimeOrg * MaxComputationTimeRestrict)
+                            CoutWarning("Elimination failed in final verfication!");
+                    }
+                    tasks[tasks.size() - 1].executionTime -= 0.1;
+                }
             }
             if (runMode == "compare")
                 return afterEnergyCost / weightEnergy;
