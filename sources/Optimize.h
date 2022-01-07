@@ -320,9 +320,10 @@ public:
             //  because it may trigger early detection of termination
 
             // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
+
             bool schedulable = CheckSchedulability<Schedul_Analysis>(tasksCurr,
                                                                      computationTimeWarmStart,
-                                                                     debugMode, 0);
+                                                                     debugMode == 1, 0);
             if ((!schedulable) ||
                 (enableMaxComputationTimeRestrict &&
                  computationTimeVector(i, 0) + eliminateTolIte > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
