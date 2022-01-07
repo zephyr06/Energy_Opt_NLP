@@ -56,5 +56,4 @@ const int debugMode = (int)ConfigParameters["debugMode"];
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double weightStep = (double)ConfigParameters["weightStep"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];
-const int iterationNumIPM_Max = (int)ConfigParameters["iterationNumIPM_Max"];
 const double xTolIPM = (double)ConfigParameters["xTolIPM"];

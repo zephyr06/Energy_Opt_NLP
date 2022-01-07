@@ -24,7 +24,7 @@ TEST(FindTaskDoNotNeedOptimize, A1)
         initialExecutionTime(i, 0) = tasks[i].executionTime;
 
     int indexExpect = 1;
-    int indexActual = Opt_LL::FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, 0, responseTimeInitial);
+    int indexActual = Opt_LL::FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, 0, responseTimeInitial, eliminateTol);
     CHECK_EQUAL(indexExpect, indexActual);
 }
 TEST(NumericalDerivativeDynamic, A1)
@@ -107,6 +107,10 @@ TEST(OptimizeTaskSet, a1)
     computationBound = 100;
     optimizerType = 1;
     EnergyMode = 1;
+    executionTimeModel = 1;
+    elimIte = 100;
+    runMode = "normal";
+    exactJacobian = 0;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
@@ -114,12 +118,11 @@ TEST(OptimizeTaskSet, a1)
 
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     InitializeGlobalVector(taskSet1.size());
-    computationBound = 100;
-    executionTimeModel = 1;
+
     double res = Opt_LL::OptimizeTaskSet(taskSet1);
     cout << "The energy saving ratio is " << res << endl;
-    if (not assert_equal<double>(0.359257, res, 0.01))
-        CoutWarning("One test case failed in performance!");
+    if (not assert_equal<double>(0.713, res, 0.01))
+        CoutError("One test case failed in performance!");
 }
 
 TEST(checkConvergenceInterior, a1)
@@ -194,7 +197,7 @@ TEST(OptimizeTaskSetOneIte, a2)
     double res = Opt_LL::OptimizeTaskSet(taskSet1);
     AssertEqualScalar(0.28, res, 0.04, __LINE__);
     if (not assert_equal<double>(0.28, res, 0.02))
-        CoutWarning("One test case failed in performance!");
+        CoutError("One test case failed in performance!");
     cout << "The energy saving ratio in OptimizeTaskSet-OptimizeTaskSetOneIte is " << res << endl;
 }
 
@@ -242,6 +245,7 @@ TEST(UnitOptimizationIPM, a1)
     eliminateTol = 1;
     optimizerType = 1;
     EnergyMode = 1;
+    enableMaxComputationTimeRestrict = 0;
     TASK_NUMBER = tasks.size();
     InitializeGlobalVector(tasks.size());
     // enableIPM = 1;
@@ -252,11 +256,6 @@ TEST(UnitOptimizationIPM, a1)
     VectorDynamic res = Opt_LL::UnitOptimization(tasks, 1, initial, initialExecution);
     cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
     AssertEqualScalar(230, res(0, 0), 1.1, __LINE__);
-    if (not(abs(res(0, 0) - 230) < 0.1))
-    {
-        cout << "Error in UnitOptimizationIPM-a1" << endl;
-        CoutWarning("One test case failed in performance!");
-    }
 }
 
 int main()

@@ -2,17 +2,17 @@
 
 runMode: normal
 
-testDataSetName: test_n3_v13
-optimizerType: 1 # 1 means dogleg, 2 means LM
+testDataSetName: test_n3_v21
+optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-debugMode: 0
+debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 000
+elimIte: 1000
 EnergyMode: 1
 exactJacobian: 0
 printFailureFile: 0
-readTaskMode: deadline
+readTaskMode: RM
 
 enableMaxComputationTimeRestrict: 0
 MaxComputationTimeRestrict: 3
@@ -20,7 +20,6 @@ weightStep: 1e2
 eliminateTol: 1e-1
 eliminateStep: 3
 
-iterationNumIPM_Max: 10
 
 weightLogBarrier: 0
 weightDrawBegin: 1e-6

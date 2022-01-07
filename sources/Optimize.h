@@ -39,7 +39,8 @@ struct OptimizeResult
     {
         ;
     }
-    OptimizeResult(double ie, double oe, VectorDynamic iv, VectorDynamic ov) : initialError(ie), optimizeError(oe), initialVariable(iv), optimizeVariable(ov) {}
+    OptimizeResult(double ie, double oe, VectorDynamic iv, VectorDynamic ov) : initialError(ie),
+                                                                               optimizeError(oe), initialVariable(iv), optimizeVariable(ov) {}
 };
 
 bool CheckExecutionTimeBound(VectorDynamic &exec, TaskSet &tasksOrg)
@@ -305,26 +306,22 @@ public:
      * N-1 means all tasks do not need optimization
      **/
     static int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTimeVector, int lastTaskDoNotNeedOptimize,
-                                         VectorDynamic computationTimeWarmStart, double tolerance = eliminateVariableThreshold)
+                                         VectorDynamic computationTimeWarmStart, double eliminateTolIte)
     {
         // update the tasks with the new optimal computationTimeVector
         TaskSet tasksCurr = tasks;
         UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
-        // cout << "eliminateTol" << eliminateTol << endl;
         int N = tasks.size();
-        vector<Task> hpTasks = tasksCurr;
         for (int i = N - 1; i >= 0; i--)
         {
-            hpTasks.pop_back();
             tasksCurr[i].executionTime += eliminateTol;
 
             double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-            // double rt = Schedul_Analysis::ResponseTimeAnalysisWarm(computationTimeWarmStart(i, 0), tasksCurr[i], hpTasks);
-            // cout << "rt is " << rt << " deadline is " << tasks[i].deadline << endl;
-            if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
-                computationTimeVector(i, 0) + tolerance > tasks[i].executionTime * 2)
+            if (abs(rt - tasks[i].deadline) <= eliminateTolIte ||
+                (enableMaxComputationTimeRestrict &&
+                 computationTimeVector(i, 0) + eliminateTolIte > tasks[i].executionTime * MaxComputationTimeRestrict))
                 return i;
-            tasksCurr[i].executionTime -= eliminateTol;
+            // tasksCurr[i].executionTime -= eliminateTol;
         }
         return -1;
     }
@@ -352,8 +349,8 @@ public:
         if (optimizerType == 1)
         {
             DoglegParams params;
-            if (debugMode == 1)
-                params.setVerbosityDL("VERBOSE");
+            // if (debugMode == 1)
+            //     params.setVerbosityDL("VERBOSE");
             params.setDeltaInitial(deltaInitialDogleg);
             params.setRelativeErrorTol(relativeErrorTolerance);
             DoglegOptimizer optimizer(graph, initialEstimateFG, params);
@@ -364,7 +361,7 @@ public:
             LevenbergMarquardtParams params;
             params.setlambdaInitial(initialLambda);
             if (debugMode == 1)
-                params.setVerbosityLM("DAMPED");
+                params.setVerbosityLM("SUMMARY");
             params.setlambdaLowerBound(lowerLambda);
             params.setlambdaUpperBound(upperLambda);
             params.setRelativeErrorTol(relativeErrorTolerance);
@@ -413,7 +410,7 @@ public:
             return -2;
 
         VectorDynamic initialExecutionTime = GetParameterVD<int>(tasks, "executionTimeOrg");
-        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, 0, responseTimeInitial);
+        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime, -1, responseTimeInitial, eliminateTol);
 
         // its size is always N
         VectorDynamic computationTimeVectorLocalOpt = initialExecutionTime;
@@ -448,13 +445,14 @@ public:
             // find variables to eliminate
             int adjustEliminateTolNum = 0;
             int lastTaskDoNotNeedOptimizeAfterOpt;
+            double eliminateTolIte = eliminateTol;
             while (adjustEliminateTolNum < 10)
             {
                 lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
                     tasks,
-                    computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial);
+                    computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial, eliminateTolIte);
                 if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
-                    eliminateTol *= eliminateStep;
+                    eliminateTolIte *= eliminateStep;
                 adjustEliminateTolNum++;
             }
             if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
