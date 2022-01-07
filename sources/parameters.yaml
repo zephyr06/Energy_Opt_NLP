@@ -1,14 +1,14 @@
 %YAML:1.0
 
 runMode: normal
-
+# TODO: v6 elimination check failed
 testDataSetName: test_n10_v6
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-debugMode: 1
+debugMode: 5
 executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 000
+elimIte: 1000
 EnergyMode: 2
 exactJacobian: 0
 printFailureFile: 0

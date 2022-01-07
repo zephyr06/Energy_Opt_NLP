@@ -417,6 +417,9 @@ public:
         VectorDynamic computationTimeVectorLocalOpt = initialExecutionTime;
         vectorGlobalOpt = initialExecutionTime;
         int numberOfIteration = 0;
+        // eliminateTolIte must be inherited from one iteration to its next, otherwise,
+        // circular elimination will occur
+        double eliminateTolIte = eliminateTol;
 
         while (numberOfTasksNeedOptimize > 0)
         {
@@ -446,7 +449,7 @@ public:
             // find variables to eliminate
             int adjustEliminateTolNum = 0;
             int lastTaskDoNotNeedOptimizeAfterOpt;
-            double eliminateTolIte = eliminateTol;
+
             while (adjustEliminateTolNum < adjustEliminateMaxIte)
             {
                 lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
