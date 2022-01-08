@@ -5,17 +5,17 @@ runMode: normal
 testDataSetName: test_n10_v8
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-debugMode: 5
-executionTimeModel: 2 # 1 is normal, 2 is more difficult
+debugMode: 0
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
-EnergyMode: 2
+EnergyMode: 1
 exactJacobian: 0
 printFailureFile: 0
 readTaskMode: RM
 
 enableMaxComputationTimeRestrict: 1
-MaxComputationTimeRestrict: 8
+MaxComputationTimeRestrict: 2
 weightStep: 1e2
 eliminateTol: 1e-1
 eliminateGranularity: 1e-1
@@ -26,7 +26,7 @@ adjustEliminateMaxIte: 10
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: "none"
+roundTypeInClamp: "fine"
 
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e5

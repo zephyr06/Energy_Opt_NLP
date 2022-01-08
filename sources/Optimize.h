@@ -292,7 +292,7 @@ public:
         }
         else
         {
-            cout << "input error in ClampComputationTime" << endl;
+            cout << "input error in ClampComputationTime: " << roundType << endl;
             throw;
         }
 

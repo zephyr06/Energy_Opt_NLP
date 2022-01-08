@@ -2,24 +2,24 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_n5_v21
+testDataSetName: test_n10_v8
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
 debugMode: 0
-executionTimeModel: 1 # 1 is normal, 2 is more difficult
+executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
-EnergyMode: 1
+EnergyMode: 2
 exactJacobian: 0
 printFailureFile: 0
 readTaskMode: RM
 
 enableMaxComputationTimeRestrict: 1
-MaxComputationTimeRestrict: 2
+MaxComputationTimeRestrict: 8
 weightStep: 1e2
 eliminateTol: 1e-1
 eliminateGranularity: 1e-1
-eliminateStep: 3
+eliminateStep: 4
 adjustEliminateMaxIte: 10
 
 
@@ -55,5 +55,5 @@ SA_iteration: 1000000
 
 utilTol: 0.001
 
-weightEnergy: 1e9
+weightEnergy: 1e8
 
