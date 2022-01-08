@@ -55,6 +55,11 @@ TEST(Jacobian, v1)
     executionTimeModel = 2;
     EnergyMode = 2;
 }
+TEST(ReadYecheng, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v18.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+}
 // TEST(EstimateEnergyTaskSet, v1)
 // {
 //     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v12.csv";

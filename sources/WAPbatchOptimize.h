@@ -10,9 +10,6 @@ void BatchOptimize()
 
     vector<string> errorFiles;
     vector<string> unschedulableFiles;
-    ofstream outfileWrite;
-    outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/data_buffer_energy_task_number.txt", std::ios_base::app);
-
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
         if (debugMode)
@@ -38,7 +35,6 @@ void BatchOptimize()
                 {
                     energySaveRatioVec.push_back(res);
                     runTime.push_back(timeTaken);
-                    outfileWrite << energySaveRatioVec.back() << endl;
                 }
                 else if (res == -1 || res > 1)
                 {

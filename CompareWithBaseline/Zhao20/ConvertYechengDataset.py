@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser.add_argument('--convertionNumber', type=int, default=5,
                         help='N')
     parser.add_argument('--directory', type=str,
-                        default='/home/zephyr/Programming/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep',
+                        default='/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep',
                         help='O')
     parser.add_argument('--directoryWriteTo', type=str,
                         default='/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number',

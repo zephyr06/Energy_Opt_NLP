@@ -314,7 +314,7 @@ public:
         int N = tasks.size();
         for (int i = N - 1; i >= 0; i--)
         {
-            tasksCurr[i].executionTime += eliminateGranularity;
+            tasksCurr[i].executionTime += eliminateTolIte;
 
             // we cannot use a more strict criteria in detecting schedulability,
             //  because it may trigger early detection of termination
@@ -329,7 +329,7 @@ public:
                  computationTimeVector(i, 0) + eliminateTolIte > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
                 return i;
             // recover tasksCurr[i].executionTime
-            tasksCurr[i].executionTime -= eliminateGranularity;
+            tasksCurr[i].executionTime -= eliminateTolIte;
         }
         return -1;
     }
@@ -526,23 +526,32 @@ public:
                 cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
                 cout << "The variable after optimization is " << computationTimeVectorLocalOpt << endl;
             }
-            if (debugMode >= 2)
+            if (debugMode >= 1)
             {
+                double granularity = GetParameterVD<double>(tasks, "executionTime").maxCoeff() * 3e-5;
                 // verify whether elimination is successful
                 if (CheckSchedulability<Schedul_Analysis>(tasks))
                 {
-                    tasks[tasks.size() - 1].executionTime += 0.1;
+                    tasks[tasks.size() - 1].executionTime += granularity;
 
                     if (CheckSchedulability<Schedul_Analysis>(tasks))
                     {
                         if (enableMaxComputationTimeRestrict &&
                             tasks[tasks.size() - 1].executionTime <
                                 tasks[tasks.size() - 1].executionTimeOrg * MaxComputationTimeRestrict)
-                            CoutWarning("Elimination failed in final verfication, \
+                        {
+                            if (tasks[tasks.size() - 1].executionTimeOrg /
+                                        tasks[tasks.size() - 1].period >
+                                    0.03 &&
+                                eliminateTolIte / tasks[tasks.size() - 1].executionTime > 0.015)
+                            {
+                                CoutWarning("Elimination failed in final verfication, \
                             eliminateTolIte used before is " +
-                                        to_string(eliminateTolIte));
+                                            to_string(eliminateTolIte));
+                            }
+                        }
                     }
-                    tasks[tasks.size() - 1].executionTime -= 0.1;
+                    tasks[tasks.size() - 1].executionTime -= granularity;
                 }
             }
             if (runMode == "compare")

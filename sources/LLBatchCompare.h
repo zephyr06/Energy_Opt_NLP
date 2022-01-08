@@ -9,6 +9,7 @@ void BatchCompare()
     vector<double> runTimeW, runTimeZ;
 
     vector<string> errorFiles;
+    runMode = "compare";
     string worstFile = "";
     double worstValue = 0.0;
     for (const auto &file : ReadFilesInDirectory(pathDataset))
@@ -44,7 +45,9 @@ void BatchCompare()
                 if (debugMode == 3)
                     cout << "One compare: " << res / (baselineResult.second / 1e9) << endl;
                 ofstream outfileWrite;
-                outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/ResultFiles/N" + to_string(taskSet1.size()) + ".txt", std::ios_base::app);
+                outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/Zhao20/EnergySaveRatio/N" +
+                                      to_string(taskSet1.size()) + ".txt",
+                                  std::ios_base::app);
                 outfileWrite << energySaveRatioVec.back() << endl;
                 outfileWrite.close();
             }
@@ -64,9 +67,7 @@ void BatchCompare()
         aveTime = Average(runTimeW) / Average(runTimeZ);
     }
 
-    ofstream outfile1, outfile2;
-    outfile1.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/data_buffer_energy_task_number.txt", std::ios_base::app);
-    outfile1 << avEnergy << endl;
+    ofstream outfile2;
     cout << Color::blue << endl;
     cout << "Average energy optimization objective (NLP: SA) ratio is " << avEnergy << endl;
     cout << "The worst value is " << worstValue << endl;
@@ -75,7 +76,7 @@ void BatchCompare()
     cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
     cout << Color::def << endl;
 
-    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/time_task_number.txt", std::ios_base::app);
+    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/Zhao20/time_task_number.txt", std::ios_base::app);
     outfile2 << Average(runTimeW) << ", " << Average(runTimeZ) << endl;
     if (debugMode == 1)
         cout << endl;

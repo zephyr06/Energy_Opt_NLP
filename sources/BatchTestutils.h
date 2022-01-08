@@ -70,7 +70,7 @@ int ExtractIndex(string path, string delimiter = "-")
  */
 pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
 {
-    string yechengRepoPath = "/home/zephyr/Programming/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + to_string(N) + "/";
+    string yechengRepoPath = "/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + to_string(N) + "/";
 
     int index = ExtractIndex(pathInPeriodicDataset);
     string targetFilePathGP = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_GPResult.txt";
@@ -86,7 +86,7 @@ pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
     }
     catch (...)
     {
-        cout << "Error in " << fileName << endl;
+        cout << "Error in reading Zhao20's result files" << fileName << endl;
     }
 
     double runTime = 0, obj = 0;
