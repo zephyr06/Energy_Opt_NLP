@@ -178,40 +178,37 @@ public:
 
     // ------------------
     // TODO: clamp turn 123.99 to 124 rather than 123
-    static VectorDynamic ClampComputationTime(VectorDynamic comp, TaskSet &tasks, int lastTaskDoNotNeedOptimize,
-                                              VectorDynamic &responseTimeInitial, string roundType)
+    static void ClampComputationTime(TaskSet &tasks, int lastTaskDoNotNeedOptimize,
+                                     VectorDynamic &responseTimeInitial, string roundType)
     {
         if (roundType == "none")
-            return comp;
-        int n = comp.rows();
-        for (int i = 0; i < n; i++)
-            comp(i, 0) = int(comp(i, 0));
+            return;
+
+        for (uint i = 0; i < tasks.size(); i++)
+            tasks[i].executionTime = int(tasks[i].executionTime);
         if (roundType == "rough")
         {
-            return comp;
+            return;
         }
         else if (roundType == "fine")
         {
             int N = tasks.size();
 
             vector<pair<int, double>> objectiveVec;
-            // objectiveVec.reserve(N);
+            objectiveVec.reserve(N);
             for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             {
-                objectiveVec.push_back(make_pair(i, JacobianInClamp(tasks, comp, i)));
+                objectiveVec.push_back(make_pair(i, JacobianInEnergyItem(tasks, i)));
             }
             sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
-            int minEliminate = INT32_MAX;
 
             int iterationNumber = 0;
-            TaskSet taskDuringOpt = tasks;
-            UpdateTaskSetExecutionTime(taskDuringOpt, comp, lastTaskDoNotNeedOptimize);
 
             if (debugMode == 1)
             {
                 cout << "before binary search, here is the task set" << endl;
                 for (int i = 0; i < N; i++)
-                    taskDuringOpt[i].print();
+                    tasks[i].print();
             }
 
             // int left = 0, right = 0;
@@ -221,63 +218,51 @@ public:
 
                 // try to round up, if success, keep the loop; otherwise, eliminate it and high priority tasks
                 // can be speeded up, if necessary, by binary search
-                int left = comp(currentIndex, 0);
-                // int right = min(taskDuringOpt[currentIndex].deadline,
-                //                 int(tasks[currentIndex].executionTime * computationBound));
-                int right = taskDuringOpt[currentIndex].deadline;
+                int left = tasks[currentIndex].executionTime;
+                int right = tasks[currentIndex].deadline;
                 if (enableMaxComputationTimeRestrict)
                 {
-                    right = min(right, tasks[currentIndex].executionTime * computationBound);
+                    right = min(right, tasks[currentIndex].executionTimeOrg * computationBound);
                 }
-                // for (int j = 0; j < currentIndex; j++)
-                //     right -= taskDuringOpt[j].executionTime;
+
                 if (left > right)
                 {
-                    cout << "left > right error in clamp!" << endl;
-                    throw;
+                    CoutError("left > right error in clamp!");
                 }
-                int ref = comp(currentIndex, 0);
-
-                while (left <= right)
+                int rightOrg = right;
+                bool schedulale_flag;
+                while (left < right)
                 {
-                    int mid = (left + right) / 2;
+                    int mid = ceil((left + right) / 2.0);
 
-                    taskDuringOpt[currentIndex].executionTime = mid;
-
-                    if ((not CheckSchedulability<Schedul_Analysis>(taskDuringOpt, responseTimeInitial)) ||
-                        not WithInBound(tasks, taskDuringOpt))
+                    tasks[currentIndex].executionTime = mid;
+                    schedulale_flag = CheckSchedulability<Schedul_Analysis>(tasks,
+                                                                            responseTimeInitial, debugMode == 1);
+                    if ((not schedulale_flag) ||
+                        not WithInBound(tasks))
                     {
-                        taskDuringOpt[currentIndex].executionTime = ref;
-                        comp(currentIndex, 0) = ref;
-                        taskDuringOpt[currentIndex].executionTime = comp(currentIndex, 0);
-                        minEliminate = currentIndex;
-                        for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
-                        {
-                            if (objectiveVec[i].first <= minEliminate)
-                            {
-                                objectiveVec.erase(objectiveVec.begin() + i);
-                            }
-                        }
                         right = mid - 1;
-                    }
-                    else if (left == right)
-                    {
-                        minEliminate = currentIndex;
-                        for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
-                        {
-                            if (objectiveVec[i].first <= minEliminate)
-                            {
-                                objectiveVec.erase(objectiveVec.begin() + i);
-                            }
-                        }
-                        break;
                     }
                     else
                     {
-                        comp(currentIndex, 0) = mid;
-                        taskDuringOpt[currentIndex].executionTime = mid;
-                        ref = mid;
-                        left = mid + 1;
+                        // comp(currentIndex, 0) = mid;
+                        tasks[currentIndex].executionTime = mid;
+                        left = mid;
+                    }
+                }
+
+                // post processing, left=right is the value we want
+                tasks[currentIndex].executionTime = left;
+                objectiveVec.erase(objectiveVec.begin() + 0);
+                if (left != rightOrg)
+                {
+                    // remove hp because they cannot be optimized anymore
+                    for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
+                    {
+                        if (objectiveVec[i].first < currentIndex)
+                        {
+                            objectiveVec.erase(objectiveVec.begin() + i);
+                        }
                     }
                 }
 
@@ -296,7 +281,7 @@ public:
             throw;
         }
 
-        return comp;
+        return;
     }
 
     /**
@@ -305,12 +290,11 @@ public:
      * -1 means all tasks need optimization
      * N-1 means all tasks do not need optimization
      **/
-    static int FindTaskDoNotNeedOptimize(const TaskSet &tasks, VectorDynamic computationTimeVector, int lastTaskDoNotNeedOptimize,
+    static int FindTaskDoNotNeedOptimize(const TaskSet &tasks, int lastTaskDoNotNeedOptimize,
                                          VectorDynamic &computationTimeWarmStart, double eliminateTolIte)
     {
         // update the tasks with the new optimal computationTimeVector
         TaskSet tasksCurr = tasks;
-        UpdateTaskSetExecutionTime(tasksCurr, computationTimeVector);
         int N = tasks.size();
         for (int i = N - 1; i >= 0; i--)
         {
@@ -326,7 +310,7 @@ public:
                                                                      debugMode == 1, 0);
             if ((!schedulable) ||
                 (enableMaxComputationTimeRestrict &&
-                 computationTimeVector(i, 0) + eliminateTolIte > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
+                 tasksCurr[i].executionTime + eliminateTolIte > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
                 return i;
             // recover tasksCurr[i].executionTime
             tasksCurr[i].executionTime -= eliminateTolIte;
@@ -420,11 +404,10 @@ public:
             return -2;
 
         VectorDynamic initialExecutionTime = GetParameterVD<int>(tasks, "executionTimeOrg");
-        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks, initialExecutionTime,
+        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks,
                                                                   -1, responseTimeInitial, eliminateTol);
 
-        // its size is always N
-        VectorDynamic computationTimeVectorLocalOpt = initialExecutionTime;
+        // computationTimeVectorLocalOpt is always stored in tasks
         vectorGlobalOpt = initialExecutionTime;
         int numberOfIteration = 0;
         // eliminateTolIte must be inherited from one iteration to its next, otherwise,
@@ -437,26 +420,19 @@ public:
             initialEstimateDuringOpt.resize(numberOfTasksNeedOptimize, 1);
             for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                 initialEstimateDuringOpt(i - lastTaskDoNotNeedOptimize - 1, 0) =
-                    computationTimeVectorLocalOpt(i, 0);
+                    tasks[i].executionTime;
 
             responseTimeInitial = ResponseTimeOfTaskSet<Schedul_Analysis>(tasks);
             // perform optimization
-            try
-            {
-                auto variNew = UnitOptimization(tasks, lastTaskDoNotNeedOptimize,
-                                                initialEstimateDuringOpt, responseTimeInitial);
-            }
-            catch (...)
-            {
-                ;
-            }
+
+            auto variNew = UnitOptimization(tasks, lastTaskDoNotNeedOptimize,
+                                            initialEstimateDuringOpt, responseTimeInitial);
 
             // formulate new computationTime
-            computationTimeVectorLocalOpt = vectorGlobalOpt;
-            computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks,
-                                                                 lastTaskDoNotNeedOptimize,
-                                                                 responseTimeInitial, roundTypeInClamp);
-            UpdateTaskSetExecutionTime(tasks, computationTimeVectorLocalOpt);
+            UpdateTaskSetExecutionTime(tasks, vectorGlobalOpt);
+            ClampComputationTime(tasks,
+                                 lastTaskDoNotNeedOptimize,
+                                 responseTimeInitial, roundTypeInClamp);
 
             // find variables to eliminate
             int adjustEliminateTolNum = 0;
@@ -465,8 +441,7 @@ public:
             while (adjustEliminateTolNum < adjustEliminateMaxIte)
             {
                 lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
-                    tasks,
-                    computationTimeVectorLocalOpt, lastTaskDoNotNeedOptimize, responseTimeInitial, eliminateTolIte);
+                    tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, eliminateTolIte);
                 if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
                     eliminateTolIte *= eliminateStep;
                 else
@@ -475,17 +450,6 @@ public:
             }
             if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
                 break;
-
-            if (debugMode == 1)
-            {
-                cout << "After one iteration, the computationTimeVectorLocalOpt is " << computationTimeVectorLocalOpt << endl;
-                cout << "After one iteration, the vectorGlobalOpt is " << vectorGlobalOpt << endl;
-
-                TaskSet tasks2 = tasks;
-                for (int i = 0; i < N; i++)
-                    tasks2[i].executionTime = computationTimeVectorLocalOpt(i, 0);
-                VectorDynamic ttt = ResponseTimeOfTaskSet<Schedul_Analysis>(tasks2);
-            }
 
             lastTaskDoNotNeedOptimize = lastTaskDoNotNeedOptimizeAfterOpt;
 
@@ -511,12 +475,6 @@ public:
                     tasks[i].print();
                 }
             }
-            if (debugMode == 1)
-                cout << "computationTimeVectorLocalOpt before Clamp fine: " << computationTimeVectorLocalOpt << endl;
-            computationTimeVectorLocalOpt = ClampComputationTime(computationTimeVectorLocalOpt, tasks, -1,
-                                                                 responseTimeInitial, roundTypeInClamp);
-            if (debugMode == 1)
-                cout << "computationTimeVectorLocalOpt after Clamp fine: " << computationTimeVectorLocalOpt << endl;
             auto tasksInit = tasks;
             UpdateTaskSetExecutionTime(tasksInit, initialExecutionTime);
             double initialEnergyCost = EstimateEnergyTaskSet(tasksInit).sum();
@@ -524,7 +482,6 @@ public:
             if (debugMode == 1)
             {
                 cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
-                cout << "The variable after optimization is " << computationTimeVectorLocalOpt << endl;
             }
             if (debugMode >= 1)
             {

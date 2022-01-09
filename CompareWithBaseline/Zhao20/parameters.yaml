@@ -1,6 +1,6 @@
 %YAML:1.0
 
-runMode: normal
+runMode: compare
 # TODO: v6 elimination check failed
 testDataSetName: test_n10_v8
 optimizerType: 1 # 1 means dogleg, 2 means LM
@@ -18,7 +18,6 @@ enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
 weightStep: 1e2
 eliminateTol: 1e-1
-eliminateGranularity: 1e-1
 eliminateStep: 4
 adjustEliminateMaxIte: 10
 

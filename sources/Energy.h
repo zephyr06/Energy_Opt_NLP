@@ -14,6 +14,7 @@
 #include "Parameters.h"
 #include "Declaration.h"
 #include "FrequencyModel.h"
+#include "utils.h"
 const double EstimateEnergyTask(const Task &task)
 /**
  * @brief Estimate energy consumption of a single task;
@@ -54,3 +55,23 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &tasks)
     }
     return res;
 }
+
+double JacobianInEnergyItem(const TaskSet &tasks, int i)
+{
+    Task taskRef = tasks[i];
+    boost::function<gtsam::Matrix(const VectorDynamic &)> f =
+        [taskRef, i](const VectorDynamic &executionTimeVector)
+    {
+        Task task = taskRef;
+        double ref = task.executionTime;
+        task.executionTime = executionTimeVector(0);
+        double res = EstimateEnergyTask(task);
+        task.executionTime = ref;
+        MatrixDynamic rrr = GenerateZeroMatrix(1, 1);
+        rrr << res;
+        return rrr;
+    };
+    VectorDynamic x = GenerateVectorDynamic(1);
+    x << tasks[i].executionTime;
+    return NumericalDerivativeDynamic(f, x, deltaOptimizer, 1)(0, 0);
+};

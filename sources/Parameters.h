@@ -54,7 +54,6 @@ const double eliminateVariableThreshold = (double)ConfigParameters["eliminateVar
 const int debugMode = (int)ConfigParameters["debugMode"];
 const int adjustEliminateMaxIte = (int)ConfigParameters["adjustEliminateMaxIte"];
 
-double eliminateGranularity = (double)ConfigParameters["eliminateGranularity"];
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double weightStep = (double)ConfigParameters["weightStep"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];

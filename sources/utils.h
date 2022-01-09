@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Parameters.h"
 #include "Declaration.h"
 /**
@@ -75,16 +77,12 @@ MatrixDynamic NumericalDerivativeDynamicUpper(boost::function<VectorDynamic(cons
     return jacobian;
 }
 
-// ------------------ two convenient functions for ClampComputationTime
-double JacobianInClamp(TaskSet &tasks, VectorDynamic &comp, int i)
-{
-    return 1.0 / tasks[i].period * pow(double(tasks[i].executionTime) / comp(i, 0), 3);
-};
+// ------------------  convenient function for ClampComputationTime
 
-// to sort from the biggest to smallest
+// to sort from the  smallest to biggest (minimum negative gradient first)
 bool comparePair(const pair<int, double> &p1, const pair<int, double> &p2)
 {
-    return (p1.second > p2.second);
+    return (p1.second < p2.second);
 }
 
 /**
@@ -95,14 +93,16 @@ bool comparePair(const pair<int, double> &p1, const pair<int, double> &p2)
  * @return true 
  * @return false 
  */
-bool WithInBound(const TaskSet &tasksRef, const TaskSet &tasksCurr)
+bool WithInBound(const TaskSet &tasks)
 {
-    int N = tasksRef.size();
+    if (not enableMaxComputationTimeRestrict)
+        return true;
+    int N = tasks.size();
     for (int i = 0; i < N; i++)
     {
-        if (tasksRef[i].executionTime * 2 < tasksCurr[i].executionTime)
+        if (tasks[i].executionTimeOrg * MaxComputationTimeRestrict < tasks[i].executionTime)
             return false;
-        if (tasksRef[i].executionTime > tasksCurr[i].executionTime)
+        else if (tasks[i].executionTimeOrg > tasks[i].executionTime)
             return false;
     }
     return true;
