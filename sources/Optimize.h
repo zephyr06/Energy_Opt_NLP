@@ -222,7 +222,7 @@ public:
                 int right = tasks[currentIndex].deadline;
                 if (enableMaxComputationTimeRestrict)
                 {
-                    right = min(right, tasks[currentIndex].executionTimeOrg * computationBound);
+                    right = min(right, tasks[currentIndex].executionTimeOrg * MaxComputationTimeRestrict);
                 }
 
                 if (left > right)
@@ -432,7 +432,7 @@ public:
             UpdateTaskSetExecutionTime(tasks, vectorGlobalOpt);
             ClampComputationTime(tasks,
                                  lastTaskDoNotNeedOptimize,
-                                 responseTimeInitial, roundTypeInClamp);
+                                 responseTimeInitial, "rough");
 
             // find variables to eliminate
             int adjustEliminateTolNum = 0;

@@ -11,7 +11,7 @@ using Opt_LL = Energy_Opt<RTA_LL>;
 TEST(FindTaskDoNotNeedOptimize, A1)
 {
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
 
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet tasks = ReadTaskSet(path, "RM");
@@ -31,7 +31,7 @@ TEST(FindTaskDoNotNeedOptimize, A1)
 TEST(FindTaskDoNotNeedOptimize, a1)
 {
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     optimizerType = 1;
     EnergyMode = 1;
     eliminateTol = 0.1;
@@ -52,7 +52,7 @@ TEST(FindTaskDoNotNeedOptimize, a2)
 {
     runMode = "normal";
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     optimizerType = 1;
     EnergyMode = 2;
     executionTimeModel = 2;
@@ -72,7 +72,7 @@ TEST(NumericalDerivativeDynamic, A1)
     // NumericalDerivativeDynamic
     // f: R2 -> R4
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     boost::function<Matrix(const VectorDynamic &)> f =
         [this](const VectorDynamic &input)
     {
@@ -100,7 +100,7 @@ TEST(NumericalDerivativeDynamic, A1)
 TEST(UpdateTaskSetExecutionTime, A1)
 {
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     InitializeGlobalVector(taskSet1.size());
@@ -115,7 +115,7 @@ TEST(UpdateTaskSetExecutionTime, A1)
 TEST(checkConvergenceInterior, a1)
 {
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     optimizerType = 1;
     EnergyMode = 1;
     double oldY = 1;
@@ -139,7 +139,7 @@ TEST(checkConvergenceInterior, a1)
 TEST(unitOptimization, a1)
 {
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     int N = taskSet1.size();
@@ -168,7 +168,7 @@ TEST(unitOptimization, a1)
 TEST(OptimizeTaskSet, a1)
 {
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     optimizerType = 1;
     EnergyMode = 1;
     executionTimeModel = 1;
@@ -193,7 +193,7 @@ TEST(OptimizeTaskSet, a1)
 TEST(OptimizeTaskSetOneIte, a2)
 {
     enableMaxComputationTimeRestrict = 1;
-    computationBound = 2;
+    MaxComputationTimeRestrict = 2;
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v13.csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
@@ -224,7 +224,7 @@ TEST(OptimizeTaskSetOneIte, a2)
 TEST(ClampComputationTime, a1)
 {
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
     InitializeGlobalVector(taskSet1.size());
@@ -257,7 +257,7 @@ TEST(ClampComputationTime, a1)
 TEST(ClampComputationTime, v3)
 {
     enableMaxComputationTimeRestrict = 1;
-    computationBound = 2;
+    MaxComputationTimeRestrict = 2;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v23.csv";
     TaskSet tasks = ReadTaskSet(path, "orig");
     InitializeGlobalVector(tasks.size());
@@ -282,7 +282,7 @@ TEST(ClampComputationTime, v3)
 TEST(ClampComputationTime, v2)
 {
     enableMaxComputationTimeRestrict = 1;
-    computationBound = 2;
+    MaxComputationTimeRestrict = 2;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v22.csv";
     TaskSet tasks = ReadTaskSet(path, "orig");
     InitializeGlobalVector(tasks.size());
@@ -307,7 +307,7 @@ TEST(ClampComputationTime, v2)
 TEST(UnitOptimizationIPM, a1)
 {
     enableMaxComputationTimeRestrict = 0;
-    computationBound = 100;
+    MaxComputationTimeRestrict = 100;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v21.csv";
     TaskSet tasks = ReadTaskSet(path, "RM");
     VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");

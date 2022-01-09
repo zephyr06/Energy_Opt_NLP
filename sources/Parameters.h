@@ -27,7 +27,6 @@ int enableIPM = (int)ConfigParameters["enableIPM"];
 const double coolingRateSA = (double)ConfigParameters["coolingRateSA"];
 int enableMaxComputationTimeRestrict = (int)ConfigParameters["enableMaxComputationTimeRestrict"];
 int exactJacobian = (int)ConfigParameters["exactJacobian"];
-double computationBound = (double)ConfigParameters["computationBound"];
 const int temperatureSA = (int)ConfigParameters["temperatureSA"];
 const double utilTol = (double)ConfigParameters["utilTol"];
 const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];

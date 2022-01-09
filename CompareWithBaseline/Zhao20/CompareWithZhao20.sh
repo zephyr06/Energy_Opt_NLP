@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 title="task_number"
-MaxTaskNumber=6
+MaxTaskNumber=5
 
 # clear buffer file content
 time_file="time_$title.txt"
@@ -17,7 +17,7 @@ make -j4
 
 
 
-for jobNumber in {5..6}
+for jobNumber in {5..5}
 do
 	cd ../CompareWithBaseline/Zhao20
 	echo "$title iteration is: $jobNumber"
