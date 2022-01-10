@@ -8,7 +8,7 @@ deltaOptimizer: 1e-5
 debugMode: 0
 executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 000
+elimIte: 1000
 EnergyMode: 2
 exactJacobian: 0
 printFailureFile: 0
@@ -17,7 +17,6 @@ batchOptimizeFolder: elimination
 
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-weightStep: 1e2
 eliminateTol: 1e-1
 eliminateStep: 3
 adjustEliminateMaxIte: 10
@@ -34,7 +33,6 @@ punishmentInBarrier: 1e5
 noiseModelSigma: 1e0
 relativeErrorTolerance: 1e-7
 relErrorTolIPM: 1e-5
-xTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
 punishmentFrequency: 10
@@ -49,7 +47,6 @@ coolingRateSA: 0.99
 temperatureSA: 100000
 granularityInBF: 1
 
-eliminateVariableThreshold: 1.0
 SA_iteration: 1000000
 
 utilTol: 0.001

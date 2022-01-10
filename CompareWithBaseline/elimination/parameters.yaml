@@ -6,20 +6,19 @@ testDataSetName: test_n10_v8
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
 debugMode: 0
-executionTimeModel: 1 # 1 is normal, 2 is more difficult
+executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
 EnergyMode: 2
 exactJacobian: 0
 printFailureFile: 0
-readTaskMode: RM
+readTaskMode: deadline
 batchOptimizeFolder: elimination
 
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-weightStep: 1e2
 eliminateTol: 1e-1
-eliminateStep: 4
+eliminateStep: 3
 adjustEliminateMaxIte: 10
 
 
@@ -34,10 +33,8 @@ punishmentInBarrier: 1e5
 noiseModelSigma: 1e0
 relativeErrorTolerance: 1e-7
 relErrorTolIPM: 1e-5
-xTolIPM: 1e-3
 toleranceBarrier: 1e-6
 
-computationBound: 2.0
 punishmentFrequency: 10
 
 randomInitialize: 0
@@ -50,7 +47,6 @@ coolingRateSA: 0.99
 temperatureSA: 100000
 granularityInBF: 1
 
-eliminateVariableThreshold: 1.0
 SA_iteration: 1000000
 
 utilTol: 0.001

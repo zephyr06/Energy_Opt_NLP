@@ -50,11 +50,8 @@ string batchOptimizeFolder = (string)ConfigParameters["batchOptimizeFolder"];
 
 const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
-const double eliminateVariableThreshold = (double)ConfigParameters["eliminateVariableThreshold"];
 const int debugMode = (int)ConfigParameters["debugMode"];
 const int adjustEliminateMaxIte = (int)ConfigParameters["adjustEliminateMaxIte"];
 
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
-const double weightStep = (double)ConfigParameters["weightStep"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];
-const double xTolIPM = (double)ConfigParameters["xTolIPM"];
