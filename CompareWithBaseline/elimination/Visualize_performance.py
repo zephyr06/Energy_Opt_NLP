@@ -13,11 +13,10 @@ parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
 parser.add_argument('--maxTaskNumber', type=int, default=7,
                     help='Nmax')
-parser.add_argument('--methodsNum', type=int, default=4,
-                    help='number of optimizers to compare')
+parser.add_argument('--methodsNum', type=int, default=2,
+                    help='number of methods to compare')
 parser.add_argument('--title', type=str, default="elimination",
-            help='tilte in produced figure')
-
+                    help='tilte in produced figure')
 
 args = parser.parse_args()
 minTaskNumber = args.minTaskNumber
@@ -28,7 +27,7 @@ title=args.title
 if __name__ == "__main__":
     data_2d = read_data_2d(minTaskNumber, maxTaskNumber, methodsNum)
     dataset_pd = pd.DataFrame()
-    optimizer_name=["Dogleg", "LM", "GN", "cSD"]
+    optimizer_name=["NoElimination", "WithElimination", "GN", "cSD"]
     marker_list = ["o", "v", "s", "D"]
     color_list = ["#0084DB", "limegreen", "r", "gold"]
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
