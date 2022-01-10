@@ -304,13 +304,17 @@ public:
             //  because it may trigger early detection of termination
 
             // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-
+            double tolerance = 0.0;
             bool schedulable = CheckSchedulability<Schedul_Analysis>(tasksCurr,
                                                                      computationTimeWarmStart,
-                                                                     debugMode == 1, 0);
+                                                                     debugMode == 1, tolerance);
             if ((!schedulable) ||
                 (enableMaxComputationTimeRestrict &&
-                 tasksCurr[i].executionTime + eliminateTolIte > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
+                 tasksCurr[i].executionTime - eliminateTolIte + tolerance > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
+
+                // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
+                // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
+                //     tasksCurr[i].executionTime - eliminateTolIte + tolerance > tasks[i].executionTimeOrg * MaxComputationTimeRestrict)
                 return i;
             // recover tasksCurr[i].executionTime
             tasksCurr[i].executionTime -= eliminateTolIte;
@@ -430,10 +434,13 @@ public:
 
             // formulate new computationTime
             UpdateTaskSetExecutionTime(tasks, vectorGlobalOpt);
+            // clamp with rough option seems to work better
             ClampComputationTime(tasks,
                                  lastTaskDoNotNeedOptimize,
                                  responseTimeInitial, "rough");
-
+            if (debugMode == 1)
+                cout << "After clamp: " << endl
+                     << GetParameterVD<double>(tasks, "executionTime") << endl;
             // find variables to eliminate
             int adjustEliminateTolNum = 0;
             int lastTaskDoNotNeedOptimizeAfterOpt;
@@ -460,7 +467,9 @@ public:
                 break;
             }
         }
-
+        ClampComputationTime(tasks,
+                             -1,
+                             responseTimeInitial, roundTypeInClamp);
         // performance evaluation
         if (CheckSchedulability<Schedul_Analysis>(tasks))
         {
