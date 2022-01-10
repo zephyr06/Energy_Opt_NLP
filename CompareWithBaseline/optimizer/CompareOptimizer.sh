@@ -24,7 +24,7 @@ do
 	for jobNumber in {5..7}
 	do
 		cd ../CompareWithBaseline/$title
-		echo "$title iteration is: $jobNumber"
+		echo "$title iteration is: $optimizerType, $jobNumber"
 		# generate task set
 	  	python ../ConvertYechengDataset.py --convertionNumber $jobNumber
 
