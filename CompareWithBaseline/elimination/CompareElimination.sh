@@ -47,4 +47,4 @@ perform_optimization 1000
 
 cd $title
 # visualize the result
-python Visualize_performance.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --methodsNum 2
+python ../Visualize_performance.py  --minTaskNumber 5 --method_names "NoElimination" "WithElimination" --title $title  --maxTaskNumber $MaxTaskNumber
