@@ -17,7 +17,7 @@ make -j4
 cd ../CompareWithBaseline
 
 python clear_result_files.py --folder $title
-python edit_yaml.py --entry "batchCompareFolder" --value $title
+python edit_yaml.py --entry "batchOptimizeFolder" --value $title
 
 
 perform_optimization() {

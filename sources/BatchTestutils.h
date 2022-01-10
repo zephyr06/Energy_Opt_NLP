@@ -87,7 +87,7 @@ pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
     catch (...)
     {
         cout << "Error in reading "
-             << batchCompareFolder
+             << batchOptimizeFolder
              << "'s result files" << fileName << endl;
     }
 

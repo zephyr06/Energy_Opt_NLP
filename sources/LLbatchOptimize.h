@@ -52,7 +52,7 @@ void BatchOptimize()
 
     ofstream outfileWrite;
     string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-                     batchCompareFolder + "/EnergySaveRatio/N" +
+                     batchOptimizeFolder + "/EnergySaveRatio/N" +
                      to_string(N) + ".txt";
     outfileWrite.open(pathRes,
                       std::ios_base::app);

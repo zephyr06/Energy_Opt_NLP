@@ -45,7 +45,7 @@ void BatchCompare()
                 if (debugMode == 3)
                     cout << "One compare: " << res / (baselineResult.second / 1e9) << endl;
                 ofstream outfileWrite;
-                outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchCompareFolder + "/EnergySaveRatio/N" +
+                outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/EnergySaveRatio/N" +
                                       to_string(taskSet1.size()) + ".txt",
                                   std::ios_base::app);
                 outfileWrite << energySaveRatioVec.back() << endl;
@@ -76,7 +76,7 @@ void BatchCompare()
     cout << Color::def << endl;
 
     ofstream outfile2;
-    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchCompareFolder + "/time_task_number.txt", std::ios_base::app);
+    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/time_task_number.txt", std::ios_base::app);
     outfile2 << Average(runTimeW) << ", " << Average(runTimeZ) << endl;
     if (debugMode == 1)
         cout << endl;

@@ -46,7 +46,7 @@ const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency
 const string testDataSetName = (string)ConfigParameters["testDataSetName"];
 const string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
 string runMode = (string)ConfigParameters["runMode"];
-string batchCompareFolder = (string)ConfigParameters["batchCompareFolder"];
+string batchOptimizeFolder = (string)ConfigParameters["batchOptimizeFolder"];
 
 const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
