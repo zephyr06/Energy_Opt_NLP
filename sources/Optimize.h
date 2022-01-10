@@ -304,7 +304,7 @@ public:
             //  because it may trigger early detection of termination
 
             // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-            double tolerance = 1.0;
+            double tolerance = 0.0;
             bool schedulable = CheckSchedulability<Schedul_Analysis>(tasksCurr,
                                                                      computationTimeWarmStart,
                                                                      debugMode == 1, tolerance);
