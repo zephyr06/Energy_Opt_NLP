@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 title="elimination"
-MaxTaskNumber=5
+MaxTaskNumber=20
 
 # clear buffer file content
 time_file="time_task_number.txt"
