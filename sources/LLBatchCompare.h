@@ -45,7 +45,7 @@ void BatchCompare()
                 if (debugMode == 3)
                     cout << "One compare: " << res / (baselineResult.second / 1e9) << endl;
                 ofstream outfileWrite;
-                outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/Zhao20/EnergySaveRatio/N" +
+                outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchCompareFolder + "/EnergySaveRatio/N" +
                                       to_string(taskSet1.size()) + ".txt",
                                   std::ios_base::app);
                 outfileWrite << energySaveRatioVec.back() << endl;
@@ -67,7 +67,6 @@ void BatchCompare()
         aveTime = Average(runTimeW) / Average(runTimeZ);
     }
 
-    ofstream outfile2;
     cout << Color::blue << endl;
     cout << "Average energy optimization objective (NLP: SA) ratio is " << avEnergy << endl;
     cout << "The worst value is " << worstValue << endl;
@@ -76,7 +75,8 @@ void BatchCompare()
     cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
     cout << Color::def << endl;
 
-    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/Zhao20/time_task_number.txt", std::ios_base::app);
+    ofstream outfile2;
+    outfile2.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchCompareFolder + "/time_task_number.txt", std::ios_base::app);
     outfile2 << Average(runTimeW) << ", " << Average(runTimeZ) << endl;
     if (debugMode == 1)
         cout << endl;

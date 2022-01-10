@@ -86,7 +86,9 @@ pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
     }
     catch (...)
     {
-        cout << "Error in reading Zhao20's result files" << fileName << endl;
+        cout << "Error in reading "
+             << batchCompareFolder
+             << "'s result files" << fileName << endl;
     }
 
     double runTime = 0, obj = 0;

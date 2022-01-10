@@ -6,6 +6,7 @@ void BatchOptimize()
     const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
     vector<double> energySaveRatioVec;
     vector<double> runTime;
+    int N;
 
     vector<string> errorFiles;
     for (const auto &file : ReadFilesInDirectory(pathDataset))
@@ -17,6 +18,7 @@ void BatchOptimize()
         {
             string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
             TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
+            N = taskSet1.size();
             auto start = chrono::high_resolution_clock::now();
             double res = Energy_Opt<RTA_LL>::OptimizeTaskSet(taskSet1);
             // cout << "The energy saving ratio is " << res << endl;
@@ -43,10 +45,19 @@ void BatchOptimize()
         avEnergy = Average(energySaveRatioVec);
         aveTime = Average(runTime);
     }
-
+    cout << Color::blue << endl;
     cout << "Average energy saving ratio is " << avEnergy << endl;
     cout << "Average time consumed is " << aveTime << endl;
     cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
+
+    ofstream outfileWrite;
+    string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                     batchCompareFolder + "/EnergySaveRatio/N" +
+                     to_string(N) + ".txt";
+    outfileWrite.open(pathRes,
+                      std::ios_base::app);
+    outfileWrite << avEnergy << endl;
+    outfileWrite.close();
 
     if (printFailureFile)
     {
@@ -56,6 +67,6 @@ void BatchOptimize()
     }
     // if (debugMode)
     cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
-
+    cout << Color::def << endl;
     return;
 }
