@@ -7,8 +7,8 @@
 #include "../sources/RTA_WAP.h"
 #include "../sources/Generate_WAP.h"
 using namespace std::chrono;
-using Opt_LL = Energy_Opt<RTA_LL>;
-using Opt_WAP = Energy_Opt<RTA_WAP>;
+using Opt_LL = Energy_Opt<Task, RTA_LL>;
+using Opt_WAP = Energy_Opt<Task, RTA_WAP>;
 
 TEST(OptimizeTaskSet, RTA_LL_V1)
 {
@@ -21,7 +21,7 @@ TEST(OptimizeTaskSet, RTA_LL_V1)
     TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
     InitializeGlobalVector(taskSet1.size());
     auto start = chrono::high_resolution_clock::now();
-    double res = Energy_Opt<RTA_LL>::OptimizeTaskSet(taskSet1);
+    double res = Energy_Opt<Task, RTA_LL>::OptimizeTaskSet(taskSet1);
     cout << blue << "The energy saving ratio is " << res << def << endl;
     auto stop = chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);

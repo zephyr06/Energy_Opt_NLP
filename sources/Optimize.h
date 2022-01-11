@@ -55,20 +55,21 @@ bool CheckExecutionTimeBound(VectorDynamic &exec, TaskSet &tasksOrg)
     return true;
 }
 
-template <class Schedul_Analysis>
+template <class TaskType, template <typename> class Schedul_Analysis>
 class Energy_Opt
 {
 public:
+    typedef std::vector<TaskType> TaskSetType;
     // TODO: whether warmStart assume sustainable?
     class ComputationFactor : public NoiseModelFactor1<VectorDynamic>
     {
     public:
-        TaskSet tasks_;
+        TaskSetType tasks_;
         int lastTaskDoNotNeedOptimize;
         VectorDynamic responseTimeInitial;
         int N;
 
-        ComputationFactor(Key key, TaskSet &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic responseTimeInitial,
+        ComputationFactor(Key key, TaskSetType &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic responseTimeInitial,
                           SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
                                                     tasks_(tasks), lastTaskDoNotNeedOptimize(lastTaskDoNotNeedOptimize),
                                                     responseTimeInitial(responseTimeInitial)
@@ -77,7 +78,7 @@ public:
         }
 
         void UpdateGlobalVector(VectorDynamic &responseTimeVec, double currentEnergyConsumption,
-                                const TaskSet &taskDurOpt) const
+                                const TaskSetType &taskDurOpt) const
         {
             for (int i = 0; i < N; i++)
             {
@@ -103,16 +104,16 @@ public:
          */
         Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
         {
-            TaskSet taskDurOpt = tasks_;
+            TaskSetType taskDurOpt = tasks_;
             UpdateTaskSetExecutionTime(taskDurOpt, executionTimeVector, lastTaskDoNotNeedOptimize);
             VectorDynamic energyVec = EstimateEnergyTaskSet(taskDurOpt);
 
-            VectorDynamic responseTimeVec = ResponseTimeOfTaskSet<Schedul_Analysis>(taskDurOpt, responseTimeInitial);
+            VectorDynamic responseTimeVec = ResponseTimeOfTaskSet<TaskType, Schedul_Analysis>(taskDurOpt, responseTimeInitial);
 
             boost::function<Matrix(const VectorDynamic &)> f2 =
                 [this](const VectorDynamic &executionTimeVector)
             {
-                TaskSet taskT = tasks_;
+                TaskSetType taskT = tasks_;
                 UpdateTaskSetExecutionTime(taskT, executionTimeVector, lastTaskDoNotNeedOptimize);
                 return EstimateEnergyTaskSet(taskT);
             };
@@ -178,7 +179,7 @@ public:
 
     // ------------------
     // TODO: clamp turn 123.99 to 124 rather than 123
-    static void ClampComputationTime(TaskSet &tasks, int lastTaskDoNotNeedOptimize,
+    static void ClampComputationTime(TaskSetType &tasks, int lastTaskDoNotNeedOptimize,
                                      VectorDynamic &responseTimeInitial, string roundType)
     {
         if (roundType == "none")
@@ -236,8 +237,8 @@ public:
                     int mid = ceil((left + right) / 2.0);
 
                     tasks[currentIndex].executionTime = mid;
-                    schedulale_flag = CheckSchedulability<Schedul_Analysis>(tasks,
-                                                                            responseTimeInitial, debugMode == 1);
+                    schedulale_flag = CheckSchedulability<TaskType, Schedul_Analysis>(tasks,
+                                                                                      responseTimeInitial, debugMode == 1);
                     if ((not schedulale_flag) ||
                         not WithInBound(tasks))
                     {
@@ -290,11 +291,11 @@ public:
      * -1 means all tasks need optimization
      * N-1 means all tasks do not need optimization
      **/
-    static int FindTaskDoNotNeedOptimize(const TaskSet &tasks, int lastTaskDoNotNeedOptimize,
+    static int FindTaskDoNotNeedOptimize(const TaskSetType &tasks, int lastTaskDoNotNeedOptimize,
                                          VectorDynamic &computationTimeWarmStart, double eliminateTolIte)
     {
         // update the tasks with the new optimal computationTimeVector
-        TaskSet tasksCurr = tasks;
+        TaskSetType tasksCurr = tasks;
         int N = tasks.size();
         for (int i = N - 1; i >= 0; i--)
         {
@@ -305,12 +306,12 @@ public:
 
             // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
             double tolerance = 0.0;
-            bool schedulable = CheckSchedulability<Schedul_Analysis>(tasksCurr,
-                                                                     computationTimeWarmStart,
-                                                                     debugMode == 1, tolerance);
+            bool schedulable = CheckSchedulability<TaskType, Schedul_Analysis>(tasksCurr,
+                                                                               computationTimeWarmStart,
+                                                                               debugMode == 1, tolerance);
             if ((!schedulable) ||
                 (enableMaxComputationTimeRestrict &&
-                 tasksCurr[i].executionTime   > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
+                 tasksCurr[i].executionTime > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
 
                 // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
                 // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
@@ -322,7 +323,7 @@ public:
         return -1;
     }
 
-    static VectorDynamic UnitOptimization(TaskSet &tasks,
+    static VectorDynamic UnitOptimization(TaskSetType &tasks,
                                           int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate,
                                           VectorDynamic &responseTimeInitial)
     {
@@ -398,13 +399,13 @@ public:
      * Perform optimization for one task set;
      * this function only performs optimization and elimination, it does not change weights
      **/
-    static double OptimizeTaskSetOneIte(TaskSet &tasks)
+    static double OptimizeTaskSetOneIte(TaskSetType &tasks)
     {
         int N = tasks.size();
 
         // this function also checks schedulability
-        VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Schedul_Analysis>(tasks);
-        if (!CheckSchedulabilityDirect(tasks, responseTimeInitial))
+        VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskType, Schedul_Analysis>(tasks);
+        if (!CheckSchedulabilityDirect<TaskType>(tasks, responseTimeInitial))
             return -2;
 
         VectorDynamic initialExecutionTime = GetParameterVD<int>(tasks, "executionTimeOrg");
@@ -426,7 +427,7 @@ public:
                 initialEstimateDuringOpt(i - lastTaskDoNotNeedOptimize - 1, 0) =
                     tasks[i].executionTime;
 
-            responseTimeInitial = ResponseTimeOfTaskSet<Schedul_Analysis>(tasks);
+            responseTimeInitial = ResponseTimeOfTaskSet<TaskType, Schedul_Analysis>(tasks);
             // perform optimization
 
             auto variNew = UnitOptimization(tasks, lastTaskDoNotNeedOptimize,
@@ -471,7 +472,7 @@ public:
                              -1,
                              responseTimeInitial, roundTypeInClamp);
         // performance evaluation
-        if (CheckSchedulability<Schedul_Analysis>(tasks))
+        if (CheckSchedulability<TaskType, Schedul_Analysis>(tasks))
         {
             if (debugMode == 1)
             {
@@ -496,11 +497,11 @@ public:
             {
                 double granularity = GetParameterVD<double>(tasks, "executionTime").maxCoeff() * 3e-5;
                 // verify whether elimination is successful
-                if (CheckSchedulability<Schedul_Analysis>(tasks))
+                if (CheckSchedulability<TaskType, Schedul_Analysis>(tasks))
                 {
                     tasks[tasks.size() - 1].executionTime += granularity;
 
-                    if (CheckSchedulability<Schedul_Analysis>(tasks))
+                    if (CheckSchedulability<TaskType, Schedul_Analysis>(tasks))
                     {
                         if (enableMaxComputationTimeRestrict &&
                             tasks[tasks.size() - 1].executionTime <
@@ -541,7 +542,7 @@ public:
     /**
  * initialize all the global variables
  */
-    static double OptimizeTaskSet(TaskSet &tasks)
+    static double OptimizeTaskSet(TaskSetType &tasks)
     {
         InitializeGlobalVector(tasks.size());
         double eliminateTolRef = eliminateTol;

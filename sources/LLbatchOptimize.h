@@ -1,6 +1,6 @@
 #pragma once
 #include "BatchTestutils.h"
-
+template <class TaskType, template <typename> class Schedul_Analysis>
 void BatchOptimize(int Nn = -1)
 {
     const char *pathDataset;
@@ -27,10 +27,10 @@ void BatchOptimize(int Nn = -1)
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
             string path = pathDataset + file;
-            TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
+            std::vector<TaskType> taskSet1 = ReadTaskSet(path, readTaskMode);
             N = taskSet1.size();
             auto start = chrono::high_resolution_clock::now();
-            double res = Energy_Opt<RTA_LL>::OptimizeTaskSet(taskSet1);
+            double res = Energy_Opt<TaskType, Schedul_Analysis>::OptimizeTaskSet(taskSet1);
             // cout << "The energy saving ratio is " << res << endl;
             auto stop = chrono::high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);

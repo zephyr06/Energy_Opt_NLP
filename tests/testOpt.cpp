@@ -4,7 +4,7 @@
 #include "../sources/Parameters.h"
 #include "../sources/Optimize.h"
 using namespace std::chrono;
-using Opt_LL = Energy_Opt<RTA_LL>;
+using Opt_LL = Energy_Opt<Task, RTA_LL>;
 
 // There are two types of tests, strict deadline test, or period & 2xExecution test
 
@@ -17,7 +17,7 @@ TEST(FindTaskDoNotNeedOptimize, A1)
     TaskSet tasks = ReadTaskSet(path, "RM");
     InitializeGlobalVector(tasks.size());
     int N = tasks.size();
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(tasks);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
     VectorDynamic initialExecutionTime;
     initialExecutionTime.resize(N, 1);
     for (int i = 0; i < N; i++)
@@ -152,7 +152,7 @@ TEST(unitOptimization, a1)
     initialEstimate.resize((N - lastTaskDoNotNeedOptimize - 1), 1);
     initialEstimate << 62;
 
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(taskSet1);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(taskSet1);
     vectorGlobalOpt.resize(N, 1);
     VectorDynamic res1 = Opt_LL::UnitOptimization(taskSet1, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
     cout << endl;
@@ -239,7 +239,7 @@ TEST(ClampComputationTime, a1)
     initialEstimate.resize((N - lastTaskDoNotNeedOptimize - 1), 1);
     initialEstimate << 62;
 
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(taskSet1);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(taskSet1);
     vectorGlobalOpt.resize(N, 1);
     VectorDynamic res1 = Opt_LL::UnitOptimization(taskSet1, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
     cout << endl;
@@ -273,7 +273,7 @@ TEST(ClampComputationTime, v3)
     initialEstimate.resize(N, 1);
     initialEstimate << 15.2, 13.1, 12.1, 16.2, 19.5;
     UpdateTaskSetExecutionTime(tasks, initialEstimate);
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(tasks);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
     Opt_LL::ClampComputationTime(tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, "fine");
     VectorDynamic expect1 = initialEstimate;
     expect1 << 15, 13, 17, 24, 19;
@@ -298,7 +298,7 @@ TEST(ClampComputationTime, v2)
     initialEstimate.resize(N, 1);
     initialEstimate << 15.2, 13.1, 12.1, 16.2, 19.5;
     UpdateTaskSetExecutionTime(tasks, initialEstimate);
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(tasks);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
     Opt_LL::ClampComputationTime(tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, "fine");
     VectorDynamic expect1 = initialEstimate;
     expect1 << 20, 22, 24, 26, 28;

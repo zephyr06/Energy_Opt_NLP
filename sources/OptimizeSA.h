@@ -6,8 +6,9 @@
 #include "RTA_LL.h"
 #include "RTA_WAP.h"
 #include "../includeMoe/moe/moe.hpp"
-template <class Schedul_Analysis>
-OptimizeResult OptimizeSchedulingSA(TaskSet &tasks)
+
+template <class TaskType, template <typename> class Schedul_Analysis>
+OptimizeResult OptimizeSchedulingSA(std::vector<TaskType> &tasks)
 {
     srand(0);
     int N = tasks.size();
@@ -18,14 +19,14 @@ OptimizeResult OptimizeSchedulingSA(TaskSet &tasks)
     int lastTaskDoNotNeedOptimize = -1;
     VectorDynamic initialEstimate = GetParameterVD<int>(tasks, "executionTime");
     VectorDynamic periods = GetParameterVD<int>(tasks, "period");
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(tasks);
-    if (!CheckSchedulabilityDirect(tasks, responseTimeInitial))
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskType, RTA_LL>(tasks);
+    if (!CheckSchedulabilityDirect<Task>(tasks, responseTimeInitial))
         return {INT_MAX, INT_MAX,
                 initialEstimate, initialEstimate};
     Symbol key('a', 0);
     auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
-    Energy_Opt<RTA_LL>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,
-                                                 responseTimeInitial, model);
+    typename Energy_Opt<TaskType, RTA_LL>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,
+                                                                    responseTimeInitial, model);
 
     moe::SimulatedAnnealing<double> moether(moe::SAParameters<double>()
                                                 .withTemperature(temperatureSA)

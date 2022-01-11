@@ -12,7 +12,7 @@ TEST(SA, v1)
     //     CoutWarning("Unschedulable task set in SA test!");
     // }
     auto start = chrono::high_resolution_clock::now();
-    auto res = OptimizeSchedulingSA<RTA_LL>(tasks);
+    auto res = OptimizeSchedulingSA<Task, RTA_LL>(tasks);
     auto stop = chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;

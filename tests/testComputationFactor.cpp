@@ -8,11 +8,11 @@ TEST(evaluateError, v1)
     int N = tasks.size();
     InitializeGlobalVector(tasks.size());
     int lastTaskDoNotNeedOptimize = -1;
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(tasks);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
     Symbol key('a', 0);
 
     auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
-    Energy_Opt<RTA_LL>::ComputationFactor factor(key, tasks, -1, responseTimeInitial, model);
+    Energy_Opt<Task, RTA_LL>::ComputationFactor factor(key, tasks, -1, responseTimeInitial, model);
     VectorDynamic x = GetParameterVD<double>(tasks, "executionTime");
     executionTimeModel = 1;
     EnergyMode = 1;
@@ -29,11 +29,11 @@ TEST(evaluateError, v2)
     int N = tasks.size();
     InitializeGlobalVector(tasks.size());
     int lastTaskDoNotNeedOptimize = -1;
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<RTA_LL>(tasks);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
     Symbol key('a', 0);
 
     auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
-    Energy_Opt<RTA_LL>::ComputationFactor factor(key, tasks, -1, responseTimeInitial, model);
+    Energy_Opt<Task, RTA_LL>::ComputationFactor factor(key, tasks, -1, responseTimeInitial, model);
     VectorDynamic x = GetParameterVD<double>(tasks, "executionTime");
     x(0) = 50;
     executionTimeModel = 1;

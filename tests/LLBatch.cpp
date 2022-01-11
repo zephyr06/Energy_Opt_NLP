@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
     if (argc == 1)
-        BatchOptimize();
+        BatchOptimize<Task, RTA_LL>();
     else if (argc == 2)
     {
         char *pEnd;
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
         if (debugMode == 1)
             cout << "Task sets under analyzation is N" + to_string(N) << endl;
         if (N >= 0)
-            BatchOptimize(N);
+            BatchOptimize<Task, RTA_LL>(N);
         else
             CoutError("Unrecognized arguments in LLBatch!");
     }

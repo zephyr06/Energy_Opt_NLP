@@ -3,16 +3,17 @@
 
 // MatrixDynamic A_Global;
 // MatrixDynamic P_Global;
-
-class RTA_WAP : public RTA_BASE
+template <class TaskType>
+class RTA_WAP : public RTA_BASE<TaskType>
 {
 public:
+    typedef std::vector<TaskType> TaskSetType;
     static string type()
     {
         return "WAP";
     }
     // ******************** Standard interfaces to use ********************************** //
-    static double RTA_Common_Warm(double beginTime, const TaskSet &tasks, int index)
+    static double RTA_Common_Warm(double beginTime, const TaskSetType &tasks, int index)
     {
         if (A_Global.rows() && P_Global.rows())
         {
@@ -25,7 +26,7 @@ public:
         }
         return -1;
     }
-    static double RTA_Common(const TaskSet &tasks, int index)
+    static double RTA_Common(const TaskSetType &tasks, int index)
     {
         double beginTime = tasks.at(index).executionTime;
         return RTA_Common_Warm(beginTime, tasks, index);
@@ -41,7 +42,7 @@ public:
      * @param index 
      * @return double 
      */
-    static double BlockingTime(const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index)
+    static double BlockingTime(const TaskSetType &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index)
     {
         int N = tasks.size();
         double block = 0;
@@ -68,12 +69,12 @@ public:
      * @param A 
      * @param P 
      * @param index 
-     * @return TaskSet
+     * @return TaskSetType
      */
-    static TaskSet EquivalentHpTasks(const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index)
+    static TaskSetType EquivalentHpTasks(const TaskSetType &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index)
     {
         // int N = tasks.size();
-        TaskSet tasksHp;
+        TaskSetType tasksHp;
         tasksHp.reserve(index);
         for (int i = 0; i < index; i++)
             tasksHp.push_back(tasks.at(i));
@@ -92,17 +93,18 @@ public:
         return tasksHp;
     }
 
-    static double GetBusyPeriod(const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index, double block = -1)
+    static double GetBusyPeriod(const TaskSetType &tasks,
+                                const MatrixDynamic &A, const MatrixDynamic &P, int index, double block = -1)
     {
         if (block == -1)
             block = BlockingTime(tasks, A, P, index);
 
-        TaskSet tasksHp = EquivalentHpTasks(tasks, A, P, index);
+        TaskSetType tasksHp = EquivalentHpTasks(tasks, A, P, index);
 
         tasksHp.push_back(tasks.at(index));
         Task task = tasks.at(index);
         task.executionTime = block + tasks.at(index).executionTime;
-        double bp = RTA_LL::ResponseTimeAnalysisWarm_util_nece(task.executionTime, task, tasksHp);
+        double bp = RTA_LL<Task>::ResponseTimeAnalysisWarm_util_nece(task.executionTime, task, tasksHp);
         if (bp == INT32_MAX)
             return HyperPeriod(tasks);
         return bp;
@@ -118,16 +120,16 @@ public:
      * @param block 
      * @return double 
      */
-    static double RTA_block(const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index, double block)
+    static double RTA_block(const TaskSetType &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index, double block)
     {
         return RTA_blockWarm(tasks.at(index).executionTime, tasks, A, P, index, block);
     }
 
-    static double RTA_blockWarm(double beginTime, const TaskSet &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index, double block)
+    static double RTA_blockWarm(double beginTime, const TaskSetType &tasks, const MatrixDynamic &A, const MatrixDynamic &P, int index, double block)
     {
-        Task taskCurr = tasks.at(index);
+        TaskType taskCurr = tasks.at(index);
         // taskCurr.executionTime += block;
-        TaskSet tasksHp = EquivalentHpTasks(tasks, A, P, index);
+        TaskSetType tasksHp = EquivalentHpTasks(tasks, A, P, index);
         double busyPeriod = GetBusyPeriod(tasks, A, P, index, block);
         if (busyPeriod == INT32_MAX)
         {
@@ -139,7 +141,7 @@ public:
         for (int i = 0; i <= ceil(busyPeriod / tasks[index].period); i++)
         {
             taskCurr.executionTime = (1 + i) * tasks.at(index).executionTime + block;
-            double instance_rt = RTA_LL::ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHp) - i * tasks.at(index).period;
+            double instance_rt = RTA_LL<Task>::ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHp) - i * tasks.at(index).period;
             wcrt = max(wcrt, instance_rt);
             if (wcrt > tasks.at(index).period)
                 return wcrt * 1000;

@@ -2,7 +2,7 @@
 #include "BatchTestutils.h"
 #include "Generate_WAP.h"
 #include "OptimizeSA.h"
-
+template <class TaskType, template <typename> class Schedul_Analysis>
 void BatchCompare()
 {
     const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
@@ -28,7 +28,7 @@ void BatchCompare()
             std::tie(success, A_Global, P_Global) = sth;
 
             auto start = chrono::high_resolution_clock::now();
-            double res = Energy_Opt<RTA_WAP>::OptimizeTaskSet(taskSet1);
+            double res = Energy_Opt<TaskType, RTA_WAP>::OptimizeTaskSet(taskSet1);
             double energySaveRatioNLP = res;
             // cout << "The energy saving ratio is " << res << endl;
             auto stop = chrono::high_resolution_clock::now();

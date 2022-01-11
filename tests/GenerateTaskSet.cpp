@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
             {
                 if (schedulabilityCheck == 1)
                 {
-                    if (!CheckSchedulability<RTA_LL>(tasks))
+                    if (!CheckSchedulability<Task, RTA_LL>(tasks))
                     {
                         i--;
                         continue;

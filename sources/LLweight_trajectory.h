@@ -31,7 +31,7 @@ void WriteWeightTrajectory()
                 TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
 
                 auto start = chrono::high_resolution_clock::now();
-                double res = Energy_Opt<RTA_LL>::OptimizeTaskSet(taskSet1);
+                double res = Energy_Opt<Task, RTA_LL>::OptimizeTaskSet(taskSet1);
                 auto stop = chrono::high_resolution_clock::now();
                 auto duration = duration_cast<microseconds>(stop - start);
                 if (isinf(res))

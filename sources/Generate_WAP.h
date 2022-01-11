@@ -85,7 +85,7 @@ bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDyn
     size_t index_first_available = -1;
     for (size_t i = 0; i < list4Sort.size(); i++)
     {
-        if (RTA_WAP::RTA_block(tasks, A, P, index, list4Sort[i].value) <= tasks.at(index).deadline)
+        if (RTA_WAP<Task>::RTA_block(tasks, A, P, index, list4Sort[i].value) <= tasks.at(index).deadline)
         {
             success = true;
             index_first_available = i;
@@ -97,7 +97,7 @@ bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDyn
     {
         // The current task cannot tolerate any block from lp tasks
         // Let's try if all block items are 0, will it be schedulable
-        if (RTA_WAP::RTA_block(tasks, A, P, index, 0) <= tasks.at(index).deadline)
+        if (RTA_WAP<Task>::RTA_block(tasks, A, P, index, 0) <= tasks.at(index).deadline)
         {
             success = true;
             for (int l = index + 1; l < N; l++)
@@ -145,6 +145,8 @@ bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDyn
         }
         return true;
     }
+    CoutError("Not expected to happen in Generate_WAP!");
+    return true;
 }
 
 tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
@@ -164,7 +166,7 @@ tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
     A_Global = A;
     P_Global = P;
     // check the last task
-    if (RTA_WAP::RTA_Common(tasks, N - 1) <= tasks.at(N - 1).deadline)
+    if (RTA_WAP<Task>::RTA_Common(tasks, N - 1) <= tasks.at(N - 1).deadline)
     {
         return make_tuple(1, A, P);
     }

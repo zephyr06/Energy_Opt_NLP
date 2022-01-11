@@ -2,6 +2,10 @@
 
 #include "Tasks.h"
 #include "Declaration.h"
+/**
+ * @brief All customized TaskType must inherit from Task in Tasks.h
+ * 
+ */
 
 /**
  * @brief RTA_BASE encapsulate all the interafaces required
@@ -11,9 +15,12 @@
  * 
  */
 
+template <class TaskType>
 class RTA_BASE
 {
 public:
+    typedef std::vector<TaskType> TaskSetType;
+
     /**
      * @brief 
      * 
@@ -21,8 +28,8 @@ public:
      * @param index 
      * @return double 
      */
-    double RTA_Common_Warm(double beginTime, const TaskSet &tasks, int index);
-    double RTA_Common(const TaskSet &tasks, int index);
+    static double RTA_Common_Warm(double beginTime, const TaskSetType &tasks, int index);
+    static double RTA_Common(const TaskSetType &tasks, int index);
 };
 
 /**
@@ -36,14 +43,14 @@ public:
  * @return true: system is schedulable
  * @return false: system is not schedulable
  */
-template <class Schedul_Analysis>
-bool CheckSchedulability(const TaskSet &tasks, VectorDynamic warmStart,
+template <class TaskType, template <typename> class Schedul_Analysis>
+bool CheckSchedulability(const std::vector<TaskType> &tasks, VectorDynamic warmStart,
                          bool whetherPrint = false, double tol = 0)
 {
     int N = tasks.size();
     for (int i = 0; i < N; i++)
     {
-        double rta = Schedul_Analysis::RTA_Common_Warm(warmStart(i, 0), tasks, i);
+        double rta = Schedul_Analysis<TaskType>::RTA_Common_Warm(warmStart(i, 0), tasks, i);
         if (whetherPrint)
             cout << "response time for task " << i << " is " << rta << " and deadline is " << tasks[i].deadline << endl;
         if (rta + tol > min(tasks[i].deadline, tasks[i].period))
@@ -54,14 +61,15 @@ bool CheckSchedulability(const TaskSet &tasks, VectorDynamic warmStart,
     return true;
 }
 
-template <class Schedul_Analysis>
-bool CheckSchedulability(const TaskSet &tasks, bool whetherPrint = false)
+template <class TaskType, template <typename> class Schedul_Analysis>
+bool CheckSchedulability(const std::vector<TaskType> &tasks, bool whetherPrint = false)
 {
     VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
-    return CheckSchedulability<Schedul_Analysis>(tasks, warmStart, whetherPrint);
+    return CheckSchedulability<TaskType, Schedul_Analysis>(tasks, warmStart, whetherPrint);
 }
 
-bool CheckSchedulabilityDirect(const TaskSet &tasks, const VectorDynamic &rta)
+template <class TaskType>
+bool CheckSchedulabilityDirect(const std::vector<TaskType> &tasks, const VectorDynamic &rta)
 {
     int N = tasks.size();
     for (int i = 0; i < N; i++)
@@ -72,8 +80,8 @@ bool CheckSchedulabilityDirect(const TaskSet &tasks, const VectorDynamic &rta)
     return true;
 }
 
-template <class Schedul_Analysis>
-VectorDynamic ResponseTimeOfTaskSet(const TaskSet &tasks, const VectorDynamic &warmStart)
+template <class TaskType, template <typename> class Schedul_Analysis>
+VectorDynamic ResponseTimeOfTaskSet(const std::vector<TaskType> &tasks, const VectorDynamic &warmStart)
 {
     int N = tasks.size();
     VectorDynamic res;
@@ -83,7 +91,7 @@ VectorDynamic ResponseTimeOfTaskSet(const TaskSet &tasks, const VectorDynamic &w
         cout << Color::blue << "RTA analysis (responseTime, deadline)" << Color::def << endl;
     for (int i = 0; i < N; i++)
     {
-        res(i, 0) = Schedul_Analysis::RTA_Common_Warm(warmStart(i, 0), tasks, i);
+        res(i, 0) = Schedul_Analysis<TaskType>::RTA_Common_Warm(warmStart(i, 0), tasks, i);
         if (debugMode == 1)
             cout << res(i, 0) << ", " << tasks[i].deadline << endl;
         if (res(i, 0) > min(tasks[i].deadline, tasks[i].period))
@@ -95,9 +103,9 @@ VectorDynamic ResponseTimeOfTaskSet(const TaskSet &tasks, const VectorDynamic &w
     return res;
 }
 
-template <class Schedul_Analysis>
-VectorDynamic ResponseTimeOfTaskSet(const TaskSet &tasks)
+template <class TaskType, template <typename> class Schedul_Analysis>
+VectorDynamic ResponseTimeOfTaskSet(const std::vector<TaskType> &tasks)
 {
     VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
-    return ResponseTimeOfTaskSet<Schedul_Analysis>(tasks, warmStart);
+    return ResponseTimeOfTaskSet<TaskType, Schedul_Analysis>(tasks, warmStart);
 }

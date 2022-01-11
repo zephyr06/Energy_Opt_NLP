@@ -1,7 +1,7 @@
 #include "../sources/LLBatchCompare.h"
 TEST(parameters, a1)
 {
-    BatchCompare();
+    BatchCompare<Task, RTA_LL>();
 }
 int main()
 {
