@@ -2,7 +2,7 @@
 #pragma once
 #include "BatchTestutils.h"
 
-void BatchCompare()
+void BatchCompare(int N = -1)
 {
     const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
     vector<double> energySaveRatioVec;

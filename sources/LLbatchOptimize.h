@@ -1,13 +1,23 @@
 #pragma once
 #include "BatchTestutils.h"
 
-void BatchOptimize()
+void BatchOptimize(int Nn = -1)
 {
-    const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
+    const char *pathDataset;
+    string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" + to_string(Nn) + "/";
+    if (Nn == -1)
+        pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/";
+    else
+    {
+        pathDataset = str.c_str();
+        if (debugMode == 1)
+            printf("Directory: %s\n", pathDataset);
+    }
     vector<double> energySaveRatioVec;
     vector<double> runTime;
     int N;
-
+    if (debugMode == 1)
+        printf("Directory: %s\n", pathDataset);
     vector<string> errorFiles;
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
@@ -16,7 +26,7 @@ void BatchOptimize()
         string delimiter = "-";
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
-            string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
+            string path = pathDataset + file;
             TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
             N = taskSet1.size();
             auto start = chrono::high_resolution_clock::now();

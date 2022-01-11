@@ -20,7 +20,7 @@ def txt2data(line):
 if __name__ == "__main__":
     # import arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument('--convertionNumber', type=int, default=5,
+    parser.add_argument('--convertionNumber', type=int, default=10,
                         help='N')
     parser.add_argument('--directory', type=str,
                         default='/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep',
