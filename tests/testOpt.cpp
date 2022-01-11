@@ -214,8 +214,8 @@ TEST(OptimizeTaskSetOneIte, a2)
     enableMaxComputationTimeRestrict = 0;
     executionTimeModel = 1;
     double res = Opt_LL::OptimizeTaskSet(taskSet1);
-    AssertEqualScalar(0.28, res, 0.04, __LINE__);
-    if (not assert_equal<double>(0.28, res, 0.02))
+    AssertEqualScalar(0.28, res, 0.1, __LINE__);
+    if (not assert_equal<double>(0.28, res, 0.1))
         CoutError("One test case failed in performance!");
     if (debugMode == 1)
         cout << "The energy saving ratio in OptimizeTaskSet-OptimizeTaskSetOneIte is " << res << endl;
