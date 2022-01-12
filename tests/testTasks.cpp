@@ -37,10 +37,10 @@ TEST(read_dag, v1)
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
 
     auto dagTasks = ReadDAG_Tasks(path, "RM");
-    AssertEqualScalar(2, dagTasks.mapPrev.size());
-    AssertEqualScalar(3, dagTasks.mapPrev[0].size());
-    AssertEqualScalar(3, dagTasks.mapPrev[1].size());
-    AssertEqualScalar(0, dagTasks.mapPrev[2].size());
+    // AssertEqualScalar(2, dagTasks.mapPrev.size());
+    AssertEqualScalar(3, GetDependentTasks(dagTasks, 0).size());
+    AssertEqualScalar(3, GetDependentTasks(dagTasks, 1).size());
+    AssertEqualScalar(0, GetDependentTasks(dagTasks, 2).size());
 }
 
 int main()
