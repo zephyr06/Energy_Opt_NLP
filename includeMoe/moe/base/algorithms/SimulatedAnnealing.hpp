@@ -14,7 +14,8 @@ namespace moe
         SimulatedAnnealing(const SAParameters<GenotypeType> &_parameters);
 
         void run(unsigned int _iterations) override;
-        void runSA(unsigned int _iterations, std::vector<double> initialSA, int whetherRandomInitialize, TaskSet &tasks)
+        void runSA(unsigned int _iterations, std::vector<double> initialSA,
+                   int whetherRandomInitialize, TaskSet &tasks)
         {
 
             // this->init(_iterations);

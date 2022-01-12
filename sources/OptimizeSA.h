@@ -7,26 +7,26 @@
 #include "RTA_WAP.h"
 #include "../includeMoe/moe/moe.hpp"
 
-template <class TaskType, template <typename> class Schedul_Analysis>
-OptimizeResult OptimizeSchedulingSA(std::vector<TaskType> &tasks)
+template <class TaskSetType, class Schedul_Analysis>
+OptimizeResult OptimizeSchedulingSA(TaskSetType &tasks)
 {
     srand(0);
-    int N = tasks.size();
-    TASK_NUMBER = tasks.size();
+    int N = tasks.tasks_.size();
+    TASK_NUMBER = N;
     vectorGlobalOpt.resize(N, 1);
     vectorGlobalOpt.setZero();
     // auto hyperPeriod = HyperPeriod(tasks);
     int lastTaskDoNotNeedOptimize = -1;
     VectorDynamic initialEstimate = GetParameterVD<int>(tasks, "executionTime");
     VectorDynamic periods = GetParameterVD<int>(tasks, "period");
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskType, RTA_LL>(tasks);
-    if (!CheckSchedulabilityDirect<Task>(tasks, responseTimeInitial))
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetType, RTA_LL>(tasks);
+    if (!CheckSchedulabilityDirect<TaskSetType>(tasks, responseTimeInitial))
         return {INT_MAX, INT_MAX,
                 initialEstimate, initialEstimate};
     Symbol key('a', 0);
     auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
-    typename Energy_Opt<TaskType, RTA_LL>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,
-                                                                    responseTimeInitial, model);
+    typename Energy_Opt<TaskSetType, RTA_LL>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,
+                                                                       responseTimeInitial, model);
 
     moe::SimulatedAnnealing<double> moether(moe::SAParameters<double>()
                                                 .withTemperature(temperatureSA)
@@ -48,7 +48,7 @@ OptimizeResult OptimizeSchedulingSA(std::vector<TaskType> &tasks)
     if (randomInitialize)
         moether.run(SA_iteration);
     else
-        moether.runSA(SA_iteration, initialSA, randomInitialize, tasks);
+        moether.runSA(SA_iteration, initialSA, randomInitialize, tasks.tasks_);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> diff = end - start;

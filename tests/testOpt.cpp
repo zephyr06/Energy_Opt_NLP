@@ -4,7 +4,7 @@
 #include "../sources/Parameters.h"
 #include "../sources/Optimize.h"
 using namespace std::chrono;
-using Opt_LL = Energy_Opt<Task, RTA_LL>;
+using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 
 // There are two types of tests, strict deadline test, or period & 2xExecution test
 
@@ -15,16 +15,17 @@ TEST(FindTaskDoNotNeedOptimize, A1)
 
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet tasks = ReadTaskSet(path, "RM");
+    TaskSetNormal taskSetNormal(tasks);
     InitializeGlobalVector(tasks.size());
     int N = tasks.size();
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
     VectorDynamic initialExecutionTime;
     initialExecutionTime.resize(N, 1);
     for (int i = 0; i < N; i++)
         initialExecutionTime(i, 0) = tasks[i].executionTime;
 
     int indexExpect = 1;
-    int indexActual = Opt_LL::FindTaskDoNotNeedOptimize(tasks, 0, responseTimeInitial, eliminateTol);
+    int indexActual = Opt_LL::FindTaskDoNotNeedOptimize(taskSetNormal, 0, responseTimeInitial, eliminateTol);
     CHECK_EQUAL(indexExpect, indexActual);
 }
 
@@ -142,6 +143,7 @@ TEST(unitOptimization, a1)
     MaxComputationTimeRestrict = 100;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
+    TaskSetNormal taskSetNormal(taskSet1);
     int N = taskSet1.size();
     InitializeGlobalVector(taskSet1.size());
     optimizerType = 1;
@@ -152,9 +154,9 @@ TEST(unitOptimization, a1)
     initialEstimate.resize((N - lastTaskDoNotNeedOptimize - 1), 1);
     initialEstimate << 62;
 
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(taskSet1);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(taskSet1);
     vectorGlobalOpt.resize(N, 1);
-    VectorDynamic res1 = Opt_LL::UnitOptimization(taskSet1, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+    VectorDynamic res1 = Opt_LL::UnitOptimization(taskSetNormal, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
     cout << endl;
     cout << endl;
     cout << endl;
@@ -181,9 +183,10 @@ TEST(OptimizeTaskSet, a1)
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
 
     TaskSet taskSet1 = ReadTaskSet(path, "RM");
+    TaskSetNormal taskSetNormal(taskSet1);
     InitializeGlobalVector(taskSet1.size());
 
-    double res = Opt_LL::OptimizeTaskSet(taskSet1);
+    double res = Opt_LL::OptimizeTaskSet(taskSetNormal);
     if (debugMode == 1)
         cout << "The energy saving ratio is " << res << endl;
     if (not assert_equal<double>(0.713, res, 0.01))
@@ -213,7 +216,8 @@ TEST(OptimizeTaskSetOneIte, a2)
     exactJacobian = 0;
     enableMaxComputationTimeRestrict = 0;
     executionTimeModel = 1;
-    double res = Opt_LL::OptimizeTaskSet(taskSet1);
+    TaskSetNormal taskSetNormal(taskSet1);
+    double res = Opt_LL::OptimizeTaskSet(taskSetNormal);
     AssertEqualScalar(0.28, res, 0.1, __LINE__);
     if (not assert_equal<double>(0.28, res, 0.1))
         CoutError("One test case failed in performance!");
@@ -239,15 +243,13 @@ TEST(ClampComputationTime, a1)
     initialEstimate.resize((N - lastTaskDoNotNeedOptimize - 1), 1);
     initialEstimate << 62;
 
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(taskSet1);
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(taskSet1);
     vectorGlobalOpt.resize(N, 1);
-    VectorDynamic res1 = Opt_LL::UnitOptimization(taskSet1, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
+    TaskSetNormal taskSetNormal(taskSet1);
+    VectorDynamic res1 = Opt_LL::UnitOptimization(taskSetNormal, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
     cout << endl;
     cout << endl;
     cout << endl;
-    cout << endl;
-    cout << endl;
-    cout << res1 << endl;
     // 204 corresponds to RT of 319, which should be the best we can get because of the clamp function
     // if (not(abs(205 - res1(0, 0)) < 1))
     //     CoutWarning("One test case failed in performance!");
@@ -268,16 +270,18 @@ TEST(ClampComputationTime, v3)
     optimizerType = 1;
     EnergyMode = 1;
     MaxComputationTimeRestrict = 2;
+    roundTypeInClamp = "fine";
 
     VectorDynamic initialEstimate;
     initialEstimate.resize(N, 1);
     initialEstimate << 15.2, 13.1, 12.1, 16.2, 19.5;
     UpdateTaskSetExecutionTime(tasks, initialEstimate);
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
-    Opt_LL::ClampComputationTime(tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, "fine");
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
+    TaskSetNormal taskSetNormal(tasks);
+    Opt_LL::ClampComputationTime(taskSetNormal, lastTaskDoNotNeedOptimize, responseTimeInitial, "fine");
     VectorDynamic expect1 = initialEstimate;
     expect1 << 15, 13, 17, 24, 19;
-    EXPECT(assert_equal(expect1, GetParameterVD<double>(tasks, "executionTime")));
+    EXPECT(assert_equal(expect1, GetParameterVD<double>(taskSetNormal.tasks_, "executionTime")));
 }
 TEST(ClampComputationTime, v2)
 {
@@ -285,6 +289,7 @@ TEST(ClampComputationTime, v2)
     MaxComputationTimeRestrict = 2;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v22.csv";
     TaskSet tasks = ReadTaskSet(path, "orig");
+    TaskSetNormal taskSetNormal(tasks);
     InitializeGlobalVector(tasks.size());
     int N = tasks.size();
 
@@ -292,17 +297,18 @@ TEST(ClampComputationTime, v2)
     eliminateTol = 0.1;
     optimizerType = 1;
     EnergyMode = 1;
+    roundTypeInClamp = "fine";
     MaxComputationTimeRestrict = 2;
 
     VectorDynamic initialEstimate;
     initialEstimate.resize(N, 1);
     initialEstimate << 15.2, 13.1, 12.1, 16.2, 19.5;
     UpdateTaskSetExecutionTime(tasks, initialEstimate);
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
-    Opt_LL::ClampComputationTime(tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, "fine");
+    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
+    Opt_LL::ClampComputationTime(taskSetNormal, lastTaskDoNotNeedOptimize, responseTimeInitial, "fine");
     VectorDynamic expect1 = initialEstimate;
     expect1 << 20, 22, 24, 26, 28;
-    EXPECT(assert_equal(expect1, GetParameterVD<double>(tasks, "executionTime")));
+    EXPECT(assert_equal(expect1, GetParameterVD<double>(taskSetNormal.tasks_, "executionTime")));
 }
 TEST(UnitOptimizationIPM, a1)
 {
@@ -310,6 +316,7 @@ TEST(UnitOptimizationIPM, a1)
     MaxComputationTimeRestrict = 100;
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v21.csv";
     TaskSet tasks = ReadTaskSet(path, "RM");
+    TaskSetNormal taskSetNormal(tasks);
     VectorDynamic initialExecution = GetParameterVD<int>(tasks, "executionTime");
     eliminateTol = 1;
     optimizerType = 1;
@@ -322,8 +329,8 @@ TEST(UnitOptimizationIPM, a1)
     VectorDynamic initial;
     initial.resize(1, 1);
     initial << initialExecution(2, 0);
-    VectorDynamic res = Opt_LL::UnitOptimization(tasks, 1, initial, initialExecution);
-    cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
+    VectorDynamic res = Opt_LL::UnitOptimization(taskSetNormal, 1, initial, initialExecution);
+    // cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
     AssertEqualScalar(230, res(0, 0), 1.1, __LINE__);
 }
 

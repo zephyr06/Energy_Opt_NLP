@@ -15,7 +15,7 @@
 #include "Declaration.h"
 using namespace std;
 
-#define TaskSet vector<Task>
+#define TaskSet std::vector<Task>
 typedef std::map<int, vector<int>> ProcessorTaskSet;
 Color::Modifier red(Color::FG_RED);
 Color::Modifier green(Color::FG_GREEN);
@@ -93,6 +93,18 @@ public:
     }
 };
 
+class TaskSetNormal
+{
+public:
+    TaskSet tasks_;
+    TaskSetNormal()
+    {
+        ;
+    }
+    TaskSetNormal(TaskSet &tasks) : tasks_(tasks) {}
+    static string Type() { return "normal"; }
+    void UpdateTaskSet(TaskSet &tasks) { tasks_ = tasks; }
+};
 void Print(TaskSet &tasks)
 {
     cout << "The task set is printed as follows" << endl;
@@ -160,6 +172,11 @@ VectorDynamic GetParameterVD(const TaskSet &taskset, string parameterType)
     return parameterList;
 }
 
+template <typename T>
+VectorDynamic GetParameterVD(const TaskSetNormal &taskset, string parameterType)
+{
+    return GetParameterVD<T>(taskset.tasks_, parameterType);
+}
 // some helper function for Reorder
 static bool comparePeriod(Task task1, Task task2)
 {

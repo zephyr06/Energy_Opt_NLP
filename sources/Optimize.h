@@ -55,11 +55,10 @@ bool CheckExecutionTimeBound(VectorDynamic &exec, TaskSet &tasksOrg)
     return true;
 }
 
-template <class TaskType, template <typename> class Schedul_Analysis>
+template <class TaskSetType, class Schedul_Analysis>
 class Energy_Opt
 {
 public:
-    typedef std::vector<TaskType> TaskSetType;
     // TODO: whether warmStart assume sustainable?
     class ComputationFactor : public NoiseModelFactor1<VectorDynamic>
     {
@@ -74,15 +73,15 @@ public:
                                                     tasks_(tasks), lastTaskDoNotNeedOptimize(lastTaskDoNotNeedOptimize),
                                                     responseTimeInitial(responseTimeInitial)
         {
-            N = tasks_.size();
+            N = tasks_.tasks_.size();
         }
 
         void UpdateGlobalVector(VectorDynamic &responseTimeVec, double currentEnergyConsumption,
-                                const TaskSetType &taskDurOpt) const
+                                const TaskSet &taskDurOpt) const
         {
             for (int i = 0; i < N; i++)
             {
-                if (tasks_[i].deadline - responseTimeVec(i, 0) < 0 ||
+                if (tasks_.tasks_[i].deadline - responseTimeVec(i, 0) < 0 ||
                     (enableMaxComputationTimeRestrict &&
                      taskDurOpt[i].executionTimeOrg * MaxComputationTimeRestrict <
                          taskDurOpt[i].executionTime))
@@ -105,17 +104,17 @@ public:
         Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
         {
             TaskSetType taskDurOpt = tasks_;
-            UpdateTaskSetExecutionTime(taskDurOpt, executionTimeVector, lastTaskDoNotNeedOptimize);
-            VectorDynamic energyVec = EstimateEnergyTaskSet(taskDurOpt);
+            UpdateTaskSetExecutionTime(taskDurOpt.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
+            VectorDynamic energyVec = EstimateEnergyTaskSet(taskDurOpt.tasks_);
 
-            VectorDynamic responseTimeVec = ResponseTimeOfTaskSet<TaskType, Schedul_Analysis>(taskDurOpt, responseTimeInitial);
+            VectorDynamic responseTimeVec = ResponseTimeOfTaskSet<TaskSetType, Schedul_Analysis>(taskDurOpt, responseTimeInitial);
 
             boost::function<Matrix(const VectorDynamic &)> f2 =
                 [this](const VectorDynamic &executionTimeVector)
             {
                 TaskSetType taskT = tasks_;
-                UpdateTaskSetExecutionTime(taskT, executionTimeVector, lastTaskDoNotNeedOptimize);
-                return EstimateEnergyTaskSet(taskT);
+                UpdateTaskSetExecutionTime(taskT.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
+                return EstimateEnergyTaskSet(taskT.tasks_);
             };
 
             boost::function<Matrix(const VectorDynamic &)> f =
@@ -127,12 +126,12 @@ public:
                 for (int i = 0; i < N; i++)
                 {
                     // barrier function part
-                    err(i, 0) += Barrier(taskDurOpt[i].deadline - responseTimeVec(i, 0));
+                    err(i, 0) += Barrier(taskDurOpt.tasks_[i].deadline - responseTimeVec(i, 0));
                     if (enableMaxComputationTimeRestrict)
-                        err(i, 0) += Barrier(taskDurOpt[i].executionTimeOrg * MaxComputationTimeRestrict -
-                                             taskDurOpt[i].executionTime);
+                        err(i, 0) += Barrier(taskDurOpt.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict -
+                                             taskDurOpt.tasks_[i].executionTime);
                 }
-                UpdateGlobalVector(responseTimeVec, currentEnergyConsumption, taskDurOpt);
+                UpdateGlobalVector(responseTimeVec, currentEnergyConsumption, taskDurOpt.tasks_);
                 return err;
             };
 
@@ -167,7 +166,7 @@ public:
                     cout << Color::green << "The response time and deadline for each task is: " << Color::def << endl;
                     for (int i = 0; i < N; i++)
                     {
-                        cout << responseTimeVec(i) << ", " << taskDurOpt[i].deadline << endl;
+                        cout << responseTimeVec(i) << ", " << taskDurOpt.tasks_[i].deadline << endl;
                     }
                     err = f(executionTimeVector);
                 }
@@ -179,12 +178,12 @@ public:
 
     // ------------------
     // TODO: clamp turn 123.99 to 124 rather than 123
-    static void ClampComputationTime(TaskSetType &tasks, int lastTaskDoNotNeedOptimize,
+    static void ClampComputationTime(TaskSetType &tasksSetType, int lastTaskDoNotNeedOptimize,
                                      VectorDynamic &responseTimeInitial, string roundType)
     {
         if (roundType == "none")
             return;
-
+        TaskSet &tasks = tasksSetType.tasks_;
         for (uint i = 0; i < tasks.size(); i++)
             tasks[i].executionTime = int(tasks[i].executionTime);
         if (roundType == "rough")
@@ -237,8 +236,8 @@ public:
                     int mid = ceil((left + right) / 2.0);
 
                     tasks[currentIndex].executionTime = mid;
-                    schedulale_flag = CheckSchedulability<TaskType, Schedul_Analysis>(tasks,
-                                                                                      responseTimeInitial, debugMode == 1);
+                    schedulale_flag = CheckSchedulability<TaskSetType, Schedul_Analysis>(tasksSetType,
+                                                                                         responseTimeInitial, debugMode == 1);
                     if ((not schedulale_flag) ||
                         not WithInBound(tasks))
                     {
@@ -281,7 +280,6 @@ public:
             cout << "input error in ClampComputationTime: " << roundType << endl;
             throw;
         }
-
         return;
     }
 
@@ -296,29 +294,29 @@ public:
     {
         // update the tasks with the new optimal computationTimeVector
         TaskSetType tasksCurr = tasks;
-        int N = tasks.size();
+        int N = tasks.tasks_.size();
         for (int i = N - 1; i >= 0; i--)
         {
-            tasksCurr[i].executionTime += eliminateTolIte;
+            tasksCurr.tasks_[i].executionTime += eliminateTolIte;
 
             // we cannot use a more strict criteria in detecting schedulability,
             //  because it may trigger early detection of termination
 
             // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
             double tolerance = 0.0;
-            bool schedulable = CheckSchedulability<TaskType, Schedul_Analysis>(tasksCurr,
-                                                                               computationTimeWarmStart,
-                                                                               debugMode == 1, tolerance);
+            bool schedulable = CheckSchedulability<TaskSetType, Schedul_Analysis>(tasksCurr,
+                                                                                  computationTimeWarmStart,
+                                                                                  debugMode == 1, tolerance);
             if ((!schedulable) ||
                 (enableMaxComputationTimeRestrict &&
-                 tasksCurr[i].executionTime > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
+                 tasksCurr.tasks_[i].executionTime > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict))
 
                 // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
                 // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
                 //     tasksCurr[i].executionTime - eliminateTolIte + tolerance > tasks[i].executionTimeOrg * MaxComputationTimeRestrict)
                 return i;
             // recover tasksCurr[i].executionTime
-            tasksCurr[i].executionTime -= eliminateTolIte;
+            tasksCurr.tasks_[i].executionTime -= eliminateTolIte;
         }
         return -1;
     }
@@ -327,7 +325,7 @@ public:
                                           int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate,
                                           VectorDynamic &responseTimeInitial)
     {
-        int N = tasks.size();
+        int N = tasks.tasks_.size();
 
         // build the factor graph
         auto model = noiseModel::Isotropic::Sigma(N, noiseModelSigma);
@@ -399,17 +397,17 @@ public:
      * Perform optimization for one task set;
      * this function only performs optimization and elimination, it does not change weights
      **/
-    static double OptimizeTaskSetOneIte(TaskSetType &tasks)
+    static double OptimizeTaskSetOneIte(TaskSetType &taskSetType)
     {
-        int N = tasks.size();
+        int N = taskSetType.tasks_.size();
 
         // this function also checks schedulability
-        VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskType, Schedul_Analysis>(tasks);
-        if (!CheckSchedulabilityDirect<TaskType>(tasks, responseTimeInitial))
+        VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetType, Schedul_Analysis>(taskSetType);
+        if (!CheckSchedulabilityDirect<TaskSetType>(taskSetType, responseTimeInitial))
             return -2;
 
-        VectorDynamic initialExecutionTime = GetParameterVD<int>(tasks, "executionTimeOrg");
-        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(tasks,
+        VectorDynamic initialExecutionTime = GetParameterVD<int>(taskSetType, "executionTimeOrg");
+        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(taskSetType,
                                                                   -1, responseTimeInitial, eliminateTol);
 
         // computationTimeVectorLocalOpt is always stored in tasks
@@ -425,23 +423,23 @@ public:
             initialEstimateDuringOpt.resize(numberOfTasksNeedOptimize, 1);
             for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                 initialEstimateDuringOpt(i - lastTaskDoNotNeedOptimize - 1, 0) =
-                    tasks[i].executionTime;
+                    taskSetType.tasks_[i].executionTime;
 
-            responseTimeInitial = ResponseTimeOfTaskSet<TaskType, Schedul_Analysis>(tasks);
+            responseTimeInitial = ResponseTimeOfTaskSet<TaskSetType, Schedul_Analysis>(taskSetType);
             // perform optimization
 
-            auto variNew = UnitOptimization(tasks, lastTaskDoNotNeedOptimize,
+            auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
                                             initialEstimateDuringOpt, responseTimeInitial);
 
             // formulate new computationTime
-            UpdateTaskSetExecutionTime(tasks, vectorGlobalOpt);
+            UpdateTaskSetExecutionTime(taskSetType.tasks_, vectorGlobalOpt);
             // clamp with rough option seems to work better
-            ClampComputationTime(tasks,
+            ClampComputationTime(taskSetType,
                                  lastTaskDoNotNeedOptimize,
                                  responseTimeInitial, "rough");
             if (debugMode == 1)
                 cout << "After clamp: " << endl
-                     << GetParameterVD<double>(tasks, "executionTime") << endl;
+                     << GetParameterVD<double>(taskSetType.tasks_, "executionTime") << endl;
             // find variables to eliminate
             int adjustEliminateTolNum = 0;
             int lastTaskDoNotNeedOptimizeAfterOpt;
@@ -449,7 +447,7 @@ public:
             while (adjustEliminateTolNum < adjustEliminateMaxIte)
             {
                 lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
-                    tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, eliminateTolIte);
+                    taskSetType, lastTaskDoNotNeedOptimize, responseTimeInitial, eliminateTolIte);
                 if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
                     eliminateTolIte *= eliminateStep;
                 else
@@ -468,11 +466,11 @@ public:
                 break;
             }
         }
-        ClampComputationTime(tasks,
+        ClampComputationTime(taskSetType,
                              -1,
                              responseTimeInitial, roundTypeInClamp);
         // performance evaluation
-        if (CheckSchedulability<TaskType, Schedul_Analysis>(tasks))
+        if (CheckSchedulability<TaskSetType, Schedul_Analysis>(taskSetType))
         {
             if (debugMode == 1)
             {
@@ -482,35 +480,37 @@ public:
                 for (int i = 0; i < N; i++)
                 {
                     cout << i << " ";
-                    tasks[i].print();
+                    taskSetType.tasks_[i].print();
                 }
             }
-            auto tasksInit = tasks;
+            TaskSet tasksInit = taskSetType.tasks_;
             UpdateTaskSetExecutionTime(tasksInit, initialExecutionTime);
             double initialEnergyCost = EstimateEnergyTaskSet(tasksInit).sum();
-            double afterEnergyCost = EstimateEnergyTaskSet(tasks).sum();
+            double afterEnergyCost = EstimateEnergyTaskSet(taskSetType.tasks_).sum();
             if (debugMode == 1)
             {
                 cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
             }
             if (debugMode >= 1)
             {
-                double granularity = GetParameterVD<double>(tasks, "executionTime").maxCoeff() * 3e-5;
+                double granularity = GetParameterVD<double>(taskSetType, "executionTime").maxCoeff() * 3e-5;
                 // verify whether elimination is successful
-                if (CheckSchedulability<TaskType, Schedul_Analysis>(tasks))
+                if (CheckSchedulability<TaskSetType, Schedul_Analysis>(taskSetType))
                 {
-                    tasks[tasks.size() - 1].executionTime += granularity;
+                    Task &taskLast = taskSetType.tasks_[taskSetType.tasks_.size() - 1];
+                    taskLast.executionTime += granularity;
 
-                    if (CheckSchedulability<TaskType, Schedul_Analysis>(tasks))
+                    if (CheckSchedulability<TaskSetType, Schedul_Analysis>(taskSetType))
                     {
+
                         if (enableMaxComputationTimeRestrict &&
-                            tasks[tasks.size() - 1].executionTime <
-                                tasks[tasks.size() - 1].executionTimeOrg * MaxComputationTimeRestrict)
+                            taskLast.executionTime <
+                                taskLast.executionTimeOrg * MaxComputationTimeRestrict)
                         {
-                            if (tasks[tasks.size() - 1].executionTimeOrg /
-                                        tasks[tasks.size() - 1].period >
+                            if (taskLast.executionTimeOrg /
+                                        taskLast.period >
                                     0.03 &&
-                                eliminateTolIte / tasks[tasks.size() - 1].executionTime > 0.015)
+                                eliminateTolIte / taskLast.executionTime > 0.015)
                             {
                                 CoutWarning("Elimination failed in final verfication, \
                             eliminateTolIte used before is " +
@@ -518,7 +518,7 @@ public:
                             }
                         }
                     }
-                    tasks[tasks.size() - 1].executionTime -= granularity;
+                    taskLast.executionTime -= granularity;
                 }
             }
             if (runMode == "compare")
@@ -542,12 +542,12 @@ public:
     /**
  * initialize all the global variables
  */
-    static double OptimizeTaskSet(TaskSetType &tasks)
+    static double OptimizeTaskSet(TaskSetType &taskSetType)
     {
-        InitializeGlobalVector(tasks.size());
+        InitializeGlobalVector(taskSetType.tasks_.size());
         double eliminateTolRef = eliminateTol;
 
-        double res = OptimizeTaskSetOneIte(tasks);
+        double res = OptimizeTaskSetOneIte(taskSetType);
         // Some variables become 0, which actually means a failure
         if (isinf(res))
             res = 10;

@@ -1,7 +1,7 @@
 #include "../sources/WAPbatchOptimize.h"
 TEST(parameters, a1)
 {
-    BatchOptimize<Task, RTA_WAP>();
+    BatchOptimize();
 }
 int main()
 {

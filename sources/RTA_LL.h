@@ -3,39 +3,30 @@
 #include "Tasks.h"
 #include "Declaration.h"
 #include "RTA_BASE.h"
-template <class TaskType>
-class RTA_LL : public RTA_BASE<TaskType>
+
+class RTA_LL : public RTA_BASE<TaskSetNormal>
 {
 
 public:
-    typedef std::vector<TaskType> TaskSetType;
+    static double RTA_Common_Warm(double beginTime, const TaskSetNormal &tasks, int index)
+    {
+        TaskSet tasksHp;
+        for (int i = 0; i < index; i++)
+        {
+            tasksHp.push_back(tasks.tasks_.at(i));
+        }
+        return ResponseTimeAnalysisWarm(beginTime, tasks.tasks_.at(index), tasksHp);
+    }
+
+    // the rest are helper functions
     static string type()
     {
         return "LL";
     }
-    static double RTA_Common(const TaskSetType &tasks, int index)
-    {
-        TaskSetType tasksHp;
-        for (int i = 0; i < index; i++)
-        {
-            tasksHp.push_back(tasks.at(i));
-        }
-        return ResponseTimeAnalysis(tasks.at(index), tasksHp);
-    }
-    static double RTA_Common_Warm(double beginTime, const TaskSetType &tasks, int index)
-    {
-        TaskSetType tasksHp;
-        for (int i = 0; i < index; i++)
-        {
-            tasksHp.push_back(tasks.at(i));
-        }
-        return ResponseTimeAnalysisWarm(beginTime, tasks.at(index), tasksHp);
-    }
 
-    static double ResponseTimeAnalysisWarm_util_nece(double beginTime, const TaskType &taskCurr,
-                                                     const TaskSetType &tasksHighPriority)
+    static double ResponseTimeAnalysisWarm_util_nece(double beginTime, const Task &taskCurr,
+                                                     const TaskSet &tasksHighPriority)
     {
-        // if(tasksHighPriority[0].deadline==760830 )
         const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
         const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
         int N = periodHigh.size();
@@ -103,18 +94,17 @@ public:
         throw;
     }
 
-    static double ResponseTimeAnalysisWarm(const double beginTime, const TaskType &taskCurr,
-                                           const std::vector<TaskType> &tasksHighPriority)
+    static double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr,
+                                           const TaskSet &tasksHighPriority)
     {
         if (Utilization(tasksHighPriority) + taskCurr.utilization() >= 1.0)
         {
-            // cout << "The given task set is unschedulable\n";
             return INT32_MAX;
         }
         return ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHighPriority);
     }
 
-    static double ResponseTimeAnalysis(const TaskType &taskCurr, const std::vector<TaskType> &tasksHighPriority)
+    static double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
     {
         const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
         double executionTimeAll = taskCurr.executionTime;

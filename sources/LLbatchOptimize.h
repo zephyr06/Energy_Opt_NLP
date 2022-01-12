@@ -1,6 +1,9 @@
 #pragma once
 #include "BatchTestutils.h"
-template <class TaskType, template <typename> class Schedul_Analysis>
+#include "Optimize.h"
+#include "RTA_DAG.h"
+
+template <class TaskSetType, class Schedul_Analysis>
 void BatchOptimize(int Nn = -1)
 {
     const char *pathDataset;
@@ -27,10 +30,26 @@ void BatchOptimize(int Nn = -1)
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
             string path = pathDataset + file;
-            std::vector<TaskType> taskSet1 = ReadTaskSet(path, readTaskMode);
-            N = taskSet1.size();
+            TaskSetType tasksN;
+            if (TaskSetType::Type() == "normal")
+            {
+                auto tasks = ReadTaskSet(path, readTaskMode);
+                tasksN.UpdateTaskSet(tasks);
+                N = tasks.size();
+            }
+
+            else if (TaskSetType::Type() == "dag")
+            {
+                tasksN = ReadDAG_Tasks(path, readTaskMode);
+                N = tasksN.tasks_.size();
+            }
+            else
+            {
+                CoutError("Unrecognized TaskSetType!");
+            }
+
             auto start = chrono::high_resolution_clock::now();
-            double res = Energy_Opt<TaskType, Schedul_Analysis>::OptimizeTaskSet(taskSet1);
+            double res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
             // cout << "The energy saving ratio is " << res << endl;
             auto stop = chrono::high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);

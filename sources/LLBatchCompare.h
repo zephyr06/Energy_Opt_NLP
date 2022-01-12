@@ -1,7 +1,6 @@
 
 #pragma once
 #include "BatchTestutils.h"
-template <class TaskType, template <typename> class Schedul_Analysis>
 void BatchCompare(int N = -1)
 {
     const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
@@ -21,9 +20,10 @@ void BatchCompare(int N = -1)
         if (file.substr(0, file.find(delimiter)) == "periodic")
         {
             string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/" + file;
-            std::vector<TaskType> taskSet1 = ReadTaskSet(path, readTaskMode);
+            auto taskSet1 = ReadTaskSet(path, readTaskMode);
+            TaskSetNormal tasksN(taskSet1);
             auto start = chrono::high_resolution_clock::now();
-            double res = Energy_Opt<TaskType, Schedul_Analysis>::OptimizeTaskSet(taskSet1);
+            double res = Energy_Opt<TaskSetNormal, RTA_LL>::OptimizeTaskSet(tasksN);
             // cout << "The energy saving ratio is " << res << endl;
             auto stop = chrono::high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);

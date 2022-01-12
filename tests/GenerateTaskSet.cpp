@@ -113,11 +113,12 @@ int main(int argc, char *argv[])
                                             numberOfProcessor,
                                             periodMin,
                                             periodMax, deadlineType);
+            TaskSetNormal tasksN(tasks);
             if (schedulabilityCheck)
             {
                 if (schedulabilityCheck == 1)
                 {
-                    if (!CheckSchedulability<Task, RTA_LL>(tasks))
+                    if (!CheckSchedulability<TaskSetNormal, RTA_LL>(tasksN))
                     {
                         i--;
                         continue;

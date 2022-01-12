@@ -6,6 +6,7 @@
 #include "../sources/RTA_LL.h"
 #include "../sources/Parameters.h"
 #include "../sources/Optimize.h"
+#include "../sources/DAG_Task.h"
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 TEST(ReadTaskSet, p1)
@@ -29,6 +30,17 @@ TEST(parameters, a2)
     MatrixXd B = A;
     MatrixXd C = A * B;
     CHECK_EQUAL(30, C(0, 0));
+}
+
+TEST(read_dag, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
+
+    auto dagTasks = ReadDAG_Tasks(path, "RM");
+    AssertEqualScalar(2, dagTasks.mapPrev.size());
+    AssertEqualScalar(3, dagTasks.mapPrev[0].size());
+    AssertEqualScalar(3, dagTasks.mapPrev[1].size());
+    AssertEqualScalar(0, dagTasks.mapPrev[2].size());
 }
 
 int main()

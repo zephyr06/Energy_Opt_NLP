@@ -4,6 +4,7 @@ using namespace std::chrono;
 TEST(SA, v1)
 {
     TaskSet tasks = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv", "orig");
+    TaskSetNormal tasksN(tasks);
     // auto sth = Generate_WAP(tasks);
     // bool success;
     // std::tie(success, A_Global, P_Global) = sth;
@@ -12,7 +13,7 @@ TEST(SA, v1)
     //     CoutWarning("Unschedulable task set in SA test!");
     // }
     auto start = chrono::high_resolution_clock::now();
-    auto res = OptimizeSchedulingSA<Task, RTA_LL>(tasks);
+    auto res = OptimizeSchedulingSA<TaskSetNormal, RTA_LL>(tasksN);
     auto stop = chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
