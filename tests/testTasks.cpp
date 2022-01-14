@@ -42,6 +42,23 @@ TEST(read_dag, v1)
     AssertEqualScalar(3, GetDependentTasks(dagTasks, 1).size());
     AssertEqualScalar(0, GetDependentTasks(dagTasks, 2).size());
 }
+TEST(dag, v2)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
+
+    auto dagTasks = ReadDAG_Tasks(path, "orig");
+    double longest = dagTasks.CriticalPath();
+    AssertEqualScalar(35, longest, 1e-6, __LINE__);
+}
+
+TEST(dag, v3)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
+
+    auto dagTasks = ReadDAG_Tasks(path, "orig");
+    double longest = dagTasks.CriticalPath();
+    AssertEqualScalar(96, longest, 1e-6, __LINE__);
+}
 
 int main()
 {

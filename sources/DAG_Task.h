@@ -4,52 +4,61 @@
 #include <boost/utility.hpp> // for boost::tie
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
+#include <iomanip>
+#include <iostream>
 #include <boost/graph/graph_traits.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/graph/bellman_ford_shortest_paths.hpp>
 #include <boost/graph/topological_sort.hpp>
 
 #include "Tasks.h"
 
 typedef std::map<int, TaskSet> MAP_Prev;
 using namespace boost;
+typedef property<edge_weight_t, float> edge_weight_property;
 typedef adjacency_list<vecS, vecS, bidirectionalS,
-                       property<vertex_name_t, LLint>,
-                       property<edge_name_t, LLint>>
+                       property<vertex_name_t, int>,
+                       edge_weight_property>
     Graph;
 // map to access properties of vertex from the graph
 typedef property_map<Graph, vertex_name_t>::type Vertex_name_map_t;
 typedef graph_traits<Graph>::vertex_descriptor Vertex;
-typedef property_map<Graph, edge_name_t>::type edge_name_map_t;
+typedef property_map<Graph, edge_weight_t>::type edge_name_map_t;
+typedef Graph::edge_descriptor Edge;
 // map from task index to Vertex
 typedef std::unordered_map<int, Vertex> IndexVertexMap;
+
+void AddVertexMy(Graph &g, IndexVertexMap &indexesBGL, int taskIndex)
+{
+    // map to access vertex from its global index
+    Vertex_name_map_t vertex2index = get(vertex_name, g);
+    IndexVertexMap::iterator pos;
+    bool inserted;
+    Vertex u;
+    boost::tie(pos, inserted) = indexesBGL.insert(std::make_pair(taskIndex, Vertex()));
+    if (inserted)
+    {
+        u = add_vertex(g);
+        vertex2index[u] = taskIndex;
+        // make sure the inserted vertex in indexesBGL
+        //  is the same as the one inserted in the graph
+        pos->second = u;
+    }
+    else
+    {
+        CoutError("Error building indexVertexMap!");
+    }
+}
 
 pair<Graph, IndexVertexMap> EstablishGraphOnlyNodes(TaskSet &tasks)
 {
 
     Graph g;
-    // map to access properties of vertex from the graph
-    Vertex_name_map_t vertex2index = get(vertex_name, g);
-
-    // map to access vertex from its global index
 
     IndexVertexMap indexesBGL;
     for (uint i = 0; i < tasks.size(); i++)
     {
-        IndexVertexMap::iterator pos;
-        bool inserted;
-        Vertex u;
-        boost::tie(pos, inserted) = indexesBGL.insert(std::make_pair(i, Vertex()));
-        if (inserted)
-        {
-            u = add_vertex(g);
-            vertex2index[u] = i;
-            // make sure the inserted vertex in indexesBGL
-            //  is the same as the one inserted in the graph
-            pos->second = u;
-        }
-        else
-        {
-            CoutError("Error building indexVertexMap!");
-        }
+        AddVertexMy(g, indexesBGL, i);
     }
     return std::make_pair(g, indexesBGL);
 }
@@ -87,10 +96,30 @@ public:
 
     static string Type() { return "dag"; }
 
-    void addEdge(int prevIndex, int nextIndex)
+    /**
+     * @brief weight of edge is the same as child task's execution time
+     * 
+     * @param prevIndex 
+     * @param nextIndex 
+     */
+    void AddEdge(int prevIndex, int nextIndex)
     {
         // mapPrev[nextIndex].push_back(tasks_[prevIndex]);
-        boost::add_edge(prevIndex, nextIndex, graph_);
+        auto sth = boost::add_edge(prevIndex, nextIndex, graph_);
+        Edge edge = sth.first;
+
+        boost::property_map<Graph,
+                            boost::edge_weight_t>::type EdgeWeightMap = get(boost::edge_weight, graph_);
+
+        if (nextIndex < N)
+        {
+            EdgeWeightMap[edge] = tasks_[nextIndex].executionTime * -1;
+        }
+
+        else
+        {
+            EdgeWeightMap[edge] = 0;
+        }
         vertex2index_ = get(vertex_name, graph_);
     }
     TaskSet GetTasks() const
@@ -98,7 +127,7 @@ public:
         return tasks_;
     }
 
-    double volume()
+    double Volume()
     {
         double vol = 0;
         for (uint i = 0; i < tasks_.size(); i++)
@@ -107,9 +136,51 @@ public:
         }
         return vol;
     }
-    double criticalPath()
+    struct EdgeProperties
     {
-        return 0;
+        int weight;
+    };
+    double CriticalPath()
+    {
+        std::vector<Vertex> sources, sinks;
+
+        boost::graph_traits<Graph>::in_edge_iterator ei, edge_end_i;
+        boost::graph_traits<Graph>::out_edge_iterator eo, edge_end_o;
+        boost::graph_traits<Graph>::vertex_iterator vi, viEnd;
+        for (boost::tie(vi, viEnd) = vertices(graph_); vi != viEnd; ++vi)
+        {
+            boost::tie(ei, edge_end_i) = in_edges(*vi, graph_);
+            if (ei == edge_end_i)
+                sources.push_back(*vi);
+            boost::tie(eo, edge_end_o) = out_edges(*vi, graph_);
+            if (eo == edge_end_o)
+                sinks.push_back(*vi);
+        }
+        AddVertexMy(graph_, index2Vertex_, N);
+        AddVertexMy(graph_, index2Vertex_, N + 1);
+        for (Vertex sourceVertex : sources)
+        {
+            AddEdge(N, sourceVertex);
+        }
+        for (Vertex sinkVertex : sinks)
+        {
+            AddEdge(sinkVertex, N + 1);
+        }
+
+        // Using bellman_ford_shortest_paths
+        edge_name_map_t weight_pmap = get(edge_weight, graph_);
+        std::vector<int> distance(N + 2, (std::numeric_limits<short>::max)());
+        distance[N] = 0;
+        std::vector<std::size_t> parent(N + 2);
+        for (int i = 0; i < N + 2; ++i)
+            parent[i] = i;
+
+        bellman_ford_shortest_paths(graph_, int(N + 2),
+                                    weight_map(weight_pmap)
+                                        .distance_map(&distance[0])
+                                        .predecessor_map(&parent[0]));
+
+        return distance.back() * -1;
     }
 };
 
@@ -143,7 +214,7 @@ DAG_Model ReadDAG_Tasks(string path, string priorityType = "orig")
             }
             dataInLine.push_back(atoi(line.c_str()));
             // mapPrev[dataInLine[1]].push_back(tasks[dataInLine[0]]);
-            dagModel.addEdge(dataInLine[1], dataInLine[0]);
+            dagModel.AddEdge(dataInLine[0], dataInLine[1]);
         }
 
         if (debugMode == 1)
@@ -163,10 +234,10 @@ vector<int> GetDependentTasks(DAG_Model &dagTasks, int index)
 {
     vector<int> dependentIndexes;
     Vertex v = dagTasks.index2Vertex_[index];
-    boost::graph_traits<Graph>::out_edge_iterator eo, edge_end_o;
-    for (boost::tie(eo, edge_end_o) = out_edges(v, dagTasks.graph_); eo != edge_end_o; ++eo)
+    boost::graph_traits<Graph>::in_edge_iterator ei, edge_end_i;
+    for (boost::tie(ei, edge_end_i) = in_edges(v, dagTasks.graph_); ei != edge_end_i; ++ei)
     {
-        Vertex vvv = target(*eo, dagTasks.graph_);
+        Vertex vvv = source(*ei, dagTasks.graph_);
         dependentIndexes.push_back(dagTasks.vertex2index_[vvv]);
     }
     return dependentIndexes;
