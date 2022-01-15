@@ -14,8 +14,6 @@ public:
     }
     RTA_WAP(const TaskSetNormal &tasks) : RTA_BASE(tasks) {}
 
-
-
     static string type()
     {
         return "WAP";
@@ -34,7 +32,7 @@ public:
         }
         return -1;
     }
-    double RTA_Common(const TaskSetNormal &tasks, int index)
+    double RTA_Common(int index)
     {
         double beginTime = tasks.tasks_.at(index).executionTime;
         return RTA_Common_Warm(beginTime, index);

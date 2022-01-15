@@ -135,12 +135,14 @@ int main(int argc, char *argv[])
         else if (taskType == 1)
         {
             std::vector<DAG_Model> dagTaskSet;
+            vector<double> utilVec = Uunifast(N, totalUtilization);
             for (int i = 0; i < N; i++)
             {
-                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, 2 * N)), totalUtilization,
+                int periodCurr = RandRange(periodMin, periodMax);
+                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, 2 * N)), utilVec[i],
                                                  numberOfProcessor,
-                                                 periodMin,
-                                                 periodMax, deadlineType));
+                                                 periodCurr,
+                                                 periodCurr, deadlineType));
             }
 
             string fileName = "dag-Melani-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".csv";

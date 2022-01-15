@@ -13,7 +13,6 @@ public:
     rta.reserve(tasks.N);
     for (int i = 0; i < tasks.N; i++)
       rta.push_back(-1);
-    rta[0] = BasicComputation(0);
   }
 
   double RTA_Common_Warm(double beginTime, int index) override
@@ -24,13 +23,18 @@ public:
     {
       return rta[index];
     }
+    else if (index == 0)
+    {
+      rta[0] = BasicComputation(0);
+      return rta[0];
+    }
     else
     {
       double rtaLeft = 0;
       double rtaBasic = BasicComputation(index);
       double rtaRight = rtaBasic;
       double cycleCount = 0;
-      while (rtaLeft <= rtaRight)
+      while (rtaLeft < rtaRight)
       {
         rtaLeft = rtaRight;
         rtaRight = rtaBasic + Interference(index, rtaLeft) / core_m_dag;
@@ -50,9 +54,14 @@ public:
     return 0;
   }
 
+  double RTA_Common(int index)
+  {
+    return RTA_Common_Warm(0, index);
+  }
+
   inline double BasicComputation(int index)
   {
-    return tasks.longestVec_[index] + 1 / core_m_dag * (tasks.volumeVec_[index] - tasks.longestVec_[index]);
+    return tasks.longestVec_[index] + 1.0 / core_m_dag * (tasks.volumeVec_[index] - tasks.longestVec_[index]);
   }
 
   double Interference(int index, double rtaIte)

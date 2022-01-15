@@ -168,8 +168,8 @@ tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
     // check the last task
     TaskSet tasksT = tasks;
     TaskSetNormal tasksNormal(tasksT);
-    RTA_WAP rtaWap;
-    if (rtaWap.RTA_Common(tasksNormal, N - 1) <= tasks.at(N - 1).deadline)
+    RTA_WAP rtaWap(tasks);
+    if (rtaWap.RTA_Common(N - 1) <= tasks.at(N - 1).deadline)
     {
         return make_tuple(1, A, P);
     }

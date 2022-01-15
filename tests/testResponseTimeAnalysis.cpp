@@ -324,21 +324,31 @@ TEST(GenerateWAP, v6)
 
 TEST(dag, v1)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v28.csv";
 
-    auto dagTasks = ReadDAG_Task(path, "RM");
-    double expect = 1;
+    auto dagTasks = ReadDAG_Tasks(path, "orig");
     RTA_DAG rtaDag(dagTasks);
+    core_m_dag = 1;
+    double expect = 17;
     double actual = rtaDag.RTA_Common_Warm(0, 0);
     AssertEqualScalar(expect, actual);
 }
 TEST(dag, v2)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v28.csv";
 
-    auto dagTasks = ReadDAG_Task(path, "RM");
+    auto dagTasks = ReadDAG_Tasks(path, "orig");
     RTA_DAG rtaDag(dagTasks);
-    AssertBool(true, rtaDag.CheckSchedulability());
+
+    core_m_dag = 2;
+
+    double expect = 14;
+    double actual = rtaDag.RTA_Common_Warm(0, 0);
+    AssertEqualScalar(expect, actual);
+
+    expect = 15.5;
+    actual = rtaDag.RTA_Common(1);
+    AssertEqualScalar(expect, actual, 1e-1, __LINE__);
 }
 int main()
 {

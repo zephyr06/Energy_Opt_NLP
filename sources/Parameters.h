@@ -52,7 +52,7 @@ const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
 const int debugMode = (int)ConfigParameters["debugMode"];
 const int adjustEliminateMaxIte = (int)ConfigParameters["adjustEliminateMaxIte"];
-const int core_m_dag = (int)ConfigParameters["core_m_dag"];
+int core_m_dag = (int)ConfigParameters["core_m_dag"];
 
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];

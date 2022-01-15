@@ -299,6 +299,8 @@ TaskSetDAG ReadDAG_Tasks(string path, string priorityType = "orig")
                 line.erase(0, pos + delimiter.length());
             }
             dataInLine.push_back(atoi(line.c_str()));
+            if (dataInLine.size() < 9)
+                CoutError("The path in ReadDAG_Tasks doesn't follow Melani format!");
             longestVec.push_back(dataInLine.back());
             dataInLine.pop_back();
             volumeVec.push_back(dataInLine.back());
