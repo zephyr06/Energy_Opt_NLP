@@ -19,8 +19,10 @@ OptimizeResult OptimizeSchedulingSA(TaskSetType &tasks)
     int lastTaskDoNotNeedOptimize = -1;
     VectorDynamic initialEstimate = GetParameterVD<int>(tasks, "executionTime");
     VectorDynamic periods = GetParameterVD<int>(tasks, "period");
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetType, RTA_LL>(tasks);
-    if (!CheckSchedulabilityDirect<TaskSetType>(tasks, responseTimeInitial))
+    RTA_LL r(tasks);
+    VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
+
+    if (!r.CheckSchedulabilityDirect(responseTimeInitial))
         return {INT_MAX, INT_MAX,
                 initialEstimate, initialEstimate};
     Symbol key('a', 0);

@@ -106,8 +106,8 @@ public:
             TaskSetType taskDurOpt = tasks_;
             UpdateTaskSetExecutionTime(taskDurOpt.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
             VectorDynamic energyVec = EstimateEnergyTaskSet(taskDurOpt.tasks_);
-
-            VectorDynamic responseTimeVec = ResponseTimeOfTaskSet<TaskSetType, Schedul_Analysis>(taskDurOpt, responseTimeInitial);
+            Schedul_Analysis r(taskDurOpt);
+            VectorDynamic responseTimeVec = r.ResponseTimeOfTaskSet(responseTimeInitial);
 
             boost::function<Matrix(const VectorDynamic &)> f2 =
                 [this](const VectorDynamic &executionTimeVector)
@@ -236,8 +236,9 @@ public:
                     int mid = ceil((left + right) / 2.0);
 
                     tasks[currentIndex].executionTime = mid;
-                    schedulale_flag = CheckSchedulability<TaskSetType, Schedul_Analysis>(tasksSetType,
-                                                                                         responseTimeInitial, debugMode == 1);
+                    Schedul_Analysis r(tasks);
+                    schedulale_flag = r.CheckSchedulability(
+                        responseTimeInitial, debugMode == 1);
                     if ((not schedulale_flag) ||
                         not WithInBound(tasks))
                     {
@@ -304,9 +305,13 @@ public:
 
             // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
             double tolerance = 0.0;
-            bool schedulable = CheckSchedulability<TaskSetType, Schedul_Analysis>(tasksCurr,
-                                                                                  computationTimeWarmStart,
-                                                                                  debugMode == 1, tolerance);
+            Schedul_Analysis r(tasksCurr);
+            bool schedulable = r.CheckSchedulability(
+                computationTimeWarmStart,
+                debugMode == 1, tolerance);
+            // bool schedulable = Schedul_Analysis::CheckSchedulability(tasksCurr,
+            //                                                          computationTimeWarmStart,
+            //                                                          debugMode == 1, tolerance);
             if ((!schedulable) ||
                 (enableMaxComputationTimeRestrict &&
                  tasksCurr.tasks_[i].executionTime > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict))
@@ -402,8 +407,9 @@ public:
         int N = taskSetType.tasks_.size();
 
         // this function also checks schedulability
-        VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetType, Schedul_Analysis>(taskSetType);
-        if (!CheckSchedulabilityDirect<TaskSetType>(taskSetType, responseTimeInitial))
+        Schedul_Analysis r(taskSetType);
+        VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
+        if (!r.CheckSchedulabilityDirect(responseTimeInitial))
             return -2;
 
         VectorDynamic initialExecutionTime = GetParameterVD<int>(taskSetType, "executionTimeOrg");
@@ -424,8 +430,8 @@ public:
             for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                 initialEstimateDuringOpt(i - lastTaskDoNotNeedOptimize - 1, 0) =
                     taskSetType.tasks_[i].executionTime;
-
-            responseTimeInitial = ResponseTimeOfTaskSet<TaskSetType, Schedul_Analysis>(taskSetType);
+            Schedul_Analysis r2(taskSetType);
+            responseTimeInitial = r2.ResponseTimeOfTaskSet();
             // perform optimization
 
             auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
@@ -470,7 +476,8 @@ public:
                              -1,
                              responseTimeInitial, roundTypeInClamp);
         // performance evaluation
-        if (CheckSchedulability<TaskSetType, Schedul_Analysis>(taskSetType))
+        Schedul_Analysis r2(taskSetType);
+        if (r2.CheckSchedulability())
         {
             if (debugMode == 1)
             {
@@ -495,12 +502,14 @@ public:
             {
                 double granularity = GetParameterVD<double>(taskSetType, "executionTime").maxCoeff() * 3e-5;
                 // verify whether elimination is successful
-                if (CheckSchedulability<TaskSetType, Schedul_Analysis>(taskSetType))
+                Schedul_Analysis r1(taskSetType);
+                if (r1.CheckSchedulability())
+                // if (Schedul_Analysis::CheckSchedulability(taskSetType))
                 {
                     Task &taskLast = taskSetType.tasks_[taskSetType.tasks_.size() - 1];
                     taskLast.executionTime += granularity;
-
-                    if (CheckSchedulability<TaskSetType, Schedul_Analysis>(taskSetType))
+                    Schedul_Analysis r2(taskSetType);
+                    if (r2.CheckSchedulability())
                     {
 
                         if (enableMaxComputationTimeRestrict &&

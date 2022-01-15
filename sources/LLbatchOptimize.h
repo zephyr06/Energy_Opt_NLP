@@ -40,7 +40,7 @@ void BatchOptimize(int Nn = -1)
 
             else if (TaskSetType::Type() == "dag")
             {
-                tasksN = ReadDAG_Task(path, readTaskMode);
+                tasksN = ReadDAG_Tasks(path, readTaskMode);
                 N = tasksN.tasks_.size();
             }
             else

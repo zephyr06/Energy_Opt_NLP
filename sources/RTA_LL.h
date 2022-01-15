@@ -119,14 +119,4 @@ public:
             executionTimeAll += task.executionTime;
         return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
     }
-
-    // bool CheckSchedulability(VectorDynamic warmStart,
-    //                          bool whetherPrint = false, double tol = 0)
-    // {
-    //     return RTA_BASE(warmStart, whetherPrint, tol);
-    // }
-    // bool CheckSchedulability(bool whetherPrint = false)
-    // {
-    //     return RTA_BASE(whetherPrint, tol);
-    // }
 };

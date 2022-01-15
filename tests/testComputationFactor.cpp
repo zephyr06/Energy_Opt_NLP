@@ -9,7 +9,8 @@ TEST(evaluateError, v1)
     int N = tasks.size();
     InitializeGlobalVector(tasks.size());
     int lastTaskDoNotNeedOptimize = -1;
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
+    RTA_LL r(tasks);
+    VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
     Symbol key('a', 0);
 
     auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
@@ -31,7 +32,8 @@ TEST(evaluateError, v2)
     int N = tasks.size();
     InitializeGlobalVector(tasks.size());
     int lastTaskDoNotNeedOptimize = -1;
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
+    RTA_LL r(tasks);
+    VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
     Symbol key('a', 0);
 
     auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);

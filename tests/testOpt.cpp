@@ -18,7 +18,8 @@ TEST(FindTaskDoNotNeedOptimize, A1)
     TaskSetNormal taskSetNormal(tasks);
     InitializeGlobalVector(tasks.size());
     int N = tasks.size();
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
+    RTA_LL r(tasks);
+    VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
     VectorDynamic initialExecutionTime;
     initialExecutionTime.resize(N, 1);
     for (int i = 0; i < N; i++)
@@ -154,7 +155,8 @@ TEST(unitOptimization, a1)
     initialEstimate.resize((N - lastTaskDoNotNeedOptimize - 1), 1);
     initialEstimate << 62;
 
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(taskSet1);
+    RTA_LL r(taskSet1);
+    VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
     vectorGlobalOpt.resize(N, 1);
     VectorDynamic res1 = Opt_LL::UnitOptimization(taskSetNormal, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
     cout << endl;
@@ -242,8 +244,8 @@ TEST(ClampComputationTime, a1)
     VectorDynamic initialEstimate;
     initialEstimate.resize((N - lastTaskDoNotNeedOptimize - 1), 1);
     initialEstimate << 62;
-
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(taskSet1);
+    RTA_LL r(taskSet1);
+    VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
     vectorGlobalOpt.resize(N, 1);
     TaskSetNormal taskSetNormal(taskSet1);
     VectorDynamic res1 = Opt_LL::UnitOptimization(taskSetNormal, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
@@ -276,7 +278,9 @@ TEST(ClampComputationTime, v3)
     initialEstimate.resize(N, 1);
     initialEstimate << 15.2, 13.1, 12.1, 16.2, 19.5;
     UpdateTaskSetExecutionTime(tasks, initialEstimate);
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
+    RTA_LL r(tasks);
+    VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
+
     TaskSetNormal taskSetNormal(tasks);
     Opt_LL::ClampComputationTime(taskSetNormal, lastTaskDoNotNeedOptimize, responseTimeInitial, "fine");
     VectorDynamic expect1 = initialEstimate;
@@ -304,7 +308,8 @@ TEST(ClampComputationTime, v2)
     initialEstimate.resize(N, 1);
     initialEstimate << 15.2, 13.1, 12.1, 16.2, 19.5;
     UpdateTaskSetExecutionTime(tasks, initialEstimate);
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
+    RTA_LL r(tasks);
+    VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
     Opt_LL::ClampComputationTime(taskSetNormal, lastTaskDoNotNeedOptimize, responseTimeInitial, "fine");
     VectorDynamic expect1 = initialEstimate;
     expect1 << 20, 22, 24, 26, 28;

@@ -19,7 +19,7 @@ template <class TaskSetType>
 class RTA_BASE
 {
 public:
-    TaskSetType tasks;
+     TaskSetType tasks;
     RTA_BASE() {}
     RTA_BASE(const TaskSetType &tasks) : tasks(tasks) {}
 
