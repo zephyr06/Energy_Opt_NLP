@@ -8,7 +8,14 @@ class RTA_LL : public RTA_BASE<TaskSetNormal>
 {
 
 public:
-    static double RTA_Common_Warm(double beginTime, const TaskSetNormal &tasks, int index)
+    RTA_LL(const TaskSet &tasksI)
+    {
+        TaskSetNormal tasksN(tasksI);
+        tasks = tasksN;
+    }
+    RTA_LL(const TaskSetNormal &tasks) : RTA_BASE(tasks) {}
+
+    double RTA_Common_Warm(double beginTime, int index) override
     {
         TaskSet tasksHp;
         for (int i = 0; i < index; i++)
@@ -24,8 +31,8 @@ public:
         return "LL";
     }
 
-    static double ResponseTimeAnalysisWarm_util_nece(double beginTime, const Task &taskCurr,
-                                                     const TaskSet &tasksHighPriority)
+    double ResponseTimeAnalysisWarm_util_nece(double beginTime, const Task &taskCurr,
+                                              const TaskSet &tasksHighPriority)
     {
         const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
         const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
@@ -41,7 +48,7 @@ public:
         }
         else if (isnan(taskCurr.executionTime) || isnan(beginTime))
         {
-            cout << red << "Nan executionTime detected" << def << endl;
+            cout << Color::red << "Nan executionTime detected" << def << endl;
             throw "Nan";
         }
         else if (taskCurr.executionTime < 0)
@@ -94,8 +101,8 @@ public:
         throw;
     }
 
-    static double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr,
-                                           const TaskSet &tasksHighPriority)
+    double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr,
+                                    const TaskSet &tasksHighPriority)
     {
         if (Utilization(tasksHighPriority) + taskCurr.utilization() >= 1.0)
         {
@@ -104,7 +111,7 @@ public:
         return ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHighPriority);
     }
 
-    static double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
+    double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
     {
         const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
         double executionTimeAll = taskCurr.executionTime;
@@ -112,4 +119,14 @@ public:
             executionTimeAll += task.executionTime;
         return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
     }
+
+    // bool CheckSchedulability(VectorDynamic warmStart,
+    //                          bool whetherPrint = false, double tol = 0)
+    // {
+    //     return RTA_BASE(warmStart, whetherPrint, tol);
+    // }
+    // bool CheckSchedulability(bool whetherPrint = false)
+    // {
+    //     return RTA_BASE(whetherPrint, tol);
+    // }
 };

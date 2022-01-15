@@ -4,6 +4,7 @@
 #include <boost/program_options/options_description.hpp>
 
 #include "Tasks.h"
+#include "DAG_Task.h"
 #include "Parameters.h"
 
 namespace po = boost::program_options;
@@ -75,5 +76,45 @@ void WriteTaskSets(ofstream &file, TaskSet &tasks)
              << tasks[i].period << "," << tasks[i].overhead << ","
              << tasks[i].executionTime << "," << tasks[i].deadline
              << "," << tasks[i].processorId << "\n";
+    }
+}
+
+DAG_Model GenerateDAG(int N, double totalUtilization,
+                      int numberOfProcessor, int periodMin,
+                      int periodMax, int deadlineType = 0)
+{
+
+    TaskSet tasks = GenerateTaskSet(N, totalUtilization,
+                                    numberOfProcessor, periodMin, periodMax, deadlineType);
+
+    DAG_Model dagModel(tasks);
+    // add edges randomly
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = i + 1; j < N; j++)
+        {
+            if (double(rand()) / RAND_MAX < parallelFactor)
+            {
+                dagModel.AddEdge(i, j);
+            }
+        }
+    }
+    return dagModel;
+}
+
+void WriteDAGMelani(ofstream &file, std::vector<DAG_Model> &tasks)
+{
+    int NN = tasks.size();
+    file << "JobID,Offset,Period,Overhead,ExecutionTime,DeadLine,processorId,volume,longestPath\n";
+    for (int i = 0; i < NN; i++)
+    {
+        file << i << "," << tasks[i].tasks_[0].offset << ","
+             << tasks[i].tasks_[0].period << "," << tasks[i].tasks_[0].overhead << ","
+             << tasks[i].tasks_[0].executionTime << ","
+             << tasks[i].tasks_[0].deadline << ","
+             << tasks[i].tasks_[0].processorId << ","
+             << tasks[i].Volume() << ","
+             << tasks[i].CriticalPath()
+             << "\n";
     }
 }

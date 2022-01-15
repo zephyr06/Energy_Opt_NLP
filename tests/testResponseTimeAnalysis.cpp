@@ -18,7 +18,8 @@ TEST(RTA, RTA0)
 
     int rta3Expect = 282;
     TaskSet hp({task_set[0], task_set[1]});
-    CHECK_EQUAL(rta3Expect, RTA_LL::ResponseTimeAnalysisWarm(rta3Expect - 100, task_set[2], hp));
+    RTA_LL r(task_set);
+    CHECK_EQUAL(rta3Expect, r.ResponseTimeAnalysisWarm(rta3Expect - 100, task_set[2], hp));
 }
 TEST(RTA, RTA1)
 {
@@ -26,7 +27,8 @@ TEST(RTA, RTA1)
 
     int rta3Expect = 282;
     TaskSet hp({task_set[0], task_set[1]});
-    int rta3Actual = RTA_LL::ResponseTimeAnalysis(task_set[2], hp);
+    RTA_LL r(task_set);
+    int rta3Actual = r.ResponseTimeAnalysis(task_set[2], hp);
     CHECK_EQUAL(rta3Expect, rta3Actual);
 }
 TEST(RTA, RTA2)
@@ -35,30 +37,32 @@ TEST(RTA, RTA2)
 
     int rta2Expect = 265;
     TaskSet hp2({task_set[0]});
-    int rta2Actual = RTA_LL::ResponseTimeAnalysis(task_set[1], hp2);
+    RTA_LL r(task_set);
+    int rta2Actual = r.ResponseTimeAnalysis(task_set[1], hp2);
     CHECK_EQUAL(rta2Expect, rta2Actual);
 
     int rta1Expect = 12;
     TaskSet hp3({});
-    int rta1Actual = RTA_LL::ResponseTimeAnalysis(task_set[0], hp3);
+    int rta1Actual = r.ResponseTimeAnalysis(task_set[0], hp3);
     CHECK_EQUAL(rta1Expect, rta1Actual);
 }
 TEST(RTA, RTA3)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
-
+    RTA_LL r(task_set);
     int rta1Expect = 12;
     TaskSet hp3({});
-    int rta1Actual = RTA_LL::ResponseTimeAnalysis(task_set[0], hp3);
+    int rta1Actual = r.ResponseTimeAnalysis(task_set[0], hp3);
     CHECK_EQUAL(rta1Expect, rta1Actual);
 }
 TEST(RTA, RTA4)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+    RTA_LL r(task_set);
     TaskSetNormal tasks(task_set);
     VectorDynamic expect = GenerateVectorDynamic(5);
     expect << 10, 21, 33, 46, 60;
-    VectorDynamic actual = ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks);
+    VectorDynamic actual = r.ResponseTimeOfTaskSet();
     AssertEigenEqualVector(expect, actual);
 }
 TEST(GetBusyPeriod, v1)
@@ -111,7 +115,8 @@ TEST(RTA, ResponseTimeAnalysisWarm)
     double rta3Expect = 282 + delta * 1;
     TaskSet hp({task_set[0], task_set[1]});
     task_set[2].executionTime += delta;
-    double rta3Actual = RTA_LL::ResponseTimeAnalysisWarm(rta3Expect - 100, task_set[2], hp);
+    RTA_LL r(task_set);
+    double rta3Actual = r.ResponseTimeAnalysisWarm(rta3Expect - 100, task_set[2], hp);
     CHECK_EQUAL(rta3Expect, rta3Actual);
     cout << "RTA "
          << "ResponseTimeAnalysisWarm"
@@ -122,27 +127,18 @@ TEST(RTA_LL, v1)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n30_v2.csv", "RM");
     TaskSetNormal tasks(task_set);
-    AssertBool(true, CheckSchedulability<TaskSetNormal, RTA_LL>(tasks, true));
+    RTA_LL r(task_set);
+    AssertBool(true, r.CheckSchedulability(true));
 }
 
-// TEST(Schedulability, p1)
-// {
-//     string path2 = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-//     auto task_set = ReadTaskSet(path2, "RM");
-//     bool schedulable = CheckSchedulability<RTA_LL>(task_set);
-//     if (not schedulable)
-//     {
-//         cout << "The test set in schedulablability test didn't pass!\n";
-//         throw;
-//     }
-// }
 TEST(RTA, ResponseTimeOfTaskSet)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
     TaskSetNormal tasks(task_set);
     int rta3Expect = 282;
     TaskSet hp({task_set[0], task_set[1]});
-    int rta3Actual = int(ResponseTimeOfTaskSet<TaskSetNormal, RTA_LL>(tasks)(2, 0));
+    RTA_LL r(task_set);
+    int rta3Actual = int(r.ResponseTimeOfTaskSet()(2, 0));
     CHECK_EQUAL(rta3Expect, rta3Actual);
 }
 
@@ -155,7 +151,8 @@ TEST(wap, v1)
     VectorDynamic expect;
     expect.resize(5, 1);
     expect << 10, 21, 33, 46, 60;
-    VectorDynamic actual = ResponseTimeOfTaskSet<TaskSetNormal, RTA_WAP>(tasks);
+    RTA_WAP r(task_set);
+    VectorDynamic actual = r.ResponseTimeOfTaskSet();
     AssertEigenEqualVector(expect, actual);
 }
 
@@ -168,7 +165,8 @@ TEST(wap, v2)
     VectorDynamic expect;
     expect.resize(5, 1);
     expect << 10, 31, 55, 82, 112;
-    VectorDynamic actual = ResponseTimeOfTaskSet<TaskSetNormal, RTA_WAP>(task_set);
+    RTA_WAP r(task_set);
+    VectorDynamic actual = r.ResponseTimeOfTaskSet();
     AssertEigenEqualVector(expect, actual);
 }
 
@@ -191,7 +189,8 @@ TEST(wap, v3)
     VectorDynamic expect;
     expect.resize(5, 1);
     expect << 10, 31, 54, 81, 110;
-    VectorDynamic actual = ResponseTimeOfTaskSet<TaskSetNormal, RTA_WAP>(task_set);
+    RTA_WAP r(task_set);
+    VectorDynamic actual = r.ResponseTimeOfTaskSet();
     AssertEigenEqualVector(expect, actual);
 }
 
@@ -327,17 +326,19 @@ TEST(dag, v1)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
 
-    auto dagTasks = ReadDAG_Tasks(path, "RM");
+    auto dagTasks = ReadDAG_Task(path, "RM");
     double expect = 1;
-    double actual = RTA_DAG::RTA_Common(dagTasks, 0);
+    RTA_DAG rtaDag(dagTasks);
+    double actual = rtaDag.RTA_Common_Warm(0, 0);
     AssertEqualScalar(expect, actual);
 }
 TEST(dag, v2)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
 
-    auto dagTasks = ReadDAG_Tasks(path, "RM");
-    AssertBool(true, CheckSchedulability<DAG_Model, RTA_DAG>(dagTasks));
+    auto dagTasks = ReadDAG_Task(path, "RM");
+    RTA_DAG rtaDag(dagTasks);
+    AssertBool(true, rtaDag.CheckSchedulability());
 }
 int main()
 {

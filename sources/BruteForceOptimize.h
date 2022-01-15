@@ -7,8 +7,8 @@ double OptimizeTaskSetBf3(TaskSet &tasks, int granularity = granularityInBF)
     int N = tasks.size();
 
     // this function also checks schedulability
-    VectorDynamic responseTimeInitial = ResponseTimeOfTaskSet<Task, RTA_LL>(tasks);
-    if (!CheckSchedulabilityDirect<Task>(tasks, responseTimeInitial))
+    VectorDynamic responseTimeInitial = RTA_LL::ResponseTimeOfTaskSet(tasks);
+    if (!RTA_LL::CheckSchedulabilityDirect(tasks, responseTimeInitial))
         return -2;
 
     double minEnergy = INT64_MAX;
@@ -35,7 +35,7 @@ double OptimizeTaskSetBf3(TaskSet &tasks, int granularity = granularityInBF)
                 executionTimeVector << firstTaskExe, secondTaskExe, thirdTaskExe;
                 TaskSet taskSetCurr_ = tasks;
                 UpdateTaskSetExecutionTime(taskSetCurr_, executionTimeVector);
-                if (CheckSchedulability<RTA_LL>(taskSetCurr_))
+                if (RTA_LL::CheckSchedulability(taskSetCurr_))
                 {
                     double energyCurr = EstimateEnergyTaskSet(tasks, executionTimeVector).sum();
                     if (energyCurr < minEnergy)
@@ -58,6 +58,5 @@ double OptimizeTaskSetBf3(TaskSet &tasks, int granularity = granularityInBF)
     cout << "The global optimal computation time vector is " << minExecutionTime << endl;
     TaskSet taskSetCurr_ = tasks;
     UpdateTaskSetExecutionTime(taskSetCurr_, minExecutionTime);
-    bool dummy = CheckSchedulability<RTA_LL>(taskSetCurr_, true);
     return minEnergy / initialEnergyCost;
 }

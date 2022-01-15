@@ -63,35 +63,44 @@ pair<Graph, IndexVertexMap> EstablishGraphOnlyNodes(TaskSet &tasks)
     return std::make_pair(g, indexesBGL);
 }
 
-class DAG_Model : public TaskSetNormal
+class DAG_Model
 {
 public:
+    TaskSet tasks_;
     Graph graph_;
     IndexVertexMap index2Vertex_;
     Vertex_name_map_t vertex2index_;
     int N;
+    double longestPath;
+    double volume;
 
     DAG_Model()
     {
-        ;
+        longestPath = 0;
+        volume = 0;
     }
-    DAG_Model(TaskSet &tasks) : TaskSetNormal(tasks)
+    DAG_Model(TaskSet &tasks)
     {
+        tasks_ = tasks;
         N = tasks.size();
         auto ss = EstablishGraphOnlyNodes(tasks);
         graph_ = ss.first;
         index2Vertex_ = ss.second;
         vertex2index_ = get(vertex_name, graph_);
+        longestPath = 0;
+        volume = 0;
     }
     // constructors for DAG specifically
     DAG_Model(TaskSet &tasks, Graph &graph,
               IndexVertexMap &index2Vertex,
-              Vertex_name_map_t &vertex2index) : TaskSetNormal(tasks),
+              Vertex_name_map_t &vertex2index) : tasks_(tasks),
                                                  graph_(graph),
                                                  index2Vertex_(index2Vertex),
                                                  vertex2index_(vertex2index)
     {
         N = tasks.size();
+        longestPath = 0;
+        volume = 0;
     }
 
     static string Type() { return "dag"; }
@@ -129,12 +138,13 @@ public:
 
     double Volume()
     {
-        double vol = 0;
+        if (volume)
+            return volume;
         for (uint i = 0; i < tasks_.size(); i++)
         {
-            vol += tasks_[i].executionTime;
+            volume += tasks_[i].executionTime;
         }
-        return vol;
+        return volume;
     }
     struct EdgeProperties
     {
@@ -142,6 +152,8 @@ public:
     };
     double CriticalPath()
     {
+        if (longestPath)
+            return longestPath;
         std::vector<Vertex> sources, sinks;
 
         boost::graph_traits<Graph>::in_edge_iterator ei, edge_end_i;
@@ -184,7 +196,7 @@ public:
     }
 };
 
-DAG_Model ReadDAG_Tasks(string path, string priorityType = "orig")
+DAG_Model ReadDAG_Task(string path, string priorityType = "orig")
 {
     TaskSet tasks = ReadTaskSet(path, priorityType);
     // some default parameters in this function
@@ -241,4 +253,73 @@ vector<int> GetDependentTasks(DAG_Model &dagTasks, int index)
         dependentIndexes.push_back(dagTasks.vertex2index_[vvv]);
     }
     return dependentIndexes;
+}
+
+class TaskSetDAG : public TaskSetNormal
+{
+public:
+    std::vector<double> volumeVec_;
+    std::vector<double> longestVec_;
+
+    TaskSetDAG() : TaskSetNormal() {}
+    TaskSetDAG(const TaskSet &tasks,
+               std::vector<double> &volumeVec,
+               std::vector<double> &longestVec)
+        : TaskSetNormal(tasks), volumeVec_(volumeVec), longestVec_(longestVec) {}
+    static string Type() { return "dag"; }
+};
+
+TaskSetDAG ReadDAG_Tasks(string path, string priorityType = "orig")
+{
+    // some default parameters in this function
+    string delimiter = ",";
+    string token;
+    string line;
+    size_t pos = 0;
+
+    vector<Task> taskSet;
+    vector<double> volumeVec;
+    vector<double> longestVec;
+
+    fstream file;
+    file.open(path, ios::in);
+    if (file.is_open())
+    {
+        string line;
+        while (getline(file, line))
+        {
+            if (!(line[0] >= '0' && line[0] <= '9'))
+                continue;
+            vector<int> dataInLine;
+            while ((pos = line.find(delimiter)) != string::npos)
+            {
+                token = line.substr(0, pos);
+                int temp = atoi(token.c_str());
+                dataInLine.push_back(temp);
+                line.erase(0, pos + delimiter.length());
+            }
+            dataInLine.push_back(atoi(line.c_str()));
+            longestVec.push_back(dataInLine.back());
+            dataInLine.pop_back();
+            volumeVec.push_back(dataInLine.back());
+            dataInLine.pop_back();
+
+            Task taskCurr(dataInLine);
+            taskSet.push_back(taskCurr);
+        }
+
+        TaskSet tasks(taskSet);
+        tasks = Reorder(tasks, priorityType);
+        TaskSetDAG dagTaskSets(tasks, volumeVec, longestVec);
+        if (debugMode == 1)
+            cout << "Finish reading the data file succesfully!\n";
+        return dagTaskSets;
+    }
+    else
+    {
+        cout << Color::red << "The path does not exist in ReadTaskSet!" << endl
+             << path
+             << Color::def << endl;
+        throw;
+    }
 }

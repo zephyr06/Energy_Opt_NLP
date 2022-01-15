@@ -44,14 +44,15 @@ int optimizerType = (int)ConfigParameters["optimizerType"];
 double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];
 const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency"];
 const string testDataSetName = (string)ConfigParameters["testDataSetName"];
- string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
+string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
 string runMode = (string)ConfigParameters["runMode"];
 string batchOptimizeFolder = (string)ConfigParameters["batchOptimizeFolder"];
-
+const double parallelFactor = (double)ConfigParameters["parallelFactor"];
 const string readTaskMode = (string)ConfigParameters["readTaskMode"];
 const int granularityInBF = (int)ConfigParameters["granularityInBF"];
 const int debugMode = (int)ConfigParameters["debugMode"];
 const int adjustEliminateMaxIte = (int)ConfigParameters["adjustEliminateMaxIte"];
+const int core_m_dag = (int)ConfigParameters["core_m_dag"];
 
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];

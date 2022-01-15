@@ -5,7 +5,6 @@
 #include "../sources/Tasks.h"
 #include "../sources/RTA_LL.h"
 #include "../sources/Parameters.h"
-#include "../sources/Optimize.h"
 #include "../sources/DAG_Task.h"
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
@@ -36,7 +35,7 @@ TEST(read_dag, v1)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
 
-    auto dagTasks = ReadDAG_Tasks(path, "RM");
+    auto dagTasks = ReadDAG_Task(path, "RM");
     // AssertEqualScalar(2, dagTasks.mapPrev.size());
     AssertEqualScalar(3, GetDependentTasks(dagTasks, 0).size());
     AssertEqualScalar(3, GetDependentTasks(dagTasks, 1).size());
@@ -46,7 +45,7 @@ TEST(dag, v2)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v25.csv";
 
-    auto dagTasks = ReadDAG_Tasks(path, "orig");
+    auto dagTasks = ReadDAG_Task(path, "orig");
     double longest = dagTasks.CriticalPath();
     AssertEqualScalar(35, longest, 1e-6, __LINE__);
 }
@@ -55,9 +54,20 @@ TEST(dag, v3)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
 
-    auto dagTasks = ReadDAG_Tasks(path, "orig");
+    auto dagTasks = ReadDAG_Task(path, "orig");
     double longest = dagTasks.CriticalPath();
     AssertEqualScalar(96, longest, 1e-6, __LINE__);
+}
+TEST(dag, v4)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v27.csv";
+
+    auto dagTasks = ReadDAG_Tasks(path, "orig");
+    AssertEqualScalar(124, dagTasks.volumeVec_[3], 1e-6, __LINE__);
+    AssertEqualScalar(98, dagTasks.longestVec_[3], 1e-6, __LINE__);
+    AssertEqualScalar(184, dagTasks.volumeVec_[0], 1e-6, __LINE__);
+    AssertEqualScalar(116, dagTasks.longestVec_[0], 1e-6, __LINE__);
+    AssertEqualScalar(200, dagTasks.tasks_[1].period, 1e-6, __LINE__);
 }
 
 int main()

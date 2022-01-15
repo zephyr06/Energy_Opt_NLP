@@ -54,8 +54,7 @@ int main(int argc, char *argv[])
         .scan<'i', int>();
     program.add_argument("--schedulabilityCheck")
         .default_value(0)
-        .help("type of tasksets, 0 means no, 1 means yes(LL), 2 means yes(*); \
-        if used, all the task sets generated are schedulable")
+        .help("schedulabilityCheck in generate task sets? If so, all the task sets are schedulable")
         .scan<'i', int>();
     // program.add_argument("--parallelismFactor")
     //     .default_value(1000)
@@ -90,6 +89,7 @@ int main(int argc, char *argv[])
          << "periodMin(--periodMin): " << periodMin << endl
          << "periodMax(--periodMax): " << periodMax << endl
          << "deadlineType(--deadlineType), 1 means random, 0 means implicit: " << deadlineType << endl
+         << "taskType(--taskType), type of tasksets, 0 means normal, 1 means DAG: " << taskType << endl
          << "schedulabilityCheck(--schedulabilityCheck), 0 means no, 1 means yes via LL: " << schedulabilityCheck << endl
          << endl;
 
@@ -118,7 +118,8 @@ int main(int argc, char *argv[])
             {
                 if (schedulabilityCheck == 1)
                 {
-                    if (!CheckSchedulability<TaskSetNormal, RTA_LL>(tasksN))
+                    RTA_LL r(tasksN);
+                    if (!r.CheckSchedulability())
                     {
                         i--;
                         continue;
@@ -130,6 +131,23 @@ int main(int argc, char *argv[])
             ofstream myfile;
             myfile.open(outDirectory + fileName);
             WriteTaskSets(myfile, tasks);
+        }
+        else if (taskType == 1)
+        {
+            std::vector<DAG_Model> dagTaskSet;
+            for (int i = 0; i < N; i++)
+            {
+                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, 2 * N)), totalUtilization,
+                                                 numberOfProcessor,
+                                                 periodMin,
+                                                 periodMax, deadlineType));
+            }
+
+            string fileName = "dag-Melani-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".csv";
+            ofstream myfile;
+            myfile.open(outDirectory + fileName);
+            WriteDAGMelani(myfile, dagTaskSet);
+            myfile.close();
         }
     }
 

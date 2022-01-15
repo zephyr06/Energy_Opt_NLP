@@ -97,11 +97,12 @@ class TaskSetNormal
 {
 public:
     TaskSet tasks_;
+    int N;
     TaskSetNormal()
     {
         ;
     }
-    TaskSetNormal(TaskSet &tasks) : tasks_(tasks) {}
+    TaskSetNormal(const TaskSet &tasks) : tasks_(tasks), N(tasks.size()) {}
     static string Type() { return "normal"; }
     void UpdateTaskSet(TaskSet &tasks) { tasks_ = tasks; }
 };
