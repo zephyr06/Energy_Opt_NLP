@@ -314,7 +314,7 @@ public:
             //                                                          debugMode == 1, tolerance);
             if ((!schedulable) ||
                 (enableMaxComputationTimeRestrict &&
-                 tasksCurr.tasks_[i].executionTime > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict))
+                 tasksCurr.tasks_[i].executionTime - eliminateTolIte > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict))
 
                 // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
                 // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
