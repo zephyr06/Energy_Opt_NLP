@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
                                                  periodCurr, deadlineType));
             }
 
-            string fileName = "dag-Melani-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".csv";
+            string fileName = "periodic-dag-Melani-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".csv";
             ofstream myfile;
             myfile.open(outDirectory + fileName);
             WriteDAGMelani(myfile, dagTaskSet);

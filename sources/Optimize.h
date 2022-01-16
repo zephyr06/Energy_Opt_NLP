@@ -236,7 +236,7 @@ public:
                     int mid = ceil((left + right) / 2.0);
 
                     tasks[currentIndex].executionTime = mid;
-                    Schedul_Analysis r(tasks);
+                    Schedul_Analysis r(tasksSetType);
                     schedulale_flag = r.CheckSchedulability(
                         responseTimeInitial, debugMode == 1);
                     if ((not schedulale_flag) ||

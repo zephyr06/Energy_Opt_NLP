@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
     if (argc == 1)
-        BatchOptimize<TaskSetNormal, RTA_LL>();
+        BatchOptimize<TaskSetDAG, RTA_DAG>();
     else if (argc == 2)
     {
         char *pEnd;
