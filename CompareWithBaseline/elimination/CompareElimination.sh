@@ -40,9 +40,11 @@ perform_optimization() {
 
 
 python edit_yaml.py --entry "elimIte" --value 0
+python edit_yaml.py --entry "roundTypeInClamp" --value "rough"
 perform_optimization 0
 
 python edit_yaml.py --entry "elimIte" --value 1000
+python edit_yaml.py --entry "roundTypeInClamp" --value "fine"
 perform_optimization 1000
 
 cd $title
