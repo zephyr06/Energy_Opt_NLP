@@ -1,4 +1,4 @@
-#include "../sources/LLbatchOptimize.h"
+#include "../sources/BatchOptimize.h"
 
 int main(int argc, char *argv[])
 {

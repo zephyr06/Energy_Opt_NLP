@@ -6,6 +6,7 @@
 template <class TaskSetType, class Schedul_Analysis>
 void BatchOptimize(int Nn = -1)
 {
+    runMode = "normal";
     const char *pathDataset;
     string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" + to_string(Nn) + "/";
     if (Nn == -1)
