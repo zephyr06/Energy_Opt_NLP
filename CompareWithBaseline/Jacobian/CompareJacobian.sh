@@ -48,3 +48,4 @@ perform_optimization 1
 cd $title
 # visualize the result
 python ../Visualize_performance.py  --minTaskNumber 5 --method_names "ApproximateJacobian" "ExactJacobian" --title $title  --maxTaskNumber $MaxTaskNumber
+python Visualize_average_speed.py
