@@ -3,6 +3,18 @@
 #include "Optimize.h"
 #include "RTA_DAG.h"
 
+void AddEntry(string pathRes, int N, double val)
+{
+    ofstream outfileWrite;
+    // string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+    //                  batchOptimizeFolder + "/EnergySaveRatio/N" +
+    //                  to_string(N) + ".txt";
+    outfileWrite.open(pathRes,
+                      std::ios_base::app);
+    outfileWrite << val << endl;
+    outfileWrite.close();
+}
+
 template <class TaskSetType, class Schedul_Analysis>
 void BatchOptimize(int Nn = -1)
 {
@@ -80,14 +92,13 @@ void BatchOptimize(int Nn = -1)
     cout << "Average time consumed is " << aveTime << endl;
     cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
 
-    ofstream outfileWrite;
     string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
                      batchOptimizeFolder + "/EnergySaveRatio/N" +
                      to_string(N) + ".txt";
-    outfileWrite.open(pathRes,
-                      std::ios_base::app);
-    outfileWrite << avEnergy << endl;
-    outfileWrite.close();
+    AddEntry(pathRes, N, avEnergy);
+    pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+              batchOptimizeFolder + "/time_task_number.txt";
+    AddEntry(pathRes, N, aveTime);
 
     if (printFailureFile)
     {

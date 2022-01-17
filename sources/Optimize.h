@@ -104,10 +104,6 @@ public:
         Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
         {
             TaskSetType taskDurOpt = tasks_;
-            UpdateTaskSetExecutionTime(taskDurOpt.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
-            VectorDynamic energyVec = EstimateEnergyTaskSet(taskDurOpt.tasks_);
-            Schedul_Analysis r(taskDurOpt);
-            VectorDynamic responseTimeVec = r.ResponseTimeOfTaskSet(responseTimeInitial);
 
             boost::function<Matrix(const VectorDynamic &)> f2 =
                 [this](const VectorDynamic &executionTimeVector)
@@ -118,8 +114,11 @@ public:
             };
 
             boost::function<Matrix(const VectorDynamic &)> f =
-                [&responseTimeVec, &taskDurOpt, &f2, this](const VectorDynamic &executionTimeVector)
+                [&taskDurOpt, &f2, this](const VectorDynamic &executionTimeVector)
             {
+                UpdateTaskSetExecutionTime(taskDurOpt.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
+                Schedul_Analysis r(taskDurOpt);
+                VectorDynamic responseTimeVec = r.ResponseTimeOfTaskSet(responseTimeInitial);
                 VectorDynamic err = f2(executionTimeVector);
 
                 double currentEnergyConsumption = err.sum();
@@ -159,16 +158,6 @@ public:
                          << endl
                          << err.norm() << endl
                          << endl;
-                }
-
-                if (debugMode == 1)
-                {
-                    cout << Color::green << "The response time and deadline for each task is: " << Color::def << endl;
-                    for (int i = 0; i < N; i++)
-                    {
-                        cout << responseTimeVec(i) << ", " << taskDurOpt.tasks_[i].deadline << endl;
-                    }
-                    err = f(executionTimeVector);
                 }
             }
 
@@ -433,9 +422,23 @@ public:
             Schedul_Analysis r2(taskSetType);
             responseTimeInitial = r2.ResponseTimeOfTaskSet();
             // perform optimization
-
-            auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
-                                            initialEstimateDuringOpt, responseTimeInitial);
+            if (exactJacobian)
+            {
+                try
+                {
+                    auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
+                                                    initialEstimateDuringOpt, responseTimeInitial);
+                }
+                catch (...)
+                {
+                    ;
+                }
+            }
+            else
+            {
+                auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
+                                                initialEstimateDuringOpt, responseTimeInitial);
+            }
 
             // formulate new computationTime
             UpdateTaskSetExecutionTime(taskSetType.tasks_, vectorGlobalOpt);
