@@ -1,21 +1,19 @@
 %YAML:1.0
 
-runMode: normal
+runMode: compare
 # TODO: v6 elimination check failed
-testDataSetName: test_n10_v9
+testDataSetName: test_n10_v8
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
 debugMode: 0
-executionTimeModel: 2 # 1 is normal, 2 is more difficult
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 10000
-EnergyMode: 2
+elimIte: 1000
+EnergyMode: 1
 exactJacobian: 0
 printFailureFile: 0
-readTaskMode: deadline
-batchOptimizeFolder: rounding
-core_m_dag: 1
-parallelFactor: 0.4
+readTaskMode: RM
+batchOptimizeFolder: Zhao20
 
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
@@ -27,7 +25,7 @@ adjustEliminateMaxIte: 10
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: fine
+roundTypeInClamp: "fine"
 
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e5
