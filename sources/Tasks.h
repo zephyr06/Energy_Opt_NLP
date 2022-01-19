@@ -286,6 +286,11 @@ TaskSet Reorder(TaskSet tasks, string priorityType)
     return tasks;
 }
 
+/**
+ * @brief read from WriteFrequencyModelRatio()
+ * 
+ * @param path 
+ */
 void ReadFrequencyModeRatio(string path)
 {
 

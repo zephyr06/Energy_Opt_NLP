@@ -36,5 +36,5 @@ double Frequency2Execution(const Task &task)
 }
 void WriteFrequencyModelRatio(ofstream &file)
 {
-    file << "Frequency_Ratio: " << RandRange(0, 1) << endl;
+    file << "Frequency_Ratio: " << RandRange(0.1, 0.9) << endl;
 }
