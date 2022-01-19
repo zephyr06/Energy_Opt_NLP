@@ -6,6 +6,7 @@
 #include "Tasks.h"
 #include "DAG_Task.h"
 #include "Parameters.h"
+#include "FrequencyModel.h"
 
 namespace po = boost::program_options;
 
@@ -26,20 +27,6 @@ vector<double> Uunifast(int N, double utilAll)
     return utilVec;
 }
 
-/**
- * @brief generate a random number within the range [a,b];
- * a must be smaller than b
- * 
- * @param a 
- * @param b 
- * @return double 
- */
-double RandRange(double a, double b)
-{
-    if (b < a)
-        CoutError("Range Error in RandRange");
-    return a + (b - a) * double(rand()) / RAND_MAX;
-}
 TaskSet GenerateTaskSet(int N, double totalUtilization,
                         int numberOfProcessor, int periodMin,
                         int periodMax, int deadlineType = 0)
@@ -66,6 +53,7 @@ TaskSet GenerateTaskSet(int N, double totalUtilization,
     }
     return tasks;
 }
+
 void WriteTaskSets(ofstream &file, TaskSet &tasks)
 {
     int N = tasks.size();
@@ -77,6 +65,7 @@ void WriteTaskSets(ofstream &file, TaskSet &tasks)
              << tasks[i].executionTime << "," << tasks[i].deadline
              << "," << tasks[i].processorId << "\n";
     }
+    WriteFrequencyModelRatio(file);
 }
 
 DAG_Model GenerateDAG(int N, double totalUtilization,
@@ -117,4 +106,5 @@ void WriteDAGMelani(ofstream &file, std::vector<DAG_Model> &tasks)
              << tasks[i].CriticalPath()
              << "\n";
     }
+    WriteFrequencyModelRatio(file);
 }

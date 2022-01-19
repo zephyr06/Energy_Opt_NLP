@@ -56,3 +56,4 @@ int core_m_dag = (int)ConfigParameters["core_m_dag"];
 
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];
+double frequencyRatio = (double)ConfigParameters["frequencyRatio"];

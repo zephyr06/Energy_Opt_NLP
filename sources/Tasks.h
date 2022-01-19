@@ -22,6 +22,21 @@ Color::Modifier green(Color::FG_GREEN);
 Color::Modifier blue(Color::FG_BLUE);
 Color::Modifier def(Color::FG_DEFAULT);
 
+/**
+ * @brief generate a random number within the range [a,b];
+ * a must be smaller than b
+ * 
+ * @param a 
+ * @param b 
+ * @return double 
+ */
+double RandRange(double a, double b)
+{
+    if (b < a)
+        CoutError("Range Error in RandRange");
+    return a + (b - a) * double(rand()) / RAND_MAX;
+}
+
 class Task
 {
 public:
@@ -270,8 +285,34 @@ TaskSet Reorder(TaskSet tasks, string priorityType)
     }
     return tasks;
 }
+
+void ReadFrequencyModeRatio(string path)
+{
+
+    fstream file;
+    file.open(path, ios::in);
+    if (file.is_open())
+    {
+        string line;
+        while (getline(file, line))
+        {
+            if (line.substr(0, 17) == "Frequency_Ratio: ")
+            {
+                frequencyRatio = stod(line.substr(17));
+                return;
+            }
+        }
+    }
+    else
+    {
+        CoutError("The path does not exist in ReadFrequencyModeRatio! Given path is " + path);
+    }
+}
+
 TaskSet ReadTaskSet(string path, string priorityType = "RM")
 {
+    ReadFrequencyModeRatio(path);
+
     // some default parameters in this function
     string delimiter = ",";
     string token;

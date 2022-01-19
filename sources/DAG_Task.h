@@ -271,6 +271,7 @@ public:
 
 TaskSetDAG ReadDAG_Tasks(string path, string priorityType = "orig")
 {
+    ReadFrequencyModeRatio(path);
     // some default parameters in this function
     string delimiter = ",";
     string token;

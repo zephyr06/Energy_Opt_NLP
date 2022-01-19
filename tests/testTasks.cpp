@@ -69,6 +69,13 @@ TEST(dag, v4)
     AssertEqualScalar(116, dagTasks.longestVec_[0], 1e-6, __LINE__);
     AssertEqualScalar(200, dagTasks.tasks_[1].period, 1e-6, __LINE__);
 }
+TEST(ReadFrequencyModeRatio, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v29.csv";
+
+    auto dagTasks = ReadTaskSet(path, "orig");
+    AssertEqualScalar(0.296547, frequencyRatio);
+}
 
 int main()
 {

@@ -17,7 +17,7 @@ double GetFrequency(const Task &task)
     }
     else if (executionTimeModel == 2)
     {
-        return task.executionTimeOrg * 0.9 / (task.executionTime - task.executionTimeOrg * 0.1);
+        return task.executionTimeOrg * frequencyRatio / (task.executionTime - task.executionTimeOrg * (1 - frequencyRatio));
     }
     else
         CoutError("executionTimeModel not recognized! Accept: 1, 2");
@@ -33,4 +33,8 @@ double GetFrequency(const Task &task)
 double Frequency2Execution(const Task &task)
 {
     return task.executionTime;
+}
+void WriteFrequencyModelRatio(ofstream &file)
+{
+    file << "Frequency_Ratio: " << RandRange(0, 1) << endl;
 }
