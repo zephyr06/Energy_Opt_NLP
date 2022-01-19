@@ -259,8 +259,7 @@ public:
                 iterationNumber++;
                 if (iterationNumber > N)
                 {
-                    cout << red << "iterationNumber error in Clamp!" << def << endl;
-                    // throw;
+                    CoutWarning("iterationNumber error in Clamp!");
                     break;
                 }
             };
@@ -539,8 +538,7 @@ public:
                 return afterEnergyCost / initialEnergyCost;
             else
             {
-                cout << red << "Unrecognized runMode!!" << def << endl;
-                throw;
+                CoutError("Unrecognized runMode!!");
             }
         }
         else

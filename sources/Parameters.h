@@ -53,6 +53,7 @@ const int granularityInBF = (int)ConfigParameters["granularityInBF"];
 const int debugMode = (int)ConfigParameters["debugMode"];
 const int adjustEliminateMaxIte = (int)ConfigParameters["adjustEliminateMaxIte"];
 int core_m_dag = (int)ConfigParameters["core_m_dag"];
+int baselineLLCompare = (int)ConfigParameters["baselineLLCompare"]; // baselineLLCompare: 1 means Zhao20, 2 means MILP
 
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];

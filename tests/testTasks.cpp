@@ -6,6 +6,7 @@
 #include "../sources/RTA_LL.h"
 #include "../sources/Parameters.h"
 #include "../sources/DAG_Task.h"
+#include "../sources/BatchTestutils.h"
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 TEST(ReadTaskSet, p1)
@@ -76,7 +77,14 @@ TEST(ReadFrequencyModeRatio, v1)
     auto dagTasks = ReadTaskSet(path, "orig");
     AssertEqualScalar(0.296547, frequencyRatio);
 }
-
+TEST(ReadBaselineResult, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/periodic-set-000-syntheticJobs";
+    baselineLLCompare = 2;
+    auto sth = ReadBaselineResult(path, 5);
+    AssertEqualScalar(64.116, sth.first);
+    AssertEqualScalar(646110010.878333, sth.second);
+}
 int main()
 {
     TestResult tr;

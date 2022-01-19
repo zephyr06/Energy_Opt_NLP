@@ -77,7 +77,15 @@ pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
     string targetFilePathBF = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_BFSResult.txt";
     if (debugMode == 1)
         cout << "targetFilePathBF " << targetFilePathBF << endl;
-    string fileName = targetFilePathBF;
+    string fileName;
+    if (baselineLLCompare == 1)
+        fileName = targetFilePathBF;
+    else if (baselineLLCompare == 2)
+        fileName = targetFilePathGP;
+    else
+    {
+        CoutError("Unrecognized baselineLLCompare! Current value is " + to_string(baselineLLCompare));
+    }
 
     ifstream cResultFile(fileName.data());
     try

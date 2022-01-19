@@ -14,7 +14,7 @@ double Barrier(double x)
     {
         if (TASK_NUMBER == 0)
         {
-            cout << red << "Please set TASK_NUMBER!" << def << endl;
+            cout << Color::red << "Please set TASK_NUMBER!" << Color::def << endl;
             throw;
         }
         return punishmentInBarrier * pow(10, TASK_NUMBER - 3) * pow(-1 * x, 1);
