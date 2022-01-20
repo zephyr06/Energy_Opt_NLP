@@ -111,5 +111,22 @@ pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
         cResultFile >> val;
         values[i] = round(val);
     }
+
+    // check schedulability
+    auto taskSet1 = ReadTaskSet(pathInPeriodicDataset, readTaskMode);
+    TaskSet tasksInit = taskSet1;
+    UpdateTaskSetExecutionTime(taskSet1, Vector2Eigen(values));
+    RTA_LL r(taskSet1);
+    bool schedulale_flag = r.CheckSchedulability(
+        debugMode == 1);
+    if (not schedulale_flag)
+    {
+        if (baselineLLCompare == 1)
+            CoutError("Found one unschedulable result in Zhao20!");
+        obj = EstimateEnergyTaskSet(tasksInit).sum() / weightEnergy;
+    }
+    if (baselineLLCompare == 1)
+        obj = obj / 1e9;
+
     return {runTime, obj};
 }

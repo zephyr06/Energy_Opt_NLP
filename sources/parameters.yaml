@@ -1,21 +1,21 @@
 %YAML:1.0
 
-runMode: normal
+runMode: compare
 # TODO: v6 elimination check failed
-testDataSetName: test_n10_v8
+testDataSetName: test_n15_v1
 optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-debugMode: 1
+debugMode: 5
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
-EnergyMode: 2
-exactJacobian: 1
+EnergyMode: 1
+exactJacobian: 0
 printFailureFile: 0
-readTaskMode: deadline
+readTaskMode: RM
 batchOptimizeFolder: Jacobian
 core_m_dag: 2
-baselineLLCompare: 1
+baselineLLCompare: 2
 
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2

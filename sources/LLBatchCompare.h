@@ -33,7 +33,7 @@ void BatchCompare(int N = -1)
 
             if (res >= 0 && res <= 1)
             {
-                energySaveRatioVec.push_back(res / (baselineResult.second / 1e9));
+                energySaveRatioVec.push_back(res / (baselineResult.second));
                 if (energySaveRatioVec.back() > worstValue)
                 {
                     worstValue = energySaveRatioVec.back();
@@ -43,7 +43,7 @@ void BatchCompare(int N = -1)
                 runTimeZ.push_back(baselineResult.first);
 
                 if (debugMode == 3)
-                    cout << "One compare: " << res / (baselineResult.second / 1e9) << endl;
+                    cout << "One compare: " << res / (baselineResult.second) << endl;
                 ofstream outfileWrite;
                 outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/EnergySaveRatio/N" +
                                       to_string(taskSet1.size()) + ".txt",
