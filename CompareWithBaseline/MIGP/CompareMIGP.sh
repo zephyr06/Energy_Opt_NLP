@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 title="MIGP"
-MaxTaskNumber=20
+MaxTaskNumber=15
 
 # clear buffer file content
 time_file="time_task_number.txt"
@@ -17,7 +17,7 @@ make -j4
 
 
 
-for jobNumber in {5..20}
+for (( jobNumber=5; jobNumber<=$MaxTaskNumber; jobNumber++ ))
 do
 	cd ../CompareWithBaseline/$title
 	echo "$title iteration is: $jobNumber"
@@ -36,7 +36,7 @@ do
 	sleep 1
 done
 
-cd Zhao20
+cd $title
 # visualize the result
-python Visualize_distribution.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --baseline "MUA-incremental" 
-python Visualize_average_speed.py --minTaskNumber 5 --baseline "MUA-incremental" --ylim 1e2 --maxTaskNumber $MaxTaskNumber
+python Visualize_distribution.py --minTaskNumber 5 --baseline "MIGP" --maxTaskNumber $MaxTaskNumber 
+python Visualize_average_speed.py --minTaskNumber 5 --baseline "MIGP" --ylim 1e3 --maxTaskNumber $MaxTaskNumber
