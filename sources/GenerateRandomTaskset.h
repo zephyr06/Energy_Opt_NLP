@@ -91,10 +91,10 @@ DAG_Model GenerateDAG(int N, double totalUtilization,
     return dagModel;
 }
 
-void WriteDAGMelani(ofstream &file, std::vector<DAG_Model> &tasks)
+void WriteDAGMelani(ofstream &file, std::vector<DAG_Model> &tasks, std::vector<double> &weightVec)
 {
     int NN = tasks.size();
-    file << "JobID,Offset,Period,Overhead,ExecutionTime,DeadLine,processorId,volume,longestPath\n";
+    file << "JobID,Offset,Period,Overhead,ExecutionTime,DeadLine,processorId,volume,longestPath,weightInControl\n";
     for (int i = 0; i < NN; i++)
     {
         file << i << "," << tasks[i].tasks_[0].offset << ","
@@ -103,7 +103,8 @@ void WriteDAGMelani(ofstream &file, std::vector<DAG_Model> &tasks)
              << tasks[i].tasks_[0].deadline << ","
              << tasks[i].tasks_[0].processorId << ","
              << tasks[i].Volume() << ","
-             << tasks[i].CriticalPath()
+             << tasks[i].CriticalPath() << ","
+             << weightVec[i]
              << "\n";
     }
     WriteFrequencyModelRatio(file);

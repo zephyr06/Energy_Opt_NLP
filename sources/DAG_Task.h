@@ -260,48 +260,41 @@ class TaskSetDAG : public TaskSetNormal
 public:
     std::vector<double> volumeVec_;
     std::vector<double> longestVec_;
+    std::vector<double> weightVec_;
 
     TaskSetDAG() : TaskSetNormal() {}
     TaskSetDAG(const TaskSet &tasks,
                std::vector<double> &volumeVec,
-               std::vector<double> &longestVec)
-        : TaskSetNormal(tasks), volumeVec_(volumeVec), longestVec_(longestVec) {}
+               std::vector<double> &longestVec, std::vector<double> &weight)
+        : TaskSetNormal(tasks), volumeVec_(volumeVec),
+          longestVec_(longestVec), weightVec_(weight) {}
     static string Type() { return "dag"; }
 };
 
 TaskSetDAG ReadDAG_Tasks(string path, string priorityType = "orig")
 {
     ReadFrequencyModeRatio(path);
-    // some default parameters in this function
-    string delimiter = ",";
-    string token;
-    string line;
-    size_t pos = 0;
 
     vector<Task> taskSet;
     vector<double> volumeVec;
     vector<double> longestVec;
+    vector<double> weightVec;
 
     fstream file;
     file.open(path, ios::in);
     if (file.is_open())
     {
         string line;
+
         while (getline(file, line))
         {
             if (!(line[0] >= '0' && line[0] <= '9'))
                 continue;
-            vector<int> dataInLine;
-            while ((pos = line.find(delimiter)) != string::npos)
-            {
-                token = line.substr(0, pos);
-                int temp = atoi(token.c_str());
-                dataInLine.push_back(temp);
-                line.erase(0, pos + delimiter.length());
-            }
-            dataInLine.push_back(atoi(line.c_str()));
-            if (dataInLine.size() < 9)
+            vector<double> dataInLine = ReadLine(line);
+            if (dataInLine.size() < 10)
                 CoutError("The path in ReadDAG_Tasks doesn't follow Melani format!");
+            weightVec.push_back(dataInLine.back());
+            dataInLine.pop_back();
             longestVec.push_back(dataInLine.back());
             dataInLine.pop_back();
             volumeVec.push_back(dataInLine.back());
@@ -310,10 +303,9 @@ TaskSetDAG ReadDAG_Tasks(string path, string priorityType = "orig")
             Task taskCurr(dataInLine);
             taskSet.push_back(taskCurr);
         }
-
         TaskSet tasks(taskSet);
         tasks = Reorder(tasks, priorityType);
-        TaskSetDAG dagTaskSets(tasks, volumeVec, longestVec);
+        TaskSetDAG dagTaskSets(tasks, volumeVec, longestVec, weightVec);
         if (debugMode == 1)
             cout << "Finish reading the data file succesfully!\n";
         return dagTaskSets;

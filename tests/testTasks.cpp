@@ -70,6 +70,15 @@ TEST(dag, v4)
     AssertEqualScalar(116, dagTasks.longestVec_[0], 1e-6, __LINE__);
     AssertEqualScalar(200, dagTasks.tasks_[1].period, 1e-6, __LINE__);
 }
+TEST(dag, v5)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v30.csv";
+
+    auto dagTasks = ReadDAG_Tasks(path, "orig");
+    AssertEqualScalar(778.401, dagTasks.weightVec_[0], 1e-6, __LINE__);
+    AssertEqualScalar(916.583, dagTasks.weightVec_[1], 1e-6, __LINE__);
+    AssertEqualScalar(161.206, dagTasks.weightVec_[4], 1e-6, __LINE__);
+}
 TEST(ReadFrequencyModeRatio, v1)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v29.csv";
@@ -77,14 +86,14 @@ TEST(ReadFrequencyModeRatio, v1)
     auto dagTasks = ReadTaskSet(path, "orig");
     AssertEqualScalar(0.296547, frequencyRatio);
 }
-TEST(ReadBaselineResult, v1)
-{
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/periodic-set-000-syntheticJobs";
-    baselineLLCompare = 2;
-    auto sth = ReadBaselineResult(path, 5);
-    AssertEqualScalar(64.116, sth.first);
-    AssertEqualScalar(646110010.878333, sth.second);
-}
+// TEST(ReadBaselineResult, v1)
+// {
+//     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/periodic-set-000-syntheticJobs";
+//     baselineLLCompare = 2;
+//     auto sth = ReadBaselineResult(path, 5);
+//     AssertEqualScalar(64.116, sth.first);
+//     AssertEqualScalar(646110010.878333, sth.second);
+// }
 int main()
 {
     TestResult tr;

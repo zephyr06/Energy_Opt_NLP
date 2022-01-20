@@ -33,6 +33,8 @@ const double EstimateEnergyTask(const Task &task)
         energy = task.executionTime * (5 * pow(frequency, 3) + 0.09 * pow(frequency, 2) +
                                        0.44 * pow(frequency, 1) +
                                        +0.47);
+    else if (EnergyMode == 3)
+        energy = task.period * 1.0;
     // energy = task.executionTime * (pow(frequency, 3) + 0.09 * pow(frequency, 2));
     else
         CoutError("Not recognized EnergyMode!");

@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
         {
             std::vector<DAG_Model> dagTaskSet;
             vector<double> utilVec = Uunifast(N, totalUtilization);
+            vector<double> weightVec;
             for (int i = 0; i < N; i++)
             {
                 int periodCurr = RandRange(periodMin, periodMax);
@@ -143,12 +144,13 @@ int main(int argc, char *argv[])
                                                  numberOfProcessor,
                                                  periodCurr,
                                                  periodCurr, deadlineType));
+                weightVec.push_back(RandRange(1e-3, 1000));
             }
 
             string fileName = "periodic-dag-Melani-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".csv";
             ofstream myfile;
             myfile.open(outDirectory + fileName);
-            WriteDAGMelani(myfile, dagTaskSet);
+            WriteDAGMelani(myfile, dagTaskSet, weightVec);
             myfile.close();
         }
     }
