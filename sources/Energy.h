@@ -15,7 +15,7 @@
 #include "Declaration.h"
 #include "FrequencyModel.h"
 #include "utils.h"
-const double EstimateEnergyTask(const Task &task)
+#include "RTA_DAG.h"
 /**
  * @brief Estimate energy consumption of a single task;
     all tasks' default frequency is 1, which is also the maximum frequency;
@@ -24,6 +24,7 @@ const double EstimateEnergyTask(const Task &task)
     @return
     scalar, energy consumption of the task if it runs at the given frequency
 */
+const double EstimateEnergyTask(const Task &task)
 {
     double frequency = GetFrequency(task);
     double energy;
@@ -33,8 +34,6 @@ const double EstimateEnergyTask(const Task &task)
         energy = task.executionTime * (5 * pow(frequency, 3) + 0.09 * pow(frequency, 2) +
                                        0.44 * pow(frequency, 1) +
                                        +0.47);
-    else if (EnergyMode == 3)
-        energy = task.period * 1.0;
     // energy = task.executionTime * (pow(frequency, 3) + 0.09 * pow(frequency, 2));
     else
         CoutError("Not recognized EnergyMode!");
@@ -49,11 +48,24 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &tasks)
 {
     int N = tasks.size();
     MatrixDynamic res = GenerateVectorDynamic(N);
-
+    VectorDynamic rta;
+    // if (EnergyMode == 3)
+    // {
+    //     RTA_DAG r(tasks);
+    //     rta = r.ResponseTimeOfTaskSet();
+    // }
     for (int i = 0; i < N; i++)
     {
-        res(i, 0) = 1.0 / tasks[i].period *
-                    EstimateEnergyTask(tasks[i]);
+        if (EnergyMode == 3)
+        {
+            // res(i, 0) = tasks.weightVec_[i] * tasks.tasks_[i].period + rta(i);
+            ;
+        }
+        if (EnergyMode == 1 || EnergyMode == 2)
+        {
+            res(i, 0) = 1.0 / tasks[i].period *
+                        EstimateEnergyTask(tasks[i]);
+        }
     }
     return res;
 }

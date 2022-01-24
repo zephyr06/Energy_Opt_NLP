@@ -260,14 +260,15 @@ class TaskSetDAG : public TaskSetNormal
 public:
     std::vector<double> volumeVec_;
     std::vector<double> longestVec_;
-    std::vector<double> weightVec_;
 
     TaskSetDAG() : TaskSetNormal() {}
     TaskSetDAG(const TaskSet &tasks,
                std::vector<double> &volumeVec,
                std::vector<double> &longestVec, std::vector<double> &weight)
         : TaskSetNormal(tasks), volumeVec_(volumeVec),
-          longestVec_(longestVec), weightVec_(weight) {}
+          longestVec_(longestVec) {
+              weightVec_=weight;
+          }
     static string Type() { return "dag"; }
 };
 
