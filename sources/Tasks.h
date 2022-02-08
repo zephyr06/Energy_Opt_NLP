@@ -73,7 +73,7 @@ public:
     /**
      * only used in ReadTaskSet because the input parameter's type is int
      **/
-    Task(vector<int> dataInLine)
+    Task(vector<double> dataInLine)
     {
         if (dataInLine.size() != 7)
         {
@@ -113,6 +113,8 @@ class TaskSetNormal
 public:
     TaskSet tasks_;
     int N;
+    // NOTE: weightVec_ is only used in TaskSetDAG and EnergyMode==3
+    std::vector<double> weightVec_;
     TaskSetNormal()
     {
         ;
@@ -313,16 +315,26 @@ void ReadFrequencyModeRatio(string path)
         CoutError("The path does not exist in ReadFrequencyModeRatio! Given path is " + path);
     }
 }
-
-TaskSet ReadTaskSet(string path, string priorityType = "RM")
+vector<double> ReadLine(string line)
 {
-    ReadFrequencyModeRatio(path);
-
     // some default parameters in this function
     string delimiter = ",";
     string token;
-    string line;
     size_t pos = 0;
+    vector<double> dataInLine;
+    while ((pos = line.find(delimiter)) != string::npos)
+    {
+        token = line.substr(0, pos);
+        double temp = stod(token.c_str());
+        dataInLine.push_back(temp);
+        line.erase(0, pos + delimiter.length());
+    }
+    dataInLine.push_back(stod(line.c_str()));
+    return dataInLine;
+}
+TaskSet ReadTaskSet(string path, string priorityType = "RM")
+{
+    ReadFrequencyModeRatio(path);
 
     vector<Task> taskSet;
 
@@ -335,15 +347,8 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
         {
             if (!(line[0] >= '0' && line[0] <= '9'))
                 continue;
-            vector<int> dataInLine;
-            while ((pos = line.find(delimiter)) != string::npos)
-            {
-                token = line.substr(0, pos);
-                int temp = atoi(token.c_str());
-                dataInLine.push_back(temp);
-                line.erase(0, pos + delimiter.length());
-            }
-            dataInLine.push_back(atoi(line.c_str()));
+            vector<double> dataInLine = ReadLine(line);
+
             // dataInLine.erase(dataInLine.begin());
             Task taskCurr(dataInLine);
             taskSet.push_back(taskCurr);
@@ -353,6 +358,7 @@ TaskSet ReadTaskSet(string path, string priorityType = "RM")
         ttt = Reorder(ttt, priorityType);
         if (debugMode == 1)
             cout << "Finish reading the data file succesfully!\n";
+        TASK_NUMBER = ttt.size();
         return ttt;
     }
     else
@@ -370,6 +376,14 @@ void UpdateTaskSetExecutionTime(TaskSet &taskSet, VectorDynamic executionTimeVec
 
     for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
         taskSet[i].executionTime = executionTimeVec(i - lastTaskDoNotNeedOptimize - 1, 0);
+}
+
+void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic periodVec, int lastTaskDoNotNeedOptimize = -1)
+{
+    int N = taskSet.size();
+
+    for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+        taskSet[i].period = periodVec(i - lastTaskDoNotNeedOptimize - 1, 0);
 }
 
 ProcessorTaskSet ExtractProcessorTaskSet(TaskSet &tasks)
