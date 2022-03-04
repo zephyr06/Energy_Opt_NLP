@@ -42,19 +42,24 @@ class Task
 public:
     // Member list
     int offset;
-    int period;
+    double period;
     int overhead;
     double executionTimeOrg;
     double executionTime;
     int deadline;
     int id;
     int processorId;
+    double periodOrg;
 
     // initializer
 
     Task() : offset(0), period(0),
              overhead(0), executionTime(0.0),
-             deadline(0) { executionTimeOrg = executionTime; }
+             deadline(0)
+    {
+        executionTimeOrg = executionTime;
+        periodOrg = period;
+    }
     Task(int offset, int period, int overhead, double executionTime,
          int deadline) : offset(offset), period(period),
                          overhead(overhead), executionTime(executionTime),
@@ -63,12 +68,17 @@ public:
         id = -1;
         processorId = -1;
         executionTimeOrg = executionTime;
+        periodOrg = period;
     }
     Task(int offset, int period, int overhead, double executionTime,
          int deadline, int id, int processorId) : offset(offset), period(period),
                                                   overhead(overhead), executionTime(executionTime),
                                                   deadline(deadline), id(id),
-                                                  processorId(processorId) { executionTimeOrg = executionTime; }
+                                                  processorId(processorId)
+    {
+        executionTimeOrg = executionTime;
+        periodOrg = period;
+    }
 
     /**
      * only used in ReadTaskSet because the input parameter's type is int
@@ -242,10 +252,10 @@ long long int HyperPeriod(const TaskSet &tasks)
     }
     else
     {
-        long long int hyper = tasks[0].period;
+        long long int hyper = ceil(tasks[0].period);
         for (int i = 1; i < N; i++)
         {
-            hyper = lcm(hyper, tasks[i].period);
+            hyper = lcm(hyper, int(ceil(tasks[i].period)));
             if (hyper < 0 || hyper > LLONG_MAX)
             {
                 // cout << Color::red <<  << Color::def << endl;
@@ -373,6 +383,14 @@ void UpdateTaskSetExecutionTime(TaskSet &taskSet, VectorDynamic executionTimeVec
 
     for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
         taskSet[i].executionTime = executionTimeVec(i - lastTaskDoNotNeedOptimize - 1, 0);
+}
+
+void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic periodVec, int lastTaskDoNotNeedOptimize = -1)
+{
+    int N = taskSet.size();
+
+    for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+        taskSet[i].period = periodVec(i - lastTaskDoNotNeedOptimize - 1, 0);
 }
 
 ProcessorTaskSet ExtractProcessorTaskSet(TaskSet &tasks)

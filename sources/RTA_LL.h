@@ -92,7 +92,7 @@ public:
                 responseTimeBefore = responseTime;
             }
             loopCount++;
-            if (loopCount > 10000)
+            if (loopCount > 1000)
             {
                 CoutError("LoopCount error in RTA_LL");
             }

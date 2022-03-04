@@ -19,7 +19,7 @@ template <class TaskSetType>
 class RTA_BASE
 {
 public:
-     TaskSetType tasks;
+    TaskSetType tasks;
     RTA_BASE() {}
     RTA_BASE(const TaskSetType &tasks) : tasks(tasks) {}
 
@@ -42,9 +42,17 @@ public:
     {
         int N = tasks.tasks_.size();
         VectorDynamic res = GenerateVectorDynamic(N);
+        if (printRTA)
+        {
+            cout << "Response time analysis of the task set is:" << endl;
+        }
         for (int i = 0; i < N; i++)
         {
             res(i, 0) = RTA_Common_Warm(warmStart(i, 0), i);
+            if (printRTA)
+            {
+                cout << "Task " << i << ": " << res(i, 0) << endl;
+            }
         }
         return res;
     }

@@ -55,6 +55,7 @@ const int adjustEliminateMaxIte = (int)ConfigParameters["adjustEliminateMaxIte"]
 int core_m_dag = (int)ConfigParameters["core_m_dag"];
 int baselineLLCompare = (int)ConfigParameters["baselineLLCompare"]; // baselineLLCompare: 1 means Zhao20, 2 means MILP
 
+int printRTA = (int)ConfigParameters["printRTA"];
 const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];
 double frequencyRatio = (double)ConfigParameters["frequencyRatio"];

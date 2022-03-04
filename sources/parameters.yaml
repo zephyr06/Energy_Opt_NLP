@@ -3,15 +3,16 @@
 runMode: compare
 # TODO: v6 elimination check failed
 testDataSetName: test_n10_v8
-optimizerType: 1 # 1 means dogleg, 2 means LM
+optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-5
-debugMode: 0
+debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
 EnergyMode: 1
 exactJacobian: 0
 printFailureFile: 0
+printRTA: 1
 readTaskMode: RM
 batchOptimizeFolder: MIGP
 core_m_dag: 2
@@ -42,7 +43,7 @@ punishmentFrequency: 10
 randomInitialize: 0
 deltaInitialDogleg: 1e10
 
-initialLambda: 1e-1
+initialLambda: 1e0
 lowerLambda: 1e-20
 upperLambda: 1e30
 coolingRateSA: 0.99
@@ -53,4 +54,4 @@ SA_iteration: 1000000
 
 utilTol: 0.001
 
-weightEnergy: 1e8
+weightEnergy: 1e4
