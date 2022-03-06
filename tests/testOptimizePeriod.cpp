@@ -48,6 +48,24 @@ TEST(ReadControlCase1, v2)
     AssertEigenEqualVector(expectCoeff, coeff);
 }
 
+TEST(rta1, v1)
+{
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    tasks[0].period = 68.000000;
+    tasks[1].period = 129.000003;
+    tasks[2].period = 129.003; // test fails if 128.9993
+    tasks[3].period = 129.000002;
+    tasks[4].period = 129.000004;
+    RTA_LL r(tasks);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    VectorDynamic expectRta = GenerateVectorDynamic(5);
+    expectRta << 2, 50, 68, 117, 129;
+    AssertEigenEqualVector(expectRta, rta);
+}
+
 class ControlFactorT : public NoiseModelFactor1<VectorDynamic>
 {
 public:
@@ -207,6 +225,7 @@ TEST(optimizeperiod1, v1)
     NonlinearFactorGraph graph;
     Symbol key('a', 0);
     VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
+    initialEstimate << 68.000000, 129.000003, 129.0003, 129.000002, 129.000004;
 
     graph.emplace_shared<ControlFactorT>(key, tasks, coeff, model);
 
@@ -239,7 +258,9 @@ TEST(optimizeperiod1, v1)
 
     VectorDynamic optComp = result.at<VectorDynamic>(key);
 
-    cout << "After optimization, the period vector is " << optComp << endl;
+    cout << "After optimization, the period vector is " << endl
+         << optComp << endl;
+    UpdateTaskSetPeriod(tasks, initialEstimate);
     cout << "Before optimization, the total error is " << realObj(tasks, coeff) << endl;
     UpdateTaskSetPeriod(tasks, optComp);
     cout << "The objective function is " << realObj(tasks, coeff) << endl;
