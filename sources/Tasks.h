@@ -323,6 +323,23 @@ void ReadFrequencyModeRatio(string path)
         CoutError("The path does not exist in ReadFrequencyModeRatio! Given path is " + path);
     }
 }
+
+vector<std::string> SplitStringMy(std::string line, std::string delimiter = ",")
+{
+    // some default parameters in this function
+    std::string token;
+    size_t pos = 0;
+    std::vector<std::string> dataInLine;
+    while ((pos = line.find(delimiter)) != std::string::npos)
+    {
+        token = line.substr(0, pos);
+        dataInLine.push_back(token);
+        line.erase(0, pos + delimiter.length());
+    }
+    dataInLine.push_back((line.c_str()));
+    return dataInLine;
+}
+
 vector<double> ReadLine(string line)
 {
     // some default parameters in this function

@@ -1,8 +1,11 @@
 #include <chrono>
-
+#include <string>
+#include <utility>
+#include <numeric>
 #include <CppUnitLite/TestHarness.h>
 #include "../sources/Parameters.h"
 #include "../sources/Optimize.h"
+using namespace std;
 using namespace std::chrono;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 class ControlFactorT : public NoiseModelFactor1<VectorDynamic>
@@ -224,6 +227,73 @@ TEST(optimizeperiod1, v1)
     cout << "Before optimization, the total error is " << realObj(tasks, coeff) << endl;
     UpdateTaskSetPeriod(tasks, optComp);
     cout << "The objective function is " << realObj(tasks, coeff) << endl;
+}
+std::vector<double> String2IntVector(std::vector<std::string> vecS)
+{
+    std::vector<double> vecI;
+    vecI.reserve(vecS.size());
+
+    for (uint i = 1; i < stoi(vecS[0]) + 1; i++)
+    {
+        vecI.push_back(stod(vecS[i]));
+    }
+    return vecI;
+}
+std::pair<TaskSet, VectorDynamic> ReadControlCase(std::string path)
+{
+    fstream newfile;
+    VectorDynamic coeffVec;
+    vector<double>
+        executionTimeVector;
+    newfile.open(path, ios::in); //open a file to perform read operation using file object
+    if (newfile.is_open())
+    { //checking whether the file is open
+        std::string tp;
+        // get number of lines in the file
+        getline(newfile, tp);
+
+        // get computation time vector
+        getline(newfile, tp);
+        executionTimeVector = String2IntVector(SplitStringMy(tp, " "));
+
+        // get coeffVec
+        getline(newfile, tp);
+        coeffVec = Vector2Eigen<double>(String2IntVector(SplitStringMy(tp, " ")));
+
+        // max period doesn't have to be read
+
+        newfile.close(); //close the file object.
+    }
+    else
+    {
+        CoutError("Path doesn't exist in ReadControlCase: " + path);
+    }
+    double period = std::accumulate(executionTimeVector.begin(), executionTimeVector.end(), 0) * 5;
+    TaskSet tasks;
+    for (uint i = 0; i < executionTimeVector.size(); i++)
+    {
+        Task t(0, period, 0, executionTimeVector[i], period, i, 0);
+        tasks.push_back(t);
+    }
+    return make_pair(tasks, coeffVec);
+}
+TEST(ReadControlCase1, v1)
+{
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet task1;
+    VectorDynamic coeff;
+    std::tie(task1, coeff) = ReadControlCase(path1);
+    VectorDynamic expectCoeff = GenerateVectorDynamic(10);
+    expectCoeff << 645, 7143, 275, 9334, 217, 5031, 489, 3778, 285, 380;
+    VectorDynamic expectC = GenerateVectorDynamic(5);
+    expectC << 2, 48, 18, 47, 12;
+    VectorDynamic actualC = GetParameterVD<double>(task1, "executionTime");
+    AssertEigenEqualVector(expectC, actualC);
+    VectorDynamic expectT = GenerateVectorDynamic(5);
+    expectT << 635, 635, 635, 635, 635;
+    VectorDynamic actualT = GetParameterVD<double>(task1, "period");
+    AssertEigenEqualVector(expectT, actualT);
+    AssertEigenEqualVector(expectCoeff, coeff);
 }
 
 int main()
