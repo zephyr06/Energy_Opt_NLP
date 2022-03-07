@@ -18,6 +18,7 @@ double eliminateTol = (double)ConfigParameters["eliminateTol"];
 double weightDrawBegin = (double)ConfigParameters["weightDrawBegin"];
 double weightDrawEnd = (double)ConfigParameters["weightDrawEnd"];
 double MaxComputationTimeRestrict = (double)ConfigParameters["MaxComputationTimeRestrict"];
+double eliminateJacobianThreshold = (double)ConfigParameters["eliminateJacobianThreshold"];
 
 int printFailureFile = (int)ConfigParameters["printFailureFile"];
 int EnergyMode = (int)ConfigParameters["EnergyMode"];
@@ -29,7 +30,7 @@ int enableMaxComputationTimeRestrict = (int)ConfigParameters["enableMaxComputati
 int exactJacobian = (int)ConfigParameters["exactJacobian"];
 const int temperatureSA = (int)ConfigParameters["temperatureSA"];
 const double utilTol = (double)ConfigParameters["utilTol"];
-const double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
+double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
 const double initialLambda = (double)ConfigParameters["initialLambda"];
 const double lowerLambda = (double)ConfigParameters["lowerLambda"];
 const double upperLambda = (double)ConfigParameters["upperLambda"];

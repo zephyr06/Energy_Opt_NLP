@@ -71,11 +71,14 @@ class ControlFactorT : public NoiseModelFactor1<VectorDynamic>
 public:
     TaskSet tasks_;
     VectorDynamic coeffVec_;
+    std::vector<bool> eliminationMask_;
     int N;
 
     ControlFactorT(Key key, TaskSet &tasks, VectorDynamic coeffVec,
+                   std::vector<bool> eliminationMask,
                    SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
-                                             tasks_(tasks), coeffVec_(coeffVec)
+                                             tasks_(tasks), coeffVec_(coeffVec),
+                                             eliminationMask_(eliminationMask)
     {
         N = tasks_.size();
     }
@@ -89,20 +92,27 @@ public:
         double totalExecution = GetParameterVD<double>(tasks, "executionTime").sum();
         for (uint i = 0; i < tasks.size(); i++)
         {
+
             resV(5 * i) = pow(coeffVec_[2 * i] * tasks[i].period, 1);
             resV(5 * i + 1) = pow(coeffVec_[2 * i + 1] * rta(i), 1);
             resV(5 * i + 2) = max(0, tasks[i].period - totalExecution * 5) * weightEnergy;
             resV(5 * i + 3) = max(0, 0 - tasks[i].period) * weightEnergy;
-            resV(5 * i + 4) = max(0, rta(i) - tasks[i].deadline) * weightEnergy;
-            if (resV(5 * i + 2) > 1)
-            {
-                int a = 1;
-            }
-            if (resV(5 * i + 2) != 0 || resV(5 * i + 3) != 0 || resV(5 * i + 4) != 0)
-            {
-                int a = 1;
-            }
+            resV(5 * i + 4) = max(0, rta(i) - min(tasks[i].deadline, tasks[i].period));
+            // if (resV(5 * i + 4) != 0)
+            //     resV(5 * i + 4) = log(resV(5 * i + 4));
+            resV(5 * i + 4) *= weightEnergy;
+            // if (resV(5 * i + 2) > 1)
+            // {
+            //     int a = 1;
+            // }
+            // if (resV(5 * i + 2) != 0 || resV(5 * i + 3) != 0 || resV(5 * i + 4) != 0)
+            // {
+            //     int a = 1;
+            // }
         }
+        cout << "The current error is "
+             << resV.norm() << endl
+             << endl;
         return resV;
     }
 
@@ -122,6 +132,8 @@ public:
         {
             TaskSet taskT = tasks_;
             UpdateTaskSetPeriod(taskT, executionTimeVector);
+            cout << "Current period time vector is " << endl
+                 << executionTimeVector << endl;
             return EstimateControlAndSchedulability(taskT);
         };
 
@@ -153,9 +165,32 @@ public:
             // if (exactJacobian)
             //     *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, N);
             // else
-            *H = NumericalDerivativeDynamicUpper(f2, executionTimeVector, deltaOptimizer, N * 5);
+            *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N * 5);
             // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
             // *H = jacobian;
+            // for (uint i = 0; i < N; i++)
+            // {
+            //     if (eliminationMask_[i])
+            //     {
+            //         (*H)(5 * i, 0) = 0;
+            //         (*H)(5 * i + 1, 0) = 0;
+            //     }
+            // }
+            for (uint i = 0; i < H->rows(); i++)
+            {
+                for (uint j = 0; j < H->cols(); j++)
+                {
+                    if (abs((*H)(i, j)) > eliminateJacobianThreshold)
+                    {
+                        // clear column
+                        for (uint k = 0; k < H->rows(); k++)
+                        {
+                            (*H)(k, j) = 0;
+                        }
+                    }
+                }
+            }
+            // (*H)(5 * 3, 3) = 0;
             if (debugMode == 1)
             {
                 cout << endl;
@@ -179,55 +214,53 @@ public:
 
 // class
 
-TEST(period, error1)
-{
-    weightEnergy = 1;
+// TEST(period, error1)
+// {
+//     // weightEnergy = 1;
 
-    TaskSet tasks;
-    tasks.push_back(Task{0, 635, 0, 2, 635, 0, 0});
-    tasks.push_back(Task{0, 635, 0, 48, 635, 1, 0});
-    tasks.push_back(Task{0, 635, 0, 18, 635, 2, 0});
-    tasks.push_back(Task{0, 635, 0, 47, 635, 3, 0});
-    tasks.push_back(Task{0, 635, 0, 12, 635, 4, 0});
-    int N = tasks.size();
-    auto model = noiseModel::Isotropic::Sigma(N * 5, noiseModelSigma);
+//     TaskSet tasks;
+//     tasks.push_back(Task{0, 635, 0, 2, 635, 0, 0});
+//     tasks.push_back(Task{0, 635, 0, 48, 635, 1, 0});
+//     tasks.push_back(Task{0, 635, 0, 18, 635, 2, 0});
+//     tasks.push_back(Task{0, 635, 0, 47, 635, 3, 0});
+//     tasks.push_back(Task{0, 635, 0, 12, 635, 4, 0});
+//     int N = tasks.size();
+//     auto model = noiseModel::Isotropic::Sigma(N * 5, noiseModelSigma);
 
-    Symbol key('a', 0);
-    VectorDynamic coeff;
-    coeff.resize(10, 1);
-    coeff << 645, 7143, 275, 9334, 217, 5031, 489, 3778, 285, 380;
-    VectorDynamic initialEstimate = GenerateVectorDynamic(5);
-    initialEstimate << 635, 635, 635, 635, 635;
-    ControlFactorT factor1(key, tasks, coeff, model);
-    cout << factor1.evaluateError(initialEstimate) << endl;
-    AssertEqualScalar(2519309, factor1.evaluateError(initialEstimate).sum());
-    initialEstimate << 634.9, 635, 635, 635, 635;
-    AssertEqualScalar(2519244.5, factor1.evaluateError(initialEstimate).sum());
-}
+//     Symbol key('a', 0);
+//     VectorDynamic coeff;
+//     coeff.resize(10, 1);
+//     coeff << 645, 7143, 275, 9334, 217, 5031, 489, 3778, 285, 380;
+//     VectorDynamic initialEstimate = GenerateVectorDynamic(5);
+//     initialEstimate << 635, 635, 635, 635, 635;
+//     std::vector<bool> eliminationMask(tasks.size(), false);
+//     ControlFactorT factor1(key, tasks, coeff, eliminationMask, model);
+//     cout << factor1.evaluateError(initialEstimate) << endl;
+//     AssertEqualScalar(2519309, factor1.evaluateError(initialEstimate).sum());
+//     initialEstimate << 634.9, 635, 635, 635, 635;
+//     AssertEqualScalar(2519244.5, factor1.evaluateError(initialEstimate).sum());
+// }
 double realObj(TaskSet &tasks, VectorDynamic coeff)
 {
     double res = 0;
     Symbol key('a', 0);
     auto model = noiseModel::Isotropic::Sigma(tasks.size() * 5, 1);
-    ControlFactorT factor(key, tasks, coeff, model);
+    std::vector<bool> eliminationMask(tasks.size(), false);
+    ControlFactorT factor(key, tasks, coeff, eliminationMask, model);
     return factor.evaluateError(GetParameterVD<double>(tasks, "period")).sum();
 }
-TEST(optimizeperiod1, v1)
-{
-    // weightEnergy = 1e8;
-    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
-    TaskSet tasks;
-    VectorDynamic coeff;
-    std::tie(tasks, coeff) = ReadControlCase(path1);
-    int N = tasks.size();
 
+pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic coeff,
+                                                   std::vector<bool> &eliminationMask, VectorDynamic &initialEstimate)
+{
+    int N = tasks.size();
     auto model = noiseModel::Isotropic::Sigma(N * 5, noiseModelSigma);
     NonlinearFactorGraph graph;
     Symbol key('a', 0);
-    VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
-    initialEstimate << 68.000000, 129.000003, 129.0003, 129.000002, 129.000004;
+    // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
+    // initialEstimate << 68.000000, 321, 400, 131, 308;
 
-    graph.emplace_shared<ControlFactorT>(key, tasks, coeff, model);
+    graph.emplace_shared<ControlFactorT>(key, tasks, coeff, eliminationMask, model);
 
     Values initialEstimateFG;
     initialEstimateFG.insert(key, initialEstimate);
@@ -257,15 +290,106 @@ TEST(optimizeperiod1, v1)
     }
 
     VectorDynamic optComp = result.at<VectorDynamic>(key);
-
+    ios::sync_with_stdio(false);
+    cout.precision(17);
+    cout << Color::blue;
     cout << "After optimization, the period vector is " << endl
          << optComp << endl;
     UpdateTaskSetPeriod(tasks, initialEstimate);
     cout << "Before optimization, the total error is " << realObj(tasks, coeff) << endl;
     UpdateTaskSetPeriod(tasks, optComp);
     cout << "The objective function is " << realObj(tasks, coeff) << endl;
+    cout << Color::def;
+    return make_pair(optComp, realObj(tasks, coeff));
 }
+VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
+                                       std::vector<bool> &eliminationMask,
+                                       VectorDynamic &initialEstimate, double initialError)
+{
+    VectorDynamic periodRes;
+    double err;
+    std::tie(periodRes, err) = UnitOptimizationPeriod(tasks, coeff, eliminationMask, initialEstimate);
+    if (err < initialError)
+    {
+        periodRes = OptimizeTaskSetIterative(tasks, coeff, eliminationMask, periodRes, err);
+    }
+    return periodRes;
+}
+bool EliminateTask(TaskSet &tasks, std::vector<bool> &eliminationMask, VectorDynamic &currPeriod)
+{
+    TaskSet tasksCurr = tasks;
+    UpdateTaskSetPeriod(tasksCurr, currPeriod);
+    RTA_LL r(tasks);
+    for (uint i = 0; i < tasks.size(); i++)
+    {
+        tasksCurr[i].period -= eliminateTol;
 
+        // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
+        double tolerance = 0.0;
+        RTA_LL r(tasksCurr);
+        bool schedulable = r.CheckSchedulability(debugMode == 1);
+        if ((!schedulable) ||
+            (enableMaxComputationTimeRestrict &&
+             tasksCurr[i].period - eliminateTol > tasks[i].periodOrg))
+        {
+            eliminationMask[i] = true;
+            return true;
+        }
+    }
+    return false;
+}
+// TEST(optimizeperiod1, v1)
+// {
+//     // weightEnergy = 1e4;
+//     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+//     TaskSet tasks;
+//     VectorDynamic coeff;
+//     std::tie(tasks, coeff) = ReadControlCase(path1);
+//     VectorDynamic initialEstimate = GenerateVectorDynamic(tasks.size()).array() + tasks[0].period;
+//     initialEstimate << 68, 129.002, 218.352, 129, 128.895;
+//     std::vector<bool> eliminationMask(tasks.size(), false);
+//     VectorDynamic resOne;
+//     double err;
+//     std::tie(resOne, err) = UnitOptimizationPeriod(tasks, coeff, eliminationMask, initialEstimate);
+// }
+
+// TEST(OptimizePeriod, v2)
+// {
+//     // weightEnergy = 1e4;
+//     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+//     TaskSet tasks;
+//     VectorDynamic coeff;
+//     std::tie(tasks, coeff) = ReadControlCase(path1);
+//     VectorDynamic initialEstimate = GenerateVectorDynamic(tasks.size()).array() + tasks[0].period;
+//     // initialEstimate << 68, 321, 400, 129, 308;
+//     initialEstimate << 68, 129.002, 218.352, 129, 128.895;
+//     std::vector<bool> eliminationMask(tasks.size(), false);
+//     VectorDynamic resOneTime;
+//     double err;
+//     std::tie(resOneTime, err) = UnitOptimizationPeriod(tasks, coeff, eliminationMask, initialEstimate);
+//     bool useless = EliminateTask(tasks, eliminationMask, resOneTime);
+//     AssertBool(true, useless);
+//     AssertBool(true, eliminationMask[0]);
+// }
+TEST(OptimizeIterative, v1)
+{
+    std::ios::sync_with_stdio(false);
+    // weightEnergy = 1e4;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    VectorDynamic initialEstimate = GenerateVectorDynamic(tasks.size()).array() + tasks[0].period;
+    // initialEstimate << 68, 129, 129, 129, 128.895;
+    initialEstimate << 68.0001, 129.001, 218.688, 129, 128.999998;
+    // initialEstimate << 68.0001, //68.000081893411362
+    //     129.00070388840817,
+    //     218.68764792734831,
+    //     129.00009184509682,
+    //     128.999998; //128.99998098915873
+    std::vector<bool> eliminationMask(tasks.size(), false);
+    VectorDynamic resOne = OptimizeTaskSetIterative(tasks, coeff, eliminationMask, initialEstimate, 1e20);
+}
 int main()
 {
     TestResult tr;

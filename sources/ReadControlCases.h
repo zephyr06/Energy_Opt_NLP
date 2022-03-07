@@ -5,7 +5,7 @@ std::vector<double> String2IntVector(std::vector<std::string> vecS)
     std::vector<double> vecI;
     vecI.reserve(vecS.size());
 
-    for (uint i = 1; i < stoi(vecS[0]) + 1; i++)
+    for (int i = 1; i < stoi(vecS[0]) + 1; i++)
     {
         vecI.push_back(stod(vecS[i]));
     }

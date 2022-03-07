@@ -53,6 +53,11 @@ public:
             {
                 cout << "Task " << i << ": " << res(i, 0) << endl;
             }
+            if (res(i, 0) >= INT32_MAX - 10000)
+            {
+                int a = 1;
+                a *= a;
+            }
         }
         return res;
     }
@@ -82,7 +87,8 @@ public:
         {
             double rta = RTA_Common_Warm(warmStart(i, 0), i);
             if (whetherPrint)
-                cout << "response time for task " << i << " is " << rta << " and deadline is " << tasks.tasks_[i].deadline << endl;
+                cout << "response time for task " << i << " is " << rta << " and deadline is "
+                     << min(tasks.tasks_[i].deadline, tasks.tasks_[i].period) << endl;
             if (rta + tol > min(tasks.tasks_[i].deadline, tasks.tasks_[i].period))
             {
                 if (whetherPrint)
