@@ -22,7 +22,6 @@
 #include "Parameters.h"
 #include "colormod.h"
 #include "testMy.h"
-#include "profilier.h"
 #include "utils.h"
 
 using namespace std;
@@ -30,6 +29,17 @@ using namespace gtsam;
 
 typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;
 typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic &)> NormalErrorFunction2D;
+
+/**
+ * @brief returns 0 if x>=0
+ * 
+ * @param x 
+ * @return double 
+ */
+double HingeLoss(double x)
+{
+    return max(0, -1 * x);
+}
 
 /**
  * @brief Constraint of x <= b
@@ -60,20 +70,17 @@ public:
     Vector evaluateError(const VectorDynamic &x,
                          boost::optional<Matrix &> H = boost::none) const override
     {
-        BeginTimer("InequalityFactor1D");
-        // AssertEqualScalar(1, x.rows(), 1e-6, __LINE__);
         VectorDynamic err = f(x);
         if (H)
         {
             *H = NumericalDerivativeDynamicUpper(f, x, deltaOptimizer, dimension);
         }
-        EndTimer("InequalityFactor1D");
         return err;
     }
 };
 
 /**
- * @brief Constraint of x >= b
+ * @brief Constraint of x <= b
  * 
  */
 class SmallerThanFactor1D : public InequalityFactor1D
@@ -86,7 +93,7 @@ public:
         f = [b](const VectorDynamic &x)
         {
             VectorDynamic res = x;
-            res << Barrier(b - x(0, 0));
+            res << HingeLoss(b - x(0, 0));
             return res;
         };
     }
@@ -106,11 +113,44 @@ public:
         f = [b](const VectorDynamic &x)
         {
             VectorDynamic res = x;
-            res << Barrier(x(0, 0) - b);
+            res << HingeLoss(x(0, 0) - b);
             return res;
         };
     }
 };
+
+MatrixDynamic NumericalDerivativeDynamic2D1(NormalErrorFunction2D h,
+                                            const VectorDynamic &x1,
+                                            const VectorDynamic &x2,
+                                            double deltaOptimizer,
+                                            int mOfJacobian)
+{
+    int n = x1.rows();
+    MatrixDynamic jacobian;
+    jacobian.resize(mOfJacobian, n);
+    NormalErrorFunction1D f = [h, x2](const VectorDynamic &x1)
+    {
+        return h(x1, x2);
+    };
+
+    return NumericalDerivativeDynamicUpper(f, x1, deltaOptimizer, mOfJacobian);
+}
+MatrixDynamic NumericalDerivativeDynamic2D2(NormalErrorFunction2D h,
+                                            const VectorDynamic &x1,
+                                            const VectorDynamic &x2,
+                                            double deltaOptimizer,
+                                            int mOfJacobian)
+{
+    int n = x2.rows();
+    MatrixDynamic jacobian;
+    jacobian.resize(mOfJacobian, n);
+    NormalErrorFunction1D f = [h, x1](const VectorDynamic &x2)
+    {
+        return h(x1, x2);
+    };
+
+    return NumericalDerivativeDynamicUpper(f, x2, deltaOptimizer, mOfJacobian);
+}
 
 /**
  * @brief Constraint of f(x1, x2) <= 0;
@@ -140,8 +180,6 @@ public:
     Vector evaluateError(const VectorDynamic &x1, const VectorDynamic &x2,
                          boost::optional<Matrix &> H1 = boost::none, boost::optional<Matrix &> H2 = boost::none) const override
     {
-        BeginTimer("InequalityFactor2D");
-        // AssertEqualScalar(1, x.rows(), 1e-6, __LINE__);
         VectorDynamic err = f(x1, x2);
         if (H1)
         {
@@ -151,7 +189,6 @@ public:
         {
             *H2 = NumericalDerivativeDynamic2D2(f, x1, x2, deltaOptimizer, 1);
         }
-        EndTimer("InequalityFactor2D");
         return err;
     }
 };

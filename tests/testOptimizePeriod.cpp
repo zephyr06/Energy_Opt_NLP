@@ -372,12 +372,12 @@ TEST(OptimizeIterative, v1)
     VectorDynamic initialEstimate = GenerateVectorDynamic(tasks.size()).array() + tasks[0].period;
     // initialEstimate << 68, 129, 129, 129, 128.895;
     cout.precision(17);
-    initialEstimate << 68.0001, 129.001, 218.688, 129, 128.999998;
-    initialEstimate << 68.0001, //68.000081893411362
-        129.00105,
-        218.68764792734831,
-        129.00009184509682,
-        128.999998; //128.99998098915873
+    // initialEstimate << 68.0001, 129.001, 218.688, 129, 128.999998;
+    // initialEstimate << 68.0001, //68.000081893411362
+    //     129.00105,
+    //     218.68764792734831,
+    //     129.00009184509682,
+    //     128.999998; //128.99998098915873
     std::vector<bool> eliminationMask(tasks.size(), false);
     VectorDynamic resOne = OptimizeTaskSetIterative(tasks, coeff, eliminationMask, initialEstimate, 1e20);
 }
