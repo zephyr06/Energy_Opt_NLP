@@ -98,6 +98,29 @@ void AssertEqualVectorNoRepeat(const vector<T> &expected, const vector<T> &actua
     return;
 }
 
+template <typename T>
+void AssertEqualVectorExact(const vector<T> &expected, const vector<T> &actual,
+                            double tolerance = 1e-6, int lineNumber = 0)
+{
+    if (expected.size() != actual.size())
+    {
+        cout << Color::red << "Length error! " << Color::def;
+        AssertUnEqual(expected.size(), actual.size());
+        return;
+    }
+
+    for (size_t i = 0; i < expected.size(); i++)
+    {
+        if (expected[i] != actual[i])
+        {
+            CoutError("Expected element: " + to_string(expected.at(i)) +
+                      " while actual element: " + to_string(actual.at(i)));
+        }
+    }
+
+    return;
+}
+
 void AssertEigenEqualVector(Eigen::Matrix<double, Eigen::Dynamic, 1> expected,
                             Eigen::Matrix<double, Eigen::Dynamic, 1> actual, int lineNumber = 0)
 {

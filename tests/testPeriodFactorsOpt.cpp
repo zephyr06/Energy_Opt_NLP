@@ -69,6 +69,23 @@ VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
     return periodRes;
 }
 
+void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination)
+{
+    RTA_LL r(tasks);
+    VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
+    for (uint i = 0; i < tasks.size(); i++)
+    {
+        tasks[i].period -= deltaOptimizer;
+        RTA_LL r1(tasks);
+        VectorDynamic rtaCurr = r.ResponseTimeOfTaskSet();
+        if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= eliminateTol)
+        {
+            maskForElimination[i] = true;
+        }
+        tasks[i].period += deltaOptimizer;
+    }
+}
+
 TEST(case1, v1)
 {
     noiseModelSigma = 1;
@@ -77,9 +94,10 @@ TEST(case1, v1)
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
     std::vector<bool> maskForElimination(tasks.size(), false);
-    // maskForElimination = {true, true, true, true, false};
-    // VectorDynamic initialEstimate = GenerateVectorDynamic(tasks.size()).array() + tasks[0].period;
     auto sth = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
+    UpdateTaskSetPeriod(tasks, sth.first);
+    FindEliminatedVariables(tasks, maskForElimination);
+    AssertEqualVectorExact({true, true, false, true, true}, maskForElimination);
 }
 
 int main()
