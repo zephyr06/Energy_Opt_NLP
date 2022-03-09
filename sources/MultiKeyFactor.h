@@ -22,7 +22,6 @@
 #include "Parameters.h"
 #include "colormod.h"
 #include "testMy.h"
-#include "profilier.h"
 #include "utils.h"
 
 using namespace std;
@@ -31,13 +30,12 @@ using namespace gtsam;
 // typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
 // typedef Eigen::SparseMatrix<double, Eigen::ColMajor> SM_Dynamic;
-// typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;
+typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;
 // typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic &)> NormalErrorFunction2D;
 typedef boost::function<Vector(const Values &x)> LambdaMultiKey;
 
 typedef long long int LLint;
 
-using namespace DAG_SPACE;
 typedef std::vector<VectorDynamic> VVec;
 
 class MultiKeyFactor : public NoiseModelFactor

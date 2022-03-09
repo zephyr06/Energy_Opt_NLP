@@ -4,8 +4,8 @@ runMode: compare
 # TODO: v6 elimination check failed
 testDataSetName: test_n10_v8
 optimizerType: 2 # 1 means dogleg, 2 means LM
-deltaOptimizer: 1e-4
-eliminateJacobianThreshold: 1e7
+deltaOptimizer: 1e-2
+eliminateJacobianThreshold: 1e30
 debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
@@ -35,7 +35,7 @@ roundTypeInClamp: "fine"
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e0
-relativeErrorTolerance: 1e-8
+relativeErrorTolerance: 1e-7
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
 

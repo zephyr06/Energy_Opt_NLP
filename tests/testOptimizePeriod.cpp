@@ -92,23 +92,11 @@ public:
         double totalExecution = GetParameterVD<double>(tasks, "executionTime").sum();
         for (uint i = 0; i < tasks.size(); i++)
         {
-
             resV(5 * i) = pow(coeffVec_[2 * i] * tasks[i].period, 1);
             resV(5 * i + 1) = pow(coeffVec_[2 * i + 1] * rta(i), 1);
             resV(5 * i + 2) = max(0, tasks[i].period - totalExecution * 5) * weightEnergy;
             resV(5 * i + 3) = max(0, 0 - tasks[i].period) * weightEnergy;
-            resV(5 * i + 4) = max(0, rta(i) - min(tasks[i].deadline, tasks[i].period));
-            // if (resV(5 * i + 4) != 0)
-            //     resV(5 * i + 4) = log(resV(5 * i + 4));
-            resV(5 * i + 4) *= weightEnergy;
-            // if (resV(5 * i + 2) > 1)
-            // {
-            //     int a = 1;
-            // }
-            // if (resV(5 * i + 2) != 0 || resV(5 * i + 3) != 0 || resV(5 * i + 4) != 0)
-            // {
-            //     int a = 1;
-            // }
+            resV(5 * i + 4) = max(0, rta(i) - min(tasks[i].deadline, tasks[i].period)) * weightEnergy;
         }
         cout << "The current error is "
              << resV.norm() << endl
@@ -188,6 +176,8 @@ public:
                             (*H)(k, j) = 0;
                         }
                     }
+                    // if (j != 2)
+                    //     (*H)(i, j) = 0;
                 }
             }
             // (*H)(5 * 3, 3) = 0;
@@ -291,7 +281,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
 
     VectorDynamic optComp = result.at<VectorDynamic>(key);
     ios::sync_with_stdio(false);
-    cout.precision(17);
+
     cout << Color::blue;
     cout << "After optimization, the period vector is " << endl
          << optComp << endl;
@@ -381,12 +371,13 @@ TEST(OptimizeIterative, v1)
     std::tie(tasks, coeff) = ReadControlCase(path1);
     VectorDynamic initialEstimate = GenerateVectorDynamic(tasks.size()).array() + tasks[0].period;
     // initialEstimate << 68, 129, 129, 129, 128.895;
+    cout.precision(17);
     initialEstimate << 68.0001, 129.001, 218.688, 129, 128.999998;
-    // initialEstimate << 68.0001, //68.000081893411362
-    //     129.00070388840817,
-    //     218.68764792734831,
-    //     129.00009184509682,
-    //     128.999998; //128.99998098915873
+    initialEstimate << 68.0001, //68.000081893411362
+        129.00105,
+        218.68764792734831,
+        129.00009184509682,
+        128.999998; //128.99998098915873
     std::vector<bool> eliminationMask(tasks.size(), false);
     VectorDynamic resOne = OptimizeTaskSetIterative(tasks, coeff, eliminationMask, initialEstimate, 1e20);
 }

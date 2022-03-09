@@ -59,6 +59,7 @@ inline MatrixDynamic GenerateOneMatrix(int m, int n)
     }
     return M;
 }
+
 template <class T>
 vector<T> Eigen2Vector(const VectorDynamic &input)
 {
@@ -86,4 +87,11 @@ inline VectorDynamic GenerateVectorDynamic(LLint N)
     v.resize(N, 1);
     v.setZero();
     return v;
+}
+
+inline VectorDynamic GenerateVectorDynamic1D(double x)
+{
+    VectorDynamic res = GenerateVectorDynamic(1);
+    res << x;
+    return res;
 }

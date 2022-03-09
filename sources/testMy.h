@@ -98,8 +98,8 @@ void AssertEqualVectorNoRepeat(const vector<T> &expected, const vector<T> &actua
     return;
 }
 
-void AssertEigenEqualVector(Eigen::Matrix<double, Eigen::Dynamic, 1> &expected,
-                            Eigen::Matrix<double, Eigen::Dynamic, 1> &actual, int lineNumber = 0)
+void AssertEigenEqualVector(Eigen::Matrix<double, Eigen::Dynamic, 1> expected,
+                            Eigen::Matrix<double, Eigen::Dynamic, 1> actual, int lineNumber = 0)
 {
     int m = expected.rows();
     int n = expected.cols();
@@ -112,8 +112,8 @@ void AssertEigenEqualVector(Eigen::Matrix<double, Eigen::Dynamic, 1> &expected,
     }
 }
 
-void AssertEigenEqualMatrix(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &expected,
-                            Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &actual)
+void AssertEigenEqualMatrix(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> expected,
+                            Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> actual)
 {
     int m = expected.rows();
     int n = expected.cols();
