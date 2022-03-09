@@ -24,6 +24,8 @@
 #include "testMy.h"
 #include "utils.h"
 
+#include "ControlFactorGraphUtils.h"
+
 using namespace std;
 using namespace gtsam;
 
@@ -76,7 +78,14 @@ public:
                     xx.update(a, xi);
                     return lambdaMK(xx);
                 };
-                (*H)[i] = NumericalDerivativeDynamicUpper(f, x.at<VectorDynamic>(keyVec[i]), deltaOptimizer, 2);
+                (*H)[i] = NumericalDerivativeDynamic(f, x.at<VectorDynamic>(keyVec[i]), deltaOptimizer);
+            }
+            if (debugMode == 1)
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+                cout << Color::blue;
+                PrintControlValues(x);
+                cout << Color::def;
             }
         }
         return lambdaMK(x);

@@ -18,6 +18,7 @@
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
 typedef long long int LLint;
+std::mutex mtx;
 // extern MatrixDynamic A_Global;
 // extern MatrixDynamic P_Global;
 MatrixDynamic A_Global;

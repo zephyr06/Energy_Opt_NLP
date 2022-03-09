@@ -29,14 +29,17 @@ MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, Task
         }
 
         VectorDynamic res = GenerateVectorDynamic(1);
-        res << error;
+        res << error * weightSchedulability;
         return res;
     };
     std::vector<gtsam::Symbol> keysVec;
     for (uint i = 0; i < tasks.size(); i++)
     {
-        if (maskForElimination[i])
+        if (!maskForElimination[i])
+        {
             keysVec.push_back(GenerateControlKey(i, "period"));
+            keysVec.push_back(GenerateControlKey(i, "response"));
+        }
     }
     auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
     return MultiKeyFactor(keysVec, f, model);

@@ -36,6 +36,10 @@ public:
         if (H)
         {
             *H = coeff_;
+            if (coeff_.rows() != 1)
+            {
+                CoutError("Wrong dimension of Jacobian in CoeffFactor!");
+            }
         }
         return err;
     }

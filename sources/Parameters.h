@@ -19,6 +19,7 @@ double weightDrawBegin = (double)ConfigParameters["weightDrawBegin"];
 double weightDrawEnd = (double)ConfigParameters["weightDrawEnd"];
 double MaxComputationTimeRestrict = (double)ConfigParameters["MaxComputationTimeRestrict"];
 double eliminateJacobianThreshold = (double)ConfigParameters["eliminateJacobianThreshold"];
+double weightSchedulability = (double)ConfigParameters["weightSchedulability"];
 
 int printFailureFile = (int)ConfigParameters["printFailureFile"];
 int EnergyMode = (int)ConfigParameters["EnergyMode"];

@@ -35,7 +35,7 @@ roundTypeInClamp: "fine"
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e0
-relativeErrorTolerance: 1e-7
+relativeErrorTolerance: 1e-10
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
 
@@ -44,7 +44,7 @@ punishmentFrequency: 10
 randomInitialize: 0
 deltaInitialDogleg: 1e10
 
-initialLambda: 1e0
+initialLambda: 1e-3
 lowerLambda: 1e-20
 upperLambda: 1e30
 coolingRateSA: 0.99
@@ -55,4 +55,5 @@ SA_iteration: 1000000
 
 utilTol: 0.001
 
-weightEnergy: 1e6
+weightEnergy: 1e9
+weightSchedulability: 1e4

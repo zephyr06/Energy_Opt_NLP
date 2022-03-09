@@ -22,10 +22,12 @@ double Barrier(double x)
 }
 
 MatrixDynamic NumericalDerivativeDynamic(boost::function<VectorDynamic(const VectorDynamic &)> h,
-                                         VectorDynamic x, double deltaOptimizer, int mOfJacobian)
+                                         VectorDynamic x, double deltaOptimizer, int mOfJacobian = -1)
 {
     int n = x.rows();
     MatrixDynamic jacobian;
+    if (mOfJacobian == -1)
+        mOfJacobian = h(x).rows();
     jacobian.resize(mOfJacobian, n);
 
     for (int i = 0; i < n; i++)
