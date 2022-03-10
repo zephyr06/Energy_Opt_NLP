@@ -10,6 +10,12 @@ MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, Task
 {
     LambdaMultiKey f = [tasks, index](const Values &x)
     {
+        // if (debugMode == 1)
+        // {
+        //     std::lock_guard<std::mutex> lock(mtx);
+        //     cout << "The values input to GenerateTaskRTAFactor: " << endl;
+        //     x.print();
+        // }
         double error = x.at<VectorDynamic>(GenerateControlKey(index, "response"))(0, 0) -
                        tasks[index].executionTime;
         for (int i = 0; i < index; i++)

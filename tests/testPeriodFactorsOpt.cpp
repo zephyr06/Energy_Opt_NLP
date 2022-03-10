@@ -1,91 +1,49 @@
 #include "../sources/ControlOptimize.h"
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
-
-pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic coeff,
-                                                   std::vector<bool> &maskForElimination)
+TEST(ExtractResults, v1)
 {
-    NonlinearFactorGraph graph = BuildControlGraph(maskForElimination, tasks, coeff);
-
-    // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
-    // initialEstimate << 68.000000, 321, 400, 131, 308;
-    Values initialEstimateFG = GenerateInitialFG(tasks, maskForElimination);
-
+    noiseModelSigma = 1;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    maskForElimination[1] = true;
     Values result;
-    if (optimizerType == 1)
-    {
-        DoglegParams params;
-        // if (debugMode == 1)
-        //     params.setVerbosityDL("VERBOSE");
-        params.setDeltaInitial(deltaInitialDogleg);
-        params.setRelativeErrorTol(relativeErrorTolerance);
-        DoglegOptimizer optimizer(graph, initialEstimateFG, params);
-        result = optimizer.optimize();
-    }
-    else if (optimizerType == 2)
-    {
-        LevenbergMarquardtParams params;
-        params.setlambdaInitial(initialLambda);
-        // if (debugMode > 1 && debugMode < 5)
-        params.setVerbosityLM("SUMMARY");
-        params.setlambdaLowerBound(lowerLambda);
-        params.setlambdaUpperBound(upperLambda);
-        params.setRelativeErrorTol(relativeErrorTolerance);
-        LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
-        result = optimizer.optimize();
-    }
-
-    VectorDynamic optComp, rtaFromOpt;
-    std::tie(optComp, rtaFromOpt) = ExtractResults(result);
-    cout << endl;
-    cout << Color::blue;
-    cout << "After optimization, the period vector is " << endl
-         << optComp << endl;
-    cout << "After optimization, the rta vector is " << endl
-         << rtaFromOpt << endl;
-    cout << Color::def;
-    cout << endl;
-    cout << Color::blue;
-    UpdateTaskSetPeriod(tasks, ExtractResults(initialEstimateFG).first);
-    cout << "Before optimization, the total error is " << realObj(tasks, coeff) << endl;
-    UpdateTaskSetPeriod(tasks, optComp);
-    cout << "The objective function is " << realObj(tasks, coeff) << endl;
-    cout << Color::def;
-
-    double eeee = graph.error(result);
-
-    return make_pair(optComp, realObj(tasks, coeff));
+    result.insert(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(1));
+    result.insert(GenerateControlKey(2, "period"), GenerateVectorDynamic1D(1));
+    result.insert(GenerateControlKey(3, "period"), GenerateVectorDynamic1D(1));
+    result.insert(GenerateControlKey(4, "period"), GenerateVectorDynamic1D(1));
+    result.insert(GenerateControlKey(0, "response"), GenerateVectorDynamic1D(1));
+    result.insert(GenerateControlKey(1, "response"), GenerateVectorDynamic1D(1));
+    result.insert(GenerateControlKey(2, "response"), GenerateVectorDynamic1D(1));
+    result.insert(GenerateControlKey(3, "response"), GenerateVectorDynamic1D(1));
+    result.insert(GenerateControlKey(4, "response"), GenerateVectorDynamic1D(1));
+    VectorDynamic expectT = GenerateVectorDynamic(5);
+    expectT = expectT.array() + 1;
+    VectorDynamic expectR = expectT;
+    expectT(1, 0) = tasks[1].period;
+    AssertEigenEqualVector(expectT, ExtractResults(result, tasks).first);
+    AssertEigenEqualVector(expectR, ExtractResults(result, tasks).second);
 }
-VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
-                                       std::vector<bool> &maskForElimination,
-                                       double initialError)
+
+TEST(FindEliminatedVariables, v1)
 {
-    VectorDynamic periodRes;
-    double err;
-    std::tie(periodRes, err) = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
-    if (err < initialError)
-    {
-        periodRes = OptimizeTaskSetIterative(tasks, coeff, maskForElimination, err);
-    }
-    return periodRes;
-}
+    noiseModelSigma = 1;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
 
-void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination)
-{
-    RTA_LL r(tasks);
-    VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
-    for (uint i = 0; i < tasks.size(); i++)
-    {
-        tasks[i].period -= deltaOptimizer;
-        RTA_LL r1(tasks);
-        VectorDynamic rtaCurr = r.ResponseTimeOfTaskSet();
-        if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= eliminateTol)
-        {
-            maskForElimination[i] = true;
-        }
-        tasks[i].period += deltaOptimizer;
-    }
+    VectorDynamic initial = GenerateVectorDynamic(5);
+    initial << 45, 372.719, 454.248, 128.127, 358.683;
+    UpdateTaskSetPeriod(tasks, initial);
+    FindEliminatedVariables(tasks, maskForElimination, 1);
+    for (auto a : maskForElimination)
+        cout << a << ", ";
+    cout << endl;
 }
-
 TEST(case1, v1)
 {
     noiseModelSigma = 1;
@@ -94,8 +52,14 @@ TEST(case1, v1)
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
     std::vector<bool> maskForElimination(tasks.size(), false);
-    auto sth = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
-    UpdateTaskSetPeriod(tasks, sth.first);
+    // auto sth = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
+    VectorDynamic periodInitial1 = GenerateVectorDynamic(5);
+    // periodInitial1 << 32.2896, 347.818, 434.834, 104.653, 333.08;
+    // UpdateTaskSetPeriod(tasks, periodInitial1);
+    // maskForElimination[1] = 1;
+    auto sth = OptimizeTaskSetIterativeWeight(tasks, coeff, maskForElimination);
+    // auto sth = OptimizeTaskSetIterative(tasks, coeff, maskForElimination);
+    // UpdateTaskSetPeriod(tasks, sth.first);
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false}, maskForElimination);
 }

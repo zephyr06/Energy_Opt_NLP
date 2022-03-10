@@ -28,29 +28,21 @@ inline gtsam::Symbol GenerateControlKey(int idtask, string type)
     }
 }
 
-pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result)
+pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet &tasks)
 {
-    VectorDynamic periods = GenerateVectorDynamic(result.size() / 2);
-    VectorDynamic rta = GenerateVectorDynamic(result.size() / 2);
-    for (uint i = 0; i < result.size() / 2; i++)
+    VectorDynamic periods = GenerateVectorDynamic(tasks.size());
+    VectorDynamic rta = GenerateVectorDynamic(tasks.size());
+    for (uint i = 0; i < tasks.size(); i++)
     {
         if (result.exists(GenerateControlKey(i, "period")))
         {
             periods(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
-            rta(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "response"))(0, 0);
         }
         else
         {
-            CoutError("Request non-existed key in ExtractPeriod" + to_string(i));
+            periods(i, 0) = tasks[i].period;
         }
+        rta(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "response"))(0, 0);
     }
     return make_pair(periods, rta);
-}
-
-void PrintControlValues(const Values &result)
-{
-    cout << "Period vector is " << endl
-         << ExtractResults(result).first << endl;
-    cout << "RTA vector is " << endl
-         << ExtractResults(result).second << endl;
 }

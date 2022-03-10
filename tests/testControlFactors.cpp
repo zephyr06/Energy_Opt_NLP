@@ -59,6 +59,7 @@ TEST(BuildGraph, v1)
 {
     weightSchedulability = 1;
     noiseModelSigma = 1;
+    weightHardConstraint = 1;
     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
     TaskSet tasks;
     VectorDynamic coeff;

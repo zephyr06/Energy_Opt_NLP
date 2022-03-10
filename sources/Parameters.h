@@ -21,6 +21,9 @@ double MaxComputationTimeRestrict = (double)ConfigParameters["MaxComputationTime
 double eliminateJacobianThreshold = (double)ConfigParameters["eliminateJacobianThreshold"];
 double weightSchedulability = (double)ConfigParameters["weightSchedulability"];
 double weightHardConstraint = (double)ConfigParameters["weightHardConstraint"];
+double weightSchedulabilityMax = (double)ConfigParameters["weightSchedulabilityMax"];
+double weightSchedulabilityMin = (double)ConfigParameters["weightSchedulabilityMin"];
+double weightSchedulabilityStep = (double)ConfigParameters["weightSchedulabilityStep"];
 
 int printFailureFile = (int)ConfigParameters["printFailureFile"];
 int EnergyMode = (int)ConfigParameters["EnergyMode"];

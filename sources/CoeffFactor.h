@@ -28,11 +28,12 @@ public:
             coeff_ = coeff_.transpose();
         }
     }
+
     Vector evaluateError(const VectorDynamic &x,
                          boost::optional<Matrix &> H = boost::none) const override
     {
         AssertEqualScalar(coeff_.rows(), x.rows(), 1e-6, __LINE__);
-        VectorDynamic err = coeff_ * (x);
+
         if (H)
         {
             *H = coeff_;
@@ -41,6 +42,7 @@ public:
                 CoutError("Wrong dimension of Jacobian in CoeffFactor!");
             }
         }
+        VectorDynamic err = coeff_ * (x);
         return err;
     }
 };

@@ -84,7 +84,8 @@ public:
             {
                 std::lock_guard<std::mutex> lock(mtx);
                 cout << Color::blue;
-                PrintControlValues(x);
+                // PrintControlValues(x);
+                // x.print();
                 cout << Color::def;
             }
         }

@@ -230,7 +230,7 @@ public:
 //     initialEstimate << 634.9, 635, 635, 635, 635;
 //     AssertEqualScalar(2519244.5, factor1.evaluateError(initialEstimate).sum());
 // }
-double realObj(TaskSet &tasks, VectorDynamic coeff)
+double RealObj(TaskSet &tasks, VectorDynamic coeff)
 {
     double res = 0;
     Symbol key('a', 0);
@@ -286,11 +286,11 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     cout << "After optimization, the period vector is " << endl
          << optComp << endl;
     UpdateTaskSetPeriod(tasks, initialEstimate);
-    cout << "Before optimization, the total error is " << realObj(tasks, coeff) << endl;
+    cout << "Before optimization, the total error is " << RealObj(tasks, coeff) << endl;
     UpdateTaskSetPeriod(tasks, optComp);
-    cout << "The objective function is " << realObj(tasks, coeff) << endl;
+    cout << "The objective function is " << RealObj(tasks, coeff) << endl;
     cout << Color::def;
-    return make_pair(optComp, realObj(tasks, coeff));
+    return make_pair(optComp, RealObj(tasks, coeff));
 }
 VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
                                        std::vector<bool> &eliminationMask,
@@ -379,7 +379,7 @@ TEST(OptimizeIterative, v1)
     //     129.00009184509682,
     //     128.999998; //128.99998098915873
     std::vector<bool> eliminationMask(tasks.size(), false);
-    VectorDynamic resOne = OptimizeTaskSetIterative(tasks, coeff, eliminationMask, initialEstimate, 1e20);
+    // VectorDynamic resOne = OptimizeTaskSetIterative(tasks, coeff, eliminationMask, initialEstimate, 1e20);
 }
 int main()
 {
