@@ -18,14 +18,16 @@ NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, Tas
 {
     NonlinearFactorGraph graph;
     double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
-    auto model1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+    auto model1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma * weightHardConstraint);
     for (uint i = 0; i < tasks.size(); i++)
     {
         if (maskForElimination[i])
             continue;
         // add CoeffFactor
-        graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"), GenerateVectorDynamic1D(coeff(2 * i, 0)), model1);
-        graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"), GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), model1);
+        graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
+                                          GenerateVectorDynamic1D(coeff(2 * i, 0)), model1);
+        graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
+                                          GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), model1);
 
         // add RTAFactor
         graph.add(GenerateTaskRTAFactor(maskForElimination, tasks, i));

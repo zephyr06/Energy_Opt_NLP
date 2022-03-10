@@ -35,7 +35,7 @@ roundTypeInClamp: "fine"
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e0
-relativeErrorTolerance: 1e-10
+relativeErrorTolerance: 1e-7
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
 
@@ -56,4 +56,5 @@ SA_iteration: 1000000
 utilTol: 0.001
 
 weightEnergy: 1e9
-weightSchedulability: 1e4
+weightSchedulability: 300
+weightHardConstraint: 1e3
