@@ -32,9 +32,9 @@ typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic
 
 /**
  * @brief returns 0 if x>=0
- * 
- * @param x 
- * @return double 
+ *
+ * @param x
+ * @return double
  */
 double HingeLoss(double x)
 {
@@ -43,7 +43,7 @@ double HingeLoss(double x)
 
 /**
  * @brief Constraint of x <= b
- * 
+ *
  */
 class InequalityFactor1D : public NoiseModelFactor1<VectorDynamic>
 {
@@ -81,7 +81,7 @@ public:
 
 /**
  * @brief Constraint of x <= b
- * 
+ *
  */
 class SmallerThanFactor1D : public InequalityFactor1D
 {
@@ -94,6 +94,9 @@ public:
         {
             VectorDynamic res = x;
             res << HingeLoss(b - x(0, 0));
+          if(res(0,0)!=0){
+                int a=1;
+            }
             return res;
         };
     }
@@ -101,7 +104,7 @@ public:
 
 /**
  * @brief Constraint of x >= b
- * 
+ *
  */
 class LargerThanFactor1D : public InequalityFactor1D
 {
@@ -114,6 +117,9 @@ public:
         {
             VectorDynamic res = x;
             res << HingeLoss(x(0, 0) - b);
+            if(res(0,0)!=0){
+                int a=1;
+            }
             return res;
         };
     }
@@ -155,21 +161,19 @@ MatrixDynamic NumericalDerivativeDynamic2D2(NormalErrorFunction2D h,
 /**
  * @brief Constraint of f(x1, x2) <= 0;
  * x1 and x2 are vectors of size (1,1)
- * 
+ *
  */
 class InequalityFactor2D : public NoiseModelFactor2<VectorDynamic, VectorDynamic>
 {
 public:
+    /**
+     * @brief an example of the f function
+     * f = [](const VectorDynamic &x1, const VectorDynamic &x2)
+         {
+             return (x1 + x2);
+         };
+     */
     NormalErrorFunction2D f;
-    InequalityFactor2D(Key key1, Key key2,
-                       SharedNoiseModel model) : NoiseModelFactor2<VectorDynamic, VectorDynamic>(model, key1, key2)
-    {
-        // an example of the f function
-        f = [](const VectorDynamic &x1, const VectorDynamic &x2)
-        {
-            return (x1 + x2);
-        };
-    }
 
     InequalityFactor2D(Key key1, Key key2, NormalErrorFunction2D f,
                        SharedNoiseModel model) : NoiseModelFactor2<VectorDynamic, VectorDynamic>(model, key1, key2),
@@ -189,6 +193,9 @@ public:
         {
             *H2 = NumericalDerivativeDynamic2D2(f, x1, x2, deltaOptimizer, 1);
         }
+        if(err(0,0)!=0){
+                int a=1;
+            }
         return err;
     }
 };

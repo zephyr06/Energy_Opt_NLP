@@ -44,7 +44,7 @@ punishmentFrequency: 10
 randomInitialize: 0
 deltaInitialDogleg: 1e10
 
-initialLambda: 1e-3
+initialLambda: 1e0
 lowerLambda: 1e-20
 upperLambda: 1e30
 coolingRateSA: 0.99
@@ -58,8 +58,8 @@ utilTol: 0.001
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 
-weightSchedulabilityMax: 1e6
+weightSchedulabilityMax: 1e7
 weightSchedulabilityStep: 1.5
-weightSchedulabilityMin: 1e3
+weightSchedulabilityMin: 1e5
 
-weightHardConstraint: 1e3 # weight of period limits and r<d (3 factors)
+weightHardConstraint: 1e5 # weight of period limits and r<d (3 factors)

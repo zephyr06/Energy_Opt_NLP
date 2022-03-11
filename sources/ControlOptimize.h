@@ -23,23 +23,38 @@ NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, Tas
     for (uint i = 0; i < tasks.size(); i++)
     {
 
-        // schedulability
-        graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
-                                                  min(tasks[i].period, tasks[i].deadline), modelNormal);
         // add CoeffFactor
         graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
                                           GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), modelNormal);
         // add RTAFactor
         graph.add(GenerateTaskRTAFactor(maskForElimination, tasks, i));
-
+        graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishment);
         if (!maskForElimination[i])
         {
             // add CoeffFactor
             graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
-                                              GenerateVectorDynamic1D(coeff(2 * i, 0)), modelPunishment);
+                                              GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
             // add period min/max limits
             graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishment);
             graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishment);
+            // schedulability
+            NormalErrorFunction2D DBF2D =
+                [](VectorDynamic x1, VectorDynamic x2)
+            {
+                // x1 <= x2
+                if (x2(0, 0) < x1(0, 0))
+                    int a = 1;
+                return GenerateVectorDynamic1D(HingeLoss((x2 - x1)(0, 0)));
+            };
+            // this factor is explained as: r_i <= T_i
+            graph.emplace_shared<InequalityFactor2D>(GenerateControlKey(i, "response"),
+                                                     GenerateControlKey(i, "period"), DBF2D, modelPunishment);
+        }
+        else
+        {
+            // schedulability
+            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
+                                                      min(tasks[i].period, tasks[i].deadline), modelPunishment);
         }
     }
     return graph;
@@ -127,7 +142,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     cout << "The objective function is " << RealObj(tasks, coeff) << endl;
     cout << Color::def;
 
-    double eeee = graph.error(result);
+    // double eeee = graph.error(result);
 
     return make_pair(optComp, RealObj(tasks, coeff));
 }

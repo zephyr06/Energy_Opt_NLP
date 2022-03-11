@@ -27,23 +27,23 @@ TEST(ExtractResults, v1)
     AssertEigenEqualVector(expectR, ExtractResults(result, tasks).second);
 }
 
-TEST(FindEliminatedVariables, v1)
-{
-    noiseModelSigma = 1;
-    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
-    TaskSet tasks;
-    VectorDynamic coeff;
-    std::tie(tasks, coeff) = ReadControlCase(path1);
-    std::vector<bool> maskForElimination(tasks.size(), false);
+// TEST(FindEliminatedVariables, v1)
+// {
+//     noiseModelSigma = 1;
+//     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+//     TaskSet tasks;
+//     VectorDynamic coeff;
+//     std::tie(tasks, coeff) = ReadControlCase(path1);
+//     std::vector<bool> maskForElimination(tasks.size(), false);
 
-    VectorDynamic initial = GenerateVectorDynamic(5);
-    initial << 45, 372.719, 454.248, 128.127, 358.683;
-    UpdateTaskSetPeriod(tasks, initial);
-    FindEliminatedVariables(tasks, maskForElimination, 1);
-    for (auto a : maskForElimination)
-        cout << a << ", ";
-    cout << endl;
-}
+//     VectorDynamic initial = GenerateVectorDynamic(5);
+//     initial << 45, 372.719, 454.248, 128.127, 358.683;
+//     UpdateTaskSetPeriod(tasks, initial);
+//     FindEliminatedVariables(tasks, maskForElimination, 1);
+//     for (auto a : maskForElimination)
+//         cout << a << ", ";
+//     cout << endl;
+// }
 TEST(case1, v1)
 {
     noiseModelSigma = 1;
