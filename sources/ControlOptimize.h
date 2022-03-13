@@ -178,8 +178,8 @@ pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, Vecto
     }
     VectorDynamic periodRes;
     double err;
-    for (double weight = weightSchedulabilityMax; weight >= weightSchedulabilityMin;
-         weight /= weightSchedulabilityStep)
+    for (double weight = weightSchedulabilityMin; weight <= weightSchedulabilityMax;
+         weight *= weightSchedulabilityStep)
     {
         weightSchedulability = weight;
         std::tie(periodRes, err) = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
@@ -189,6 +189,11 @@ pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, Vecto
         if (!r.CheckSchedulability())
         {
             UpdateTaskSetPeriod(tasks, periodPrev);
+            std::lock_guard<std::mutex> lock(mtx);
+            cout << Color::blue << "After one iterate on updating weight parameter,\
+             the periods become unschedulable and are"
+                 << endl
+                 << periodRes << endl;
             return make_pair(periodPrev, err);
         }
         else
