@@ -14,47 +14,57 @@
 
 #include "ControlFactorGraphUtils.h"
 
+InequalityFactor2D GenerateSchedulabilityFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index)
+{
+    auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
+
+    auto modelPunishmentHard = noiseModel::Constrained::All(1);
+    NormalErrorFunction2D DBF2D =
+        [](VectorDynamic x1, VectorDynamic x2)
+    {
+        // x1 <= x2
+        if (x2(0, 0) < x1(0, 0))
+            int a = 1;
+        return GenerateVectorDynamic1D(HingeLoss((x2 - x1)(0, 0)) * weightHardConstraint);
+    };
+    // this factor is explained as: r_i <= T_i
+    return InequalityFactor2D(GenerateControlKey(index, "response"),
+                              GenerateControlKey(index, "period"), DBF2D, modelPunishmentHard);
+}
 NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
 {
     NonlinearFactorGraph graph;
     double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
-    auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);                            //
-    auto modelPunishment = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); // smaller sigma means larger error
+    auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+    auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
+
+    auto modelPunishmentHard = noiseModel::Constrained::All(1);
+
     for (uint i = 0; i < tasks.size(); i++)
     {
 
-        // add CoeffFactor
-        graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
-                                          GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), modelNormal);
         // add RTAFactor
         graph.add(GenerateTaskRTAFactor(maskForElimination, tasks, i));
-        graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishment);
+        graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishmentHard);
         if (!maskForElimination[i])
         {
+            // add CoeffFactor
+            graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
+                                              GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), modelNormal);
             // add CoeffFactor
             graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
                                               GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
             // add period min/max limits
-            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishment);
-            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishment);
+            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishmentHard);
+            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentHard);
             // schedulability
-            NormalErrorFunction2D DBF2D =
-                [](VectorDynamic x1, VectorDynamic x2)
-            {
-                // x1 <= x2
-                if (x2(0, 0) < x1(0, 0))
-                    int a = 1;
-                return GenerateVectorDynamic1D(HingeLoss((x2 - x1)(0, 0)));
-            };
-            // this factor is explained as: r_i <= T_i
-            graph.emplace_shared<InequalityFactor2D>(GenerateControlKey(i, "response"),
-                                                     GenerateControlKey(i, "period"), DBF2D, modelPunishment);
+            graph.add(GenerateSchedulabilityFactor(maskForElimination, tasks, i));
         }
         else
         {
             // schedulability
             graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
-                                                      min(tasks[i].period, tasks[i].deadline), modelPunishment);
+                                                      min(tasks[i].period, tasks[i].deadline), modelPunishmentHard);
         }
     }
     return graph;
@@ -116,8 +126,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     {
         LevenbergMarquardtParams params;
         params.setlambdaInitial(initialLambda);
-        // if (debugMode > 1 && debugMode < 5)
-        params.setVerbosityLM("SUMMARY");
+        params.setVerbosityLM(verbosityLM);
         params.setlambdaLowerBound(lowerLambda);
         params.setlambdaUpperBound(upperLambda);
         params.setRelativeErrorTol(relativeErrorTolerance);
@@ -133,6 +142,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
          << optComp << endl;
     cout << "After optimization, the rta vector is " << endl
          << rtaFromOpt << endl;
+    cout << "The graph error is " << graph.error(result) << endl;
     cout << Color::def;
     cout << endl;
     cout << Color::blue;
@@ -227,6 +237,6 @@ VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
         UpdateTaskSetPeriod(tasks, periodResCurr);
         errCurr = RealObj(tasks, coeff);
     }
-
+    UpdateTaskSetPeriod(tasks, periodResPrev);
     return periodResPrev;
 }

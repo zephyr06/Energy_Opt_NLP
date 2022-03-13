@@ -107,9 +107,9 @@ public:
 
     /**
      * @brief weight of edge is the same as child task's execution time
-     * 
-     * @param prevIndex 
-     * @param nextIndex 
+     *
+     * @param prevIndex
+     * @param nextIndex
      */
     void AddEdge(int prevIndex, int nextIndex)
     {
@@ -291,7 +291,7 @@ TaskSetDAG ReadDAG_Tasks(string path, string priorityType = "orig")
             if (!(line[0] >= '0' && line[0] <= '9'))
                 continue;
             vector<double> dataInLine = ReadLine(line);
-            if (dataInLine.size() < 10)
+            if (dataInLine.size() < 9)
                 CoutError("The path in ReadDAG_Tasks doesn't follow Melani format!");
             weightVec.push_back(dataInLine.back());
             dataInLine.pop_back();

@@ -25,10 +25,10 @@ Color::Modifier def(Color::FG_DEFAULT);
 /**
  * @brief generate a random number within the range [a,b];
  * a must be smaller than b
- * 
- * @param a 
- * @param b 
- * @return double 
+ *
+ * @param a
+ * @param b
+ * @return double
  */
 double RandRange(double a, double b)
 {
@@ -85,9 +85,9 @@ public:
      **/
     Task(vector<double> dataInLine)
     {
-        if (dataInLine.size() != 7)
+        if (dataInLine.size() < 7)
         {
-            cout << Color::red << "The length of dataInLine in Task constructor is wrong! Must be 7!\n"
+            cout << Color::red << "The length of dataInLine in Task constructor is wrong! Must be at least 7!\n"
                  << Color::def << endl;
             throw;
         }
@@ -298,8 +298,8 @@ TaskSet Reorder(TaskSet tasks, string priorityType)
 
 /**
  * @brief read from WriteFrequencyModelRatio()
- * 
- * @param path 
+ *
+ * @param path
  */
 void ReadFrequencyModeRatio(string path)
 {

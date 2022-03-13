@@ -139,6 +139,29 @@ TEST(RTAFactor, J)
     }
     AssertEigenEqualMatrix(GenerateVectorDynamic1D(1), Hs[9]);
 }
+TEST(GenerateSchedulabilityFactor, v1)
+{
+    weightSchedulability = 1;
+    weightHardConstraint = 1;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    VectorDynamic periodInitial1 = GenerateVectorDynamic(5);
+    periodInitial1 << 127.008,
+        127.077,
+        223.425,
+        127.002,
+        114.262;
+    UpdateTaskSetPeriod(tasks, periodInitial1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    maskForElimination[0] = 1;
+    maskForElimination[3] = 1;
+    auto factor1 = GenerateSchedulabilityFactor(maskForElimination, tasks, 4);
+    AssertEqualScalar(127 - 114.262, factor1.evaluateError(
+                                         GenerateVectorDynamic1D(127), GenerateVectorDynamic1D(114.262))(0, 0));
+}
+
 int main()
 {
     TestResult tr;

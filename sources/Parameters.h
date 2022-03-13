@@ -51,6 +51,8 @@ double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];
 const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency"];
 const string testDataSetName = (string)ConfigParameters["testDataSetName"];
 string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
+string verbosityLM = (string)ConfigParameters["verbosityLM"];
+
 string runMode = (string)ConfigParameters["runMode"];
 string batchOptimizeFolder = (string)ConfigParameters["batchOptimizeFolder"];
 const double parallelFactor = (double)ConfigParameters["parallelFactor"];

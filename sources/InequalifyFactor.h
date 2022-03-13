@@ -67,6 +67,14 @@ public:
         dimension = 1;
     }
 
+    /** active when constraint *NOT* met */
+    bool active(const Values &c) const override
+    {
+        // note: still active at equality to avoid zigzagging?
+        VectorDynamic x = (c.at<VectorDynamic>(this->key()));
+        return f(x)(0, 0) > 0;
+    }
+
     Vector evaluateError(const VectorDynamic &x,
                          boost::optional<Matrix &> H = boost::none) const override
     {
@@ -94,8 +102,9 @@ public:
         {
             VectorDynamic res = x;
             res << HingeLoss(b - x(0, 0));
-          if(res(0,0)!=0){
-                int a=1;
+            if (res(0, 0) != 0)
+            {
+                int a = 1;
             }
             return res;
         };
@@ -117,8 +126,9 @@ public:
         {
             VectorDynamic res = x;
             res << HingeLoss(x(0, 0) - b);
-            if(res(0,0)!=0){
-                int a=1;
+            if (res(0, 0) != 0)
+            {
+                int a = 1;
             }
             return res;
         };
@@ -181,6 +191,16 @@ public:
     {
     }
 
+    /** active when constraint *NOT* met */
+    bool active(const Values &c) const override
+    {
+        // note: still active at equality to avoid zigzagging??
+        VectorDynamic x0 = (c.at<VectorDynamic>(this->keys()[0]));
+        VectorDynamic x1 = (c.at<VectorDynamic>(this->keys()[1]));
+        return f(x0, x1)(0, 0) >= 0;
+        // return true;
+    }
+
     Vector evaluateError(const VectorDynamic &x1, const VectorDynamic &x2,
                          boost::optional<Matrix &> H1 = boost::none, boost::optional<Matrix &> H2 = boost::none) const override
     {
@@ -193,9 +213,10 @@ public:
         {
             *H2 = NumericalDerivativeDynamic2D2(f, x1, x2, deltaOptimizer, 1);
         }
-        if(err(0,0)!=0){
-                int a=1;
-            }
+        if (err(0, 0) != 0)
+        {
+            int a = 1;
+        }
         return err;
     }
 };

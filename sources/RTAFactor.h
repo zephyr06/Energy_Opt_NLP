@@ -35,7 +35,7 @@ MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, Task
         }
 
         VectorDynamic res = GenerateVectorDynamic(1);
-        res << error * weightSchedulability;
+        res << error;
         return res;
     };
     std::vector<gtsam::Symbol> keysVec;
@@ -47,7 +47,9 @@ MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, Task
             keysVec.push_back(GenerateControlKey(i, "response"));
         }
     }
-    auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+    auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightSchedulability);
+    auto modelPunishmentHard = noiseModel::Constrained::All(1);
+    // return MultiKeyFactor(keysVec, f, modelPunishmentHard);
     return MultiKeyFactor(keysVec, f, model);
 }
 void AddRTAFactor(NonlinearFactorGraph &graph, std::vector<bool> maskForElimination, TaskSet &tasks)

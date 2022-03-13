@@ -2,7 +2,7 @@
 
 #include "Tasks.h"
 #include "Declaration.h"
-#include "RTA_BASE.h"
+#include "RTA_BASE.h" 
 
 class RTA_LL : public RTA_BASE<TaskSetNormal>
 {
@@ -85,6 +85,10 @@ public:
             if (responseTime == responseTimeBefore)
             {
                 stop_flag = true;
+                if (responseTime > taskCurr.period)
+                {
+                    return INT32_MAX;
+                }
                 return responseTime;
             }
             else

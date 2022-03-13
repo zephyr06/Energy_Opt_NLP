@@ -4,7 +4,7 @@ runMode: compare
 # TODO: v6 elimination check failed
 testDataSetName: test_n5_v8
 optimizerType: 2 # 1 means dogleg, 2 means LM
-deltaOptimizer: 1e-2
+deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
 debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
@@ -21,7 +21,7 @@ baselineLLCompare: 2
 
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-eliminateTol: 1e-1
+eliminateTol: 5e-1
 eliminateStep: 3
 adjustEliminateMaxIte: 10
 
@@ -44,9 +44,9 @@ punishmentFrequency: 10
 randomInitialize: 0
 deltaInitialDogleg: 1e10
 
-initialLambda: 1e0
+initialLambda: 1e3
 lowerLambda: 1e-20
-upperLambda: 1e30
+upperLambda: 1e20
 coolingRateSA: 0.99
 temperatureSA: 100000
 granularityInBF: 1
@@ -54,12 +54,12 @@ granularityInBF: 1
 SA_iteration: 1000000
 
 utilTol: 0.001
-
+verbosityLM: "SUMMARY"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 
-weightSchedulabilityMax: 1e7
+weightSchedulabilityMax: 1e6
 weightSchedulabilityStep: 1.5
-weightSchedulabilityMin: 1e5
+weightSchedulabilityMin: 1e6
 
-weightHardConstraint: 1e5 # weight of period limits and r<d (3 factors)
+weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)

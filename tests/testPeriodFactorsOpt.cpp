@@ -58,7 +58,7 @@ TEST(case1, v1)
     // UpdateTaskSetPeriod(tasks, periodInitial1);
     // maskForElimination[1] = 1;
     auto sth = OptimizeTaskSetIterativeWeight(tasks, coeff, maskForElimination);
-    // auto sth = OptimizeTaskSetIterative(tasks, coeff, maskForElimination);
+    auto sth2 = OptimizeTaskSetIterative(tasks, coeff, maskForElimination);
     // UpdateTaskSetPeriod(tasks, sth.first);
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false}, maskForElimination);

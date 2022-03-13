@@ -73,7 +73,7 @@ public:
                      tasks.volumeVec_[i] / core_m_dag;
       double firstItem = floor((carry) /
                                tasks.tasks_[i].period);
-      double secondItem = min(tasks.volumeVec_[i], core_m_dag * (int(std::ceil(carry)) % tasks.tasks_[i].period));
+      double secondItem = min(tasks.volumeVec_[i], core_m_dag * (int(std::ceil(carry)) % int(tasks.tasks_[i].period)));
       interf += firstItem + secondItem;
     }
     return interf;
