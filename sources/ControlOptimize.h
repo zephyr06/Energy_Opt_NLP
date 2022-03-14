@@ -110,7 +110,7 @@ struct FactorGraphInManifold
 {
     static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet tasks)
     {
-        VectorDynamic periods = GenerateVectorDynamic(tasks.size());
+        VectorDynamic periods = GetParameterVD<double>(tasks, "period");
         for (uint i = 0; i < tasks.size(); i++)
         {
             if (result.exists(GenerateControlKey(i, "period")))
@@ -122,6 +122,7 @@ struct FactorGraphInManifold
         RTA_LL r(tasks);
         return make_pair(periods, r.ResponseTimeOfTaskSet());
     }
+
     static MultiKeyFactor GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff)
     {
         LambdaMultiKey f = [tasks, index, coeff](const Values &x)
@@ -139,9 +140,12 @@ struct FactorGraphInManifold
 
         std::vector<gtsam::Symbol> keys;
         keys.reserve(index);
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i <= index; i++)
         {
-            keys.push_back(GenerateControlKey(i, "period"));
+            if (!maskForElimination[i])
+            {
+                keys.push_back(GenerateControlKey(i, "period"));
+            }
         }
 
         VectorDynamic sigma = GenerateVectorDynamic(2);
@@ -149,6 +153,7 @@ struct FactorGraphInManifold
         auto model = noiseModel::Diagonal::Sigmas(sigma);
         return MultiKeyFactor(keys, f, model);
     }
+
     static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
     {
         NonlinearFactorGraph graph;
@@ -158,7 +163,6 @@ struct FactorGraphInManifold
 
         for (uint i = 0; i < tasks.size(); i++)
         {
-
             if (!maskForElimination[i])
             {
                 // add CoeffFactor
@@ -169,6 +173,7 @@ struct FactorGraphInManifold
                 graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentSoft1);
             }
             auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff);
+
             graph.add(factor);
         }
         return graph;

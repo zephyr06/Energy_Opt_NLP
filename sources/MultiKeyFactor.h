@@ -53,7 +53,11 @@ public:
                                              dimension(keyVec.size()), lambdaMK(lambdaMK)
     {
     }
-
+    /* no need to optimize if it contains no keys */
+    bool active(const Values &c) const override
+    {
+        return keyVec.size() != 0;
+    }
     Vector unwhitenedError(const Values &x,
                            boost::optional<std::vector<Matrix> &> H = boost::none) const override
     {

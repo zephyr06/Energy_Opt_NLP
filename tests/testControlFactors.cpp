@@ -236,6 +236,7 @@ TEST(GenerateSchedulabilityFactor, v3)
     HsExpect.push_back(GenerateMatrixDynamic(2, 1));
     HsExpect.push_back(GenerateMatrixDynamic(2, 1));
     HsExpect.push_back(GenerateMatrixDynamic(2, 1));
+    HsExpect.push_back(GenerateMatrixDynamic(2, 1));
     HsActual = HsExpect;
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial, HsActual), __LINE__);
     AssertEigenEqualMatrix(HsExpect[0], HsActual[0], __LINE__);
@@ -247,6 +248,79 @@ TEST(GenerateSchedulabilityFactor, v3)
     auto matrix1 = GenerateMatrixDynamic(2, 1);
 
     HsExpect[2] = matrix1;
+}
+
+TEST(FindEliminatedVariables, v1)
+{
+    noiseModelSigma = 1;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+
+    VectorDynamic initial = GenerateVectorDynamic(5);
+    initial << 45, 372.719, 454.248, 128.127, 358.683;
+    UpdateTaskSetPeriod(tasks, initial);
+    FindEliminatedVariables(tasks, maskForElimination, 1);
+    AssertEqualVectorExact({1, 0, 0, 0, 0}, maskForElimination);
+}
+
+TEST(FactorGraphInManifold, inference)
+{
+    noiseModelSigma = 1;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    maskForElimination[0] = 1;
+    VectorDynamic initial = GenerateVectorDynamic(5);
+    initial << 68.0034,
+        321.249,
+        400.807,
+        131.088,
+        308.676;
+    UpdateTaskSetPeriod(tasks, initial);
+    NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
+    auto sth = graph.linearize(initialEstimateFG)->jacobian();
+
+    MatrixDynamic jacobianCurr = sth.first;
+    cout << "Current Jacobian matrix:" << endl;
+    cout << jacobianCurr << endl;
+    cout << "Current b vector: " << endl;
+    cout << sth.second << endl;
+    MatrixDynamic jacobianExpect = GenerateMatrixDynamic(14, 4);
+    jacobianExpect(2, 0) = 275;
+    jacobianExpect(5, 1) = 217;
+    jacobianExpect(8, 2) = 489;
+    jacobianExpect(11, 3) = 285;
+    AssertEigenEqualMatrix(jacobianExpect, jacobianCurr);
+    AssertEqualScalar(321.249 * -1 * 275, sth.second(2, 0));
+    AssertEqualScalar(-50 * 9334, sth.second(3, 0));
+}
+
+TEST(FactorGraphInManifold, inference2)
+{
+    noiseModelSigma = 1;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    maskForElimination[0] = 1;
+    VectorDynamic initial = GenerateVectorDynamic(5);
+    initial << 68.0034,
+        321.249,
+        400.807,
+        131.088,
+        308.676;
+    UpdateTaskSetPeriod(tasks, initial);
+    NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
+    FindEliminatedVariables(tasks, maskForElimination);
+    AssertEqualVectorExact({1, 0, 0, 0, 0}, maskForElimination);
 }
 
 int main()
