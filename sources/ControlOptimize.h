@@ -292,8 +292,8 @@ pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, Vecto
     return make_pair(periodRes, err);
 }
 template <typename FactorGraphType>
-VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
-                                       std::vector<bool> &maskForElimination)
+pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
+                                                     std::vector<bool> &maskForElimination)
 {
     VectorDynamic periodResCurr, periodResPrev;
     double errPrev = 1e30;
@@ -311,5 +311,5 @@ VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
         errCurr = RealObj(tasks, coeff);
     }
     UpdateTaskSetPeriod(tasks, periodResPrev);
-    return periodResPrev;
+    return make_pair(periodResPrev, errPrev);
 }

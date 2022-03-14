@@ -340,10 +340,10 @@ vector<std::string> SplitStringMy(std::string line, std::string delimiter = ",")
     return dataInLine;
 }
 
-vector<double> ReadLine(string line)
+vector<double> ReadLine(string line, string delimiter = ",")
 {
     // some default parameters in this function
-    string delimiter = ",";
+
     string token;
     size_t pos = 0;
     vector<double> dataInLine;
@@ -354,7 +354,8 @@ vector<double> ReadLine(string line)
         dataInLine.push_back(temp);
         line.erase(0, pos + delimiter.length());
     }
-    dataInLine.push_back(stod(line.c_str()));
+    if (line.find_first_not_of(' ') != std::string::npos)
+        dataInLine.push_back(stod(line.c_str()));
     return dataInLine;
 }
 TaskSet ReadTaskSet(string path, string priorityType = "RM")

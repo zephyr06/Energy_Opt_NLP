@@ -1,5 +1,5 @@
 #include "../sources/ControlOptimize.h"
-
+#include "../sources/BatchControlOptimize.h"
 using namespace std;
 using namespace std::chrono;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
@@ -158,10 +158,10 @@ TEST(RTAFactor, J)
     }
 
     auto eActual = factor1.unwhitenedError(initialEstimateFG, Hs);
-    cout << "Hs is as follows: " << endl;
+    std::cout << "Hs is as follows: " << endl;
     for (uint i = 0; i < 10; i++)
     {
-        cout << Hs[i] << endl;
+        std::cout << Hs[i] << endl;
     }
     AssertEigenEqualMatrix(GenerateVectorDynamic1D(1), Hs[9]);
 }
@@ -287,18 +287,18 @@ TEST(FactorGraphInManifold, inference)
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
 
     MatrixDynamic jacobianCurr = sth.first;
-    cout << "Current Jacobian matrix:" << endl;
-    cout << jacobianCurr << endl;
-    cout << "Current b vector: " << endl;
-    cout << sth.second << endl;
-    MatrixDynamic jacobianExpect = GenerateMatrixDynamic(14, 4);
-    jacobianExpect(2, 0) = 275;
-    jacobianExpect(5, 1) = 217;
-    jacobianExpect(8, 2) = 489;
-    jacobianExpect(11, 3) = 285;
+    std::cout << "Current Jacobian matrix:" << endl;
+    std::cout << jacobianCurr << endl;
+    std::cout << "Current b vector: " << endl;
+    std::cout << sth.second << endl;
+    MatrixDynamic jacobianExpect = GenerateMatrixDynamic(12, 4);
+    jacobianExpect(0, 0) = 275;
+    jacobianExpect(3, 1) = 217;
+    jacobianExpect(6, 2) = 489;
+    jacobianExpect(9, 3) = 285;
     AssertEigenEqualMatrix(jacobianExpect, jacobianCurr);
-    AssertEqualScalar(321.249 * -1 * 275, sth.second(2, 0));
-    AssertEqualScalar(-50 * 9334, sth.second(3, 0));
+    AssertEqualScalar(321.249 * -1 * 275, sth.second(0, 0));
+    AssertEqualScalar(-50 * 9334, sth.second(1, 0));
 }
 
 TEST(FactorGraphInManifold, inference2)
@@ -322,7 +322,29 @@ TEST(FactorGraphInManifold, inference2)
     FindEliminatedVariables(tasks, maskForElimination);
     AssertEqualVectorExact({1, 0, 0, 0, 0}, maskForElimination);
 }
-
+TEST(io, IfTargetFile)
+{
+    string s1 = "Case0.m";
+    string s2 = "Case0.txt";
+    string s3 = "Case8.txt_RM_GPResult.txt";
+    string s4 = "Case20.txt_RM_BFSResult.txt";
+    string s5 = "";
+    string s6 = ".";
+    string s7 = "../";
+    AssertEqualScalar(3, TargetFileType(s1));
+    AssertEqualScalar(3, TargetFileType(s5));
+    AssertEqualScalar(3, TargetFileType(s6));
+    AssertEqualScalar(3, TargetFileType(s7));
+    AssertEqualScalar(0, TargetFileType(s2));
+    AssertEqualScalar(1, TargetFileType(s3));
+    AssertEqualScalar(2, TargetFileType(s4));
+    string path = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt_RM_BFSResult.txt";
+    AssertEqualScalar(0.00995458, ReadBaselineZhao20(path).first);
+    AssertEqualScalar(1.52131e+06, ReadBaselineZhao20(path).second);
+    path = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case9.txt_RM_GPResult.txt";
+    AssertEqualScalar(0.136000, ReadBaselineZhao20(path).first);
+    AssertEqualScalar(2852692.008127, ReadBaselineZhao20(path).second);
+}
 int main()
 {
     TestResult tr;
