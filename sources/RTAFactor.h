@@ -48,7 +48,7 @@ MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, Task
         }
     }
     auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightSchedulability);
-    auto modelPunishmentHard = noiseModel::Constrained::All(1);
+    // auto modelPunishmentHard = noiseModel::Constrained::All(1);
     // return MultiKeyFactor(keysVec, f, modelPunishmentHard);
     return MultiKeyFactor(keysVec, f, model);
 }

@@ -36,9 +36,7 @@ struct FactorGraphForceManifold
     }
     static InequalityFactor2D GenerateSchedulabilityFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index)
     {
-        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
-
-        auto modelPunishmentHard = noiseModel::Constrained::All(1);
+        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
         NormalErrorFunction2D DBF2D =
             [](VectorDynamic x1, VectorDynamic x2)
         {
@@ -49,23 +47,21 @@ struct FactorGraphForceManifold
         };
         // this factor is explained as: r_i <= T_i
         return InequalityFactor2D(GenerateControlKey(index, "response"),
-                                  GenerateControlKey(index, "period"), DBF2D, modelPunishmentHard);
+                                  GenerateControlKey(index, "period"), DBF2D, modelPunishmentSoft1);
     }
     static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
     {
         NonlinearFactorGraph graph;
         double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
         auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
-
-        auto modelPunishmentHard = noiseModel::Constrained::All(1);
+        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
 
         for (uint i = 0; i < tasks.size(); i++)
         {
 
             // add RTAFactor
             graph.add(GenerateTaskRTAFactor(maskForElimination, tasks, i));
-            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishmentHard);
+            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishmentSoft1);
             if (!maskForElimination[i])
             {
                 // add CoeffFactor
@@ -75,8 +71,8 @@ struct FactorGraphForceManifold
                 graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
                                                   GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
                 // add period min/max limits
-                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishmentHard);
-                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentHard);
+                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishmentSoft1);
+                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentSoft1);
                 // schedulability
                 graph.add(GenerateSchedulabilityFactor(maskForElimination, tasks, i));
             }
@@ -84,7 +80,7 @@ struct FactorGraphForceManifold
             {
                 // schedulability
                 graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
-                                                          min(tasks[i].period, tasks[i].deadline), modelPunishmentHard);
+                                                          min(tasks[i].period, tasks[i].deadline), modelPunishmentSoft1);
             }
         }
         return graph;
@@ -158,9 +154,7 @@ struct FactorGraphInManifold
         NonlinearFactorGraph graph;
         double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
         auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
-
-        auto modelPunishmentHard = noiseModel::Constrained::All(1);
+        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
 
         for (uint i = 0; i < tasks.size(); i++)
         {
