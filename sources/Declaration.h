@@ -41,7 +41,7 @@ double max(double a, double b)
     return 0;
 }
 
-inline MatrixDynamic GenerateZeroMatrix(int m, int n)
+inline MatrixDynamic GenerateMatrixDynamic(int m, int n)
 {
     MatrixDynamic M;
     M.resize(m, n);

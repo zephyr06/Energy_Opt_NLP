@@ -28,21 +28,36 @@ inline gtsam::Symbol GenerateControlKey(int idtask, string type)
     }
 }
 
-pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet &tasks)
+double RealObj(TaskSet &tasks, VectorDynamic coeff)
 {
-    VectorDynamic periods = GenerateVectorDynamic(tasks.size());
-    VectorDynamic rta = GenerateVectorDynamic(tasks.size());
+    double res = 0;
+    RTA_LL r(tasks);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
     for (uint i = 0; i < tasks.size(); i++)
     {
-        if (result.exists(GenerateControlKey(i, "period")))
-        {
-            periods(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
-        }
-        else
-        {
-            periods(i, 0) = tasks[i].period;
-        }
-        rta(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "response"))(0, 0);
+        res += coeff(i * 2, 0) * tasks[i].period;
+        res += coeff(i * 2 + 1, 0) * rta(i, 0);
     }
-    return make_pair(periods, rta);
+    return res;
+}
+
+void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = 1e0)
+{
+    RTA_LL r(tasks);
+    VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
+    for (uint i = 0; i < tasks.size(); i++)
+    {
+        tasks[i].period -= disturb;
+        RTA_LL r1(tasks);
+        VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet();
+        if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
+        // TODO: more analytic way
+        {
+            maskForElimination[i] = true;
+        }
+        tasks[i].period += disturb;
+    }
+    for (auto a : maskForElimination)
+        cout << a << ", ";
+    cout << endl;
 }

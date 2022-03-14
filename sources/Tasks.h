@@ -409,7 +409,6 @@ void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic periodVec, int lastTask
     for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
         taskSet[i].period = periodVec(i - lastTaskDoNotNeedOptimize - 1, 0);
 }
-
 ProcessorTaskSet ExtractProcessorTaskSet(TaskSet &tasks)
 {
     int N = tasks.size();

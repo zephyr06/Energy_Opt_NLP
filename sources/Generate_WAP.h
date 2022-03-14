@@ -152,8 +152,8 @@ bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDyn
 tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
 {
     int N = tasks.size();
-    MatrixDynamic A = GenerateZeroMatrix(N, N);
-    MatrixDynamic P = GenerateZeroMatrix(N, N);
+    MatrixDynamic A = GenerateMatrixDynamic(N, N);
+    MatrixDynamic P = GenerateMatrixDynamic(N, N);
 
     for (int i = 0; i < N - 1; i++)
     {
@@ -175,11 +175,11 @@ tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
     }
     else
     {
-        A_Global = GenerateZeroMatrix(0, 0);
-        P_Global = GenerateZeroMatrix(0, 0);
+        A_Global = GenerateMatrixDynamic(0, 0);
+        P_Global = GenerateMatrixDynamic(0, 0);
         return make_tuple(0, A, P);
     }
-    A_Global = GenerateZeroMatrix(0, 0);
-    P_Global = GenerateZeroMatrix(0, 0);
+    A_Global = GenerateMatrixDynamic(0, 0);
+    P_Global = GenerateMatrixDynamic(0, 0);
     return make_tuple(0, A, P);
 }

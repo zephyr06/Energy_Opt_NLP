@@ -14,102 +14,195 @@
 
 #include "ControlFactorGraphUtils.h"
 
-InequalityFactor2D GenerateSchedulabilityFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index)
+struct FactorGraphForceManifold
 {
-    auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
-
-    auto modelPunishmentHard = noiseModel::Constrained::All(1);
-    NormalErrorFunction2D DBF2D =
-        [](VectorDynamic x1, VectorDynamic x2)
+    static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet &tasks)
     {
-        // x1 <= x2
-        if (x2(0, 0) < x1(0, 0))
-            int a = 1;
-        return GenerateVectorDynamic1D(HingeLoss((x2 - x1)(0, 0)) * weightHardConstraint);
-    };
-    // this factor is explained as: r_i <= T_i
-    return InequalityFactor2D(GenerateControlKey(index, "response"),
-                              GenerateControlKey(index, "period"), DBF2D, modelPunishmentHard);
-}
-NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
-{
-    NonlinearFactorGraph graph;
-    double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
-    auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-    auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
-
-    auto modelPunishmentHard = noiseModel::Constrained::All(1);
-
-    for (uint i = 0; i < tasks.size(); i++)
-    {
-
-        // add RTAFactor
-        graph.add(GenerateTaskRTAFactor(maskForElimination, tasks, i));
-        graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishmentHard);
-        if (!maskForElimination[i])
+        VectorDynamic periods = GenerateVectorDynamic(tasks.size());
+        VectorDynamic rta = GenerateVectorDynamic(tasks.size());
+        for (uint i = 0; i < tasks.size(); i++)
         {
-            // add CoeffFactor
-            graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
-                                              GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), modelNormal);
-            // add CoeffFactor
-            graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
-                                              GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
-            // add period min/max limits
-            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishmentHard);
-            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentHard);
-            // schedulability
-            graph.add(GenerateSchedulabilityFactor(maskForElimination, tasks, i));
+            if (result.exists(GenerateControlKey(i, "period")))
+            {
+                periods(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
+            }
+            else
+            {
+                periods(i, 0) = tasks[i].period;
+            }
+            rta(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "response"))(0, 0);
         }
-        else
-        {
-            // schedulability
-            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
-                                                      min(tasks[i].period, tasks[i].deadline), modelPunishmentHard);
-        }
+        return make_pair(periods, rta);
     }
-    return graph;
-}
-
-Values GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
-{
-    RTA_LL r(tasks);
-    auto rta = r.ResponseTimeOfTaskSet();
-    Values initialEstimateFG;
-    for (uint i = 0; i < tasks.size(); i++)
+    static InequalityFactor2D GenerateSchedulabilityFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index)
     {
-        if (!maskForElimination[i])
+        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
+
+        auto modelPunishmentHard = noiseModel::Constrained::All(1);
+        NormalErrorFunction2D DBF2D =
+            [](VectorDynamic x1, VectorDynamic x2)
         {
-            initialEstimateFG.insert(GenerateControlKey(i, "period"),
-                                     GenerateVectorDynamic1D(tasks[i].period));
+            // x1 <= x2
+            if (x2(0, 0) < x1(0, 0))
+                int a = 1;
+            return GenerateVectorDynamic1D(HingeLoss((x2 - x1)(0, 0)) * weightHardConstraint);
+        };
+        // this factor is explained as: r_i <= T_i
+        return InequalityFactor2D(GenerateControlKey(index, "response"),
+                                  GenerateControlKey(index, "period"), DBF2D, modelPunishmentHard);
+    }
+    static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
+    {
+        NonlinearFactorGraph graph;
+        double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
+        auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
+
+        auto modelPunishmentHard = noiseModel::Constrained::All(1);
+
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+
+            // add RTAFactor
+            graph.add(GenerateTaskRTAFactor(maskForElimination, tasks, i));
+            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishmentHard);
+            if (!maskForElimination[i])
+            {
+                // add CoeffFactor
+                graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
+                                                  GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), modelNormal);
+                // add CoeffFactor
+                graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
+                                                  GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
+                // add period min/max limits
+                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishmentHard);
+                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentHard);
+                // schedulability
+                graph.add(GenerateSchedulabilityFactor(maskForElimination, tasks, i));
+            }
+            else
+            {
+                // schedulability
+                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
+                                                          min(tasks[i].period, tasks[i].deadline), modelPunishmentHard);
+            }
+        }
+        return graph;
+    }
+
+    static Values GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
+    {
+        RTA_LL r(tasks);
+        auto rta = r.ResponseTimeOfTaskSet();
+        Values initialEstimateFG;
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            if (!maskForElimination[i])
+            {
+                initialEstimateFG.insert(GenerateControlKey(i, "period"),
+                                         GenerateVectorDynamic1D(tasks[i].period));
+            }
+
+            initialEstimateFG.insert(GenerateControlKey(i, "response"),
+                                     GenerateVectorDynamic1D(rta(i, 0)));
+        }
+        return initialEstimateFG;
+    }
+};
+
+struct FactorGraphInManifold
+{
+    static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet tasks)
+    {
+        VectorDynamic periods = GenerateVectorDynamic(tasks.size());
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            if (result.exists(GenerateControlKey(i, "period")))
+            {
+                periods(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
+            }
+        }
+        UpdateTaskSetPeriod(tasks, periods);
+        RTA_LL r(tasks);
+        return make_pair(periods, r.ResponseTimeOfTaskSet());
+    }
+    static MultiKeyFactor GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff)
+    {
+        LambdaMultiKey f = [tasks, index, coeff](const Values &x)
+        {
+            VectorDynamic error = GenerateVectorDynamic(2);
+            TaskSet tasksCurr = tasks;
+            UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks).first);
+            RTA_LL r(tasksCurr);
+            double rta = r.RTA_Common_Warm(tasksCurr[index].executionTime, index);
+            error(0) = rta * coeff[2 * index + 1];
+            error(1) = HingeLoss(tasksCurr[index].period - rta);
+
+            return error;
+        };
+
+        std::vector<gtsam::Symbol> keys;
+        keys.reserve(index);
+        for (int i = 0; i < index; i++)
+        {
+            keys.push_back(GenerateControlKey(i, "period"));
         }
 
-        initialEstimateFG.insert(GenerateControlKey(i, "response"),
-                                 GenerateVectorDynamic1D(rta(i, 0)));
+        VectorDynamic sigma = GenerateVectorDynamic(2);
+        sigma << noiseModelSigma, noiseModelSigma / weightSchedulability;
+        auto model = noiseModel::Diagonal::Sigmas(sigma);
+        return MultiKeyFactor(keys, f, model);
     }
-    return initialEstimateFG;
-}
-
-double RealObj(TaskSet &tasks, VectorDynamic coeff)
-{
-    double res = 0;
-    RTA_LL r(tasks);
-    VectorDynamic rta = r.ResponseTimeOfTaskSet();
-    for (uint i = 0; i < tasks.size(); i++)
+    static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
     {
-        res += coeff(i * 2, 0) * tasks[i].period;
-        res += coeff(i * 2 + 1, 0) * rta(i, 0);
-    }
-    return res;
-}
+        NonlinearFactorGraph graph;
+        double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
+        auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint); //
 
+        auto modelPunishmentHard = noiseModel::Constrained::All(1);
+
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+
+            if (!maskForElimination[i])
+            {
+                // add CoeffFactor
+                graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
+                                                  GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
+                // add period min/max limits
+                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), tasks[i].executionTime, modelPunishmentSoft1);
+                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentSoft1);
+            }
+            auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff);
+            graph.add(factor);
+        }
+        return graph;
+    }
+
+    static Values GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
+    {
+        Values initialEstimateFG;
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            if (!maskForElimination[i])
+            {
+                initialEstimateFG.insert(GenerateControlKey(i, "period"),
+                                         GenerateVectorDynamic1D(tasks[i].period));
+            }
+        }
+        return initialEstimateFG;
+    }
+};
+template <typename FactorGraphType>
 pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic coeff,
                                                    std::vector<bool> &maskForElimination)
 {
-    NonlinearFactorGraph graph = BuildControlGraph(maskForElimination, tasks, coeff);
+    NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(maskForElimination, tasks, coeff);
 
     // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
     // initialEstimate << 68.000000, 321, 400, 131, 308;
-    Values initialEstimateFG = GenerateInitialFG(tasks, maskForElimination);
+    Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
 
     Values result;
     if (optimizerType == 1)
@@ -135,7 +228,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     }
 
     VectorDynamic optComp, rtaFromOpt;
-    std::tie(optComp, rtaFromOpt) = ExtractResults(result, tasks);
+    std::tie(optComp, rtaFromOpt) = FactorGraphType::ExtractResults(result, tasks);
     cout << endl;
     cout << Color::blue;
     cout << "After optimization, the period vector is " << endl
@@ -146,7 +239,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     cout << Color::def;
     cout << endl;
     cout << Color::blue;
-    UpdateTaskSetPeriod(tasks, ExtractResults(initialEstimateFG, tasks).first);
+    UpdateTaskSetPeriod(tasks, FactorGraphType::ExtractResults(initialEstimateFG, tasks).first);
     cout << "Before optimization, the total error is " << RealObj(tasks, coeff) << endl;
     UpdateTaskSetPeriod(tasks, optComp);
     cout << "The objective function is " << RealObj(tasks, coeff) << endl;
@@ -156,27 +249,8 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
 
     return make_pair(optComp, RealObj(tasks, coeff));
 }
-void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = 1e0)
-{
-    RTA_LL r(tasks);
-    VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
-    for (uint i = 0; i < tasks.size(); i++)
-    {
-        tasks[i].period -= disturb;
-        RTA_LL r1(tasks);
-        VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet();
-        if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
-        // TODO: more analytic way
-        {
-            maskForElimination[i] = true;
-        }
-        tasks[i].period += disturb;
-    }
-    for (auto a : maskForElimination)
-        cout << a << ", ";
-    cout << endl;
-}
 
+template <typename FactorGraphType>
 pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, VectorDynamic coeff,
                                                            std::vector<bool> &maskForElimination)
 {
@@ -192,7 +266,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, Vecto
          weight *= weightSchedulabilityStep)
     {
         weightSchedulability = weight;
-        std::tie(periodRes, err) = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
+        std::tie(periodRes, err) = UnitOptimizationPeriod<FactorGraphType>(tasks, coeff, maskForElimination);
         VectorDynamic periodPrev = GetParameterVD<double>(tasks, "period");
         UpdateTaskSetPeriod(tasks, periodRes);
         RTA_LL r(tasks);
@@ -218,7 +292,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, Vecto
 
     return make_pair(periodRes, err);
 }
-
+template <typename FactorGraphType>
 VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
                                        std::vector<bool> &maskForElimination)
 {
@@ -233,7 +307,7 @@ VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
 
         FindEliminatedVariables(tasks, maskForElimination);
         double err;
-        std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight(tasks, coeff, maskForElimination);
+        std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks, coeff, maskForElimination);
         UpdateTaskSetPeriod(tasks, periodResCurr);
         errCurr = RealObj(tasks, coeff);
     }

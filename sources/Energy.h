@@ -69,7 +69,7 @@ double JacobianInEnergyItem(const TaskSet &tasks, int i)
         task.executionTime = executionTimeVector(0);
         double res = EstimateEnergyTask(task);
         task.executionTime = ref;
-        MatrixDynamic rrr = GenerateZeroMatrix(1, 1);
+        MatrixDynamic rrr = GenerateMatrixDynamic(1, 1);
         rrr << res;
         return rrr;
     };

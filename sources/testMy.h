@@ -136,17 +136,17 @@ void AssertEigenEqualVector(Eigen::Matrix<double, Eigen::Dynamic, 1> expected,
 }
 
 void AssertEigenEqualMatrix(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> expected,
-                            Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> actual)
+                            Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> actual, int lineNumber = 0)
 {
     int m = expected.rows();
     int n = expected.cols();
-    AssertEqualScalar(m, actual.rows());
-    AssertEqualScalar(n, actual.cols());
+    AssertEqualScalar(m, actual.rows(), 1e-6, lineNumber);
+    AssertEqualScalar(n, actual.cols(), 1e-6, lineNumber);
     for (int i = 0; i < m; i++)
     {
         for (int j = 0; j < n; j++)
         {
-            AssertEqualScalar(expected(i, j), actual(i, j));
+            AssertEqualScalar(expected(i, j), actual(i, j), 1e-6, lineNumber);
         }
     }
 }

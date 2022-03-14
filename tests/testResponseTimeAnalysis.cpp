@@ -71,8 +71,8 @@ TEST(GetBusyPeriod, v1)
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
     int N = task_set.size();
     int busyExpect = 74;
-    MatrixDynamic A = GenerateZeroMatrix(N, N);
-    MatrixDynamic P = GenerateZeroMatrix(N, N);
+    MatrixDynamic A = GenerateMatrixDynamic(N, N);
+    MatrixDynamic P = GenerateMatrixDynamic(N, N);
     int busyActual = RTA_WAP::GetBusyPeriod(task_set, A, P, 4);
     AssertEqualScalar(busyExpect, busyActual);
 }
@@ -82,8 +82,8 @@ TEST(GetBusyPeriod, v2)
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
     int N = task_set.size();
     int busyExpect = 74;
-    MatrixDynamic A = GenerateZeroMatrix(N, N);
-    MatrixDynamic P = GenerateZeroMatrix(N, N);
+    MatrixDynamic A = GenerateMatrixDynamic(N, N);
+    MatrixDynamic P = GenerateMatrixDynamic(N, N);
     P << 1, 0, 1, 0, 1,
         0, 1, 0, 1, 0,
         1, 0, 1, 0, 1,
@@ -98,8 +98,8 @@ TEST(GetBusyPeriod, v3)
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v16.csv", "orig");
     int N = task_set.size();
     int busyExpect = 80;
-    MatrixDynamic A = GenerateZeroMatrix(N, N);
-    MatrixDynamic P = GenerateZeroMatrix(N, N);
+    MatrixDynamic A = GenerateMatrixDynamic(N, N);
+    MatrixDynamic P = GenerateMatrixDynamic(N, N);
     P << 1, 0, 1, 0, 1,
         0, 1, 0, 1, 0,
         1, 0, 1, 0, 1,
@@ -146,7 +146,7 @@ TEST(RTA, ResponseTimeOfTaskSet)
 TEST(wap, v1)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    A_Global = GenerateZeroMatrix(5, 5);
+    A_Global = GenerateMatrixDynamic(5, 5);
     P_Global = GenerateOneMatrix(5, 5);
     TaskSetNormal tasks(task_set);
     VectorDynamic expect;
@@ -160,7 +160,7 @@ TEST(wap, v1)
 TEST(wap, v2)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    P_Global = GenerateZeroMatrix(5, 5);
+    P_Global = GenerateMatrixDynamic(5, 5);
     A_Global = GenerateOneMatrix(5, 5);
 
     VectorDynamic expect;
@@ -174,13 +174,13 @@ TEST(wap, v2)
 TEST(wap, v3)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    A_Global = GenerateZeroMatrix(5, 5);
+    A_Global = GenerateMatrixDynamic(5, 5);
     A_Global << 0, 1, 0, 1, 0,
         1, 0, 1, 0, 1,
         0, 1, 0, 1, 0,
         1, 0, 1, 0, 1,
         0, 0, 0, 0, 0;
-    P_Global = GenerateZeroMatrix(5, 5);
+    P_Global = GenerateMatrixDynamic(5, 5);
     P_Global << 1, 0, 1, 0, 1,
         0, 1, 0, 1, 0,
         1, 0, 1, 0, 1,
@@ -199,8 +199,8 @@ TEST(GenerateWAP, v1)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
     int N = task_set.size();
-    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
-    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
     auto sth = Generate_WAP(task_set);
     MatrixDynamic actualA, actualP;
     bool success;
@@ -214,8 +214,8 @@ TEST(GenerateWAP, v2)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v11.csv", "RM");
     int N = task_set.size();
-    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
-    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
     expectP << 0, 0, 0, 0, 0,
         0, 0, 0, 0, 1,
         0, 0, 0, 0, 1,
@@ -236,8 +236,8 @@ TEST(GenerateWAP, v3)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v5.csv", "orig");
     int N = task_set.size();
-    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
-    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
     expectP << 0, 1, 1, 1, 0,
         0, 0, 0, 0, 0,
         0, 0, 0, 0, 0,
@@ -258,8 +258,8 @@ TEST(GenerateWAP, v4)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v12.csv", "RM");
     int N = task_set.size();
-    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
-    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
     expectP << 0, 1, 0, 1, 1,
         0, 0, 0, 1, 0,
         0, 0, 0, 1, 1,
@@ -280,9 +280,9 @@ TEST(GenerateWAP, v5)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v13.csv", "RM");
     int N = task_set.size();
-    MatrixDynamic expectA = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
     expectA(2, 4) = 1;
-    MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
     expectP << 0, 1, 0, 1, 1,
         0, 0, 0, 1, 0,
         0, 0, 0, 1, 0,
@@ -303,9 +303,9 @@ TEST(GenerateWAP, v5)
 // {
 //     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v15.csv", "RM");
 //     int N = task_set.size();
-//     MatrixDynamic expectA = GenerateZeroMatrix(N, N);
+//     MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
 //     // expectA(2, 4) = 1;
-//     MatrixDynamic expectP = GenerateZeroMatrix(N, N);
+//     MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
 //     expectP << 0, 1, 0, 1, 1,
 //         0, 0, 0, 1, 1,
 //         0, 0, 0, 1, 1,
