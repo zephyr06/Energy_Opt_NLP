@@ -62,11 +62,12 @@ struct FactorGraphForceManifold
             // add RTAFactor
             graph.add(GenerateTaskRTAFactor(maskForElimination, tasks, i));
             graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishmentSoft1);
+            // add CoeffFactor
+            graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
+                                              GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), modelNormal);
             if (!maskForElimination[i])
             {
-                // add CoeffFactor
-                graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
-                                                  GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), modelNormal);
+
                 // add CoeffFactor
                 graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
                                                   GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
@@ -202,6 +203,16 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
     // initialEstimate << 68.000000, 321, 400, 131, 308;
     Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
+
+    cout << Color::green;
+    // std::lock_guard<std::mutex> lock(mtx);
+    auto sth = graph.linearize(initialEstimateFG)->jacobian();
+    MatrixDynamic jacobianCurr = sth.first;
+    std::cout << "Current Jacobian matrix:" << endl;
+    std::cout << jacobianCurr << endl;
+    std::cout << "Current b vector: " << endl;
+    std::cout << sth.second << endl;
+    cout << Color::def << endl;
 
     Values result;
     if (optimizerType == 1)

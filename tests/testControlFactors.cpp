@@ -345,6 +345,39 @@ TEST(io, IfTargetFile)
     AssertEqualScalar(0.136000, ReadBaselineZhao20(path).first);
     AssertEqualScalar(2852692.008127, ReadBaselineZhao20(path).second);
 }
+
+TEST(jacobian, vn)
+{
+    noiseModelSigma = 1;
+    weightSchedulability = 1e6;
+    weightHardConstraint = 1e5;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    maskForElimination[0] = 1;
+    VectorDynamic initial = GenerateVectorDynamic(5);
+    initial << 127.008,
+        455.654,
+        515.147,
+        237.366,
+        444.963;
+    UpdateTaskSetPeriod(tasks, initial);
+    NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    auto initialEstimateFG = FactorGraphForceManifold::GenerateInitialFG(tasks, maskForElimination);
+    auto sth = graph.linearize(initialEstimateFG)->jacobian();
+
+    MatrixDynamic jacobianCurr = sth.first;
+    std::cout << "Current Jacobian matrix:" << endl;
+    std::cout << jacobianCurr << endl;
+    std::cout << "Current b vector: " << endl;
+    std::cout << sth.second << endl;
+    MatrixDynamic jacobianExpect = GenerateMatrixDynamic(18, 9);
+
+    AssertEqualScalar(1e6, jacobianCurr(2, 1));
+    AssertEqualScalar(1e6, jacobianCurr(0, 0));
+}
 int main()
 {
     TestResult tr;
