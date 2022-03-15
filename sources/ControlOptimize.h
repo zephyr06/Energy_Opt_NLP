@@ -59,7 +59,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
         result = optimizer.optimize();
     }
 
-    VectorDynamic optComp, rtaFromOpt;
+    VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
     std::tie(optComp, rtaFromOpt) = FactorGraphType::ExtractResults(result, tasks);
     cout << endl;
     cout << Color::blue;

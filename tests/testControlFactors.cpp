@@ -392,6 +392,63 @@ TEST(QuotientDouble, v1)
     AssertEqualScalar(2, QuotientDouble(2, 10));
     AssertEqualScalar(4.9, QuotientDouble(4.9, 10));
 }
+TEST(FindEliminatedVariables, ForceManifold)
+{
+    noiseModelSigma = 1;
+    weightSchedulability = 1e6;
+    weightHardConstraint = 1e5;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
+    VectorDynamic initial = GenerateVectorDynamic(5);
+    initial << 127.008,
+        455.654,
+        515.147,
+        237.366,
+        444.963;
+    UpdateTaskSetPeriod(tasks, initial);
+    // NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    // auto initialEstimateFG = FactorGraphForceManifold::GenerateInitialFG(tasks, maskForElimination);
+    // rta: 2, 50, 68, 115, 127
+    FactorGraphForceManifold::FindEliminatedVariables(tasks, maskForElimination);
+    AssertBool(true, maskForElimination[9]); // r_4
+    AssertBool(true, maskForElimination[0]); // t_0
+}
+TEST(eliminate, ForceManifold)
+{
+    noiseModelSigma = 1;
+    weightSchedulability = 1e6;
+    weightHardConstraint = 1e5;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
+    VectorDynamic initial = GenerateVectorDynamic(5);
+    initial << 127.008,
+        455.654,
+        515.147,
+        237.366,
+        444.963;
+    UpdateTaskSetPeriod(tasks, initial);
+    maskForElimination[0] = true;
+    maskForElimination[9] = true;
+
+    NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    auto initialEstimateFG = FactorGraphForceManifold::GenerateInitialFG(tasks, maskForElimination);
+    auto sth = graph.linearize(initialEstimateFG)->jacobian();
+
+    MatrixDynamic jacobianCurr = sth.first;
+    std::cout << "Current Jacobian matrix:" << endl;
+    std::cout << jacobianCurr << endl;
+    std::cout << "Current b vector: " << endl;
+    std::cout << sth.second << endl;
+    MatrixDynamic jacobianExpect = GenerateMatrixDynamic(18, 9);
+
+    // todo: add assert, fix the possibly missing r_i keys
+}
 int main()
 {
     TestResult tr;

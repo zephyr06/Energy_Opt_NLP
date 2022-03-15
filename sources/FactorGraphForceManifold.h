@@ -20,6 +20,13 @@
  */
 struct FactorGraphForceManifold
 {
+    /**
+     * @brief 
+     * 
+     * @param result 
+     * @param tasks 
+     * @return pair<VectorDynamic, VectorDynamic> periods, rta; rta is raw rta, which could include -1 (eliminated before)
+     */
     static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet &tasks)
     {
         VectorDynamic periods = GenerateVectorDynamic(tasks.size());
@@ -34,7 +41,14 @@ struct FactorGraphForceManifold
             {
                 periods(i, 0) = tasks[i].period;
             }
-            rta(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "response"))(0, 0);
+            if (result.exists(GenerateControlKey(i, "response")))
+            {
+                rta(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "response"))(0, 0);
+            }
+            else
+            {
+                rta(i, 0) = -1;
+            }
         }
         return make_pair(periods, rta);
     }
