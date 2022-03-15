@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Tasks.h"
 
 std::vector<double> String2IntVector(std::vector<std::string> vecS)

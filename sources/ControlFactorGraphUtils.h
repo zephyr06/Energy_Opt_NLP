@@ -41,23 +41,17 @@ double RealObj(TaskSet &tasks, VectorDynamic coeff)
     return res;
 }
 
-void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = 1e0)
+/**
+ * @brief perform customized quotient operation for two double type numbers
+ * return result is min_k |a - k b|, where k is an integer, a & b >0;
+ * 
+ * Brute force solution, find minimum remainder by finding minimum rem=(a-=b)
+ * @param a 
+ * @param b 
+ * @return double 
+ */
+double QuotientDouble(double a, double b)
 {
-    RTA_LL r(tasks);
-    VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
-    for (uint i = 0; i < tasks.size(); i++)
-    {
-        tasks[i].period -= disturb;
-        RTA_LL r1(tasks);
-        VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet();
-        if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
-        // TODO: more analytic way
-        {
-            maskForElimination[i] = true;
-        }
-        tasks[i].period += disturb;
-    }
-    for (auto a : maskForElimination)
-        cout << a << ", ";
-    cout << endl;
+    double remainder = a - int(a / b) * b;
+    return min(remainder, abs(remainder - b));
 }

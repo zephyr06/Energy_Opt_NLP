@@ -364,6 +364,23 @@ TEST(LL, vn)
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     AssertEqualScalar(INT32_MAX, rta(4, 0));
 }
+TEST(LL, vn1)
+{
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    VectorDynamic periodInitial1 = GenerateVectorDynamic(5);
+    periodInitial1 << 57.513,
+        311.526,
+        393.204,
+        119,
+        298.655;
+    UpdateTaskSetPeriod(tasks, periodInitial1);
+    RTA_LL r(tasks);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    AssertEqualScalar(119, rta(3, 0));
+}
 int main()
 {
     TestResult tr;

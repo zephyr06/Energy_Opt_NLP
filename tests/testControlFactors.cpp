@@ -10,7 +10,7 @@ TEST(ExtractResults, v1)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
-    std::vector<bool> maskForElimination(tasks.size(), false);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
     maskForElimination[1] = true;
     Values result;
     result.insert(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(1));
@@ -59,16 +59,20 @@ TEST(RTAFactor, v1)
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
     std::vector<bool> maskForElimination(tasks.size(), false);
-    NonlinearFactorGraph graph;
-    AddRTAFactor(graph, maskForElimination, tasks);
-    // initial estimate
     RTA_LL r(tasks);
-    auto rta = r.ResponseTimeOfTaskSet();
+    VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
+    NonlinearFactorGraph graph;
+    for (int index = 0; index < int(tasks.size()); index++)
+    {
+        MultiKeyFactor f = GenerateTaskRTAFactor(maskForElimination, tasks, index, rtaBase);
+        graph.add(f);
+    }
+    // initial estimate
     Values initialEstimateFG;
     for (uint i = 0; i < tasks.size(); i++)
     {
         initialEstimateFG.insert(GenerateControlKey(i, "period"), GenerateVectorDynamic1D(tasks[i].period));
-        initialEstimateFG.insert(GenerateControlKey(i, "response"), GenerateVectorDynamic1D(rta(i, 0)));
+        initialEstimateFG.insert(GenerateControlKey(i, "response"), GenerateVectorDynamic1D(rtaBase(i, 0)));
     }
     AssertEqualScalar(0, graph.error(initialEstimateFG));
     initialEstimateFG.update(GenerateControlKey(0, "response"), GenerateVectorDynamic1D(1));
@@ -92,7 +96,7 @@ TEST(BuildGraph, v1)
     std::tie(tasks, coeff) = ReadControlCase(path1);
     coeff << 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1;
-    std::vector<bool> maskForElimination(tasks.size(), false);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
     NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     RTA_LL r(tasks);
     auto rta = r.ResponseTimeOfTaskSet();
@@ -119,7 +123,7 @@ TEST(BuildGraph, v2)
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
 
-    std::vector<bool> maskForElimination(tasks.size(), false);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
     NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     RTA_LL r(tasks);
     auto rta = r.ResponseTimeOfTaskSet();
@@ -140,7 +144,7 @@ TEST(RTAFactor, J)
     std::vector<bool> maskForElimination(tasks.size(), false);
     RTA_LL r(tasks);
     auto rta = r.ResponseTimeOfTaskSet();
-    auto factor1 = GenerateTaskRTAFactor(maskForElimination, tasks, 4);
+    auto factor1 = GenerateTaskRTAFactor(maskForElimination, tasks, 4, rta);
     Values initialEstimateFG;
     for (uint i = 0; i < tasks.size(); i++)
     {
@@ -180,7 +184,7 @@ TEST(GenerateSchedulabilityFactor, v1)
         127.002,
         114.262;
     UpdateTaskSetPeriod(tasks, periodInitial1);
-    std::vector<bool> maskForElimination(tasks.size(), false);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
     maskForElimination[0] = 1;
     maskForElimination[3] = 1;
     auto factor1 = FactorGraphForceManifold::GenerateSchedulabilityFactor(maskForElimination, tasks, 4);
@@ -262,7 +266,7 @@ TEST(FindEliminatedVariables, v1)
     VectorDynamic initial = GenerateVectorDynamic(5);
     initial << 45, 372.719, 454.248, 128.127, 358.683;
     UpdateTaskSetPeriod(tasks, initial);
-    FindEliminatedVariables(tasks, maskForElimination, 1);
+    FactorGraphInManifold::FindEliminatedVariables(tasks, maskForElimination, 1);
     AssertEqualVectorExact({1, 0, 0, 0, 0}, maskForElimination);
 }
 
@@ -319,7 +323,7 @@ TEST(FactorGraphInManifold, inference2)
     UpdateTaskSetPeriod(tasks, initial);
     NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
-    FindEliminatedVariables(tasks, maskForElimination);
+    FactorGraphInManifold::FindEliminatedVariables(tasks, maskForElimination);
     AssertEqualVectorExact({1, 0, 0, 0, 0}, maskForElimination);
 }
 TEST(io, IfTargetFile)
@@ -355,7 +359,7 @@ TEST(jacobian, vn)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
-    std::vector<bool> maskForElimination(tasks.size(), false);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
     maskForElimination[0] = 1;
     VectorDynamic initial = GenerateVectorDynamic(5);
     initial << 127.008,
@@ -377,6 +381,16 @@ TEST(jacobian, vn)
 
     AssertEqualScalar(1e6, jacobianCurr(2, 1));
     AssertEqualScalar(1e6, jacobianCurr(0, 0));
+}
+TEST(QuotientDouble, v1)
+{
+    AssertEqualScalar(0.01, QuotientDouble(127.01, 127));
+    AssertEqualScalar(0.01, QuotientDouble(126.99, 127));
+    AssertEqualScalar(0.03, QuotientDouble(126.99 * 3, 127));
+    AssertEqualScalar(126.97, QuotientDouble(126.99 * 3, 127 * 2));
+    AssertEqualScalar(0, QuotientDouble(10, 2));
+    AssertEqualScalar(2, QuotientDouble(2, 10));
+    AssertEqualScalar(4.9, QuotientDouble(4.9, 10));
 }
 int main()
 {

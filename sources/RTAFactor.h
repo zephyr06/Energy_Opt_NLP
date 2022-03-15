@@ -6,9 +6,9 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
 typedef long long int LLint;
 
-MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, TaskSet &tasks, int index)
+MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, TaskSet &tasks, int index, VectorDynamic &rtaBase)
 {
-    LambdaMultiKey f = [tasks, index](const Values &x)
+    LambdaMultiKey f = [tasks, index, rtaBase](const Values &x)
     {
         // if (debugMode == 1)
         // {
@@ -16,8 +16,17 @@ MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, Task
         //     cout << "The values input to GenerateTaskRTAFactor: " << endl;
         //     x.print();
         // }
-        double error = x.at<VectorDynamic>(GenerateControlKey(index, "response"))(0, 0) -
-                       tasks[index].executionTime;
+        double error;
+        if (x.exists(GenerateControlKey(index, "response")))
+        {
+            error = x.at<VectorDynamic>(GenerateControlKey(index, "response"))(0, 0) -
+                    tasks[index].executionTime;
+        }
+        else
+        {
+            error = rtaBase(index, 0) -
+                    tasks[index].executionTime;
+        }
         for (int i = 0; i < index; i++)
         {
             double tj = 0;
@@ -51,12 +60,4 @@ MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, Task
     // auto modelPunishmentHard = noiseModel::Constrained::All(1);
     // return MultiKeyFactor(keysVec, f, modelPunishmentHard);
     return MultiKeyFactor(keysVec, f, model);
-}
-void AddRTAFactor(NonlinearFactorGraph &graph, std::vector<bool> maskForElimination, TaskSet &tasks)
-{
-    for (int index = 0; index < int(tasks.size()); index++)
-    {
-        MultiKeyFactor f = GenerateTaskRTAFactor(maskForElimination, tasks, index);
-        graph.add(f);
-    }
 }
