@@ -4,7 +4,7 @@ title="Control_Zhao20"
 MaxTaskNumber=20
 
 # clear buffer file content
-time_file="time_$title.txt"
+time_file="time_task_number.txt"
 > $time_file
 
 cp parameters.yaml ../../sources/parameters.yaml

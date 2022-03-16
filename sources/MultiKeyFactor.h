@@ -61,15 +61,7 @@ public:
     Vector unwhitenedError(const Values &x,
                            boost::optional<std::vector<Matrix> &> H = boost::none) const override
     {
-        // const VectorDynamic &x0 = x.at<VectorDynamic>(keyVec[0]);
-        // const VectorDynamic &x1 = x.at<VectorDynamic>(keyVec[1]);
-
-        // VectorDynamic res = GenerateVectorDynamic(dimension);
-        // for (uint i = 0; i < dimension; i++)
-        // {
-        //     res(i, 0) = bv[i] - x.at<VectorDynamic>(keyVec[i])(0, 0);
-        // }
-        // cout << "Res: " << res << endl;
+        BeginTimer(__func__);
         if (H)
         {
             for (uint i = 0; i < dimension; i++)
@@ -93,6 +85,7 @@ public:
                 cout << Color::def;
             }
         }
+        EndTimer(__func__);
         return lambdaMK(x);
     }
 };

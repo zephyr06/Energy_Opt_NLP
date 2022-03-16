@@ -308,6 +308,7 @@ TEST(FactorGraphInManifold, inference)
 TEST(FactorGraphInManifold, inference2)
 {
     noiseModelSigma = 1;
+    disturb_max = 1;
     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
     TaskSet tasks;
     VectorDynamic coeff;
