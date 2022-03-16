@@ -171,8 +171,12 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
         std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks, coeff, maskForElimination);
         UpdateTaskSetPeriod(tasks, periodResCurr);
         errCurr = RealObj(tasks, coeff);
-        cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
-        print(maskForElimination);
+        if (debugMode)
+        {
+            cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
+            print(maskForElimination);
+        }
+
         loopCount++;
 
         FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
