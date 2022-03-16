@@ -93,7 +93,10 @@ void BatchOptimize(int Nn = 5)
         printf("Directory: %s\n", pathDataset);
 
     vector<vector<double>> objVecAll;
-    vector<vector<double>> runTimeAll;
+    vector<double> dummy;
+    for (int i = 0; i < 3; i++)
+        objVecAll.push_back(dummy);
+    vector<vector<double>> runTimeAll = objVecAll;
     int N;
     if (debugMode == 1)
         printf("Directory: %s\n", pathDataset);
@@ -101,8 +104,8 @@ void BatchOptimize(int Nn = 5)
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
 
-        if (debugMode)
-            cout << file << endl;
+        // if (debugMode)
+
         int type = TargetFileType(file);
 
         string path = pathDataset + file;
@@ -110,6 +113,7 @@ void BatchOptimize(int Nn = 5)
         {
         case 0: // perform optimization
         {
+            cout << file << endl;
             TaskSet tasks;
             VectorDynamic coeff;
             std::tie(tasks, coeff) = ReadControlCase(path);

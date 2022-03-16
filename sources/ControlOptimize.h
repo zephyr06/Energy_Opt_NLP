@@ -25,16 +25,18 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
     // initialEstimate << 68.000000, 321, 400, 131, 308;
     Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
-
-    cout << Color::green;
-    // std::lock_guard<std::mutex> lock(mtx);
-    auto sth = graph.linearize(initialEstimateFG)->jacobian();
-    MatrixDynamic jacobianCurr = sth.first;
-    std::cout << "Current Jacobian matrix:" << endl;
-    std::cout << jacobianCurr << endl;
-    std::cout << "Current b vector: " << endl;
-    std::cout << sth.second << endl;
-    cout << Color::def << endl;
+    if (debugMode == 1)
+    {
+        cout << Color::green;
+        // std::lock_guard<std::mutex> lock(mtx);
+        auto sth = graph.linearize(initialEstimateFG)->jacobian();
+        MatrixDynamic jacobianCurr = sth.first;
+        std::cout << "Current Jacobian matrix:" << endl;
+        std::cout << jacobianCurr << endl;
+        std::cout << "Current b vector: " << endl;
+        std::cout << sth.second << endl;
+        cout << Color::def << endl;
+    }
 
     Values result;
     if (optimizerType == 1)
@@ -61,24 +63,26 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
 
     VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
     std::tie(optComp, rtaFromOpt) = FactorGraphType::ExtractResults(result, tasks);
-    cout << endl;
-    cout << Color::blue;
-    cout << "After optimization, the period vector is " << endl
-         << optComp << endl;
-    cout << "After optimization, the rta vector is " << endl
-         << rtaFromOpt << endl;
-    cout << "The graph error is " << graph.error(result) << endl;
-    cout << Color::def;
-    cout << endl;
-    cout << Color::blue;
-    UpdateTaskSetPeriod(tasks, FactorGraphType::ExtractResults(initialEstimateFG, tasks).first);
-    cout << "Before optimization, the total error is " << RealObj(tasks, coeff) << endl;
+    if (debugMode == 1)
+    {
+        cout << endl;
+        cout << Color::blue;
+        cout << "After optimization, the period vector is " << endl
+             << optComp << endl;
+        cout << "After optimization, the rta vector is " << endl
+             << rtaFromOpt << endl;
+        cout << "The graph error is " << graph.error(result) << endl;
+        cout << Color::def;
+        cout << endl;
+        cout << Color::blue;
+        UpdateTaskSetPeriod(tasks, FactorGraphType::ExtractResults(initialEstimateFG, tasks).first);
+        cout << "Before optimization, the total error is " << RealObj(tasks, coeff) << endl;
+        UpdateTaskSetPeriod(tasks, optComp);
+        cout << "The objective function is " << RealObj(tasks, coeff) << endl;
+        cout << Color::def;
+    }
+
     UpdateTaskSetPeriod(tasks, optComp);
-    cout << "The objective function is " << RealObj(tasks, coeff) << endl;
-    cout << Color::def;
-
-    // double eeee = graph.error(result);
-
     return make_pair(optComp, RealObj(tasks, coeff));
 }
 
@@ -105,20 +109,29 @@ pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, Vecto
         if (!r.CheckSchedulability())
         {
             UpdateTaskSetPeriod(tasks, periodPrev);
-            std::lock_guard<std::mutex> lock(mtx);
-            cout << Color::blue << "After one iterate on updating weight parameter,\
+            if (debugMode == 1)
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+                cout << Color::blue << "After one iterate on updating weight parameter,\
              the periods become unschedulable and are"
-                 << endl
-                 << periodRes << endl;
+                     << endl
+                     << periodRes << endl;
+                cout << Color::def;
+            }
+
             return make_pair(periodPrev, err);
         }
         else
         {
-            std::lock_guard<std::mutex> lock(mtx);
-            cout << Color::blue << "After one iterate on updating weight parameter,\
+            if (debugMode == 1)
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+                cout << Color::blue << "After one iterate on updating weight parameter,\
              the periods remain schedulable and are"
-                 << endl
-                 << periodRes << endl;
+                     << endl
+                     << periodRes << endl;
+                cout << Color::def;
+            }
         }
     }
 

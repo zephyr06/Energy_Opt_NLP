@@ -115,8 +115,12 @@ struct FactorGraphInManifold
             }
             tasks[i].period += disturb;
         }
-        for (auto a : maskForElimination)
-            cout << a << ", ";
-        cout << endl;
+        if (debugMode == 1)
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            for (auto a : maskForElimination)
+                cout << a << ", ";
+            cout << endl;
+        }
     }
 };
