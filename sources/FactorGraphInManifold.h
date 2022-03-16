@@ -54,7 +54,7 @@ struct FactorGraphInManifold
         {
             f_with_RTA = [tasks, index, coeff, rtaBase](const Values &x)
             {
-                BeginTimer(__func__);
+                BeginTimer("f_with_RTA");
                 VectorDynamic error = GenerateVectorDynamic(2);
                 TaskSet tasksCurr = tasks;
                 UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks).first);
@@ -62,7 +62,7 @@ struct FactorGraphInManifold
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = rta * coeff[2 * index + 1];
                 error(1) = HingeLoss(tasksCurr[index].period - rta);
-                EndTimer(__func__);
+                EndTimer("f_with_RTA");
                 return error;
             };
         }
@@ -74,7 +74,7 @@ struct FactorGraphInManifold
         Vector unwhitenedError(const Values &x,
                                boost::optional<std::vector<Matrix> &> H = boost::none) const override
         {
-            BeginTimer(__func__);
+            BeginTimer("RTARelatedFactor_unwhitenedError");
             if (H)
             {
                 for (int i = 0; i < dimension; i++)
@@ -104,7 +104,7 @@ struct FactorGraphInManifold
                     cout << Color::def;
                 }
             }
-            EndTimer(__func__);
+            EndTimer("RTARelatedFactor_unwhitenedError");
             return f_with_RTA(x);
         }
     };
@@ -190,7 +190,7 @@ struct FactorGraphInManifold
             return;
         }
         bool whether_new_eliminate = false;
-        while (!whether_new_eliminate && disturb < disturb_max)
+        while (!whether_new_eliminate && disturb <= disturb_max)
         {
             RTA_LL r(tasks);
             VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();

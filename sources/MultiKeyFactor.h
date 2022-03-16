@@ -61,7 +61,7 @@ public:
     Vector unwhitenedError(const Values &x,
                            boost::optional<std::vector<Matrix> &> H = boost::none) const override
     {
-        BeginTimer(__func__);
+        BeginTimer("MultiKeyFactor");
         if (H)
         {
             for (uint i = 0; i < dimension; i++)
@@ -85,7 +85,7 @@ public:
                 cout << Color::def;
             }
         }
-        EndTimer(__func__);
+        EndTimer("MultiKeyFactor");
         return lambdaMK(x);
     }
 };
