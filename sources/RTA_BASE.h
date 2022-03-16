@@ -2,6 +2,7 @@
 
 #include "Tasks.h"
 #include "Declaration.h"
+#include "profilier.h"
 /**
  * @brief All customized TaskSetType must inherit from TaskSetNormal in Tasks.h
  * 
@@ -64,8 +65,12 @@ public:
 
     VectorDynamic ResponseTimeOfTaskSet()
     {
+        BeginTimer("ResponseTimeOfTaskSet");
+
         VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
-        return ResponseTimeOfTaskSet(warmStart);
+        auto res = ResponseTimeOfTaskSet(warmStart);
+        EndTimer("ResponseTimeOfTaskSet");
+        return res;
     }
     /**
      * @brief 

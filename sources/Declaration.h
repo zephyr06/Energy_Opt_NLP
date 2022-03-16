@@ -14,6 +14,7 @@
 #include <gtsam/nonlinear/Values.h>
 
 #include "testMy.h"
+#include "profilier.h"
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;

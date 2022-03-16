@@ -12,7 +12,7 @@ enableIPM: 0
 elimIte: 1000
 EnergyMode: 1
 exactJacobian: 0
-printFailureFile: 0
+printFailureFile: 1
 printRTA: 0
 readTaskMode: RM
 batchOptimizeFolder: MIGP
@@ -53,6 +53,7 @@ granularityInBF: 1
 
 SA_iteration: 1000000
 
+controlPath: "N5/Case5"
 utilTol: 0.001
 verbosityLM: "SILENT"
 # all the weight parameters used in control experiment
@@ -61,5 +62,8 @@ weightSchedulability: 500 # actual parameter that controls schedulability constr
 weightSchedulabilityMax: 1e7
 weightSchedulabilityStep: 3
 weightSchedulabilityMin: 1e7
+disturb_step: 2
+disturb_max: 10
+relativeErrorToleranceOuterLoop: 1e-8
 
 weightHardConstraint: 1e5 # weight of period limits and r<d (3 factors)

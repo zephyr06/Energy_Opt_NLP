@@ -20,6 +20,7 @@ template <typename FactorGraphType>
 pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic coeff,
                                                    std::vector<bool> &maskForElimination)
 {
+    BeginTimer(__func__);
     NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(maskForElimination, tasks, coeff);
 
     // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
@@ -83,6 +84,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     }
 
     UpdateTaskSetPeriod(tasks, optComp);
+    EndTimer(__func__);
     return make_pair(optComp, RealObj(tasks, coeff));
 }
 
@@ -137,6 +139,21 @@ pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, Vecto
 
     return make_pair(periodRes, err);
 }
+/* @brief return a string with expected precision by adding leading 0 */
+string to_string_precision(int a, int precision)
+{
+    return std::string(4 - min(4, to_string(a).length()), '0') + to_string(a);
+}
+template <typename T>
+void print(const std::vector<T> &vec)
+{
+    for (auto x : vec)
+    {
+        cout << x << ", ";
+    }
+}
+
+// TODO: limit the number of outer loops
 template <typename FactorGraphType>
 pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
                                                      std::vector<bool> &maskForElimination)
@@ -144,18 +161,23 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
     VectorDynamic periodResCurr, periodResPrev;
     double errPrev = 1e30;
     double errCurr = RealObj(tasks, coeff);
-    while (errCurr < errPrev)
+    int loopCount = 0;
+    while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) && ContainFalse(maskForElimination))
     {
         // store prev result
         errPrev = errCurr;
         periodResPrev = GetParameterVD<double>(tasks, "period");
-
-        FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
         double err;
         std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks, coeff, maskForElimination);
         UpdateTaskSetPeriod(tasks, periodResCurr);
         errCurr = RealObj(tasks, coeff);
+        cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
+        print(maskForElimination);
+        loopCount++;
+
+        FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
     }
     UpdateTaskSetPeriod(tasks, periodResPrev);
+    cout << "The number of outside loop in OptimizeTaskSetIterative is " << loopCount << endl;
     return make_pair(periodResPrev, errPrev);
 }

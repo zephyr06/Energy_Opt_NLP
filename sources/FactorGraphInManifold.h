@@ -12,6 +12,16 @@
 #include "RTAFactor.h"
 #include "InequalifyFactor.h"
 #include "ControlFactorGraphUtils.h"
+
+bool ContainFalse(std::vector<bool> &maskForElimination)
+{
+    for (auto x : maskForElimination)
+    {
+        if (x == false)
+            return true;
+    }
+    return false;
+}
 struct FactorGraphInManifold
 {
     static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet tasks)
@@ -25,19 +35,19 @@ struct FactorGraphInManifold
             }
         }
         UpdateTaskSetPeriod(tasks, periods);
-        RTA_LL r(tasks);
-        return make_pair(periods, r.ResponseTimeOfTaskSet());
+        return make_pair(periods, RTALLVector(tasks));
     }
 
     static MultiKeyFactor GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff)
     {
-        LambdaMultiKey f = [tasks, index, coeff](const Values &x)
+        VectorDynamic rtaBase = RTALLVector(tasks);
+        LambdaMultiKey f = [tasks, index, coeff, rtaBase](const Values &x)
         {
             VectorDynamic error = GenerateVectorDynamic(2);
             TaskSet tasksCurr = tasks;
             UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks).first);
             RTA_LL r(tasksCurr);
-            double rta = r.RTA_Common_Warm(tasksCurr[index].executionTime, index);
+            double rta = r.RTA_Common_Warm(rtaBase(index), index);
             error(0) = rta * coeff[2 * index + 1];
             error(1) = HingeLoss(tasksCurr[index].period - rta);
 
@@ -101,26 +111,41 @@ struct FactorGraphInManifold
 
     static void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = 1e0)
     {
-        RTA_LL r(tasks);
-        VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
-        for (uint i = 0; i < tasks.size(); i++)
+        BeginTimer(__func__);
+        if (!ContainFalse(maskForElimination))
         {
-            tasks[i].period -= disturb;
-            RTA_LL r1(tasks);
-            VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet();
-            if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
-            // TODO: more analytic way
+            return;
+        }
+        bool whether_new_eliminate = false;
+        while (!whether_new_eliminate && disturb < disturb_max)
+        {
+            RTA_LL r(tasks);
+            VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
+            for (uint i = 0; i < tasks.size(); i++)
             {
-                maskForElimination[i] = true;
+                tasks[i].period -= disturb;
+                RTA_LL r1(tasks);
+                VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet();
+                if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
+                // TODO: more analytic way
+                {
+                    if (!maskForElimination[i])
+                        whether_new_eliminate = true;
+                    maskForElimination[i] = true;
+                }
+                tasks[i].period += disturb;
             }
-            tasks[i].period += disturb;
+            if (!whether_new_eliminate)
+                disturb *= disturb_step;
+            if (debugMode == 1)
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+                for (auto a : maskForElimination)
+                    cout << a << ", ";
+                cout << endl;
+            }
         }
-        if (debugMode == 1)
-        {
-            std::lock_guard<std::mutex> lock(mtx);
-            for (auto a : maskForElimination)
-                cout << a << ", ";
-            cout << endl;
-        }
+
+        EndTimer(__func__);
     }
 };

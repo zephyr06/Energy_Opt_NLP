@@ -81,7 +81,7 @@ public:
         VectorDynamic err = f(x);
         if (H)
         {
-            *H = NumericalDerivativeDynamicUpper(f, x, deltaOptimizer, dimension);
+            *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
         }
         return err;
     }
@@ -149,7 +149,7 @@ MatrixDynamic NumericalDerivativeDynamic2D1(NormalErrorFunction2D h,
         return h(x1, x2);
     };
 
-    return NumericalDerivativeDynamicUpper(f, x1, deltaOptimizer, mOfJacobian);
+    return NumericalDerivativeDynamic(f, x1, deltaOptimizer, mOfJacobian);
 }
 MatrixDynamic NumericalDerivativeDynamic2D2(NormalErrorFunction2D h,
                                             const VectorDynamic &x1,
@@ -165,7 +165,7 @@ MatrixDynamic NumericalDerivativeDynamic2D2(NormalErrorFunction2D h,
         return h(x1, x2);
     };
 
-    return NumericalDerivativeDynamicUpper(f, x2, deltaOptimizer, mOfJacobian);
+    return NumericalDerivativeDynamic(f, x2, deltaOptimizer, mOfJacobian);
 }
 
 /**

@@ -1,7 +1,9 @@
 #include "../sources/BatchControlOptimize.h"
+#include "../sources/profilier.h"
 
 int main(int argc, char *argv[])
 {
+    BeginTimer(__func__);
     if (argc == 1)
         BatchOptimize<FactorGraphInManifold>();
     else if (argc == 2)
@@ -30,4 +32,6 @@ int main(int argc, char *argv[])
     {
         CoutError("Too many arguments in LLBatch!");
     }
+    EndTimer(__func__);
+    PrintTimer();
 }

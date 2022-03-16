@@ -24,6 +24,7 @@ double Barrier(double x)
 MatrixDynamic NumericalDerivativeDynamic(boost::function<VectorDynamic(const VectorDynamic &)> h,
                                          VectorDynamic x, double deltaOptimizer, int mOfJacobian = -1)
 {
+    BeginTimer(__func__);
     int n = x.rows();
     MatrixDynamic jacobian;
     if (mOfJacobian == -1)
@@ -50,6 +51,7 @@ MatrixDynamic NumericalDerivativeDynamic(boost::function<VectorDynamic(const Vec
             jacobian(j, i) = (resPlus(j, 0) - resMinus(j, 0)) / 2 / deltaOptimizer;
         }
     }
+    EndTimer(__func__);
     return jacobian;
 }
 

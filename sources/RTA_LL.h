@@ -2,7 +2,7 @@
 
 #include "Tasks.h"
 #include "Declaration.h"
-#include "RTA_BASE.h" 
+#include "RTA_BASE.h"
 
 class RTA_LL : public RTA_BASE<TaskSetNormal>
 {
@@ -124,3 +124,9 @@ public:
         return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
     }
 };
+
+VectorDynamic RTALLVector(const TaskSet &tasks)
+{
+    RTA_LL r(tasks);
+    return r.ResponseTimeOfTaskSet();
+}

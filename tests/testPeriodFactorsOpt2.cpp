@@ -1,10 +1,12 @@
 #include "../sources/ControlOptimize.h"
+#include "../sources/profilier.h"
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 
 TEST(case1, v1)
 {
+    BeginTimer("main");
     noiseModelSigma = 1;
-    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/" + controlPath + ".txt";
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
@@ -19,6 +21,8 @@ TEST(case1, v1)
     // UpdateTaskSetPeriod(tasks, sth.first);
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false}, maskForElimination);
+    EndTimer("main");
+    PrintTimer();
 }
 
 int main()

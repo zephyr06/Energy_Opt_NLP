@@ -97,15 +97,14 @@ void BatchOptimize(int Nn = 5)
     for (int i = 0; i < 3; i++)
         objVecAll.push_back(dummy);
     vector<vector<double>> runTimeAll = objVecAll;
+    vector<string> failedFiles;
     int N;
     if (debugMode == 1)
         printf("Directory: %s\n", pathDataset);
     vector<string> errorFiles;
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
-
         // if (debugMode)
-
         int type = TargetFileType(file);
 
         string path = pathDataset + file;
@@ -117,7 +116,7 @@ void BatchOptimize(int Nn = 5)
             TaskSet tasks;
             VectorDynamic coeff;
             std::tie(tasks, coeff) = ReadControlCase(path);
-            std::vector<bool> maskForElimination(tasks.size(), false);
+            std::vector<bool> maskForElimination(tasks.size(), false); // TODO: try *2 to ?
             auto start = chrono::high_resolution_clock::now();
             auto res = OptimizeTaskSetIterative<FactorGraphType>(tasks, coeff, maskForElimination);
             auto stop = chrono::high_resolution_clock::now();
@@ -125,6 +124,13 @@ void BatchOptimize(int Nn = 5)
             double timeTaken = double(duration.count()) / 1e6;
             runTimeAll[0].push_back(timeTaken);
             objVecAll[0].push_back(res.second);
+            // check schedulability
+            UpdateTaskSetPeriod(tasks, res.first);
+            RTA_LL r(tasks);
+            if (!r.CheckSchedulability())
+            {
+                failedFiles.push_back(file);
+            }
             break;
         }
         case 1: // read MILP result
@@ -162,12 +168,12 @@ void BatchOptimize(int Nn = 5)
     //           batchOptimizeFolder + "/time_task_number.txt";
     // AddEntry(pathRes, N, aveTime);
 
-    // if (printFailureFile)
-    // {
-    //     cout << endl;
-    //     for (auto &file : errorFiles)
-    //         cout << file << endl;
-    // }
+    if (printFailureFile)
+    {
+        cout << endl;
+        for (auto &file : failedFiles)
+            cout << file << endl;
+    }
     // // if (debugMode)
     // cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
     // cout << Color::def << endl;

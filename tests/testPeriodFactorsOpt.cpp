@@ -1,8 +1,10 @@
 #include "../sources/ControlOptimize.h"
+#include "../sources/profilier.h"
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 
 TEST(case1, v1)
 {
+    BeginTimer("main");
     noiseModelSigma = 1;
     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
     TaskSet tasks;
@@ -10,7 +12,7 @@ TEST(case1, v1)
     std::tie(tasks, coeff) = ReadControlCase(path1);
     std::vector<bool> maskForElimination(tasks.size() * 2, false);
     // auto sth = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
-    VectorDynamic periodInitial1 = GenerateVectorDynamic(5);
+    VectorDynamic periodInitial1 = GenerateVectorDynamic(10);
     // periodInitial1 << 32.2896, 347.818, 434.834, 104.653, 333.08;
     // UpdateTaskSetPeriod(tasks, periodInitial1);
     // maskForElimination[1] = 1;
@@ -19,6 +21,8 @@ TEST(case1, v1)
     // UpdateTaskSetPeriod(tasks, sth.first);
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false}, maskForElimination);
+    EndTimer("main");
+    PrintTimer();
 }
 
 int main()

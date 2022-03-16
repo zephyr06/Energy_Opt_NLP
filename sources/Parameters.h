@@ -48,11 +48,16 @@ const double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTol
 const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
 int optimizerType = (int)ConfigParameters["optimizerType"];
 double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];
+double disturb_step = (double)ConfigParameters["disturb_step"];
+double relativeErrorToleranceOuterLoop = (double)ConfigParameters["relativeErrorToleranceOuterLoop"];
+double disturb_max = (double)ConfigParameters["disturb_max"];
+
 const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency"];
 const string testDataSetName = (string)ConfigParameters["testDataSetName"];
 string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
 string verbosityLM = (string)ConfigParameters["verbosityLM"];
 
+string controlPath = (string)ConfigParameters["controlPath"];
 string runMode = (string)ConfigParameters["runMode"];
 string batchOptimizeFolder = (string)ConfigParameters["batchOptimizeFolder"];
 const double parallelFactor = (double)ConfigParameters["parallelFactor"];
