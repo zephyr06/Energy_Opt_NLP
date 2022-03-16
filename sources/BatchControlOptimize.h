@@ -2,7 +2,7 @@
 #include "BatchTestutils.h"
 #include "ControlOptimize.h"
 
-void AddEntry(string pathRes, int N, double val)
+void AddEntry(string pathRes, double val)
 {
     ofstream outfileWrite;
     outfileWrite.open(pathRes,
@@ -124,6 +124,7 @@ void BatchOptimize(int Nn = 5)
             double timeTaken = double(duration.count()) / 1e6;
             runTimeAll[0].push_back(timeTaken);
             objVecAll[0].push_back(res.second);
+
             // check schedulability
             UpdateTaskSetPeriod(tasks, res.first);
             RTA_LL r(tasks);
@@ -145,6 +146,14 @@ void BatchOptimize(int Nn = 5)
             auto res = ReadBaselineZhao20(path);
             runTimeAll[2].push_back(res.first);
             objVecAll[2].push_back(res.second);
+            // record results for plot
+            string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                             batchOptimizeFolder + "/EnergySaveRatio/N" +
+                             to_string(N) + ".txt";
+            AddEntry(pathRes, objVecAll[0].back() / res.second);
+            pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                      batchOptimizeFolder + "/time_task_number.txt";
+            AddEntry(pathRes, runTimeAll[0].back() / res.first);
             break;
         }
         default:
@@ -158,15 +167,7 @@ void BatchOptimize(int Nn = 5)
     cout << "Average relative performance gap (NO: MUA) is " << RelativeGap(objVecAll[0], objVecAll[1]) << endl;
     cout << "Speed ratio (NO: MUA) is " << SpeedRatio(runTimeAll[0], runTimeAll[1]) << endl;
     cout << "Average time consumed is " << Average(runTimeAll[0]) << endl;
-    // cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
-
-    // string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-    //                  batchOptimizeFolder + "/EnergySaveRatio/N" +
-    //                  to_string(N) + ".txt";
-    // AddEntry(pathRes, N, avEnergy);
-    // pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-    //           batchOptimizeFolder + "/time_task_number.txt";
-    // AddEntry(pathRes, N, aveTime);
+    cout << Color::def << endl;
 
     if (printFailureFile)
     {
@@ -174,8 +175,4 @@ void BatchOptimize(int Nn = 5)
         for (auto &file : failedFiles)
             cout << file << endl;
     }
-    // // if (debugMode)
-    // cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
-    // cout << Color::def << endl;
-    // return;
 }

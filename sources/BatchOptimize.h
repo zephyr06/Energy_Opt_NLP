@@ -3,7 +3,7 @@
 #include "Optimize.h"
 #include "RTA_DAG.h"
 
-void AddEntry(string pathRes, int N, double val)
+void AddEntry(string pathRes, double val)
 {
     ofstream outfileWrite;
     // string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
@@ -95,10 +95,10 @@ void BatchOptimize(int Nn = -1)
     string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
                      batchOptimizeFolder + "/EnergySaveRatio/N" +
                      to_string(N) + ".txt";
-    AddEntry(pathRes, N, avEnergy);
+    AddEntry(pathRes, avEnergy);
     pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
               batchOptimizeFolder + "/time_task_number.txt";
-    AddEntry(pathRes, N, aveTime);
+    AddEntry(pathRes, aveTime);
 
     if (printFailureFile)
     {
