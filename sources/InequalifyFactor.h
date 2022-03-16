@@ -68,12 +68,12 @@ public:
     }
 
     /** active when constraint *NOT* met */
-    // bool active(const Values &c) const override
-    // {
-    //     // note: still active at equality to avoid zigzagging?
-    //     VectorDynamic x = (c.at<VectorDynamic>(this->key()));
-    //     return f(x)(0, 0) > 0;
-    // }
+    bool active(const Values &c) const override
+    {
+        // note: still active at equality to avoid zigzagging?
+        VectorDynamic x = (c.at<VectorDynamic>(this->key()));
+        return f(x)(0, 0) > 0;
+    }
 
     Vector evaluateError(const VectorDynamic &x,
                          boost::optional<Matrix &> H = boost::none) const override
@@ -192,14 +192,14 @@ public:
     }
 
     /** active when constraint *NOT* met */
-    // bool active(const Values &c) const override
-    // {
-    //     // note: still active at equality to avoid zigzagging??
-    //     VectorDynamic x0 = (c.at<VectorDynamic>(this->keys()[0]));
-    //     VectorDynamic x1 = (c.at<VectorDynamic>(this->keys()[1]));
-    //     return f(x0, x1)(0, 0) >= 0;
-    //     // return true;
-    // }
+    bool active(const Values &c) const override
+    {
+        // note: still active at equality to avoid zigzagging??
+        VectorDynamic x0 = (c.at<VectorDynamic>(this->keys()[0]));
+        VectorDynamic x1 = (c.at<VectorDynamic>(this->keys()[1]));
+        return f(x0, x1)(0, 0) >= 0;
+        // return true;
+    }
 
     Vector evaluateError(const VectorDynamic &x1, const VectorDynamic &x2,
                          boost::optional<Matrix &> H1 = boost::none, boost::optional<Matrix &> H2 = boost::none) const override

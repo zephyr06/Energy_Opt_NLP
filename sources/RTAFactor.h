@@ -6,55 +6,37 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
 typedef long long int LLint;
 
+/* convenient function only used for GenerateTaskRTAFactor function*/
+double AtWithReplace(const Values &x, gtsam::Symbol key, double alternative)
+{
+    if (x.exists(key))
+        return x.at<VectorDynamic>(key)(0, 0);
+    else
+        return alternative;
+};
+
 MultiKeyFactor GenerateTaskRTAFactor(std::vector<bool> &maskForElimination, TaskSet &tasks, int index, VectorDynamic &rtaBase)
 {
     LambdaMultiKey f = [tasks, index, rtaBase](const Values &x)
     {
-        // if (debugMode == 1)
-        // {
-        //     std::lock_guard<std::mutex> lock(mtx);
-        //     cout << "The values input to GenerateTaskRTAFactor: " << endl;
-        //     x.print();
-        // }
-        double error;
-        if (x.exists(GenerateControlKey(index, "response")))
-        {
-            error = x.at<VectorDynamic>(GenerateControlKey(index, "response"))(0, 0) -
-                    tasks[index].executionTime;
-        }
-        else
-        {
-            error = rtaBase(index, 0) -
-                    tasks[index].executionTime;
-        }
+        double error = AtWithReplace(x, GenerateControlKey(index, "response"), rtaBase(index, 0)) -
+                       tasks[index].executionTime;
+
         for (int i = 0; i < index; i++)
         {
-            double tj = 0;
-            if (x.exists(GenerateControlKey(i, "period")))
-            {
-                tj = x.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
-            }
-            else
-            {
-                tj = tasks[i].period;
-            }
-            error -= ceil(x.at<VectorDynamic>(GenerateControlKey(index, "response"))(0, 0) /
-                          tj) *
+            error -= ceil(AtWithReplace(x, GenerateControlKey(index, "response"), rtaBase(index)) /
+                          AtWithReplace(x, GenerateControlKey(i, "period"), tasks[i].period)) *
                      tasks[i].executionTime;
         }
-
-        VectorDynamic res = GenerateVectorDynamic(1);
-        res << error;
-        return res;
+        return GenerateVectorDynamic1D(error);
     };
     std::vector<gtsam::Symbol> keysVec;
     for (uint i = 0; i < tasks.size(); i++)
     {
         if (!maskForElimination[i])
-        {
             keysVec.push_back(GenerateControlKey(i, "period"));
-        }
-        keysVec.push_back(GenerateControlKey(i, "response"));
+        if (!maskForElimination[i + 5])
+            keysVec.push_back(GenerateControlKey(i, "response"));
     }
     auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightSchedulability);
     // auto modelPunishmentHard = noiseModel::Constrained::All(1);

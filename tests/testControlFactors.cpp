@@ -141,7 +141,7 @@ TEST(RTAFactor, J)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
-    std::vector<bool> maskForElimination(tasks.size(), false);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
     RTA_LL r(tasks);
     auto rta = r.ResponseTimeOfTaskSet();
     auto factor1 = GenerateTaskRTAFactor(maskForElimination, tasks, 4, rta);
@@ -445,9 +445,8 @@ TEST(eliminate, ForceManifold)
     std::cout << jacobianCurr << endl;
     std::cout << "Current b vector: " << endl;
     std::cout << sth.second << endl;
-    MatrixDynamic jacobianExpect = GenerateMatrixDynamic(18, 9);
-
-    // todo: add assert, fix the possibly missing r_i keys
+    AssertEqualScalar(1e6, jacobianCurr(0, 0));
+    AssertEqualScalar(1e6, jacobianCurr(2, 1));
 }
 int main()
 {

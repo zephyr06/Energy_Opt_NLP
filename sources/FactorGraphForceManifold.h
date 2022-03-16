@@ -77,7 +77,6 @@ struct FactorGraphForceManifold
         VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
         for (uint i = 0; i < tasks.size(); i++)
         {
-
             // add RTAFactor
             graph.add(GenerateTaskRTAFactor(maskForElimination, tasks, i, rtaBase));
 
@@ -90,21 +89,28 @@ struct FactorGraphForceManifold
             }
             if (!maskForElimination[i])
             {
-
                 // add CoeffFactor
                 graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
                                                   GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
                 // add period min/max limits
                 graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishmentSoft1);
                 graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentSoft1);
-                // schedulability
-                graph.add(GenerateSchedulabilityFactor(maskForElimination, tasks, i));
             }
-            else
+
+            // schedulability factor
+            if (!maskForElimination[i]) // T_i is an variable
             {
-                // schedulability
-                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
-                                                          min(tasks[i].period, tasks[i].deadline), modelPunishmentSoft1);
+                if (!maskForElimination[i + 5]) // r_i is an variable
+                    graph.add(GenerateSchedulabilityFactor(maskForElimination, tasks, i));
+                else
+                    graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"),
+                                                             rtaBase(i), modelPunishmentSoft1);
+            }
+            else // T_i is eliminated
+            {
+                if (!maskForElimination[i + 5]) // r_i is an variable
+                    graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
+                                                              min(tasks[i].period, tasks[i].deadline), modelPunishmentSoft1);
             }
         }
         return graph;
