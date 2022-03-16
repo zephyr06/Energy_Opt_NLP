@@ -161,6 +161,7 @@ struct FactorGraphForceManifold
                 }
             }
         }
+        std::lock_guard<std::mutex> lock(mtx);
         for (auto a : maskForElimination)
             cout << a << ", ";
         cout << endl;

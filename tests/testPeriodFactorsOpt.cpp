@@ -8,7 +8,7 @@ TEST(case1, v1)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
-    std::vector<bool> maskForElimination(tasks.size(), false);
+    std::vector<bool> maskForElimination(tasks.size() * 2, false);
     // auto sth = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
     VectorDynamic periodInitial1 = GenerateVectorDynamic(5);
     // periodInitial1 << 32.2896, 347.818, 434.834, 104.653, 333.08;
