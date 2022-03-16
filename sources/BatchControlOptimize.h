@@ -116,6 +116,7 @@ void BatchOptimize(int Nn = 5)
             TaskSet tasks;
             VectorDynamic coeff;
             std::tie(tasks, coeff) = ReadControlCase(path);
+            N = tasks.size();
             std::vector<bool> maskForElimination(tasks.size(), false); // TODO: try *2 to ?
             auto start = chrono::high_resolution_clock::now();
             auto res = OptimizeTaskSetIterative<FactorGraphType>(tasks, coeff, maskForElimination);
