@@ -6,7 +6,7 @@ testDataSetName: test_n5_v8
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
-debugMode: 2
+debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
@@ -29,7 +29,7 @@ adjustEliminateMaxIte: 10
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: "fine"
+roundTypeInClamp: "rough"
 
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e5
@@ -44,7 +44,7 @@ punishmentFrequency: 10
 randomInitialize: 0
 deltaInitialDogleg: 1e10
 
-initialLambda: 1e3
+initialLambda: 1e2
 lowerLambda: 1e-20
 upperLambda: 1e20
 coolingRateSA: 0.99
@@ -55,7 +55,7 @@ SA_iteration: 1000000
 
 controlPath: "N5/Case5"
 utilTol: 0.001
-verbosityLM: "SILENT"
+verbosityLM: "SUMMARY"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 

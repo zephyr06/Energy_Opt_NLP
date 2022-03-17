@@ -153,11 +153,124 @@ void print(const std::vector<T> &vec)
     }
 }
 
+/**
+ * @brief round period into int type, we assume the given task set is schedulable!
+ * 
+ * @param tasks 
+ * @param maskForElimination 
+ * @param coeff 
+ */
+void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDynamic coeff)
+{
+    if (roundTypeInClamp == "none")
+        return;
+    else if (roundTypeInClamp == "rough")
+    {
+        for (uint i = 0; i < maskForElimination.size(); i++)
+        {
+            if (maskForElimination[i])
+            {
+                tasks[i].period = ceil(tasks[i].period);
+            }
+        }
+    }
+    else if (roundTypeInClamp == "fine")
+    {
+        int N = tasks.size();
+
+        vector<int> wait_for_eliminate_index;
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            if (maskForElimination[i] && tasks[i].period != ceil(tasks[i].period))
+                wait_for_eliminate_index.push_back(i);
+        }
+        if (!wait_for_eliminate_index.empty())
+        {
+
+            VectorDynamic rtaBase = RTALLVector(tasks);
+
+            vector<pair<int, double>> objectiveVec;
+            objectiveVec.reserve(wait_for_eliminate_index.size());
+            for (uint i = 0; i < wait_for_eliminate_index.size(); i++)
+            {
+                objectiveVec.push_back(make_pair(wait_for_eliminate_index[i], coeff(wait_for_eliminate_index[i] * 2) * -1));
+            }
+            sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
+            int iterationNumber = 0;
+
+            // int left = 0, right = 0;
+            while (objectiveVec.size() > 0)
+            {
+                int currentIndex = objectiveVec[0].first;
+
+                // try to round 'up', if success, keep the loop; otherwise, eliminate it and high priority tasks
+                // can be speeded up, if necessary, by binary search
+                int left = rtaBase(currentIndex);
+                int right = ceil(tasks[currentIndex].period);
+                if (left > right)
+                {
+                    CoutError("left > right error in clamp!");
+                }
+                int rightOrg = right;
+                bool schedulale_flag;
+                while (left < right)
+                {
+                    int mid = (left + right) / 2;
+
+                    tasks[currentIndex].period = mid;
+                    RTA_LL r(tasks);
+                    schedulale_flag = r.CheckSchedulability(
+                        rtaBase, debugMode == 1);
+                    if (not schedulale_flag)
+                    {
+                        left = mid + 1;
+                        tasks[currentIndex].period = rightOrg;
+                    }
+                    else
+                    {
+                        tasks[currentIndex].period = mid;
+                        right = mid;
+                    }
+                }
+
+                // post processing, left=right is the value we want
+                tasks[currentIndex].period = left;
+                objectiveVec.erase(objectiveVec.begin() + 0);
+                // if (left != rightOrg)
+                // {
+                //     // remove hp because they cannot be optimized anymore
+                //     for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
+                //     {
+                //         if (objectiveVec[i].first < currentIndex)
+                //         {
+                //             objectiveVec.erase(objectiveVec.begin() + i);
+                //         }
+                //     }
+                // }
+
+                iterationNumber++;
+                if (iterationNumber > N)
+                {
+                    CoutWarning("iterationNumber error in Clamp!");
+                    break;
+                }
+            };
+        }
+    }
+    else
+    {
+        cout << "input error in ClampComputationTime: " << roundTypeInClamp << endl;
+        throw;
+    }
+    return;
+}
+
 // TODO: limit the number of outer loops
 template <typename FactorGraphType>
 pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
                                                      std::vector<bool> &maskForElimination)
 {
+
     VectorDynamic periodResCurr, periodResPrev;
     double errPrev = 1e30;
     double errCurr = RealObj(tasks, coeff);
@@ -175,13 +288,17 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
         {
             cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
             print(maskForElimination);
+            cout << endl;
         }
 
         loopCount++;
 
         FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
+        RoundPeriod(tasks, maskForElimination, coeff);
     }
+
     UpdateTaskSetPeriod(tasks, periodResPrev);
+    RoundPeriod(tasks, maskForElimination, coeff);
     cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << endl;
     return make_pair(periodResPrev, errPrev);
 }
