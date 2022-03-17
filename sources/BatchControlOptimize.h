@@ -173,8 +173,8 @@ void BatchOptimize(int Nn = 5)
     }
 
     cout << Color::blue << endl;
-    cout << "Average relative performance gap (NO: MUA) is " << RelativeGap(objVecAll[0], objVecAll[1]) << endl;
-    cout << "Speed ratio (NO: MUA) is " << SpeedRatio(runTimeAll[0], runTimeAll[1]) << endl;
+    cout << "Average relative performance gap (NO: MUA) is " << RelativeGap(objVecAll[0], objVecAll[2]) << endl;
+    cout << "Speed ratio (NO: MUA) is " << SpeedRatio(runTimeAll[0], runTimeAll[2]) << endl;
     cout << "Average time consumed is " << Average(runTimeAll[0]) << endl;
     cout << Color::def << endl;
 
