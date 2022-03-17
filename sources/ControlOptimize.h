@@ -182,6 +182,6 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
         FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
     }
     UpdateTaskSetPeriod(tasks, periodResPrev);
-    cout << "The number of outside loop in OptimizeTaskSetIterative is " << loopCount << endl;
+    cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << endl;
     return make_pair(periodResPrev, errPrev);
 }

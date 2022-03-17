@@ -189,16 +189,16 @@ struct FactorGraphInManifold
         {
             return;
         }
+        RTA_LL r(tasks);
+        VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
         bool whether_new_eliminate = false;
         while (!whether_new_eliminate && disturb <= disturb_max)
         {
-            RTA_LL r(tasks);
-            VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
             for (uint i = 0; i < tasks.size(); i++)
             {
                 tasks[i].period -= disturb;
                 RTA_LL r1(tasks);
-                VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet();
+                VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);
                 if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
                 // TODO: more analytic way
                 {
