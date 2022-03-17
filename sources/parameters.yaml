@@ -6,7 +6,7 @@ testDataSetName: test_n5_v8
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
-debugMode: 1
+debugMode: 2
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
@@ -29,7 +29,7 @@ adjustEliminateMaxIte: 10
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: "rough"
+roundTypeInClamp: "fine"
 
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e5

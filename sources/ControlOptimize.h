@@ -205,7 +205,8 @@ void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDy
 
                 // try to round 'up', if success, keep the loop; otherwise, eliminate it and high priority tasks
                 // can be speeded up, if necessary, by binary search
-                int left = rtaBase(currentIndex);
+                int left = int(tasks[currentIndex].period);
+                // int left = rtaBase(currentIndex);
                 int right = ceil(tasks[currentIndex].period);
                 if (left > right)
                 {
@@ -236,17 +237,6 @@ void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDy
                 // post processing, left=right is the value we want
                 tasks[currentIndex].period = left;
                 objectiveVec.erase(objectiveVec.begin() + 0);
-                // if (left != rightOrg)
-                // {
-                //     // remove hp because they cannot be optimized anymore
-                //     for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
-                //     {
-                //         if (objectiveVec[i].first < currentIndex)
-                //         {
-                //             objectiveVec.erase(objectiveVec.begin() + i);
-                //         }
-                //     }
-                // }
 
                 iterationNumber++;
                 if (iterationNumber > N)
@@ -283,22 +273,21 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
         double err;
         std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks, coeff, maskForElimination);
         UpdateTaskSetPeriod(tasks, periodResCurr);
+        loopCount++;
+        FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
+        RoundPeriod(tasks, maskForElimination, coeff);
         errCurr = RealObj(tasks, coeff);
+
         if (debugMode)
         {
             cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
             print(maskForElimination);
             cout << endl;
         }
-
-        loopCount++;
-
-        FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
-        RoundPeriod(tasks, maskForElimination, coeff);
     }
 
     UpdateTaskSetPeriod(tasks, periodResPrev);
     RoundPeriod(tasks, maskForElimination, coeff);
     cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << endl;
-    return make_pair(periodResPrev, errPrev);
+    return make_pair(GetParameterVD<double>(tasks, "period"), RealObj(tasks, coeff));
 }
