@@ -72,6 +72,11 @@ public:
             // cout << "The given task set is unschedulable\n";
             return INT32_MAX;
         }
+        for (uint i = 0; i < tasksHighPriority.size(); i++)
+        {
+            if (tasksHighPriority[i].period < 0)
+                return INT32_MAX;
+        }
 
         bool stop_flag = false;
 
