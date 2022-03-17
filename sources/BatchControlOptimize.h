@@ -10,12 +10,20 @@ void AddEntry(string pathRes, double val)
     outfileWrite << val << endl;
     outfileWrite.close();
 }
+void AddEntry(string pathRes, double val1, double val2)
+{
+    ofstream outfileWrite;
+    outfileWrite.open(pathRes,
+                      std::ios_base::app);
+    outfileWrite << val1 << ", " << val2 << endl;
+    outfileWrite.close();
+}
 
 /**
  * @brief check whether the file in the directory is what we're looking for; this function assumes the possible input are only one of the following: Case<n>.m, Case<n>.txt, Case<n>.txt_RM_BFSResult.txt, Case<n>.txt_RM_GPResult.txt
- * 
- * @param file 
- * @return int 
+ *
+ * @param file
+ * @return int
  *  0 means target source file;
  *  1 means baseline result, MILP
  *  2 means baseline result, MUAi
@@ -35,8 +43,8 @@ int TargetFileType(string file)
 
 /**
  * @brief read baseline result file, e.g., Case0.txt_RM_GPResult.txt, or Case0.txt_RM_BFSResult.txt
- * 
- * @param path 
+ *
+ * @param path
  * @return pair<double, double> {runTime, obj}
  */
 pair<double, double> ReadBaselineZhao20(string path)
@@ -57,11 +65,11 @@ pair<double, double> ReadBaselineZhao20(string path)
     }
 }
 /**
- * @brief 
- * 
- * @param v1 
- * @param v2 
- * @return (v1[i]-v2[i])/v2[i] 
+ * @brief
+ *
+ * @param v1
+ * @param v2
+ * @return (v1[i]-v2[i])/v2[i]
  */
 double RelativeGap(std::vector<double> &v1, std::vector<double> &v2)
 {
@@ -154,7 +162,7 @@ void BatchOptimize(int Nn = 5)
             AddEntry(pathRes, objVecAll[0].back() / res.second);
             pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
                       batchOptimizeFolder + "/time_task_number.txt";
-            AddEntry(pathRes, runTimeAll[0].back() / res.first);
+            AddEntry(pathRes, runTimeAll[0].back(), res.first);
             break;
         }
         default:
