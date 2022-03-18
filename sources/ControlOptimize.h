@@ -22,7 +22,10 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
 {
     BeginTimer(__func__);
     NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(maskForElimination, tasks, coeff);
-
+    if (debugMode == 1)
+    {
+        graph.print();
+    }
     // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
     // initialEstimate << 68.000000, 321, 400, 131, 308;
     Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
@@ -155,10 +158,10 @@ void print(const std::vector<T> &vec)
 
 /**
  * @brief round period into int type, we assume the given task set is schedulable!
- * 
- * @param tasks 
- * @param maskForElimination 
- * @param coeff 
+ *
+ * @param tasks
+ * @param maskForElimination
+ * @param coeff
  */
 void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDynamic coeff)
 {

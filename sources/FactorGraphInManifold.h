@@ -144,6 +144,17 @@ struct FactorGraphInManifold
         return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model);
     }
 
+    /* whether task 'index' has free dependent variables*/
+    static bool HasDependency(int index, std::vector<bool> &maskForElimination)
+    {
+        for (int i = 0; i <= index; i++)
+        {
+            if (!maskForElimination[i])
+                return true;
+        }
+        return false;
+    }
+
     static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
     {
         NonlinearFactorGraph graph;
@@ -162,8 +173,11 @@ struct FactorGraphInManifold
                 graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), tasks[i].executionTime, modelPunishmentSoft1);
                 graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentSoft1);
             }
-            auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff);
-            graph.add(factor);
+            if (HasDependency(i, maskForElimination))
+            {
+                auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff);
+                graph.add(factor);
+            }
         }
         return graph;
     }

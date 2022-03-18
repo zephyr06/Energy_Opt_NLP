@@ -449,6 +449,23 @@ TEST(eliminate, ForceManifold)
     AssertEqualScalar(1e6, jacobianCurr(0, 0));
     AssertEqualScalar(1e6, jacobianCurr(2, 1));
 }
+TEST(HasDependency, v1)
+{
+    noiseModelSigma = 1;
+    weightSchedulability = 1e6;
+    weightHardConstraint = 1e5;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    maskForElimination = {1, 0, 1, 1, 1};
+    AssertEqualScalar(false, FactorGraphInManifold::HasDependency(0, maskForElimination), 1e-6, __LINE__);
+    AssertEqualScalar(true, FactorGraphInManifold::HasDependency(1, maskForElimination), 1e-6, __LINE__);
+    AssertEqualScalar(true, FactorGraphInManifold::HasDependency(2, maskForElimination), 1e-6, __LINE__);
+    AssertEqualScalar(true, FactorGraphInManifold::HasDependency(3, maskForElimination), 1e-6, __LINE__);
+    AssertEqualScalar(true, FactorGraphInManifold::HasDependency(4, maskForElimination), 1e-6, __LINE__);
+}
 int main()
 {
     TestResult tr;
