@@ -102,7 +102,7 @@ pair<double, double> ReadBaselineZhao20(string directory, string path)
         UpdateTaskSetPeriod(tasks, periods);
         tasks = Reorder(tasks, "RM");
         RTA_LL r(tasks);
-        if (r.CheckSchedulability())
+        if (r.CheckSchedulability() || TargetFileType(path) == 2)
         {
             return make_pair(data[0], data[1]);
         }

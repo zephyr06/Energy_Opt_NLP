@@ -113,10 +113,10 @@ public:
     double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr,
                                     const TaskSet &tasksHighPriority)
     {
-        if (Utilization(tasksHighPriority) + taskCurr.utilization() > 1.0 + 1e-6)
+        if (Utilization(tasksHighPriority) + taskCurr.utilization() > 1.0 - 1e-6)
         {
-            // double u1 = Utilization(tasksHighPriority);
-            // double u2 = taskCurr.utilization();
+            double u1 = Utilization(tasksHighPriority);
+            double u2 = taskCurr.utilization();
             return INT32_MAX;
         }
         return ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHighPriority);
@@ -134,6 +134,10 @@ public:
 
 VectorDynamic RTALLVector(const TaskSet &tasks)
 {
+    BeginTimer(__func__);
     RTA_LL r(tasks);
-    return r.ResponseTimeOfTaskSet();
+    auto res = r.ResponseTimeOfTaskSet();
+
+    EndTimer(__func__);
+    return res;
 }

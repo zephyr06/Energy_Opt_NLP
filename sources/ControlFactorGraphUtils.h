@@ -34,6 +34,7 @@ inline gtsam::Symbol GenerateControlKey(int idtask, string type)
 
 double RealObj(TaskSet &tasks, VectorDynamic coeff)
 {
+    BeginTimer(__func__);
     double res = 0;
     RTA_LL r(tasks);
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
@@ -42,6 +43,7 @@ double RealObj(TaskSet &tasks, VectorDynamic coeff)
         res += coeff(i * 2, 0) * tasks[i].period;
         res += coeff(i * 2 + 1, 0) * rta(i, 0);
     }
+    EndTimer(__func__);
     return res;
 }
 

@@ -504,6 +504,23 @@ TEST(ReadBaselineZhao20, unschedulable_v2)
     RTA_LL r2(tasks);
     EXPECT(r2.CheckSchedulability(false));
 }
+TEST(ReadBaselineZhao20, unschedulable_v3)
+{
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N20/Case684.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    RTA_LL r(tasks);
+    auto res = r.CheckSchedulability(1);
+    EXPECT(res);
+    VectorDynamic periodCurr = GenerateVectorDynamic(20);
+    // periodCurr << 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 387, 774, 774, 387, 774, 774, 774;
+    periodCurr = periodCurr.array() + 1133;
+    UpdateTaskSetPeriod(tasks, periodCurr);
+    tasks = Reorder(tasks, "RM");
+    RTA_LL r2(tasks);
+    EXPECT(r2.CheckSchedulability(1));
+}
 int main()
 {
     TestResult tr;

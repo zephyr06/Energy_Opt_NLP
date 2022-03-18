@@ -12,6 +12,7 @@
 #define CurrentTime std::chrono::high_resolution_clock::now()
 #define BeginTimerApp BeginTimer(__FUNCTION__);
 #define EndTimerApp EndTimer(__FUNCTION__);
+std::mutex mtx_profiler;
 struct ProfilerData
 {
     typedef std::chrono::time_point<std::chrono::high_resolution_clock> TimerType;
@@ -31,6 +32,7 @@ std::unordered_map<std::string, ProfilerData> profilerMap;
 
 void BeginTimer(std::string funcName)
 {
+    std::lock_guard<std::mutex> lock(mtx_profiler);
     auto itr = profilerMap.find(funcName);
     if (itr == profilerMap.end())
     {
@@ -44,6 +46,7 @@ void BeginTimer(std::string funcName)
 
 void EndTimer(std::string funcName)
 {
+    std::lock_guard<std::mutex> lock(mtx_profiler);
     auto itr = profilerMap.find(funcName);
     if (itr == profilerMap.end())
     {

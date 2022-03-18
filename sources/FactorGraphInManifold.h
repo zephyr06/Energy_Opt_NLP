@@ -113,20 +113,6 @@ struct FactorGraphInManifold
     GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff)
     {
         VectorDynamic rtaBase = RTALLVector(tasks);
-        LambdaMultiKey f = [tasks, index, coeff, rtaBase](const Values &x)
-        {
-            BeginTimer(__func__);
-            VectorDynamic error = GenerateVectorDynamic(2);
-            TaskSet tasksCurr = tasks;
-            UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks).first);
-            RTA_LL r(tasksCurr);
-            double rta = r.RTA_Common_Warm(rtaBase(index), index);
-            error(0) = rta * coeff[2 * index + 1];
-            error(1) = HingeLoss(tasksCurr[index].period - rta);
-            EndTimer(__func__);
-            return error;
-        };
-
         std::vector<gtsam::Symbol> keys;
         keys.reserve(index);
         for (int i = 0; i <= index; i++)
