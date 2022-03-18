@@ -121,6 +121,7 @@ void BatchOptimize(int Nn = 5)
         case 0: // perform optimization
         {
             cout << file << endl;
+            relativeErrorTolerance = relativeErrorToleranceInit;
             TaskSet tasks;
             VectorDynamic coeff;
             std::tie(tasks, coeff) = ReadControlCase(path);

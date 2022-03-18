@@ -59,3 +59,20 @@ double QuotientDouble(double a, double b)
     double remainder = a - int(a / b) * b;
     return min(remainder, abs(remainder - b));
 }
+
+template <typename T>
+bool Equals(std::vector<T> &v1, std::vector<T> &v2)
+{
+    if (v1.size() != v2.size())
+    {
+        return false;
+    }
+    for (uint i = 0; i < v1.size(); i++)
+    {
+        if (v1[i] != v2[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}

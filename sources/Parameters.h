@@ -44,7 +44,10 @@ const double deltaInitialDogleg = (double)ConfigParameters["deltaInitialDogleg"]
 const int randomInitialize = (int)ConfigParameters["randomInitialize"];
 const int weightEnergyMaxOrder = (int)ConfigParameters["weightEnergyMaxOrder"];
 const int SA_iteration = (int)ConfigParameters["SA_iteration"];
-const double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTolerance"];
+double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTolerance"];
+double relativeErrorToleranceMin = (double)ConfigParameters["relativeErrorToleranceMin"];
+const double relativeErrorToleranceInit = (double)ConfigParameters["relativeErrorToleranceInit"];
+
 const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
 int optimizerType = (int)ConfigParameters["optimizerType"];
 double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];

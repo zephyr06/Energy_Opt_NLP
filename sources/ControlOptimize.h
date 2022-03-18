@@ -265,6 +265,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
 {
 
     VectorDynamic periodResCurr, periodResPrev;
+    std::vector<bool> maskForEliminationPrev = maskForElimination;
     double errPrev = 1e30;
     double errCurr = RealObj(tasks, coeff);
     int loopCount = 0;
@@ -273,14 +274,22 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
         // store prev result
         errPrev = errCurr;
         periodResPrev = GetParameterVD<double>(tasks, "period");
+        maskForEliminationPrev = maskForElimination;
+
+        // perform optimization
         double err;
         std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks, coeff, maskForElimination);
         UpdateTaskSetPeriod(tasks, periodResCurr);
+
+        // adjust optimization settings
         loopCount++;
         FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
         RoundPeriod(tasks, maskForElimination, coeff);
         errCurr = RealObj(tasks, coeff);
-
+        if (Equals(maskForElimination, maskForEliminationPrev) && relativeErrorTolerance > relativeErrorToleranceMin)
+        {
+            relativeErrorTolerance = relativeErrorTolerance / 10;
+        }
         if (debugMode)
         {
             cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
