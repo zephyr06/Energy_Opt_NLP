@@ -162,11 +162,11 @@ TEST(RTAFactor, J)
     }
 
     auto eActual = factor1.unwhitenedError(initialEstimateFG, Hs);
-    std::cout << "Hs is as follows: " << endl;
-    for (uint i = 0; i < 10; i++)
-    {
-        std::cout << Hs[i] << endl;
-    }
+    // std::cout << "Hs is as follows: " << endl;
+    // for (uint i = 0; i < 10; i++)
+    // {
+    //     std::cout << Hs[i] << endl;
+    // }
     AssertEigenEqualMatrix(GenerateVectorDynamic1D(1), Hs[9]);
 }
 TEST(GenerateSchedulabilityFactor, v1)
@@ -291,10 +291,10 @@ TEST(FactorGraphInManifold, inference)
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
 
     MatrixDynamic jacobianCurr = sth.first;
-    std::cout << "Current Jacobian matrix:" << endl;
-    std::cout << jacobianCurr << endl;
-    std::cout << "Current b vector: " << endl;
-    std::cout << sth.second << endl;
+    // std::cout << "Current Jacobian matrix:" << endl;
+    // std::cout << jacobianCurr << endl;
+    // std::cout << "Current b vector: " << endl;
+    // std::cout << sth.second << endl;
     MatrixDynamic jacobianExpect = GenerateMatrixDynamic(12, 4);
     jacobianExpect(0, 0) = 275;
     jacobianExpect(3, 1) = 217;
@@ -343,12 +343,6 @@ TEST(io, IfTargetFile)
     AssertEqualScalar(0, TargetFileType(s2));
     AssertEqualScalar(1, TargetFileType(s3));
     AssertEqualScalar(2, TargetFileType(s4));
-    string path = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt_RM_BFSResult.txt";
-    AssertEqualScalar(0.00995458, ReadBaselineZhao20(path).first);
-    AssertEqualScalar(1.52131e+06, ReadBaselineZhao20(path).second);
-    path = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case9.txt_RM_GPResult.txt";
-    AssertEqualScalar(0.136000, ReadBaselineZhao20(path).first);
-    AssertEqualScalar(2852692.008127, ReadBaselineZhao20(path).second);
 }
 
 TEST(jacobian, vn)
@@ -374,10 +368,10 @@ TEST(jacobian, vn)
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
 
     MatrixDynamic jacobianCurr = sth.first;
-    std::cout << "Current Jacobian matrix:" << endl;
-    std::cout << jacobianCurr << endl;
-    std::cout << "Current b vector: " << endl;
-    std::cout << sth.second << endl;
+    // std::cout << "Current Jacobian matrix:" << endl;
+    // std::cout << jacobianCurr << endl;
+    // std::cout << "Current b vector: " << endl;
+    // std::cout << sth.second << endl;
     MatrixDynamic jacobianExpect = GenerateMatrixDynamic(18, 9);
 
     AssertEqualScalar(1e6, jacobianCurr(2, 1));
@@ -442,10 +436,10 @@ TEST(eliminate, ForceManifold)
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
 
     MatrixDynamic jacobianCurr = sth.first;
-    std::cout << "Current Jacobian matrix:" << endl;
-    std::cout << jacobianCurr << endl;
-    std::cout << "Current b vector: " << endl;
-    std::cout << sth.second << endl;
+    // std::cout << "Current Jacobian matrix:" << endl;
+    // std::cout << jacobianCurr << endl;
+    // std::cout << "Current b vector: " << endl;
+    // std::cout << sth.second << endl;
     AssertEqualScalar(1e6, jacobianCurr(0, 0));
     AssertEqualScalar(1e6, jacobianCurr(2, 1));
 }
@@ -465,6 +459,50 @@ TEST(HasDependency, v1)
     AssertEqualScalar(true, FactorGraphInManifold::HasDependency(2, maskForElimination), 1e-6, __LINE__);
     AssertEqualScalar(true, FactorGraphInManifold::HasDependency(3, maskForElimination), 1e-6, __LINE__);
     AssertEqualScalar(true, FactorGraphInManifold::HasDependency(4, maskForElimination), 1e-6, __LINE__);
+}
+TEST(ExtractCaseID, v1)
+{
+    EXPECT_LONGS_EQUAL(0, ExtractCaseID("Case0.txt_RM_GPResult.txt"));
+    EXPECT_LONGS_EQUAL(6, ExtractCaseID("Case6.txt_RM_GPResult.txt"));
+    EXPECT_LONGS_EQUAL(215, ExtractCaseID("Case215.txt_RM_GPResult.txt"));
+    EXPECT_LONGS_EQUAL(31, ExtractCaseID("Case31.txt_RM_GPResult.txt"));
+}
+TEST(ReadBaselineZhao20, unschedulable)
+{
+    string directory = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N20/";
+    auto res1 = ReadBaselineZhao20(directory, "Case0.txt_RM_GPResult.txt");
+    EXPECT_LONGS_EQUAL(1402.473, res1.first);
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N20/Case0.txt";
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    EXPECT_LONGS_EQUAL(54382956, res1.second);
+
+    res1 = ReadBaselineZhao20("/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/", "Case0.txt_RM_GPResult.txt");
+    EXPECT_LONGS_EQUAL(0.543000, res1.first);
+    EXPECT_LONGS_EQUAL(1521314.003946, res1.second);
+
+    res1 = ReadBaselineZhao20("/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/", "Case0.txt_RM_BFSResult.txt");
+    EXPECT_LONGS_EQUAL(0.00995458, res1.first);
+    EXPECT_LONGS_EQUAL(1.52131e+06, res1.second);
+}
+
+TEST(ReadBaselineZhao20, unschedulable_v2)
+{
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N20/Case3.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    RTA_LL r(tasks);
+    auto res = r.CheckSchedulability(false);
+    EXPECT(res);
+    VectorDynamic periodCurr = GenerateVectorDynamic(20);
+    // periodCurr << 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 387, 774, 774, 387, 774, 774, 774;
+    periodCurr = periodCurr.array() + 1032;
+    UpdateTaskSetPeriod(tasks, periodCurr);
+    tasks = Reorder(tasks, "RM");
+    RTA_LL r2(tasks);
+    EXPECT(r2.CheckSchedulability(false));
 }
 int main()
 {

@@ -37,7 +37,7 @@ punishmentInBarrier: 1e5
 noiseModelSigma: 1e0
 relativeErrorToleranceInit: 1e-5
 relativeErrorTolerance: 1e-5
-relativeErrorToleranceMin: 1e-5
+relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
 
@@ -66,6 +66,6 @@ weightSchedulabilityStep: 3
 weightSchedulabilityMin: 1e7
 disturb_step: 2
 disturb_max: 1
-relativeErrorToleranceOuterLoop: 1e-8
+relativeErrorToleranceOuterLoop: 1e-10
 
 weightHardConstraint: 1e5 # weight of period limits and r<d (3 factors)

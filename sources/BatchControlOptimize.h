@@ -40,23 +40,79 @@ int TargetFileType(string file)
     else
         return 3;
 }
+/* Extract case ID, input requirements are the same as above*/
+int ExtractCaseID(string file)
+{
+    int id;
+    std::istringstream(SplitStringMy(file, ".")[0].substr(4)) >> id;
+    return id;
+}
 
 /**
  * @brief read baseline result file, e.g., Case0.txt_RM_GPResult.txt, or Case0.txt_RM_BFSResult.txt
  *
- * @param path
+ * @param directory absolute folder directory
+ * @param path name of target file
  * @return pair<double, double> {runTime, obj}
  */
-pair<double, double> ReadBaselineZhao20(string path)
+pair<double, double> ReadBaselineZhao20(string directory, string path)
 {
     fstream file;
-    file.open(path, ios::in);
+    file.open(directory + "/" + path, ios::in);
     if (file.is_open())
     {
         string line;
         getline(file, line);
         auto data = ReadLine(line, " ");
-        return make_pair(data[0], data[1]);
+        TaskSet tasks;
+        VectorDynamic coeff;
+        std::tie(tasks, coeff) = ReadControlCase(directory + "/" + "Case" + to_string(ExtractCaseID(path)) + ".txt");
+        double initialError = RealObj(tasks, coeff);
+        VectorDynamic periods;
+        if (TargetFileType(path) == 1) // GP
+        {
+            vector<double>::const_iterator first = data.begin() + 3;
+            vector<double>::const_iterator last = data.end();
+            vector<double> newVec(first, last);
+            for (auto &x : newVec)
+            {
+                x = round(x);
+            }
+            periods = Vector2Eigen(newVec);
+        }
+        else if (TargetFileType(path) == 2) // BFS, or MUA
+        {
+            getline(file, line);
+            auto data = ReadLine(line, " ");
+            vector<double>::const_iterator first = data.begin() + 1;
+            vector<double>::const_iterator last = data.end() - 1;
+            vector<double> newVec(first, last);
+            periods = Vector2Eigen(newVec);
+            for (auto &x : newVec)
+            {
+                x = round(x);
+            }
+            periods = Vector2Eigen(newVec);
+        }
+        else
+        {
+            CoutError("Unrecognized file type in ReadBaselineZhao20");
+        }
+
+        UpdateTaskSetPeriod(tasks, periods);
+        tasks = Reorder(tasks, "RM");
+        RTA_LL r(tasks);
+        if (r.CheckSchedulability())
+        {
+            return make_pair(data[0], data[1]);
+        }
+        else // return initial estimate
+        {
+            if (TargetFileType(path) == 2)
+                CoutWarning("Find one unschedulable baseline assignment: " + path);
+
+            return make_pair(data[0], initialError);
+        }
     }
     else
     {
@@ -146,14 +202,14 @@ void BatchOptimize(int Nn = 5)
         }
         case 1: // read MILP result
         {
-            auto res = ReadBaselineZhao20(path);
+            auto res = ReadBaselineZhao20(pathDataset, file);
             runTimeAll[1].push_back(res.first);
             objVecAll[1].push_back(res.second);
             break;
         }
         case 2: // read MUA result
         {
-            auto res = ReadBaselineZhao20(path);
+            auto res = ReadBaselineZhao20(pathDataset, file);
             runTimeAll[2].push_back(res.first);
             objVecAll[2].push_back(res.second);
             // record results for plot
@@ -175,6 +231,7 @@ void BatchOptimize(int Nn = 5)
 
     cout << Color::blue << endl;
     cout << "Average relative performance gap (NO: MUA) is " << RelativeGap(objVecAll[0], objVecAll[2]) << endl;
+    cout << "Average relative performance gap (NO: MIGP) is " << RelativeGap(objVecAll[0], objVecAll[1]) << endl;
     cout << "Speed ratio (NO: MUA) is " << SpeedRatio(runTimeAll[0], runTimeAll[2]) << endl;
     cout << "Average time consumed is " << Average(runTimeAll[0]) << endl;
     cout << Color::def << endl;
