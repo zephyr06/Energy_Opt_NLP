@@ -217,9 +217,7 @@ void BatchOptimize(int Nn = 5)
                              batchOptimizeFolder + "/EnergySaveRatio/N" +
                              to_string(N) + ".txt";
             AddEntry(pathRes, objVecAll[0].back() / res.second);
-            pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-                      batchOptimizeFolder + "/time_task_number.txt";
-            AddEntry(pathRes, runTimeAll[0].back(), res.first);
+
             break;
         }
         default:
@@ -228,6 +226,9 @@ void BatchOptimize(int Nn = 5)
         }
         }
     }
+    string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                     batchOptimizeFolder + "/time_task_number.txt";
+    AddEntry(pathRes, Average(runTimeAll[0]), Average(runTimeAll[2]));
 
     cout << Color::blue << endl;
     cout << "Average relative performance gap (NO: MUA) is " << RelativeGap(objVecAll[0], objVecAll[2]) << endl;
