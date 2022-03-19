@@ -185,10 +185,10 @@ struct FactorGraphInManifold
     static void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = 1e0)
     {
         BeginTimer(__func__);
-        if (!ContainFalse(maskForElimination))
-        {
-            return;
-        }
+        // if (!ContainFalse(maskForElimination))
+        // {
+        //     return;
+        // }
         RTA_LL r(tasks);
         VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
         bool whether_new_eliminate = false;

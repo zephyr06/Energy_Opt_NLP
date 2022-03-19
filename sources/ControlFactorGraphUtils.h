@@ -78,3 +78,33 @@ bool Equals(std::vector<T> &v1, std::vector<T> &v2)
     }
     return true;
 }
+
+/* only used in Reorder function */
+struct TaskAugment
+{
+    Task task_;
+    double coeff_T;
+    double coeff_R;
+    TaskAugment(Task &task, double coeffT, double coeffR) : task_(task), coeff_T(coeffT), coeff_R(coeffR) {}
+    static bool Compare(const TaskAugment &t1, const TaskAugment &t2)
+    {
+        return t1.task_.period < t2.task_.period;
+    }
+};
+/* in-place adjustment of tasks' order; highest order being the first in tasks */
+void Reorder(TaskSet &tasks, VectorDynamic &coeff, string priority_type = "RM")
+{
+    std::vector<TaskAugment> tasksAug;
+    tasksAug.reserve(tasks.size());
+    for (uint i = 0; i < tasks.size(); i++)
+    {
+        tasksAug.push_back({tasks[i], coeff(i * 2), coeff(i * 2 + 1)});
+    }
+    stable_sort(tasksAug.begin(), tasksAug.end(), TaskAugment::Compare);
+    for (uint i = 0; i < tasks.size(); i++)
+    {
+        tasks[i] = tasksAug[i].task_;
+        coeff(2 * i) = tasksAug[i].coeff_T;
+        coeff(2 * i + 1) = tasksAug[i].coeff_R;
+    }
+}

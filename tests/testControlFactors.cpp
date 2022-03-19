@@ -29,6 +29,7 @@ TEST(ExtractResults, v1)
     AssertEigenEqualVector(expectT, FactorGraphForceManifold::ExtractResults(result, tasks).first);
     AssertEigenEqualVector(expectR, FactorGraphForceManifold::ExtractResults(result, tasks).second);
 }
+
 TEST(coeffFactor, v1)
 {
     // std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
@@ -520,6 +521,51 @@ TEST(ReadBaselineZhao20, unschedulable_v3)
     tasks = Reorder(tasks, "RM");
     RTA_LL r2(tasks);
     EXPECT(r2.CheckSchedulability(1));
+}
+TEST(Reorder, v1)
+{
+    enableReorder = 1;
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    tasks[0].period = 5;
+    tasks[1].period = 10;
+    tasks[2].period = 7;
+    tasks[3].period = 7;
+    tasks[4].period = 7;
+    Reorder(tasks, coeff, "RM");
+    EXPECT_LONGS_EQUAL(0, tasks[0].id);
+
+    EXPECT_LONGS_EQUAL(2, tasks[1].id);
+
+    EXPECT_LONGS_EQUAL(3, tasks[2].id);
+
+    EXPECT_LONGS_EQUAL(4, tasks[3].id);
+
+    EXPECT_LONGS_EQUAL(1, tasks[4].id);
+    VectorDynamic coeffExpect = coeff;
+    coeffExpect << 645, 7143, 217, 5031, 489, 3778, 285, 380, 275, 9334;
+    assert_equal(coeffExpect, coeff);
+}
+TEST(Reorder, v2)
+{
+    enableReorder = 1;
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N20/Case0.txt";
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    tasks[0].period = 5;
+    tasks[1].period = 10;
+    tasks[2].period = 7;
+    tasks[3].period = 7;
+    tasks[4].period = 7;
+    Reorder(tasks, coeff, "RM");
+    EXPECT_LONGS_EQUAL(0, tasks[0].id);
+    EXPECT_LONGS_EQUAL(2, tasks[1].id);
+    EXPECT_LONGS_EQUAL(3, tasks[2].id);
+    EXPECT_LONGS_EQUAL(4, tasks[3].id);
+    EXPECT_LONGS_EQUAL(1, tasks[4].id);
 }
 int main()
 {

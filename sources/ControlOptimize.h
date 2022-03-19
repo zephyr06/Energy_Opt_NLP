@@ -17,7 +17,7 @@
 #include "FactorGraphInManifold.h"
 
 template <typename FactorGraphType>
-pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic coeff,
+pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic &coeff,
                                                    std::vector<bool> &maskForElimination)
 {
     BeginTimer(__func__);
@@ -92,7 +92,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
 }
 
 template <typename FactorGraphType>
-pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, VectorDynamic coeff,
+pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, VectorDynamic &coeff,
                                                            std::vector<bool> &maskForElimination)
 {
     RTA_LL rr(tasks);
@@ -163,7 +163,7 @@ void print(const std::vector<T> &vec)
  * @param maskForElimination
  * @param coeff
  */
-void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDynamic coeff)
+void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDynamic &coeff)
 {
     if (roundTypeInClamp == "none")
         return;
@@ -260,7 +260,7 @@ void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDy
 
 // TODO: limit the number of outer loops
 template <typename FactorGraphType>
-pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
+pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic &coeff,
                                                      std::vector<bool> &maskForElimination)
 {
 
@@ -281,6 +281,21 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
         std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks, coeff, maskForElimination);
         UpdateTaskSetPeriod(tasks, periodResCurr);
 
+        // adjust tasks' priority based on RM
+        if (enableReorder)
+        {
+            errCurr = RealObj(tasks, coeff);
+            TaskSet tasksTry = tasks;
+            VectorDynamic coeffTry = coeff;
+            Reorder(tasksTry, coeffTry, "RM");
+            double errCurrTry = RealObj(tasksTry, coeffTry);
+            if (errCurrTry < errCurr)
+            {
+                tasks = tasksTry;
+                coeff = coeffTry;
+            }
+        }
+
         // adjust optimization settings
         loopCount++;
         FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
@@ -297,9 +312,16 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
             cout << endl;
         }
     }
+    if (ContainFalse(maskForElimination))
+    {
+        UpdateTaskSetPeriod(tasks, periodResPrev);
+        RoundPeriod(tasks, maskForElimination, coeff);
+    }
+    else
+    {
+        ; //nothing else to do
+    }
 
-    UpdateTaskSetPeriod(tasks, periodResPrev);
-    RoundPeriod(tasks, maskForElimination, coeff);
     cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << endl;
     return make_pair(GetParameterVD<double>(tasks, "period"), RealObj(tasks, coeff));
 }
