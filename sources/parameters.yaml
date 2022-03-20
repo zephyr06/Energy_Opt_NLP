@@ -57,8 +57,8 @@ SA_iteration: 1000000
 
 controlPath: "N19/Case279"
 utilTol: 0.001
-debugMode: 1
-verbosityLM: "SUMMARY"
+debugMode: 0
+verbosityLM: "SILENT"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 
@@ -70,4 +70,4 @@ disturb_max: 1
 relativeErrorToleranceOuterLoop: 1e-10
 
 weightHardConstraint: 1e5 # weight of period limits and r<d (3 factors)
-enableReorder: 1
+enableReorder: 2
