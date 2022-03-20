@@ -166,6 +166,8 @@ void BatchOptimize(int Nn = 5)
     if (debugMode == 1)
         printf("Directory: %s\n", pathDataset);
     vector<string> errorFiles;
+    double worstObjRatio = -100;
+    string worstFile = "";
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
         // if (debugMode)
@@ -217,7 +219,12 @@ void BatchOptimize(int Nn = 5)
                              batchOptimizeFolder + "/EnergySaveRatio/N" +
                              to_string(N) + ".txt";
             AddEntry(pathRes, objVecAll[0].back() / res.second);
-
+            double relativeGapCurr = (objVecAll[0].back() - objVecAll[2].back()) / objVecAll[2].back();
+            if (relativeGapCurr > worstObjRatio)
+            {
+                worstObjRatio = relativeGapCurr;
+                worstFile = file;
+            }
             break;
         }
         default:
@@ -236,6 +243,9 @@ void BatchOptimize(int Nn = 5)
     cout << "Speed ratio (NO: MUA) is " << SpeedRatio(runTimeAll[0], runTimeAll[2]) << endl;
     cout << "Average time consumed is " << Average(runTimeAll[0]) << endl;
     cout << Color::def << endl;
+
+    cout << "Worst relative gap is " << worstObjRatio << endl;
+    cout << "Worst file is " << worstFile << endl;
 
     if (printFailureFile)
     {

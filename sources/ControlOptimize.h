@@ -96,7 +96,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, Vecto
                                                            std::vector<bool> &maskForElimination)
 {
     RTA_LL rr(tasks);
-    if (!rr.CheckSchedulability())
+    if (!rr.CheckSchedulability(debugMode == 1))
     {
         cout << "The task set is not schedulable!" << endl;
         return make_pair(GetParameterVD<double>(tasks, "period"), 1e30);
@@ -269,6 +269,19 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
     double errPrev = 1e30;
     double errCurr = RealObj(tasks, coeff);
     int loopCount = 0;
+    if (enableReorder > 1)
+    {
+        errCurr = RealObj(tasks, coeff);
+        TaskSet tasksTry = tasks;
+        VectorDynamic coeffTry = coeff;
+        Reorder(tasksTry, coeffTry, "RM");
+        double errCurrTry = RealObj(tasksTry, coeffTry);
+        if (errCurrTry < errCurr)
+        {
+            tasks = tasksTry;
+            coeff = coeffTry;
+        }
+    }
     while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) && ContainFalse(maskForElimination))
     {
         // store prev result
@@ -282,7 +295,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
         UpdateTaskSetPeriod(tasks, periodResCurr);
 
         // adjust tasks' priority based on RM
-        if (enableReorder)
+        if (enableReorder > 0)
         {
             errCurr = RealObj(tasks, coeff);
             TaskSet tasksTry = tasks;

@@ -88,7 +88,19 @@ struct TaskAugment
     TaskAugment(Task &task, double coeffT, double coeffR) : task_(task), coeff_T(coeffT), coeff_R(coeffR) {}
     static bool Compare(const TaskAugment &t1, const TaskAugment &t2)
     {
-        return t1.task_.period < t2.task_.period;
+        if (enableReorder == 1)
+        {
+            return t1.task_.period < t2.task_.period;
+        }
+        else
+        {
+            if (t1.task_.period != t2.task_.period)
+                return t1.task_.period < t2.task_.period;
+            else
+            {
+                return t1.task_.executionTime < t2.task_.executionTime;
+            }
+        }
     }
 };
 /* in-place adjustment of tasks' order; highest order being the first in tasks */

@@ -12,15 +12,18 @@ TEST(case1, v1)
     std::tie(tasks, coeff) = ReadControlCase(path1);
     std::vector<bool> maskForElimination(tasks.size(), false);
     // auto sth = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
-    VectorDynamic periodInitial1 = GenerateVectorDynamic(5);
-    // periodInitial1 << 32.2896, 347.818, 434.834, 104.653, 333.08;
-    // UpdateTaskSetPeriod(tasks, periodInitial1);
+    VectorDynamic periodInitial1 = GenerateVectorDynamic(tasks.size());
+    periodInitial1 << 815, 815, 815, 815, 591, 815, 815, 815, 815, 815, 815, 815, 815, 815, 815, 815, 204, 815, 815;
+    UpdateTaskSetPeriod(tasks, periodInitial1);
+    // Reorder(tasks, coeff, "RM");
     // maskForElimination[1] = 1;
     // auto sth = OptimizeTaskSetIterativeWeight<FactorGraphInManifold>(tasks, coeff, maskForElimination);
     auto sth2 = OptimizeTaskSetIterative<FactorGraphInManifold>(tasks, coeff, maskForElimination);
-    // UpdateTaskSetPeriod(tasks, sth.first);
+
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false}, maskForElimination);
+    UpdateTaskSetPeriod(tasks, sth2.first);
+    cout << "Actual objective function is" << RealObj(tasks, coeff) << endl;
     EndTimer("main");
     PrintTimer();
 }
