@@ -12,9 +12,9 @@ TEST(case1, v1)
     std::tie(tasks, coeff) = ReadControlCase(path1);
     std::vector<bool> maskForElimination(tasks.size(), false);
     // auto sth = UnitOptimizationPeriod(tasks, coeff, maskForElimination);
-    VectorDynamic periodInitial1 = GenerateVectorDynamic(tasks.size());
-    periodInitial1 << 815, 815, 815, 815, 591, 815, 815, 815, 815, 815, 815, 815, 815, 815, 815, 815, 204, 815, 815;
-    UpdateTaskSetPeriod(tasks, periodInitial1);
+    // VectorDynamic periodInitial1 = GenerateVectorDynamic(tasks.size());
+    // periodInitial1 << 815, 815, 815, 815, 591, 815, 815, 815, 815, 815, 815, 815, 815, 815, 815, 815, 204, 815, 815;
+    // UpdateTaskSetPeriod(tasks, periodInitial1);
     // Reorder(tasks, coeff, "RM");
     // maskForElimination[1] = 1;
     // auto sth = OptimizeTaskSetIterativeWeight<FactorGraphInManifold>(tasks, coeff, maskForElimination);

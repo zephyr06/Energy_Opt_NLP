@@ -11,7 +11,7 @@ executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
 EnergyMode: 1
-exactJacobian: 0
+
 printFailureFile: 1
 printRTA: 0
 readTaskMode: RM
@@ -35,7 +35,7 @@ roundTypeInClamp: "fine"
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e0
-relativeErrorToleranceInit: 1e-5
+relativeErrorToleranceInit: 1e-12
 relativeErrorTolerance: 1e-5
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
@@ -55,10 +55,12 @@ granularityInBF: 1
 
 SA_iteration: 1000000
 
-controlPath: "N19/Case279"
+controlPath: "N5/Case0"
+MaxLoopControl: 1e4
+exactJacobian: 0
 utilTol: 0.001
-debugMode: 0
-verbosityLM: "SILENT"
+debugMode: 1
+verbosityLM: "SUMMARY"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 

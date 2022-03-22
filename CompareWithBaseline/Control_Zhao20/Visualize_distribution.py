@@ -1,3 +1,4 @@
+import numpy as np
 
 from utils_visualize import *
 
@@ -17,6 +18,11 @@ if __name__ == "__main__":
     dataset_pd = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in data_2d.items()]))
 
     ax = sns.boxplot( data=dataset_pd, orient="v", fliersize=1, saturation=0.75, whis=1.5)
+
+    x = np.linspace(-0.5,15.5,16)
+    y = np.zeros((16))
+    ax = sns.lineplot(x=x, y=y, linestyle="dashed",color='darkgray')
+
     ax.set(xlabel="Task Number", ylabel="Relative Gap (%)")
     plt.savefig("Compare_energy"+baseline + ".pdf", format='pdf')
     plt.savefig("Compare_energy"+baseline + ".png", format='png')

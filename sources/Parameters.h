@@ -48,6 +48,7 @@ double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTolerance
 double relativeErrorToleranceMin = (double)ConfigParameters["relativeErrorToleranceMin"];
 const double relativeErrorToleranceInit = (double)ConfigParameters["relativeErrorToleranceInit"];
 int enableReorder = (int)ConfigParameters["enableReorder"];
+int MaxLoopControl = (int)ConfigParameters["MaxLoopControl"];
 
 const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
 int optimizerType = (int)ConfigParameters["optimizerType"];

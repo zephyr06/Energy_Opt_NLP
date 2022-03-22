@@ -282,7 +282,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
             coeff = coeffTry;
         }
     }
-    while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) && ContainFalse(maskForElimination))
+    while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) && ContainFalse(maskForElimination) && loopCount< MaxLoopControl)
     {
         // store prev result
         errPrev = errCurr;
