@@ -314,6 +314,8 @@ void ReadFrequencyModeRatio(string path)
             if (line.substr(0, 17) == "Frequency_Ratio: ")
             {
                 frequencyRatio = stod(line.substr(17));
+                if (frequencyRatio == 0)
+                    frequencyRatio = 0.5;
                 return;
             }
         }

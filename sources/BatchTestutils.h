@@ -109,13 +109,15 @@ pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
     {
         double val = 0;
         cResultFile >> val;
-        values[i] = round(val);
+        values[i] = abs(round(val));
     }
 
     // check schedulability
-    auto taskSet1 = ReadTaskSet(pathInPeriodicDataset, readTaskMode);
+    auto taskSet1 = ReadTaskSet(pathInPeriodicDataset, "orig");
     TaskSet tasksInit = taskSet1;
     UpdateTaskSetExecutionTime(taskSet1, Vector2Eigen(values));
+    taskSet1 = Reorder(taskSet1, "deadline");
+
     RTA_LL r(taskSet1);
     bool schedulale_flag = r.CheckSchedulability(
         debugMode == 1);

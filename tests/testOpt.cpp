@@ -149,6 +149,7 @@ TEST(unitOptimization, a1)
     InitializeGlobalVector(taskSet1.size());
     optimizerType = 1;
     EnergyMode = 1;
+    executionTimeModel = 1;
     int lastTaskDoNotNeedOptimize = 1;
 
     VectorDynamic initialEstimate;
@@ -338,7 +339,61 @@ TEST(UnitOptimizationIPM, a1)
     // cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
     AssertEqualScalar(230, res(0, 0), 1.1, __LINE__);
 }
+TEST(ReadYecheng_result, v1)
+{
+    string pathInPeriodicDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/periodic-set-0-syntheticJobs.csv";
+    int N = 20;
+    string yechengRepoPath = "/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + to_string(N) + "/";
 
+    int index = 0;
+    string targetFilePathGP = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_GPResult.txt";
+    string targetFilePathBF = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_BFSResult.txt";
+    if (debugMode == 1)
+        cout << "targetFilePathBF " << targetFilePathBF << endl;
+    string fileName;
+    if (baselineLLCompare == 1)
+        fileName = targetFilePathBF;
+    else if (baselineLLCompare == 2)
+        fileName = targetFilePathGP;
+    else
+    {
+        CoutError("Unrecognized baselineLLCompare! Current value is " + to_string(baselineLLCompare));
+    }
+
+    ifstream cResultFile(fileName.data());
+    try
+    {
+        assert(cResultFile.is_open());
+    }
+    catch (...)
+    {
+        cout << "Error in reading "
+             << batchOptimizeFolder
+             << "'s result files" << fileName << endl;
+    }
+
+    double runTime = 0, obj = 0;
+    cResultFile >> runTime >> obj;
+    double nd = 0;
+    cResultFile >> nd;
+    int n = round(nd);
+    vector<int> values(n, 0);
+    for (int i = 0; i < n; i++)
+    {
+        double val = 0;
+        cResultFile >> val;
+        values[i] = abs(round(val));
+    }
+
+    // check schedulability
+    auto taskSet1 = ReadTaskSet(pathInPeriodicDataset, "orig");
+    // TaskSet tasksInit = taskSet1;
+    UpdateTaskSetExecutionTime(taskSet1, Vector2Eigen(values));
+    taskSet1 = Reorder(taskSet1, "RM");
+    RTA_LL r(taskSet1);
+    EXPECT(r.CheckSchedulability(
+        debugMode == 1));
+}
 int main()
 {
     TestResult tr;
