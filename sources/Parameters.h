@@ -62,6 +62,7 @@ const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency
 const string testDataSetName = (string)ConfigParameters["testDataSetName"];
 string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
 string verbosityLM = (string)ConfigParameters["verbosityLM"];
+string linearOptimizerType = (string)ConfigParameters["linearOptimizerType"];
 
 string controlPath = (string)ConfigParameters["controlPath"];
 string runMode = (string)ConfigParameters["runMode"];

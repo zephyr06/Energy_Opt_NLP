@@ -111,6 +111,7 @@ struct FactorGraphInManifold
     static RTARelatedFactor
     GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic &rtaBase)
     {
+        BeginTimer(__func__);
         std::vector<gtsam::Symbol> keys;
         keys.reserve(index);
         for (int i = 0; i <= index; i++)
@@ -125,6 +126,7 @@ struct FactorGraphInManifold
         sigma << noiseModelSigma, noiseModelSigma / weightSchedulability;
         auto model = noiseModel::Diagonal::Sigmas(sigma);
         // return MultiKeyFactor(keys, f, model);
+        EndTimer(__func__);
         return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model);
     }
 
@@ -141,6 +143,7 @@ struct FactorGraphInManifold
 
     static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
     {
+        BeginTimer(__func__);
         NonlinearFactorGraph graph;
         double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
         auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
@@ -163,6 +166,7 @@ struct FactorGraphInManifold
                 graph.add(factor);
             }
         }
+        EndTimer(__func__);
         return graph;
     }
 

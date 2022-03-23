@@ -61,6 +61,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
         params.setlambdaLowerBound(lowerLambda);
         params.setlambdaUpperBound(upperLambda);
         params.setRelativeErrorTol(relativeErrorTolerance);
+        params.setLinearSolverType(linearOptimizerType);
         LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
         result = optimizer.optimize();
     }
