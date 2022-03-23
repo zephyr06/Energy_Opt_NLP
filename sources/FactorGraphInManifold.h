@@ -182,7 +182,7 @@ struct FactorGraphInManifold
         return initialEstimateFG;
     }
 
-    static void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = 1e0)
+    static void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = disturb_init)
     {
         BeginTimer(__func__);
         // if (!ContainFalse(maskForElimination))

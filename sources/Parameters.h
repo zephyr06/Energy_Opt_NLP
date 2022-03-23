@@ -50,6 +50,7 @@ const double relativeErrorToleranceInit = (double)ConfigParameters["relativeErro
 int enableReorder = (int)ConfigParameters["enableReorder"];
 int MaxLoopControl = (int)ConfigParameters["MaxLoopControl"];
 
+double disturb_init = (double)ConfigParameters["disturb_init"];
 const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
 int optimizerType = (int)ConfigParameters["optimizerType"];
 double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];

@@ -257,7 +257,20 @@ void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDy
     }
     return;
 }
-
+template <typename T>
+bool EqualVector(std::vector<T> &v1, std::vector<T> &v2)
+{
+    if (v1.size() != v2.size())
+    {
+        return false;
+    }
+    for (uint i = 0; i < v1.size(); i++)
+    {
+        if (v1[i] != v2[i])
+            return false;
+    }
+    return true;
+}
 // TODO: limit the number of outer loops
 template <typename FactorGraphType>
 pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic &coeff,
@@ -282,7 +295,8 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
             coeff = coeffTry;
         }
     }
-    while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) && ContainFalse(maskForElimination) && loopCount< MaxLoopControl)
+    double disturbIte = eliminateTol;
+    while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) && ContainFalse(maskForElimination) && loopCount < MaxLoopControl)
     {
         // store prev result
         errPrev = errCurr;
@@ -311,7 +325,18 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
 
         // adjust optimization settings
         loopCount++;
+
+        // int eliminateIteCount = 0;
+        // std::vector<bool> maskForEliminationCopy = maskForElimination;
+        // while (EqualVector(maskForEliminationCopy, maskForElimination) && eliminateIteCount < adjustEliminateMaxIte)
+        // {
+        //     FactorGraphType::FindEliminatedVariables(tasks, maskForEliminationCopy, disturbIte);
+        //     disturbIte *= eliminateStep;
+        //     eliminateIteCount++;
+        // }
+        // maskForElimination = maskForEliminationCopy;
         FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
+
         RoundPeriod(tasks, maskForElimination, coeff);
         errCurr = RealObj(tasks, coeff);
         if (Equals(maskForElimination, maskForEliminationPrev) && relativeErrorTolerance > relativeErrorToleranceMin)

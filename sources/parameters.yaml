@@ -3,7 +3,7 @@
 runMode: compare
 # TODO: v6 elimination check failed
 testDataSetName: test_n20_v2
-optimizerType: 2 # 1 means dogleg, 2 means LM
+optimizerType: 1 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
 
@@ -21,7 +21,7 @@ baselineLLCompare: 1
 
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-eliminateTol: 5e-1
+eliminateTol: 1e0
 eliminateStep: 3
 adjustEliminateMaxIte: 10
 
@@ -35,7 +35,7 @@ roundTypeInClamp: "fine"
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e0
-relativeErrorToleranceInit: 1e-12
+relativeErrorToleranceInit: 1e-5
 relativeErrorTolerance: 1e-5
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
@@ -57,18 +57,19 @@ SA_iteration: 1000000
 
 controlPath: "N5/Case0"
 MaxLoopControl: 1e4
-exactJacobian: 0
+exactJacobian: 1
 utilTol: 1e-3
-debugMode: 0
-verbosityLM: "SILENT"
+debugMode: 1
+verbosityLM: "SUMMARY"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 
 weightSchedulabilityMax: 1e7
 weightSchedulabilityStep: 1.5
 weightSchedulabilityMin: 1e7
+disturb_init: 1e0
 disturb_step: 2
-disturb_max: 1
+disturb_max: 1e0
 relativeErrorToleranceOuterLoop: 1e-10
 
 weightHardConstraint: 1e5 # weight of period limits and r<d (3 factors)

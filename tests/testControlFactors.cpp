@@ -505,23 +505,23 @@ TEST(ReadBaselineZhao20, unschedulable_v2)
     RTA_LL r2(tasks);
     EXPECT(r2.CheckSchedulability(false));
 }
-TEST(ReadBaselineZhao20, unschedulable_v3)
-{
-    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N20/Case684.txt";
-    TaskSet tasks;
-    VectorDynamic coeff;
-    std::tie(tasks, coeff) = ReadControlCase(path1);
-    RTA_LL r(tasks);
-    auto res = r.CheckSchedulability(1);
-    EXPECT(res);
-    VectorDynamic periodCurr = GenerateVectorDynamic(20);
-    // periodCurr << 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 387, 774, 774, 387, 774, 774, 774;
-    periodCurr = periodCurr.array() + 1133;
-    UpdateTaskSetPeriod(tasks, periodCurr);
-    tasks = Reorder(tasks, "RM");
-    RTA_LL r2(tasks);
-    EXPECT(r2.CheckSchedulability(1));
-}
+// TEST(ReadBaselineZhao20, unschedulable_v3)
+// {
+//     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N20/Case684.txt";
+//     TaskSet tasks;
+//     VectorDynamic coeff;
+//     std::tie(tasks, coeff) = ReadControlCase(path1);
+//     RTA_LL r(tasks);
+//     auto res = r.CheckSchedulability(1);
+//     EXPECT(res);
+//     VectorDynamic periodCurr = GenerateVectorDynamic(20);
+//     // periodCurr << 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 774, 387, 774, 774, 387, 774, 774, 774;
+//     periodCurr = periodCurr.array() + 1133;
+//     UpdateTaskSetPeriod(tasks, periodCurr);
+//     tasks = Reorder(tasks, "RM");
+//     RTA_LL r2(tasks);
+//     EXPECT(r2.CheckSchedulability(1));
+// }
 TEST(Reorder, v1)
 {
     enableReorder = 1;
@@ -566,6 +566,79 @@ TEST(Reorder, v2)
     EXPECT_LONGS_EQUAL(3, tasks[2].id);
     EXPECT_LONGS_EQUAL(4, tasks[3].id);
     EXPECT_LONGS_EQUAL(1, tasks[4].id);
+}
+class TestBigJacobian1 : public NoiseModelFactor1<VectorDynamic>
+{
+public:
+    NormalErrorFunction1D f;
+    int dimension;
+
+    TestBigJacobian1(Key key,
+                     SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key)
+    {
+        dimension = 1;
+    }
+
+    Vector evaluateError(const VectorDynamic &x,
+                         boost::optional<Matrix &> H = boost::none) const override
+    {
+        VectorDynamic b = GenerateVectorDynamic(6);
+        b << 1, 2, 3, 4, 5, 6;
+        MatrixDynamic jj = GenerateMatrixDynamic(6, 5);
+        jj << 1, 0, 0, 0, 0,
+            0, 1, 0, 0, 0,
+            0, 0, -1e6, 0, 0,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1;
+
+        VectorDynamic err = jj * x - b;
+        if (H)
+        {
+            *H = jj;
+        }
+        return err;
+    }
+};
+
+TEST(assumption, bigJacobian)
+{
+    int m = 6;
+    int n = 5;
+    NonlinearFactorGraph graph;
+    auto key = Symbol('a', 0);
+    auto model = noiseModel::Isotropic::Sigma(m, noiseModelSigma);
+    graph.emplace_shared<TestBigJacobian1>(key, model);
+
+    // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
+    // initialEstimate << 68.000000, 321, 400, 131, 308;
+    Values initialEstimateFG;
+    initialEstimateFG.insert(key, GenerateVectorDynamic(n));
+
+    Values result;
+    if (optimizerType == 1)
+    {
+        DoglegParams params;
+        // if (debugMode == 1)
+        //     params.setVerbosityDL("VERBOSE");
+        params.setDeltaInitial(deltaInitialDogleg);
+        params.setRelativeErrorTol(relativeErrorTolerance);
+        DoglegOptimizer optimizer(graph, initialEstimateFG, params);
+        result = optimizer.optimize();
+    }
+    else if (optimizerType == 2)
+    {
+        LevenbergMarquardtParams params;
+        params.setlambdaInitial(initialLambda);
+        params.setVerbosityLM(verbosityLM);
+        params.setlambdaLowerBound(lowerLambda);
+        params.setlambdaUpperBound(upperLambda);
+        params.setRelativeErrorTol(relativeErrorTolerance);
+        LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+        result = optimizer.optimize();
+    }
+    cout << result.at<VectorDynamic>(key);
+    EXPECT_LONGS_EQUAL(-3e-6, result.at<VectorDynamic>(key)(2));
 }
 int main()
 {
