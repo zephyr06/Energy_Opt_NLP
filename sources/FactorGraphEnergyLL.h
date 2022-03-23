@@ -1,41 +1,31 @@
-
 #pragma once
 #include <chrono>
-#include <string>
-#include <utility>
-#include <numeric>
-#include <CppUnitLite/TestHarness.h>
+#include <math.h>
+
 #include "Parameters.h"
-#include "Optimize.h"
-#include "ReadControlCases.h"
-#include "CoeffFactor.h"
-#include "RTAFactor.h"
-#include "InequalifyFactor.h"
+#include <Eigen/Dense>
+#include "Declaration.h"
+#include "Tasks.h"
+#include "RTA_LL.h"
+#include "Energy.h"
+#include "utils.h"
+#include "FrequencyModel.h"
 #include "ControlFactorGraphUtils.h"
 
-bool ContainFalse(std::vector<bool> &maskForElimination)
-{
-    for (auto x : maskForElimination)
-    {
-        if (x == false)
-            return true;
-    }
-    return false;
-}
-struct FactorGraphInManifold
+struct FactorGraphEnergyLL
 {
     static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet tasks)
     {
-        VectorDynamic periods = GetParameterVD<double>(tasks, "period");
+        VectorDynamic executionTimes = GetParameterVD<double>(tasks, "executionTime");
         for (uint i = 0; i < tasks.size(); i++)
         {
-            if (result.exists(GenerateControlKey(i, "period")))
+            if (result.exists(GenerateControlKey(i, "executionTime")))
             {
-                periods(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
+                executionTimes(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "executionTime"))(0, 0);
             }
         }
-        UpdateTaskSetPeriod(tasks, periods);
-        return make_pair(periods, RTALLVector(tasks));
+        UpdateTaskSetExecutionTime(tasks, executionTimes);
+        return make_pair(executionTimes, RTALLVector(tasks));
     }
 
     class RTARelatedFactor : public NoiseModelFactor
@@ -43,25 +33,23 @@ struct FactorGraphInManifold
     public:
         TaskSet tasks;
         int index;
-        VectorDynamic coeff;
         VectorDynamic rtaBase;
         int dimension;
         vector<Symbol> keyVec;
         LambdaMultiKey f_with_RTA;
 
-        RTARelatedFactor(vector<Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic rtaBase,
-                         SharedNoiseModel model) : NoiseModelFactor(model, keyVec), tasks(tasks), index(index), coeff(coeff), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
+        RTARelatedFactor(vector<Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic rtaBase,
+                         SharedNoiseModel model) : NoiseModelFactor(model, keyVec), tasks(tasks), index(index), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
         {
-            f_with_RTA = [tasks, index, coeff, rtaBase](const Values &x)
+            f_with_RTA = [tasks, index, rtaBase](const Values &x)
             {
                 BeginTimer("f_with_RTA");
-                VectorDynamic error = GenerateVectorDynamic(2);
+                VectorDynamic error = GenerateVectorDynamic(1);
                 TaskSet tasksCurr = tasks;
                 UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks).first);
                 RTA_LL r(tasksCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
-                error(0) = rta * coeff[2 * index + 1];
-                error(1) = HingeLoss(tasksCurr[index].period - rta);
+                error(0) = HingeLoss(tasksCurr[index].period - rta);
                 EndTimer("f_with_RTA");
                 return error;
             };
@@ -93,7 +81,7 @@ struct FactorGraphInManifold
                     }
 
                     else
-                        (*H)[i] = GenerateVectorDynamic(2);
+                        (*H)[i] = GenerateVectorDynamic(1);
                 }
                 if (debugMode == 1)
                 {
@@ -110,59 +98,68 @@ struct FactorGraphInManifold
     };
 
     static RTARelatedFactor
-    GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff)
+    GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index,
+                             VectorDynamic &rtaBase)
     {
-        // TODO!!! move this part outside the for-loop
-        VectorDynamic rtaBase = RTALLVector(tasks);
+
         std::vector<gtsam::Symbol> keys;
         keys.reserve(index);
         for (int i = 0; i <= index; i++)
         {
             if (!maskForElimination[i])
             {
-                keys.push_back(GenerateControlKey(i, "period"));
+                keys.push_back(GenerateControlKey(i, "executionTime"));
             }
         }
 
-        VectorDynamic sigma = GenerateVectorDynamic(2);
+        VectorDynamic sigma = GenerateVectorDynamic(1);
         sigma << noiseModelSigma, noiseModelSigma / weightSchedulability;
         auto model = noiseModel::Diagonal::Sigmas(sigma);
         // return MultiKeyFactor(keys, f, model);
         return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model);
     }
 
-    /* whether task 'index' has free dependent variables*/
-    static bool HasDependency(int index, std::vector<bool> &maskForElimination)
+    static MultiKeyFactor EliminationLLFactor(std::vector<bool> maskForElimination, TaskSet tasks, int index)
     {
-        for (int i = 0; i <= index; i++)
+        std::vector<gtsam::Symbol> keys;
+        for (uint i = 0; i <= index; i++)
         {
             if (!maskForElimination[i])
-                return true;
+                keys.push_back(GenerateControlKey(i, "executionTime"));
         }
-        return false;
+        LambdaMultiKey f = [tasks, index, rtaBase](const Values &x)
+        {
+            BeginTimer("f_with_RTA");
+            VectorDynamic error = GenerateVectorDynamic(1);
+            TaskSet tasksCurr = tasks;
+            UpdateTaskSetPeriod(tasksCurr, FactorGraphEnergyLL::ExtractResults(x, tasks).first);
+            RTA_LL r(tasksCurr);
+            double rta = r.RTA_Common_Warm(rtaBase(index), index);
+            error(0) = HingeLoss(tasksCurr[index].period - rta);
+            EndTimer("f_with_RTA");
+            return error;
+        };
     }
 
-    static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
+    static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks)
     {
+        VectorDynamic rtaBase = RTALLVector(tasks);
         NonlinearFactorGraph graph;
-        double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
         auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
         auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
+        auto modelPunishmentHard = noiseModel::Constrained::All(1);
 
         for (uint i = 0; i < tasks.size(); i++)
         {
             if (!maskForElimination[i])
             {
-                // add CoeffFactor
-                graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
-                                                  GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
-                // add period min/max limits
-                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), tasks[i].executionTime, modelPunishmentSoft1);
-                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentSoft1);
+                // add executionTime min/max limits
+                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
+                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), min(tasks[i].deadline, tasks[i].period), modelPunishmentSoft1);
             }
             if (HasDependency(i, maskForElimination))
             {
-                auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff);
+                auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase);
                 graph.add(factor);
             }
         }
@@ -176,8 +173,8 @@ struct FactorGraphInManifold
         {
             if (!maskForElimination[i])
             {
-                initialEstimateFG.insert(GenerateControlKey(i, "period"),
-                                         GenerateVectorDynamic1D(tasks[i].period));
+                initialEstimateFG.insert(GenerateControlKey(i, "executionTime"),
+                                         GenerateVectorDynamic1D(tasks[i].executionTime));
             }
         }
         return initialEstimateFG;
@@ -186,10 +183,7 @@ struct FactorGraphInManifold
     static void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = disturb_init)
     {
         BeginTimer(__func__);
-        // if (!ContainFalse(maskForElimination))
-        // {
-        //     return;
-        // }
+
         RTA_LL r(tasks);
         VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
         bool whether_new_eliminate = false;

@@ -57,10 +57,10 @@ SA_iteration: 1000000
 
 controlPath: "N5/Case0"
 MaxLoopControl: 1e4
-exactJacobian: 1
+exactJacobian: 0
 utilTol: 1e-3
-debugMode: 1
-verbosityLM: "SUMMARY"
+debugMode: 0
+verbosityLM: "SILENT"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 

@@ -18,11 +18,11 @@ inline gtsam::Symbol GenerateControlKey(int idtask, string type)
     }
     else if (type == "response")
     {
-        if (idtask == 4)
-        {
-            int a = 1;
-        }
         return gtsam::Symbol('r', idtask);
+    }
+    else if (type == "executionTime")
+    {
+        return gtsam::Symbol('c', idtask);
     }
     else
     {
