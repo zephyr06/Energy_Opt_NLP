@@ -24,7 +24,7 @@ bool ContainFalse(std::vector<bool> &maskForElimination)
 }
 struct FactorGraphInManifold
 {
-    static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet tasks)
+    static VectorDynamic ExtractResults(const Values &result, TaskSet tasks)
     {
         VectorDynamic periods = GetParameterVD<double>(tasks, "period");
         for (uint i = 0; i < tasks.size(); i++)
@@ -34,8 +34,7 @@ struct FactorGraphInManifold
                 periods(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
             }
         }
-        UpdateTaskSetPeriod(tasks, periods);
-        return make_pair(periods, RTALLVector(tasks));
+        return periods;
     }
 
     class RTARelatedFactor : public NoiseModelFactor
@@ -57,7 +56,7 @@ struct FactorGraphInManifold
                 BeginTimer("f_with_RTA");
                 VectorDynamic error = GenerateVectorDynamic(2);
                 TaskSet tasksCurr = tasks;
-                UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks).first);
+                UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks));
                 RTA_LL r(tasksCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = rta * coeff[2 * index + 1];
@@ -110,10 +109,8 @@ struct FactorGraphInManifold
     };
 
     static RTARelatedFactor
-    GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff)
+    GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic &rtaBase)
     {
-        // TODO!!! move this part outside the for-loop
-        VectorDynamic rtaBase = RTALLVector(tasks);
         std::vector<gtsam::Symbol> keys;
         keys.reserve(index);
         for (int i = 0; i <= index; i++)
@@ -148,7 +145,7 @@ struct FactorGraphInManifold
         double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
         auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
         auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
-
+        VectorDynamic rtaBase = RTALLVector(tasks);
         for (uint i = 0; i < tasks.size(); i++)
         {
             if (!maskForElimination[i])
@@ -162,7 +159,7 @@ struct FactorGraphInManifold
             }
             if (HasDependency(i, maskForElimination))
             {
-                auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff);
+                auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff, rtaBase);
                 graph.add(factor);
             }
         }

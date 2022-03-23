@@ -66,7 +66,9 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     }
 
     VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
-    std::tie(optComp, rtaFromOpt) = FactorGraphType::ExtractResults(result, tasks);
+    optComp = FactorGraphType::ExtractResults(result, tasks);
+    UpdateTaskSetPeriod(tasks, optComp);
+    rtaFromOpt = RTALLVector(tasks);
     if (debugMode == 1)
     {
         cout << endl;
@@ -79,7 +81,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
         cout << Color::def;
         cout << endl;
         cout << Color::blue;
-        UpdateTaskSetPeriod(tasks, FactorGraphType::ExtractResults(initialEstimateFG, tasks).first);
+        UpdateTaskSetPeriod(tasks, FactorGraphType::ExtractResults(initialEstimateFG, tasks));
         cout << "Before optimization, the total error is " << RealObj(tasks, coeff) << endl;
         UpdateTaskSetPeriod(tasks, optComp);
         cout << "The objective function is " << RealObj(tasks, coeff) << endl;

@@ -27,7 +27,8 @@ struct FactorGraphForceManifold
      * @param tasks 
      * @return pair<VectorDynamic, VectorDynamic> periods, rta; rta is raw rta, which could include -1 (eliminated before)
      */
-    static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet &tasks)
+    // Issue in this function! not able to extract rta because of consistency
+    static VectorDynamic ExtractResults(const Values &result, TaskSet &tasks)
     {
         VectorDynamic periods = GenerateVectorDynamic(tasks.size());
         VectorDynamic rta = GenerateVectorDynamic(tasks.size());
@@ -50,7 +51,7 @@ struct FactorGraphForceManifold
                 rta(i, 0) = -1;
             }
         }
-        return make_pair(periods, rta);
+        return periods;
     }
     static InequalityFactor2D GenerateSchedulabilityFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index)
     {
