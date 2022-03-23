@@ -32,6 +32,7 @@ public:
     Vector evaluateError(const VectorDynamic &x,
                          boost::optional<Matrix &> H = boost::none) const override
     {
+        BeginTimer("CoeffFactor");
         AssertEqualScalar(coeff_.rows(), x.rows(), 1e-6, __LINE__);
 
         if (H)
@@ -43,6 +44,7 @@ public:
             }
         }
         VectorDynamic err = coeff_ * (x);
+        EndTimer("CoeffFactor");
         return err;
     }
 };
