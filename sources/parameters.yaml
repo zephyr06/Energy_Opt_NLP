@@ -2,7 +2,7 @@
 
 runMode: compare
 # TODO: v6 elimination check failed
-testDataSetName: test_n5_v8
+testDataSetName: test_n20_v2
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
@@ -58,9 +58,9 @@ SA_iteration: 1000000
 controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
-utilTol: 0.001
-debugMode: 1
-verbosityLM: "SUMMARY"
+utilTol: 1e-3
+debugMode: 0
+verbosityLM: "SILENT"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 

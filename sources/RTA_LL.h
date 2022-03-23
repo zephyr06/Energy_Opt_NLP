@@ -67,7 +67,7 @@ public:
             }
         }
         double utilAll = Utilization(tasksHighPriority);
-        if (utilAll >= 1.0 + utilTol)
+        if (utilAll >= 1.0 - utilTol)
         {
             // cout << "The given task set is unschedulable\n";
             return INT32_MAX;

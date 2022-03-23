@@ -13,8 +13,8 @@ void BatchCompare(int N = -1)
     double worstValue = 0.0;
     for (const auto &file : ReadFilesInDirectory(pathDataset))
     {
-        if (debugMode)
-            cout << file << endl;
+        // if (debugMode)
+        cout << file << endl;
         string delimiter = "-";
 
         if (file.substr(0, file.find(delimiter)) == "periodic")
