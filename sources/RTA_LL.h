@@ -115,8 +115,8 @@ public:
     {
         if (Utilization(tasksHighPriority) + taskCurr.utilization() > 1.0 + 1e-6)
         {
-            double u1 = Utilization(tasksHighPriority);
-            double u2 = taskCurr.utilization();
+            // double u1 = Utilization(tasksHighPriority);
+            // double u2 = taskCurr.utilization();
             return INT32_MAX;
         }
         return ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHighPriority);

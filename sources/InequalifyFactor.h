@@ -102,10 +102,10 @@ public:
         {
             VectorDynamic res = x;
             res << HingeLoss(b - x(0, 0));
-            if (res(0, 0) != 0)
-            {
-                int a = 1;
-            }
+            // if (res(0, 0) != 0)
+            // {
+            //     int a = 1;
+            // }
             return res;
         };
     }
@@ -126,10 +126,10 @@ public:
         {
             VectorDynamic res = x;
             res << HingeLoss(x(0, 0) - b);
-            if (res(0, 0) != 0)
-            {
-                int a = 1;
-            }
+            // if (res(0, 0) != 0)
+            // {
+            //     int a = 1;
+            // }
             return res;
         };
     }
@@ -213,10 +213,10 @@ public:
         {
             *H2 = NumericalDerivativeDynamic2D2(f, x1, x2, deltaOptimizer, 1);
         }
-        if (err(0, 0) != 0)
-        {
-            int a = 1;
-        }
+        // if (err(0, 0) != 0)
+        // {
+        //     int a = 1;
+        // }
         return err;
     }
 };

@@ -3,6 +3,7 @@
 #include <CppUnitLite/TestHarness.h>
 #include "../sources/Parameters.h"
 #include "../sources/Optimize.h"
+#include "../sources/FactorGraphEnergyLL.h"
 using namespace std::chrono;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 
@@ -160,11 +161,7 @@ TEST(unitOptimization, a1)
     VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
     vectorGlobalOpt.resize(N, 1);
     VectorDynamic res1 = Opt_LL::UnitOptimization(taskSetNormal, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
-    cout << endl;
-    cout << endl;
-    cout << endl;
-    cout << endl;
-    cout << endl;
+
     // 204 corresponds to RT of 319, which should be the best we can get because of the clamp function
     if (not(abs(204 - res1(0, 0)) < 5))
         CoutWarning("One test case failed in performance!");
@@ -250,9 +247,7 @@ TEST(ClampComputationTime, a1)
     vectorGlobalOpt.resize(N, 1);
     TaskSetNormal taskSetNormal(taskSet1);
     VectorDynamic res1 = Opt_LL::UnitOptimization(taskSetNormal, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
-    cout << endl;
-    cout << endl;
-    cout << endl;
+
     // 204 corresponds to RT of 319, which should be the best we can get because of the clamp function
     // if (not(abs(205 - res1(0, 0)) < 1))
     //     CoutWarning("One test case failed in performance!");
@@ -393,6 +388,31 @@ TEST(ReadYecheng_result, v1)
     RTA_LL r(taskSet1);
     EXPECT(r.CheckSchedulability(
         debugMode == 1));
+}
+TEST(EnergyFactor, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+    executionTimeModel = 1;
+    EnergyMode = 1;
+    VectorDynamic comp;
+    comp.resize(3, 1);
+    comp << 17, 12, 253;
+    UpdateTaskSetExecutionTime(tasks, comp);
+
+    VectorDynamic energy1;
+    weightEnergy = 1e8;
+    auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+    FactorGraphEnergyLL::EnergyFactor f0(GenerateControlKey(0, "executionTime"), tasks[0], model);
+    FactorGraphEnergyLL::EnergyFactor f1(GenerateControlKey(1, "executionTime"), tasks[1], model);
+    MatrixDynamic h1 = GenerateMatrixDynamic(1, 1);
+    MatrixDynamic h1Expect = GenerateVectorDynamic1D(-2 / tasks[0].period * weightEnergy);
+    MatrixDynamic h2 = GenerateMatrixDynamic(1, 1);
+    MatrixDynamic h2Expect = GenerateVectorDynamic1D(-2 / tasks[1].period * weightEnergy);
+    AssertEqualScalar(3777777.7778, f0.evaluateError(GenerateVectorDynamic1D(tasks[0].executionTime), h1)(0, 0));
+    AssertEqualScalar(2448979.5918, f1.evaluateError(GenerateVectorDynamic1D(tasks[1].executionTime), h2)(0, 0));
+    assert_equal(h1Expect, h1, 1e-3);
+    assert_equal(h2Expect, h2, 1e-3);
 }
 int main()
 {
