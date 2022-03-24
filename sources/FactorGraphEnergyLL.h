@@ -11,10 +11,12 @@
 #include "utils.h"
 #include "FrequencyModel.h"
 #include "ControlFactorGraphUtils.h"
+#include "MultiKeyFactor.h"
+#include "InequalifyFactor.h"
 
 struct FactorGraphEnergyLL
 {
-    static pair<VectorDynamic, VectorDynamic> ExtractResults(const Values &result, TaskSet tasks)
+    static VectorDynamic ExtractResults(const Values &result, TaskSet tasks)
     {
         VectorDynamic executionTimes = GetParameterVD<double>(tasks, "executionTime");
         for (uint i = 0; i < tasks.size(); i++)
@@ -24,8 +26,7 @@ struct FactorGraphEnergyLL
                 executionTimes(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "executionTime"))(0, 0);
             }
         }
-        UpdateTaskSetExecutionTime(tasks, executionTimes);
-        return make_pair(executionTimes, RTALLVector(tasks));
+        return executionTimes;
     }
 
     class RTARelatedFactor : public NoiseModelFactor
@@ -46,7 +47,7 @@ struct FactorGraphEnergyLL
                 BeginTimer("f_with_RTA");
                 VectorDynamic error = GenerateVectorDynamic(1);
                 TaskSet tasksCurr = tasks;
-                UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks).first);
+                UpdateTaskSetPeriod(tasksCurr, FactorGraphEnergyLL::ExtractResults(x, tasks));
                 RTA_LL r(tasksCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = HingeLoss(tasksCurr[index].period - rta);
@@ -116,30 +117,69 @@ struct FactorGraphEnergyLL
         sigma << noiseModelSigma, noiseModelSigma / weightSchedulability;
         auto model = noiseModel::Diagonal::Sigmas(sigma);
         // return MultiKeyFactor(keys, f, model);
-        return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model);
+        return RTARelatedFactor(keys, tasks, index, rtaBase, model);
     }
 
-    static MultiKeyFactor EliminationLLFactor(std::vector<bool> maskForElimination, TaskSet tasks, int index)
+    static MultiKeyFactor EliminationLLFactor(std::vector<bool> maskForElimination, TaskSet tasks,
+                                              int index, double rtaIndex)
     {
         std::vector<gtsam::Symbol> keys;
-        for (uint i = 0; i <= index; i++)
+        for (int i = 0; i <= index; i++)
         {
             if (!maskForElimination[i])
                 keys.push_back(GenerateControlKey(i, "executionTime"));
         }
-        LambdaMultiKey f = [tasks, index, rtaBase](const Values &x)
+        LambdaMultiKey f = [tasks, index, rtaIndex](const Values &x)
         {
-            BeginTimer("f_with_RTA");
             VectorDynamic error = GenerateVectorDynamic(1);
             TaskSet tasksCurr = tasks;
-            UpdateTaskSetPeriod(tasksCurr, FactorGraphEnergyLL::ExtractResults(x, tasks).first);
-            RTA_LL r(tasksCurr);
-            double rta = r.RTA_Common_Warm(rtaBase(index), index);
-            error(0) = HingeLoss(tasksCurr[index].period - rta);
-            EndTimer("f_with_RTA");
+            VectorDynamic executionTimeVecCurr = FactorGraphEnergyLL::ExtractResults(x, tasks).block(0, 0, 1, index + 1);
+            VectorDynamic coeff = executionTimeVecCurr.transpose();
+            for (int i = 0; i < index; i++)
+            {
+                coeff(i) = ceil(rtaIndex / tasks[i].period);
+            }
+            coeff(index) = 1;
+            error(0) = HingeLoss(rtaIndex - (coeff * executionTimeVecCurr)(0, 0));
             return error;
         };
+        auto model = noiseModel::Constrained::All(1);
+        return MultiKeyFactor(keys, f, noiseModel::Constrained::All(1));
     }
+
+    class EnergyFactor : public NoiseModelFactor1<VectorDynamic>
+    {
+    public:
+        Task task_;
+        /**
+         * @brief Construct a new Inequality Factor 1 D object,
+         *  mainly used in derived class because f is not defined
+         */
+        EnergyFactor(Key key, Task &task,
+                     SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key), task_(task)
+        {
+        }
+
+        Vector evaluateError(const VectorDynamic &x,
+                             boost::optional<Matrix &> H = boost::none) const override
+        {
+            boost::function<Matrix(const VectorDynamic &)> f =
+                [this](const VectorDynamic &executionTimeVector)
+            {
+                Task taskCurr = task_;
+                taskCurr.executionTime = executionTimeVector(0, 0);
+                VectorDynamic err = GenerateVectorDynamic1D(1.0 / taskCurr.period *
+                                                            EstimateEnergyTask(taskCurr));
+                return err;
+            };
+            VectorDynamic err = f(x);
+            if (H)
+            {
+                *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, 1);
+            }
+            return err;
+        }
+    };
 
     static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks)
     {
@@ -157,11 +197,11 @@ struct FactorGraphEnergyLL
                 graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
                 graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), min(tasks[i].deadline, tasks[i].period), modelPunishmentSoft1);
             }
-            if (HasDependency(i, maskForElimination))
-            {
-                auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase);
-                graph.add(factor);
-            }
+            // if (HasDependency(i, maskForElimination))
+            // {
+            //     auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase);
+            //     graph.add(factor);
+            // }
         }
         return graph;
     }
