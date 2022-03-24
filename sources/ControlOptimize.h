@@ -285,7 +285,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynam
     double errPrev = 1e30;
     double errCurr = RealObj(tasks, coeff);
     int loopCount = 0;
-    if (enableReorder > 1)
+    if (enableReorder > -1)
     {
         errCurr = RealObj(tasks, coeff);
         TaskSet tasksTry = tasks;
