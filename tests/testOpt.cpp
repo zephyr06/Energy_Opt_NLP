@@ -414,6 +414,54 @@ TEST(EnergyFactor, v1)
     assert_equal(h1Expect, h1, 1e-3);
     assert_equal(h2Expect, h2, 1e-3);
 }
+TEST(RTARelatedFactor, v1)
+{
+    exactJacobian = 1;
+
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    VectorDynamic rtaBase = RTALLVector(tasks);
+    auto f1 = FactorGraphEnergyLL::GenerateRTARelatedFactor(maskForElimination, tasks, 3, rtaBase);
+    auto x = FactorGraphEnergyLL::GenerateInitialFG(tasks, maskForElimination);
+    std::vector<MatrixDynamic> Hs, HsExpect;
+    Hs.reserve(5);
+    HsExpect.reserve(5);
+    for (uint i = 0; i < 5; i++)
+    {
+        MatrixDynamic m = GenerateMatrixDynamic(1, 1);
+        Hs.push_back(m);
+        HsExpect.push_back(m);
+    }
+    assert_equal(GenerateVectorDynamic1D(0), f1.unwhitenedError(x, Hs), 1e-3);
+    for (int i = 0; i < 5; i++)
+        assert_equal(HsExpect[i], Hs[i]);
+}
+TEST(GenerateEliminationLLFactor, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    maskForElimination = {0, 0, 0, 1, 0};
+    VectorDynamic rtaBase = RTALLVector(tasks);
+    MultiKeyFactor f1 = FactorGraphEnergyLL::GenerateEliminationLLFactor(maskForElimination, tasks, 3, rtaBase(3));
+    int dimension = 4;
+    std::vector<MatrixDynamic> Hs, HsExpect;
+    Hs.reserve(dimension);
+    HsExpect.reserve(dimension);
+    for (uint i = 0; i < dimension; i++)
+    {
+        MatrixDynamic m = GenerateMatrixDynamic(1, 1);
+        Hs.push_back(m);
+        m << -1 * ceil(rtaBase(3) / tasks[i].period);
+        HsExpect.push_back(m);
+    }
+    HsExpect[3] << -1;
+    auto x = FactorGraphEnergyLL::GenerateInitialFG(tasks, maskForElimination);
+    assert_equal(GenerateVectorDynamic1D(0), f1.unwhitenedError(x, Hs), 1e-3);
+    for (uint i = 0; i < HsExpect.size(); i++)
+        assert_equal(HsExpect[i], Hs[i], 1e-7);
+}
 int main()
 {
     TestResult tr;

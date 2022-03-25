@@ -47,10 +47,10 @@ struct FactorGraphEnergyLL
                 BeginTimer("f_with_RTA");
                 VectorDynamic error = GenerateVectorDynamic(1);
                 TaskSet tasksCurr = tasks;
-                UpdateTaskSetPeriod(tasksCurr, FactorGraphEnergyLL::ExtractResults(x, tasks));
+                UpdateTaskSetExecutionTime(tasksCurr, FactorGraphEnergyLL::ExtractResults(x, tasks));
                 RTA_LL r(tasksCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
-                error(0) = HingeLoss(tasksCurr[index].period - rta);
+                error(0) = HingeLoss(min(tasksCurr[index].period, tasksCurr[index].deadline) - rta);
                 EndTimer("f_with_RTA");
                 return error;
             };
@@ -107,40 +107,42 @@ struct FactorGraphEnergyLL
         keys.reserve(index);
         for (int i = 0; i <= index; i++)
         {
-            if (!maskForElimination[i])
-            {
-                keys.push_back(GenerateControlKey(i, "executionTime"));
-            }
+            // if (!maskForElimination[i])
+            // {
+            keys.push_back(GenerateControlKey(i, "executionTime"));
+            // }
         }
 
         VectorDynamic sigma = GenerateVectorDynamic(1);
-        sigma << noiseModelSigma, noiseModelSigma / weightSchedulability;
+        sigma << noiseModelSigma / weightSchedulability;
         auto model = noiseModel::Diagonal::Sigmas(sigma);
         // return MultiKeyFactor(keys, f, model);
         return RTARelatedFactor(keys, tasks, index, rtaBase, model);
     }
 
-    static MultiKeyFactor EliminationLLFactor(std::vector<bool> maskForElimination, TaskSet tasks,
-                                              int index, double rtaIndex)
+    static MultiKeyFactor GenerateEliminationLLFactor(std::vector<bool> maskForElimination, TaskSet tasks,
+                                                      int index, double rtaAtIndex)
     {
         std::vector<gtsam::Symbol> keys;
         for (int i = 0; i <= index; i++)
         {
-            if (!maskForElimination[i])
-                keys.push_back(GenerateControlKey(i, "executionTime"));
+            // if (!maskForElimination[i])
+            keys.push_back(GenerateControlKey(i, "executionTime"));
         }
-        LambdaMultiKey f = [tasks, index, rtaIndex](const Values &x)
+        LambdaMultiKey f = [tasks, index, rtaAtIndex](const Values &x)
         {
             VectorDynamic error = GenerateVectorDynamic(1);
             TaskSet tasksCurr = tasks;
-            VectorDynamic executionTimeVecCurr = FactorGraphEnergyLL::ExtractResults(x, tasks).block(0, 0, 1, index + 1);
-            VectorDynamic coeff = executionTimeVecCurr.transpose();
+            VectorDynamic executionTimeVecCurr = FactorGraphEnergyLL::ExtractResults(x, tasks).block(0, 0, index + 1, 1);
+
+            MatrixDynamic coeff = executionTimeVecCurr.transpose();
+
             for (int i = 0; i < index; i++)
             {
-                coeff(i) = ceil(rtaIndex / tasks[i].period);
+                coeff(i) = ceil(rtaAtIndex / tasks[i].period);
             }
             coeff(index) = 1;
-            error(0) = HingeLoss(rtaIndex - (coeff * executionTimeVecCurr)(0, 0));
+            error(0) = rtaAtIndex - (coeff * executionTimeVecCurr)(0, 0);
             return error;
         };
         auto model = noiseModel::Constrained::All(1);
@@ -187,15 +189,23 @@ struct FactorGraphEnergyLL
         NonlinearFactorGraph graph;
         auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
         auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
-        auto modelPunishmentHard = noiseModel::Constrained::All(1);
+        // auto modelPunishmentHard = noiseModel::Constrained::All(1);
 
         for (uint i = 0; i < tasks.size(); i++)
         {
-            if (!maskForElimination[i])
+            // energy factor
+            graph.emplace_shared<EnergyFactor>(GenerateControlKey(i, "executionTime"), tasks[i], modelNormal);
+
+            // add executionTime min/max limits
+            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
+            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), min(tasks[i].deadline, tasks[i].period), modelPunishmentSoft1);
+
+            // RTA factor
+            graph.add(GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase));
+
+            if (maskForElimination[i])
             {
-                // add executionTime min/max limits
-                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
-                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), min(tasks[i].deadline, tasks[i].period), modelPunishmentSoft1);
+                graph.add(GenerateEliminationLLFactor(maskForElimination, tasks, i, rtaBase(i)));
             }
             // if (HasDependency(i, maskForElimination))
             // {
@@ -211,11 +221,11 @@ struct FactorGraphEnergyLL
         Values initialEstimateFG;
         for (uint i = 0; i < tasks.size(); i++)
         {
-            if (!maskForElimination[i])
-            {
-                initialEstimateFG.insert(GenerateControlKey(i, "executionTime"),
-                                         GenerateVectorDynamic1D(tasks[i].executionTime));
-            }
+            // if (!maskForElimination[i])
+            // {
+            initialEstimateFG.insert(GenerateControlKey(i, "executionTime"),
+                                     GenerateVectorDynamic1D(tasks[i].executionTime));
+            // }
         }
         return initialEstimateFG;
     }
@@ -231,7 +241,7 @@ struct FactorGraphEnergyLL
         {
             for (uint i = 0; i < tasks.size(); i++)
             {
-                tasks[i].period -= disturb;
+                tasks[i].executionTime -= disturb;
                 RTA_LL r1(tasks);
                 VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);
                 if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
@@ -241,7 +251,7 @@ struct FactorGraphEnergyLL
                         whether_new_eliminate = true;
                     maskForElimination[i] = true;
                 }
-                tasks[i].period += disturb;
+                tasks[i].executionTime += disturb;
             }
             if (!whether_new_eliminate)
                 disturb *= disturb_step;

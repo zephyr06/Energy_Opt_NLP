@@ -69,9 +69,8 @@ public:
                 NormalErrorFunction1D f =
                     [x, i, this](const VectorDynamic xi)
                 {
-                    Symbol a = keyVec.at(i);
                     Values xx = x;
-                    xx.update(a, xi);
+                    xx.update(keyVec.at(i), xi);
                     return lambdaMK(xx);
                 };
                 (*H)[i] = NumericalDerivativeDynamic(f, x.at<VectorDynamic>(keyVec[i]), deltaOptimizer);
