@@ -13,15 +13,6 @@
 #include "InequalifyFactor.h"
 #include "ControlFactorGraphUtils.h"
 
-bool ContainFalse(std::vector<bool> &maskForElimination)
-{
-    for (auto x : maskForElimination)
-    {
-        if (x == false)
-            return true;
-    }
-    return false;
-}
 struct FactorGraphInManifold
 {
     static VectorDynamic ExtractResults(const Values &result, TaskSet tasks)
@@ -222,5 +213,20 @@ struct FactorGraphInManifold
         }
 
         EndTimer(__func__);
+    }
+
+    static double RealObj(TaskSet &tasks, VectorDynamic coeff)
+    {
+        BeginTimer(__func__);
+        double res = 0;
+        RTA_LL r(tasks);
+        VectorDynamic rta = r.ResponseTimeOfTaskSet();
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            res += coeff(i * 2, 0) * tasks[i].period;
+            res += coeff(i * 2 + 1, 0) * rta(i, 0);
+        }
+        EndTimer(__func__);
+        return res;
     }
 };

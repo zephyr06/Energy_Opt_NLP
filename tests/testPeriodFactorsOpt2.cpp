@@ -1,6 +1,5 @@
 #include "../sources/ControlOptimize.h"
 #include "../sources/profilier.h"
-using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 
 TEST(case1, v1)
 {
@@ -24,7 +23,7 @@ TEST(case1, v1)
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false}, maskForElimination);
     UpdateTaskSetPeriod(tasks, sth2.first);
-    cout << "Actual objective function is" << RealObj(tasks, coeff) << endl;
+    cout << "Actual objective function is" << FactorGraphInManifold::RealObj(tasks, coeff) << endl;
     EndTimer("main");
     PrintTimer();
 }

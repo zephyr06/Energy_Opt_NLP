@@ -14,6 +14,8 @@
 #include "utils.h"
 #include "FrequencyModel.h"
 
+#include "EnergyOptimize.h"
+
 using namespace std;
 using namespace gtsam;
 
@@ -496,6 +498,8 @@ public:
             UpdateTaskSetExecutionTime(tasksInit, initialExecutionTime);
             double initialEnergyCost = EstimateEnergyTaskSet(tasksInit).sum();
             double afterEnergyCost = EstimateEnergyTaskSet(taskSetType.tasks_).sum();
+            if (debugMode == 1)
+                cout << "Actual objective function is" << FactorGraphEnergyLL::RealObj(taskSetType.tasks_) << endl;
             if (debugMode == 1)
             {
                 cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;

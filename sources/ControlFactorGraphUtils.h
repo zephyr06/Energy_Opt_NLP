@@ -2,6 +2,15 @@
 #include <gtsam/inference/Key.h>
 #include <gtsam/inference/Symbol.h>
 
+bool ContainFalse(std::vector<bool> &maskForElimination)
+{
+    for (auto x : maskForElimination)
+    {
+        if (x == false)
+            return true;
+    }
+    return false;
+}
 /**
  * @brief generate keys for factor graph modeling the control problem
  * keys' attributes can be extracted via key.chr(). key.index()
@@ -30,21 +39,6 @@ inline gtsam::Symbol GenerateControlKey(int idtask, string type)
         gtsam::Symbol key('a', idtask);
         return key;
     }
-}
-
-double RealObj(TaskSet &tasks, VectorDynamic coeff)
-{
-    BeginTimer(__func__);
-    double res = 0;
-    RTA_LL r(tasks);
-    VectorDynamic rta = r.ResponseTimeOfTaskSet();
-    for (uint i = 0; i < tasks.size(); i++)
-    {
-        res += coeff(i * 2, 0) * tasks[i].period;
-        res += coeff(i * 2 + 1, 0) * rta(i, 0);
-    }
-    EndTimer(__func__);
-    return res;
 }
 
 /**

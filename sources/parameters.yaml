@@ -2,7 +2,7 @@
 
 runMode: compare
 # TODO: v6 elimination check failed
-testDataSetName: test_n20_v2
+testDataSetName: test_n20_v4
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
@@ -29,7 +29,7 @@ adjustEliminateMaxIte: 10
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: "fine"
+roundTypeInClamp: "rough"
 
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e5
@@ -60,18 +60,18 @@ MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
 debugMode: 1
-verbosityLM: "SILENT"
+verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
-weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger -> more important 
-weightSchedulabilityMax: 1e7
+weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
+weightSchedulabilityMax: 1e12
 weightSchedulabilityStep: 1.5
-weightSchedulabilityMin: 1e7
+weightSchedulabilityMin: 1e12
 disturb_init: 1e0
 disturb_step: 2
 disturb_max: 1e0
 relativeErrorToleranceOuterLoop: 1e-10
 
-weightHardConstraint: 1e5 # weight of period limits and r<d (3 factors)
+weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0

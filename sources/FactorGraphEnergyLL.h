@@ -198,7 +198,12 @@ struct FactorGraphEnergyLL
 
             // add executionTime min/max limits
             graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
-            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), min(tasks[i].deadline, tasks[i].period), modelPunishmentSoft1);
+            double limit = min(tasks[i].deadline, tasks[i].period);
+            if (enableMaxComputationTimeRestrict)
+            {
+                limit = min(limit, tasks[i].executionTimeOrg * MaxComputationTimeRestrict);
+            }
+            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), limit, modelPunishmentSoft1);
 
             // RTA factor
             graph.add(GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase));
@@ -265,5 +270,10 @@ struct FactorGraphEnergyLL
         }
 
         EndTimer(__func__);
+    }
+
+    static double RealObj(TaskSet &tasks)
+    {
+        return EstimateEnergyTaskSet(tasks).sum() / weightEnergy;
     }
 };
