@@ -235,7 +235,7 @@ struct FactorGraphEnergyLL
         return initialEstimateFG;
     }
 
-    static void FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = disturb_init)
+    static double FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = disturb_init)
     {
         BeginTimer(__func__);
 
@@ -246,17 +246,24 @@ struct FactorGraphEnergyLL
         {
             for (uint i = 0; i < tasks.size(); i++)
             {
-                tasks[i].executionTime -= disturb;
+                // if (maskForElimination[i])
+                //     continue;
+                tasks[i].executionTime += disturb;
                 RTA_LL r1(tasks);
-                VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);
-                if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
+                // VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);
+                if (!r1.CheckSchedulability(1 == debugMode) || (enableMaxComputationTimeRestrict &&
+                                                                tasks[i].executionTime > tasks[i].executionTimeOrg * MaxComputationTimeRestrict))
                 // TODO: more analytic way
                 {
                     if (!maskForElimination[i])
                         whether_new_eliminate = true;
                     maskForElimination[i] = true;
                 }
-                tasks[i].executionTime += disturb;
+                else
+                {
+                    maskForElimination[i] = false;
+                }
+                tasks[i].executionTime -= disturb;
             }
             if (!whether_new_eliminate)
                 disturb *= disturb_step;
@@ -268,8 +275,8 @@ struct FactorGraphEnergyLL
                 cout << endl;
             }
         }
-
         EndTimer(__func__);
+        return disturb;
     }
 
     static double RealObj(TaskSet &tasks)

@@ -282,7 +282,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks,
     double errCurr = FactorGraphType::RealObj(tasks);
     int loopCount = 0;
     double disturbIte = eliminateTol;
-    while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) && ContainFalse(maskForElimination) && loopCount < MaxLoopControl)
+    while (ContainFalse(maskForElimination) && loopCount < MaxLoopControl) //errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) &&
     {
         // store prev result
         errPrev = errCurr;
@@ -306,7 +306,7 @@ pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks,
         //     eliminateIteCount++;
         // }
         // maskForElimination = maskForEliminationCopy;
-        FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
+        disturbIte = FactorGraphType::FindEliminatedVariables(tasks, maskForElimination, disturbIte);
 
         RoundExecutionTime(tasks, maskForElimination);
         errCurr = FactorGraphType::RealObj(tasks);

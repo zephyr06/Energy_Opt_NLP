@@ -46,12 +46,12 @@ public:
             }
             beginTime = 0;
         }
-        else if (isnan(taskCurr.executionTime) || isnan(beginTime))
+        if (isnan(taskCurr.executionTime) || isnan(beginTime))
         {
             cout << Color::red << "Nan executionTime detected" << def << endl;
             throw "Nan";
         }
-        else if (taskCurr.executionTime < 0)
+        if (taskCurr.executionTime < 0)
         {
             return INT32_MAX;
         }
