@@ -59,8 +59,8 @@ controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
-debugMode: 1
-verbosityLM: "SUMMARY"
+debugMode: 0
+verbosityLM: "SILENT"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
@@ -72,6 +72,6 @@ disturb_init: 1e0
 disturb_step: 1.5
 disturb_max: 1e4
 relativeErrorToleranceOuterLoop: 1e-10
-
+LLCompareWithGeneralizedElimination: 1
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0

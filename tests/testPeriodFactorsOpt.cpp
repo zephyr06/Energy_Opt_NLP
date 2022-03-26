@@ -1,7 +1,7 @@
 #include "../sources/ControlOptimize.h"
 #include "../sources/profilier.h"
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
-
+using namespace ControlOptimize;
 TEST(case1, v1)
 {
     BeginTimer("main");

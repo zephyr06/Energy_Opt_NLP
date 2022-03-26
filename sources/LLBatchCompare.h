@@ -1,6 +1,8 @@
 
 #pragma once
 #include "BatchTestutils.h"
+#include "FactorGraphEnergyLL.h"
+#include "EnergyOptimize.h"
 void BatchCompare(int N = -1)
 {
     const char *pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number";
@@ -23,7 +25,17 @@ void BatchCompare(int N = -1)
             auto taskSet1 = ReadTaskSet(path, readTaskMode);
             TaskSetNormal tasksN(taskSet1);
             auto start = chrono::high_resolution_clock::now();
-            double res = Energy_Opt<TaskSetNormal, RTA_LL>::OptimizeTaskSet(tasksN);
+            double res;
+            if (LLCompareWithGeneralizedElimination)
+            {
+
+                res = EnergyOptimize::OptimizeTaskSetIterative<FactorGraphEnergyLL>(taskSet1).second;
+            }
+            else
+            {
+                res = Energy_Opt<TaskSetNormal, RTA_LL>::OptimizeTaskSet(tasksN);
+            }
+
             // cout << "The energy saving ratio is " << res << endl;
             auto stop = chrono::high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);

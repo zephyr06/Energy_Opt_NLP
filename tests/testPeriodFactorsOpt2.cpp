@@ -1,6 +1,6 @@
 #include "../sources/ControlOptimize.h"
 #include "../sources/profilier.h"
-
+using namespace ControlOptimize;
 TEST(case1, v1)
 {
     BeginTimer("main");

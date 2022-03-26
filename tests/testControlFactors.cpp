@@ -3,6 +3,7 @@
 using namespace std;
 using namespace std::chrono;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
+using namespace ControlOptimize;
 TEST(ExtractResults, v1)
 {
     noiseModelSigma = 1;

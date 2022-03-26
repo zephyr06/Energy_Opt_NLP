@@ -1,7 +1,7 @@
 #pragma once
 #include "BatchTestutils.h"
 #include "ControlOptimize.h"
-
+using namespace ControlOptimize;
 void AddEntry(string pathRes, double val)
 {
     ofstream outfileWrite;
@@ -67,7 +67,7 @@ pair<double, double> ReadBaselineZhao20(string directory, string path)
         TaskSet tasks;
         VectorDynamic coeff;
         std::tie(tasks, coeff) = ReadControlCase(directory + "/" + "Case" + to_string(ExtractCaseID(path)) + ".txt");
-        double initialError = RealObj(tasks, coeff);
+        double initialError = FactorGraphInManifold::RealObj(tasks, coeff);
         VectorDynamic periods;
         if (TargetFileType(path) == 1) // GP
         {

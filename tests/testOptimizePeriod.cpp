@@ -4,12 +4,12 @@
 #include <numeric>
 #include <CppUnitLite/TestHarness.h>
 #include "../sources/Parameters.h"
-#include "../sources/Optimize.h"
+#include "../sources/ControlOptimize.h"
 #include "../sources/ReadControlCases.h"
 using namespace std;
 using namespace std::chrono;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
-
+using namespace ControlOptimize;
 TEST(ReadControlCase1, v1)
 {
     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";

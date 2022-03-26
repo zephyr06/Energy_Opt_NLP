@@ -25,6 +25,7 @@ double weightSchedulabilityMax = (double)ConfigParameters["weightSchedulabilityM
 double weightSchedulabilityMin = (double)ConfigParameters["weightSchedulabilityMin"];
 double weightSchedulabilityStep = (double)ConfigParameters["weightSchedulabilityStep"];
 
+int LLCompareWithGeneralizedElimination = (int)ConfigParameters["LLCompareWithGeneralizedElimination"];
 int printFailureFile = (int)ConfigParameters["printFailureFile"];
 int EnergyMode = (int)ConfigParameters["EnergyMode"];
 int elimIte = (int)ConfigParameters["elimIte"];

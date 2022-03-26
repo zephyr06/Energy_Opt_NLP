@@ -114,3 +114,33 @@ void Reorder(TaskSet &tasks, VectorDynamic &coeff, string priority_type = "RM")
         coeff(2 * i + 1) = tasksAug[i].coeff_R;
     }
 }
+
+/* @brief return a string with expected precision by adding leading 0 */
+string to_string_precision(int a, int precision)
+{
+    return std::string(4 - min(4, to_string(a).length()), '0') + to_string(a);
+}
+
+template <typename T>
+void print(const std::vector<T> &vec)
+{
+    for (auto x : vec)
+    {
+        cout << x << ", ";
+    }
+}
+
+template <typename T>
+bool EqualVector(std::vector<T> &v1, std::vector<T> &v2)
+{
+    if (v1.size() != v2.size())
+    {
+        return false;
+    }
+    for (uint i = 0; i < v1.size(); i++)
+    {
+        if (v1[i] != v2[i])
+            return false;
+    }
+    return true;
+}
