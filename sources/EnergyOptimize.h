@@ -88,7 +88,6 @@ namespace EnergyOptimize
         std::cout << "Current b vector: " << endl;
         std::cout << sth3.second << endl;
         cout << Color::def << endl;
-        cout << FactorGraphEnergyLL::count << endl;
 
         VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
         optComp = FactorGraphType::ExtractResults(result, tasks);
