@@ -405,7 +405,7 @@ void UpdateTaskSetExecutionTime(TaskSet &taskSet, VectorDynamic executionTimeVec
         taskSet[i].executionTime = executionTimeVec(i - lastTaskDoNotNeedOptimize - 1, 0);
 }
 
-void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic periodVec, int lastTaskDoNotNeedOptimize = -1)
+void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic &periodVec, int lastTaskDoNotNeedOptimize = -1)
 {
     int N = taskSet.size();
 

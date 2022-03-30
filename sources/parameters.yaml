@@ -22,7 +22,7 @@ baselineLLCompare: 1
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
 eliminateTol: 1e0
-eliminateStep: 3
+eliminateStep: 1e10
 adjustEliminateMaxIte: 10
 
 
@@ -59,8 +59,8 @@ controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
-debugMode: 0
-verbosityLM: "SILENT"
+debugMode: 2
+verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
@@ -72,6 +72,6 @@ disturb_init: 1e0
 disturb_step: 1.5
 disturb_max: 1e4
 relativeErrorToleranceOuterLoop: 1e-10
-LLCompareWithGeneralizedElimination: 1
+LLCompareWithGeneralizedElimination: 0
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0

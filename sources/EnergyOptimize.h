@@ -13,6 +13,8 @@
 
 #include "ControlFactorGraphUtils.h"
 #include "FactorGraphEnergyLL.h"
+#include <chrono>
+using namespace std::chrono;
 
 namespace EnergyOptimize
 {
@@ -66,6 +68,28 @@ namespace EnergyOptimize
             result = optimizer.optimize();
         }
 
+        auto start = high_resolution_clock::now();
+        auto sth = graph.error(initialEstimateFG);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cout << "Evaluate error:" << duration.count() << endl;
+        start = high_resolution_clock::now();
+        auto sth2 = graph.linearize(initialEstimateFG);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cout << "linearize:" << duration.count() << endl;
+
+        cout << Color::green;
+        // std::lock_guard<std::mutex> lock(mtx);
+        auto sth3 = graph.linearize(initialEstimateFG)->jacobian();
+        MatrixDynamic jacobianCurr = sth3.first;
+        std::cout << "Current Jacobian matrix:" << endl;
+        std::cout << jacobianCurr << endl;
+        std::cout << "Current b vector: " << endl;
+        std::cout << sth3.second << endl;
+        cout << Color::def << endl;
+        cout << FactorGraphEnergyLL::count << endl;
+
         VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
         optComp = FactorGraphType::ExtractResults(result, tasks);
         UpdateTaskSetExecutionTime(tasks, optComp);
@@ -82,7 +106,8 @@ namespace EnergyOptimize
             cout << Color::def;
             cout << endl;
             cout << Color::blue;
-            UpdateTaskSetExecutionTime(tasks, FactorGraphType::ExtractResults(initialEstimateFG, tasks));
+            VectorDynamic newExecutionTime = FactorGraphEnergyLL::ExtractResults(initialEstimateFG, tasks);
+            UpdateTaskSetExecutionTime(tasks, newExecutionTime);
             cout << "Before optimization, the total error is " << FactorGraphType::RealObj(tasks) << endl;
             UpdateTaskSetExecutionTime(tasks, optComp);
             cout << "After optimization, the total error is " << FactorGraphType::RealObj(tasks) << endl;

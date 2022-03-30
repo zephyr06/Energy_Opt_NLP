@@ -9,14 +9,14 @@ TEST(case1, v1)
 
     TaskSet tasks = ReadTaskSet(path, readTaskMode);
 
-    // std::vector<bool> maskForElimination(tasks.size(), false);
     // VectorDynamic periodInitial1 = GenerateVectorDynamic(tasks.size());
     // // periodInitial1 << 815, 815, 815, 815, 591, 815, 815, 815, 815, 815, 815, 815, 815, 815, 815, 815, 204, 815, 815;
     // periodInitial1 << 68, 300, 300, 300, 300;
     // UpdateTaskSetPeriod(tasks, periodInitial1);
     // maskForElimination[1] = 1;
-    // auto sth = OptimizeTaskSetIterativeWeight<FactorGraphEnergyLL>(tasks, maskForElimination);
-    auto sth = EnergyOptimize::OptimizeTaskSetIterative<FactorGraphEnergyLL>(tasks);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    auto sth = EnergyOptimize::OptimizeTaskSetIterativeWeight<FactorGraphEnergyLL>(tasks, maskForElimination);
+    // auto sth = EnergyOptimize::OptimizeTaskSetIterative<FactorGraphEnergyLL>(tasks);
 
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false}, maskForElimination);

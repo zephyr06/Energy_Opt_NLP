@@ -105,6 +105,7 @@ public:
          */
         Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
         {
+            BeginTimer("main_factor");
             TaskSetType taskDurOpt = tasks_;
 
             boost::function<Matrix(const VectorDynamic &)> f2 =
@@ -143,7 +144,7 @@ public:
                 if (exactJacobian)
                     *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, N);
                 else
-                    *H = NumericalDerivativeDynamicUpper(f2, executionTimeVector, deltaOptimizer, N);
+                    *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N);
                 // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
                 // *H = jacobian;
                 if (debugMode == 1)
@@ -162,7 +163,7 @@ public:
                          << endl;
                 }
             }
-
+            EndTimer("main_factor");
             return err;
         }
     };
@@ -283,6 +284,7 @@ public:
     static int FindTaskDoNotNeedOptimize(const TaskSetType &tasks, int lastTaskDoNotNeedOptimize,
                                          VectorDynamic &computationTimeWarmStart, double eliminateTolIte)
     {
+        BeginTimer(__func__);
         // update the tasks with the new optimal computationTimeVector
         TaskSetType tasksCurr = tasks;
         int N = tasks.tasks_.size();
@@ -306,13 +308,17 @@ public:
                 (enableMaxComputationTimeRestrict &&
                  tasksCurr.tasks_[i].executionTime - eliminateTolIte > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict))
 
-                // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-                // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
-                //     tasksCurr[i].executionTime - eliminateTolIte + tolerance > tasks[i].executionTimeOrg * MaxComputationTimeRestrict)
+            // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
+            // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
+            //     tasksCurr[i].executionTime - eliminateTolIte + tolerance > tasks[i].executionTimeOrg * MaxComputationTimeRestrict)
+            {
+                EndTimer(__func__);
                 return i;
+            }
             // recover tasksCurr[i].executionTime
             tasksCurr.tasks_[i].executionTime -= eliminateTolIte;
         }
+        EndTimer(__func__);
         return -1;
     }
 
@@ -320,6 +326,7 @@ public:
                                           int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate,
                                           VectorDynamic &responseTimeInitial)
     {
+        BeginTimer(__func__);
         int N = tasks.tasks_.size();
 
         // build the factor graph
@@ -377,6 +384,27 @@ public:
             result = optimizer.optimize();
         }
 
+        auto start = high_resolution_clock::now();
+        auto sth = graph.error(initialEstimateFG);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cout << "Evaluate error:" << duration.count() << endl;
+        start = high_resolution_clock::now();
+        auto sth2 = graph.linearize(initialEstimateFG);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cout << "linearize:" << duration.count() << endl;
+
+        cout << Color::green;
+        // std::lock_guard<std::mutex> lock(mtx);
+        auto sth3 = graph.linearize(initialEstimateFG)->jacobian();
+        MatrixDynamic jacobianCurr = sth3.first;
+        std::cout << "Current Jacobian matrix:" << endl;
+        std::cout << jacobianCurr << endl;
+        std::cout << "Current b vector: " << endl;
+        std::cout << sth3.second << endl;
+        cout << Color::def << endl;
+
         VectorDynamic optComp = result.at<VectorDynamic>(key);
         if (debugMode == 1)
         {
@@ -385,6 +413,7 @@ public:
 
         // if (debugMode == 1)
         //     cout << "After clamp, the computation time vector is " << optComp << endl;
+        EndTimer(__func__);
         return optComp;
     }
 

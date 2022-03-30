@@ -6,12 +6,14 @@
 #include "../sources/RTA_LL.h"
 #include "../sources/RTA_WAP.h"
 #include "../sources/Generate_WAP.h"
+#include "../sources/profilier.h"
 using namespace std::chrono;
 using Opt_LL = Energy_Opt<Task, RTA_LL>;
 using Opt_WAP = Energy_Opt<Task, RTA_WAP>;
 
 TEST(OptimizeTaskSet, RTA_LL_V1)
 {
+    BeginTimer("main");
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
@@ -27,6 +29,8 @@ TEST(OptimizeTaskSet, RTA_LL_V1)
     auto stop = chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
+    EndTimer("main");
+    PrintTimer();
 }
 
 int main()
