@@ -2,7 +2,7 @@
 
 runMode: compare
 # TODO: v6 elimination check failed
-testDataSetName: test_n20_v4
+testDataSetName: test_n20_v16
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
@@ -22,8 +22,8 @@ baselineLLCompare: 1
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
 eliminateTol: 1e0
-eliminateStep: 1e10
-adjustEliminateMaxIte: 10
+eliminateStep: 1.5
+adjustEliminateMaxIte: 100
 
 
 weightLogBarrier: 0
@@ -35,8 +35,8 @@ roundTypeInClamp: "rough"
 punishmentInBarrier: 1e5
 
 noiseModelSigma: 1e0
-relativeErrorToleranceInit: 1e-5
-relativeErrorTolerance: 1e-5
+relativeErrorToleranceInit: 1e-7
+relativeErrorTolerance: 1e-7
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
@@ -59,7 +59,7 @@ controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
-debugMode: 2
+debugMode: 1
 verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
@@ -70,8 +70,8 @@ weightSchedulabilityStep: 1.5
 weightSchedulabilityMin: 1e12
 disturb_init: 1e0
 disturb_step: 1.5
-disturb_max: 1e4
-relativeErrorToleranceOuterLoop: 1e-10
-LLCompareWithGeneralizedElimination: 0
+disturb_max: 4e3
+relativeErrorToleranceOuterLoop: 1e-7
+LLCompareWithGeneralizedElimination: 1
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0

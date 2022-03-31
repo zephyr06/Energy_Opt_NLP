@@ -205,12 +205,14 @@ struct FactorGraphEnergyLL
             }
             graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), limit, modelPunishmentSoft1);
 
-            // RTA factor
-            graph.add(GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase));
-
             if (maskForElimination[i])
             {
                 graph.add(GenerateEliminationLLFactor(maskForElimination, tasks, i, rtaBase(i)));
+            }
+            else
+            {
+                // RTA factor
+                graph.add(GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase));
             }
             // if (HasDependency(i, maskForElimination))
             // {
@@ -235,19 +237,25 @@ struct FactorGraphEnergyLL
         return initialEstimateFG;
     }
 
-    static double FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination, double disturb = disturb_init)
+    static double FindEliminatedVariables(TaskSet &tasks, std::vector<bool> &maskForElimination,
+                                          bool &whether_new_eliminate, double disturb = disturb_init)
     {
         BeginTimer(__func__);
+        whether_new_eliminate = false;
+        if (debugMode == 1)
+        {
+            cout << GetParameterVD<double>(tasks, "executionTime") << endl;
+        }
 
         RTA_LL r(tasks);
         VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
-        bool whether_new_eliminate = false;
+        // bool whether_new_eliminate = false;
         while (!whether_new_eliminate && disturb <= disturb_max)
         {
             for (uint i = 0; i < tasks.size(); i++)
             {
-                // if (maskForElimination[i])
-                //     continue;
+                if (maskForElimination[i])
+                    continue;
                 tasks[i].executionTime += disturb;
                 RTA_LL r1(tasks);
                 // VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);

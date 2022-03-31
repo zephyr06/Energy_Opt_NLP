@@ -384,26 +384,26 @@ public:
             result = optimizer.optimize();
         }
 
-        auto start = high_resolution_clock::now();
-        auto sth = graph.error(initialEstimateFG);
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<microseconds>(stop - start);
-        cout << "Evaluate error:" << duration.count() << endl;
-        start = high_resolution_clock::now();
-        auto sth2 = graph.linearize(initialEstimateFG);
-        stop = high_resolution_clock::now();
-        duration = duration_cast<microseconds>(stop - start);
-        cout << "linearize:" << duration.count() << endl;
+        // auto start = high_resolution_clock::now();
+        // auto sth = graph.error(initialEstimateFG);
+        // auto stop = high_resolution_clock::now();
+        // auto duration = duration_cast<microseconds>(stop - start);
+        // cout << "Evaluate error:" << duration.count() << endl;
+        // start = high_resolution_clock::now();
+        // auto sth2 = graph.linearize(initialEstimateFG);
+        // stop = high_resolution_clock::now();
+        // duration = duration_cast<microseconds>(stop - start);
+        // cout << "linearize:" << duration.count() << endl;
 
-        cout << Color::green;
-        // std::lock_guard<std::mutex> lock(mtx);
-        auto sth3 = graph.linearize(initialEstimateFG)->jacobian();
-        MatrixDynamic jacobianCurr = sth3.first;
-        std::cout << "Current Jacobian matrix:" << endl;
-        std::cout << jacobianCurr << endl;
-        std::cout << "Current b vector: " << endl;
-        std::cout << sth3.second << endl;
-        cout << Color::def << endl;
+        // cout << Color::green;
+        // // std::lock_guard<std::mutex> lock(mtx);
+        // auto sth3 = graph.linearize(initialEstimateFG)->jacobian();
+        // MatrixDynamic jacobianCurr = sth3.first;
+        // std::cout << "Current Jacobian matrix:" << endl;
+        // std::cout << jacobianCurr << endl;
+        // std::cout << "Current b vector: " << endl;
+        // std::cout << sth3.second << endl;
+        // cout << Color::def << endl;
 
         VectorDynamic optComp = result.at<VectorDynamic>(key);
         if (debugMode == 1)
