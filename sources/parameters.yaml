@@ -29,7 +29,7 @@ adjustEliminateMaxIte: 100
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: "rough"
+roundTypeInClamp: "fine"
 
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e5
@@ -59,8 +59,8 @@ controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
-debugMode: 1
-verbosityLM: "SUMMARY"
+debugMode: 0
+verbosityLM: "SILENT"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
@@ -72,6 +72,6 @@ disturb_init: 1e0
 disturb_step: 1.5
 disturb_max: 4e3
 relativeErrorToleranceOuterLoop: 1e-7
-LLCompareWithGeneralizedElimination: 1
+LLCompareWithGeneralizedElimination: 0
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0
