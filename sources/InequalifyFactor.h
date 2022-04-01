@@ -23,6 +23,7 @@
 #include "colormod.h"
 #include "testMy.h"
 #include "utils.h"
+#include "GlobalVariables.h"
 
 using namespace std;
 using namespace gtsam;
@@ -50,12 +51,20 @@ class InequalityFactor1D : public NoiseModelFactor1<VectorDynamic>
 public:
     NormalErrorFunction1D f;
     int dimension;
+    int indexInEliminationRecord;
     /**
      * @brief Construct a new Inequality Factor 1 D object,
      *  mainly used in derived class because f is not defined
      */
     InequalityFactor1D(Key key,
                        SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key)
+    {
+        dimension = 1;
+    }
+
+    InequalityFactor1D(Key key, int indexInEliminationRecord,
+                       SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
+                                                 indexInEliminationRecord(indexInEliminationRecord)
     {
         dimension = 1;
     }
@@ -79,6 +88,9 @@ public:
                          boost::optional<Matrix &> H = boost::none) const override
     {
         VectorDynamic err = f(x);
+
+        eliminationRecordGlobal.AdjustEliminationError(err(0), indexInEliminationRecord, EliminationType::Bound);
+
         if (H)
         {
             *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
@@ -102,10 +114,17 @@ public:
         {
             VectorDynamic res = x;
             res << HingeLoss(b - x(0, 0));
-            // if (res(0, 0) != 0)
-            // {
-            //     int a = 1;
-            // }
+            return res;
+        };
+    }
+
+    SmallerThanFactor1D(Key key, double b, int indexInEliminationRecord,
+                        SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
+    {
+        f = [b](const VectorDynamic &x)
+        {
+            VectorDynamic res = x;
+            res << HingeLoss(b - x(0, 0));
             return res;
         };
     }
@@ -121,6 +140,17 @@ public:
     double b;
     LargerThanFactor1D(Key key, double b,
                        SharedNoiseModel model) : InequalityFactor1D(key, model)
+    {
+        f = [b](const VectorDynamic &x)
+        {
+            VectorDynamic res = x;
+            res << HingeLoss(x(0, 0) - b);
+            return res;
+        };
+    }
+
+    LargerThanFactor1D(Key key, double b, int indexInEliminationRecord,
+                       SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
     {
         f = [b](const VectorDynamic &x)
         {

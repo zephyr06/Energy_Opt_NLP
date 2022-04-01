@@ -66,7 +66,13 @@ namespace EnergyOptimize
             params.setLinearSolverType(linearOptimizerType);
             LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
             result = optimizer.optimize();
+            // print some messages
+            cout << "*****************************************" << endl;
+            cout << "Inner iterations " << optimizer.getInnerIterations() << endl;
+            cout << "lambda " << optimizer.lambda() << endl;
         }
+        eliminationRecordGlobal.Print();
+        eliminationRecordGlobal.PrintViolatedFactor(graph);
 
         // auto start = high_resolution_clock::now();
         // auto sth = graph.error(initialEstimateFG);

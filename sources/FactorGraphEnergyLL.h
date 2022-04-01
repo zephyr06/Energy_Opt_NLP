@@ -13,6 +13,7 @@
 #include "ControlFactorGraphUtils.h"
 #include "MultiKeyFactor.h"
 #include "InequalifyFactor.h"
+#include "GlobalVariables.h"
 
 struct FactorGraphEnergyLL
 {
@@ -38,11 +39,12 @@ struct FactorGraphEnergyLL
         int dimension;
         vector<Symbol> keyVec;
         LambdaMultiKey f_with_RTA;
+        int indexInEliminationRecord;
 
-        RTARelatedFactor(vector<Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic rtaBase,
-                         SharedNoiseModel model) : NoiseModelFactor(model, keyVec), tasks(tasks), index(index), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
+        RTARelatedFactor(vector<Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic rtaBase, int indexInEliminationRecord,
+                         SharedNoiseModel model) : NoiseModelFactor(model, keyVec), tasks(tasks), index(index), rtaBase(rtaBase), indexInEliminationRecord(indexInEliminationRecord), dimension(keyVec.size()), keyVec(keyVec)
         {
-            f_with_RTA = [tasks, index, rtaBase](const Values &x)
+            f_with_RTA = [tasks, index, rtaBase, indexInEliminationRecord](const Values &x)
             {
                 BeginTimer("f_with_RTA");
                 VectorDynamic error = GenerateVectorDynamic(1);
@@ -51,6 +53,7 @@ struct FactorGraphEnergyLL
                 RTA_LL r(tasksCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = HingeLoss(min(tasksCurr[index].period, tasksCurr[index].deadline) - rta);
+                eliminationRecordGlobal.AdjustEliminationError(error(0), indexInEliminationRecord, EliminationType::RTA);
                 EndTimer("f_with_RTA");
                 return error;
             };
@@ -100,7 +103,7 @@ struct FactorGraphEnergyLL
 
     static RTARelatedFactor
     GenerateRTARelatedFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index,
-                             VectorDynamic &rtaBase)
+                             VectorDynamic &rtaBase, int indexInEliminationRecord = 0)
     {
 
         std::vector<gtsam::Symbol> keys;
@@ -117,7 +120,7 @@ struct FactorGraphEnergyLL
         sigma << noiseModelSigma / weightSchedulability;
         auto model = noiseModel::Diagonal::Sigmas(sigma);
         // return MultiKeyFactor(keys, f, model);
-        return RTARelatedFactor(keys, tasks, index, rtaBase, model);
+        return RTARelatedFactor(keys, tasks, index, rtaBase, indexInEliminationRecord, model);
     }
 
     static MultiKeyFactor GenerateEliminationLLFactor(std::vector<bool> maskForElimination, TaskSet tasks,
@@ -149,6 +152,24 @@ struct FactorGraphEnergyLL
         return MultiKeyFactor(keys, f, noiseModel::Constrained::All(1));
     }
 
+    static MultiKeyFactor GenerateLockLLFactor(std::vector<bool> maskForElimination, TaskSet tasks,
+                                               int index, double rtaAtIndex)
+    {
+        std::vector<gtsam::Symbol> keys;
+        keys.push_back(GenerateControlKey(index, "executionTime"));
+
+        LambdaMultiKey f = [tasks, index, rtaAtIndex](const Values &x)
+        {
+            VectorDynamic error = GenerateVectorDynamic(1);
+            TaskSet tasksCurr = tasks;
+            VectorDynamic executionTimeVecCurr = x.at<VectorDynamic>(GenerateControlKey(index, "executionTime"));
+            error(0) = executionTimeVecCurr(0, 0) - tasks[index].executionTime;
+            return error;
+        };
+        auto model = noiseModel::Constrained::All(1);
+        return MultiKeyFactor(keys, f, noiseModel::Constrained::All(1));
+    }
+
     class EnergyFactor : public NoiseModelFactor1<VectorDynamic>
     {
     public:
@@ -158,7 +179,8 @@ struct FactorGraphEnergyLL
          *  mainly used in derived class because f is not defined
          */
         EnergyFactor(Key key, Task &task,
-                     SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key), task_(task)
+                     SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
+                                               task_(task)
         {
         }
 
@@ -190,30 +212,36 @@ struct FactorGraphEnergyLL
         auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
         auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
         // auto modelPunishmentHard = noiseModel::Constrained::All(1);
-
+        eliminationRecordGlobal.Initialize(tasks.size());
+        // int indexInEliminationRecordGlobal = 0;
         for (uint i = 0; i < tasks.size(); i++)
         {
             // energy factor
             graph.emplace_shared<EnergyFactor>(GenerateControlKey(i, "executionTime"), tasks[i], modelNormal);
+            // indexInEliminationRecordGlobal++;
 
             // add executionTime min/max limits
-            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
+            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg,
+                                                     i, modelPunishmentSoft1);
             double limit = min(tasks[i].deadline, tasks[i].period);
             if (enableMaxComputationTimeRestrict)
             {
                 limit = min(limit, tasks[i].executionTimeOrg * MaxComputationTimeRestrict);
             }
-            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), limit, modelPunishmentSoft1);
+            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), limit,
+                                                      i, modelPunishmentSoft1);
 
             if (maskForElimination[i])
             {
                 graph.add(GenerateEliminationLLFactor(maskForElimination, tasks, i, rtaBase(i)));
+                i;
             }
             else
             {
                 // RTA factor
-                graph.add(GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase));
+                graph.add(GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase, i));
             }
+
             // if (HasDependency(i, maskForElimination))
             // {
             //     auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, rtaBase);
@@ -223,7 +251,8 @@ struct FactorGraphEnergyLL
         return graph;
     }
 
-    static Values GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
+    static Values
+    GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
     {
         Values initialEstimateFG;
         for (uint i = 0; i < tasks.size(); i++)

@@ -462,6 +462,17 @@ TEST(GenerateEliminationLLFactor, v1)
     for (uint i = 0; i < HsExpect.size(); i++)
         assert_equal(HsExpect[i], Hs[i], 1e-7);
 }
+
+TEST(EliminationRecord, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    eliminationRecordGlobal.Initialize(tasks.size());
+    VectorDynamic rtaBase = RTALLVector(tasks);
+    auto sth = EnergyOptimize::UnitOptimizationPeriod<FactorGraphEnergyLL>(tasks, maskForElimination);
+    eliminationRecordGlobal.Print();
+}
 int main()
 {
     TestResult tr;

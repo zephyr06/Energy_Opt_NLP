@@ -15,8 +15,8 @@ TEST(case1, v1)
     // UpdateTaskSetPeriod(tasks, periodInitial1);
     // maskForElimination[1] = 1;
     std::vector<bool> maskForElimination(tasks.size(), false);
-    // auto sth = EnergyOptimize::OptimizeTaskSetIterativeWeight<FactorGraphEnergyLL>(tasks, maskForElimination);
-    auto sth = EnergyOptimize::OptimizeTaskSetIterative<FactorGraphEnergyLL>(tasks);
+    auto sth = EnergyOptimize::OptimizeTaskSetIterativeWeight<FactorGraphEnergyLL>(tasks, maskForElimination);
+    // auto sth = EnergyOptimize::OptimizeTaskSetIterative<FactorGraphEnergyLL>(tasks);
 
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false}, maskForElimination);
