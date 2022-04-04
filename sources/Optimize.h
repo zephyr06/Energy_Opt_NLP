@@ -359,6 +359,7 @@ public:
             params.setlambdaInitial(initialLambda);
             if (debugMode > 1 && debugMode < 5)
                 params.setVerbosityLM("SUMMARY");
+            // params.setVerbosityLM("TRYDELTA");
             params.setlambdaLowerBound(lowerLambda);
             params.setlambdaUpperBound(upperLambda);
             params.setRelativeErrorTol(relativeErrorTolerance);

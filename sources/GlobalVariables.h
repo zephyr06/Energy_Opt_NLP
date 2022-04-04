@@ -10,11 +10,11 @@ enum class EliminationType
 };
 struct RecordInfo
 {
-    int taskIndex;
+    uint taskIndex;
 
     EliminationType type;
 
-    RecordInfo(int index, EliminationType type) : taskIndex(index), type(type) {}
+    RecordInfo(uint index, EliminationType type) : taskIndex(index), type(type) {}
 
     void print()
     {
@@ -44,20 +44,25 @@ public:
     EliminationRecord()
     {
     }
+
+    RecordInfo operator[](int index)
+    {
+        return record[index];
+    }
     /**
      * @brief 
      * 
      * @param n  task set's size
      */
-    void Initialize(int n)
+    void Initialize(uint n)
     {
         record.clear();
-        if (record.size() >= n)
+        if (static_cast<int>(record.size()) >= n)
         {
             return;
         }
         record.reserve(n);
-        for (int i = 0; i < n; i++)
+        for (uint i = 0; i < n; i++)
         {
             record.push_back({i, EliminationType::Not});
         }
@@ -75,11 +80,7 @@ public:
     }
     void SetEliminated(uint i, EliminationType type)
     {
-        RangeCheck(i);
-        if (type > record[i].type)
-        {
-            record[i] = {i, type};
-        }
+        record[i] = {i, type};
     }
     void SetUnEliminated(uint i)
     {
@@ -88,12 +89,21 @@ public:
 
     void AdjustEliminationError(double err, uint index, EliminationType type)
     {
+        RangeCheck(index);
+
         if (err > 0)
         {
+            if (type <= record[index].type)
+                return;
             SetEliminated(index, type);
         }
         else if (err == 0)
         {
+            // this statement prevents variables going back from elimination;
+            // reason: we only adjust elimination after LM stops; during LM's inner loops, even though elimination stats could possibly change, the graph doesn't change because it is build before inner loops, and so these changes won't influence inner loop; as for the outer loop, it will make a difference;
+            // changes made during inner loop must be discarded by recovering elimination stats based on previous' result
+            if (record[index].type != EliminationType::Not)
+                return;
             SetUnEliminated(index);
         }
         else
@@ -111,7 +121,7 @@ public:
         }
         cout << endl;
     }
-    void PrintViolatedFactor(NonlinearFactorGraph &graph)
+    void PrintViolatedFactor()
     {
 
         for (uint i = 0; i < record.size(); i++)

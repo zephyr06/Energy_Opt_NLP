@@ -51,7 +51,7 @@ class InequalityFactor1D : public NoiseModelFactor1<VectorDynamic>
 public:
     NormalErrorFunction1D f;
     int dimension;
-    int indexInEliminationRecord;
+    int index;
     /**
      * @brief Construct a new Inequality Factor 1 D object,
      *  mainly used in derived class because f is not defined
@@ -62,9 +62,9 @@ public:
         dimension = 1;
     }
 
-    InequalityFactor1D(Key key, int indexInEliminationRecord,
+    InequalityFactor1D(Key key, int index,
                        SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
-                                                 indexInEliminationRecord(indexInEliminationRecord)
+                                                 index(index)
     {
         dimension = 1;
     }
@@ -77,23 +77,24 @@ public:
     }
 
     /** active when constraint *NOT* met */
-    bool active(const Values &c) const override
-    {
-        // note: still active at equality to avoid zigzagging?
-        VectorDynamic x = (c.at<VectorDynamic>(this->key()));
-        return f(x)(0, 0) > 0;
-    }
+    // bool active(const Values &c) const override
+    // {
+    //     // note: still active at equality to avoid zigzagging?
+    //     VectorDynamic x = (c.at<VectorDynamic>(this->key()));
+    //     return f(x)(0, 0) > 0;
+    // }
 
     Vector evaluateError(const VectorDynamic &x,
                          boost::optional<Matrix &> H = boost::none) const override
     {
         VectorDynamic err = f(x);
 
-        eliminationRecordGlobal.AdjustEliminationError(err(0), indexInEliminationRecord, EliminationType::Bound);
+        eliminationRecordGlobal.AdjustEliminationError(err(0), index, EliminationType::Bound);
 
         if (H)
         {
-            *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
+            // *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
+            *H = GenerateVectorDynamic(dimension);
         }
         return err;
     }

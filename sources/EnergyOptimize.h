@@ -19,18 +19,18 @@ using namespace std::chrono;
 namespace EnergyOptimize
 {
     template <typename FactorGraphType>
-    pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks,
-                                                       std::vector<bool> &maskForElimination)
+    pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks)
     {
         BeginTimer(__func__);
-        NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(maskForElimination, tasks);
+
+        NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
         if (debugMode == 1)
         {
             graph.print();
         }
         // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
         // initialEstimate << 68.000000, 321, 400, 131, 308;
-        Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
+        Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
         if (debugMode == 1)
         {
             cout << Color::green;
@@ -45,6 +45,7 @@ namespace EnergyOptimize
         }
 
         Values result;
+        double lambdaRes;
         if (optimizerType == 1)
         {
             DoglegParams params;
@@ -70,9 +71,10 @@ namespace EnergyOptimize
             cout << "*****************************************" << endl;
             cout << "Inner iterations " << optimizer.getInnerIterations() << endl;
             cout << "lambda " << optimizer.lambda() << endl;
+            lambdaRes = optimizer.lambda();
         }
         eliminationRecordGlobal.Print();
-        eliminationRecordGlobal.PrintViolatedFactor(graph);
+        eliminationRecordGlobal.PrintViolatedFactor();
 
         // auto start = high_resolution_clock::now();
         // auto sth = graph.error(initialEstimateFG);
@@ -125,8 +127,7 @@ namespace EnergyOptimize
     }
 
     template <typename FactorGraphType>
-    pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks,
-                                                               std::vector<bool> &maskForElimination)
+    pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks)
     {
         RTA_LL rr(tasks);
         if (!rr.CheckSchedulability(debugMode == 1))
@@ -134,15 +135,15 @@ namespace EnergyOptimize
             cout << "The task set is not schedulable!" << endl;
             return make_pair(GetParameterVD<double>(tasks, "executionTime"), 1e30);
         }
-        VectorDynamic periodRes;
+        VectorDynamic executionTimeRes;
         double err;
         for (double weight = weightSchedulabilityMin; weight <= weightSchedulabilityMax;
              weight *= weightSchedulabilityStep)
         {
             weightSchedulability = weight;
-            std::tie(periodRes, err) = UnitOptimizationPeriod<FactorGraphType>(tasks, maskForElimination);
+            std::tie(executionTimeRes, err) = UnitOptimizationPeriod<FactorGraphType>(tasks);
             VectorDynamic periodPrev = GetParameterVD<double>(tasks, "executionTime");
-            UpdateTaskSetExecutionTime(tasks, periodRes);
+            UpdateTaskSetExecutionTime(tasks, executionTimeRes);
             RTA_LL r(tasks);
             if (!r.CheckSchedulability(1 == debugMode))
             {
@@ -153,7 +154,7 @@ namespace EnergyOptimize
                     cout << Color::blue << "After one iterate on updating weight parameter,\
              the execution time become unschedulable and are"
                          << endl
-                         << periodRes << endl;
+                         << executionTimeRes << endl;
                     cout << Color::def;
                 }
 
@@ -167,23 +168,22 @@ namespace EnergyOptimize
                     cout << Color::blue << "After one iterate on updating weight parameter,\
              the execution time remain schedulable and are"
                          << endl
-                         << periodRes << endl;
+                         << executionTimeRes << endl;
                     cout << Color::def;
                 }
             }
         }
 
-        return make_pair(periodRes, err);
+        return make_pair(executionTimeRes, err);
     }
 
     /**
  * @brief round period into int type, we assume the given task set is schedulable!
  *
  * @param tasks
- * @param maskForElimination
  * @param coeff
  */
-    void RoundExecutionTime(TaskSet &tasks, std::vector<bool> &maskForElimination)
+    void RoundExecutionTime(TaskSet &tasks)
     {
         if (roundTypeInClamp == "none")
             return;
@@ -191,8 +191,14 @@ namespace EnergyOptimize
         {
             for (uint i = 0; i < tasks.size(); i++)
             {
-
-                tasks[i].executionTime = int(tasks[i].executionTime);
+                if (abs(tasks[i].executionTime - int(tasks[i].executionTime)) < 0.01)
+                {
+                    tasks[i].executionTime = int(round(tasks[i].executionTime));
+                }
+                else
+                {
+                    tasks[i].executionTime = int(tasks[i].executionTime);
+                }
             }
         }
         // else if (roundTypeInClamp == "fine")
@@ -275,31 +281,107 @@ namespace EnergyOptimize
         }
         return;
     }
+    bool FindEliminationRecordDiff(EliminationRecord &eliminationRecordPrev,
+                                   EliminationRecord &eliminationRecordGlobal)
+    {
+        for (uint i = 0; i < eliminationRecordGlobal.record.size(); i++)
+        {
+            if (eliminationRecordPrev[i].type == EliminationType::Not && eliminationRecordGlobal[i].type != EliminationType::Not)
+            {
+                return true;
+            }
+            // if (eliminationRecordPrev[i].type != eliminationRecordGlobal[i].type)
+            // {
+            //     return true;
+            // }
+        }
+        return false;
+    }
+    template <typename FactorGraphType>
+    void FindEliminateVariableFromRecordGlobal(TaskSet &tasks)
+    {
+        EliminationRecord eliminationRecordPrev = eliminationRecordGlobal;
+        eliminationRecordGlobal.Print();
+        NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
+        Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
+        Values result;
+        LevenbergMarquardtParams params;
+        params.setlambdaInitial(initialLambda);
+        params.setVerbosityLM(verbosityLM);
+        params.setlambdaLowerBound(lowerLambda);
+        params.setRelativeErrorTol(relativeErrorTolerance);
+        params.setLinearSolverType(linearOptimizerType);
+        params.setlambdaUpperBound(upperLambda);
+        if (debugMode == 1)
+        {
+            cout << Color::green;
+            // std::lock_guard<std::mutex> lock(mtx);
+            auto sth = graph.linearize(initialEstimateFG)->jacobian();
+            MatrixDynamic jacobianCurr = sth.first;
+            std::cout << "Current Jacobian matrix:" << endl;
+            std::cout << jacobianCurr << endl;
+            std::cout << "Current b vector: " << endl;
+            std::cout << sth.second << endl;
+            cout << Color::def << endl;
+        }
 
+        double lambdaCurr = upperLambda;
+
+        while (lambdaCurr > lowerLambda)
+        {
+            params.setlambdaInitial(lambdaCurr / 10);
+            params.setlambdaLowerBound(lambdaCurr / 10);
+            params.setlambdaUpperBound(lambdaCurr);
+
+            LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+            result = optimizer.optimize();
+            if (FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal))
+            {
+                break;
+            }
+            lambdaCurr /= 10.0;
+            cout << endl;
+        }
+        if (debugMode == 1)
+        {
+            if (FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal))
+            {
+                cout << "Find a new elimination" << endl;
+            }
+            else
+            {
+                cout << Color::red << "Backtrack new elimination failed!" << endl
+                     << Color::def;
+            }
+        }
+        eliminationRecordGlobal.Print();
+        int a = 1;
+    }
     // TODO: limit the number of outer loops
     template <typename FactorGraphType>
     pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks)
     {
+        eliminationRecordGlobal.Initialize(tasks.size());
 
-        VectorDynamic periodResCurr, periodResPrev;
-        std::vector<bool> maskForElimination(tasks.size(), false);
-        std::vector<bool> maskForEliminationPrev = maskForElimination;
+        VectorDynamic executionTimeResCurr, executionTimeResPrev;
+        EliminationRecord eliminationRecordPrev = eliminationRecordGlobal;
         double errPrev = 1e30;
         double errCurr = FactorGraphType::RealObj(tasks);
         int loopCount = 0;
         double disturbIte = eliminateTol;
         bool whether_new_eliminate = false;
-        while (whether_new_eliminate || (ContainFalse(maskForElimination) && loopCount < MaxLoopControl && errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop))) // &&
+        while (whether_new_eliminate || (loopCount < MaxLoopControl && errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop))) // &&
         {
+
             // store prev result
             errPrev = errCurr;
-            periodResPrev = GetParameterVD<double>(tasks, "executionTime");
-            maskForEliminationPrev = maskForElimination;
+            executionTimeResPrev = GetParameterVD<double>(tasks, "executionTime");
+            eliminationRecordPrev = eliminationRecordGlobal;
 
             // perform optimization
             double err;
-            std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks, maskForElimination);
-            UpdateTaskSetExecutionTime(tasks, periodResCurr);
+            std::tie(executionTimeResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks);
+            UpdateTaskSetExecutionTime(tasks, executionTimeResCurr);
 
             // adjust optimization settings
             loopCount++;
@@ -313,31 +395,40 @@ namespace EnergyOptimize
             //     eliminateIteCount++;
             // }
             // maskForElimination = maskForEliminationCopy;
-            whether_new_eliminate = false;
-            disturbIte = FactorGraphType::FindEliminatedVariables(tasks, maskForElimination, whether_new_eliminate, disturbIte);
 
-            RoundExecutionTime(tasks, maskForElimination);
+            // erase changes of eliminationRecord made during inner loops
+            eliminationRecordGlobal = eliminationRecordPrev;
+
+            FindEliminateVariableFromRecordGlobal<FactorGraphType>(tasks);
+            whether_new_eliminate = FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal);
+            if (!ContainFalse(eliminationRecordGlobal))
+            {
+                break;
+            }
+            // disturbIte = FactorGraphType::FindEliminatedVariables(tasks, whether_new_eliminate, disturbIte);
+
+            RoundExecutionTime(tasks);
             errCurr = FactorGraphType::RealObj(tasks);
-            if (Equals(maskForElimination, maskForEliminationPrev) && relativeErrorTolerance > relativeErrorToleranceMin)
+            if (!whether_new_eliminate && relativeErrorTolerance > relativeErrorToleranceMin)
             {
                 relativeErrorTolerance = relativeErrorTolerance / 10;
             }
-            if (debugMode)
-            {
-                cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
-                print(maskForElimination);
-                cout << endl;
-            }
+            // if (debugMode)
+            // {
+            // cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
+            //     print(maskForElimination);
+            //     cout << endl;
+            // }
         }
-        if (ContainFalse(maskForElimination))
-        {
-            UpdateTaskSetExecutionTime(tasks, periodResPrev);
-            RoundExecutionTime(tasks, maskForElimination);
-        }
-        else
-        {
-            ; //nothing else to do
-        }
+        // if (ContainFalse(maskForElimination))
+        // {
+        //     UpdateTaskSetExecutionTime(tasks, executionTimeResPrev);
+        //     RoundExecutionTime(tasks, maskForElimination);
+        // }
+        // else
+        // {
+        //     ; //nothing else to do
+        // }
 
         cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << endl;
         return make_pair(GetParameterVD<double>(tasks, "executionTime"), FactorGraphType::RealObj(tasks));

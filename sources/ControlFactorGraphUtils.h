@@ -1,13 +1,16 @@
 #pragma once
 #include <gtsam/inference/Key.h>
 #include <gtsam/inference/Symbol.h>
+#include "GlobalVariables.h"
 
-bool ContainFalse(std::vector<bool> &maskForElimination)
+bool ContainFalse(EliminationRecord &eliminationRecord)
 {
-    for (auto x : maskForElimination)
+    for (uint i = 0; i < eliminationRecord.record.size(); i++)
     {
-        if (x == false)
+        if (eliminationRecord[i].type == EliminationType::Not)
+        {
             return true;
+        }
     }
     return false;
 }
