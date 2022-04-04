@@ -300,7 +300,7 @@ public:
             Schedul_Analysis r(tasksCurr);
             bool schedulable = r.CheckSchedulability(
                 computationTimeWarmStart,
-                debugMode == 1, tolerance);
+                false, tolerance);
             // bool schedulable = Schedul_Analysis::CheckSchedulability(tasksCurr,
             //                                                          computationTimeWarmStart,
             //                                                          debugMode == 1, tolerance);
@@ -357,11 +357,12 @@ public:
         {
             LevenbergMarquardtParams params;
             params.setlambdaInitial(initialLambda);
-            if (debugMode > 1 && debugMode < 5)
-                params.setVerbosityLM("SUMMARY");
+            // if (debugMode > 1 && debugMode < 5)
+            params.setVerbosityLM(verbosityLM);
             // params.setVerbosityLM("TRYDELTA");
             params.setlambdaLowerBound(lowerLambda);
             params.setlambdaUpperBound(upperLambda);
+            params.setMaxIterations(maxIterationsOptimizer);
             params.setRelativeErrorTol(relativeErrorTolerance);
             LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
             result = optimizer.optimize();
@@ -477,6 +478,9 @@ public:
             ClampComputationTime(taskSetType,
                                  lastTaskDoNotNeedOptimize,
                                  responseTimeInitial, "rough");
+            // update vectorGlobalOpt to be the clamped version
+            vectorGlobalOpt = GetParameterVD<double>(taskSetType.tasks_, "executionTime");
+            valueGlobalOpt = EstimateEnergyTaskSet(taskSetType.tasks_).sum() / weightEnergy;
             if (debugMode == 1)
                 cout << "After clamp: " << endl
                      << GetParameterVD<double>(taskSetType.tasks_, "executionTime") << endl;
