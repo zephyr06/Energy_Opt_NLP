@@ -141,10 +141,38 @@ public:
             err = f(executionTimeVector);
             if (H)
             {
-                if (exactJacobian)
+
+                if (exactJacobian == 1)
                     *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, N);
-                else
+                else if (exactJacobian == 0)
                     *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N);
+                else if ((exactJacobian == -1))
+                {
+                    *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N);
+                    cout << "The old Jacobian is " << endl
+                         << *H << endl;
+                    int m = N;
+                    int n = executionTimeVector.rows();
+                    int maxIndex = 0; // the index of variable
+                    double maxElement = abs((*H)(m - n + maxIndex, maxIndex));
+                    for (int i = 1; i < n; i++)
+                    {
+                        if ((*H)(m - n + i, i) > maxElement)
+                        {
+                            maxElement = abs((*H)(m - n + i, i));
+                            maxIndex = i;
+                        }
+                    }
+                    cout << "MaxIndex: " << maxIndex << endl;
+                    for (int i = 0; i < n; i++)
+                    {
+                        if (i != maxIndex)
+                        {
+                            (*H)(m - n + i, i) = 0;
+                        }
+                    }
+                }
+
                 // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
                 // *H = jacobian;
                 if (debugMode == 1)
@@ -477,7 +505,7 @@ public:
             // clamp with rough option seems to work better
             ClampComputationTime(taskSetType,
                                  lastTaskDoNotNeedOptimize,
-                                 responseTimeInitial, "rough");
+                                 responseTimeInitial, "none");
             // update vectorGlobalOpt to be the clamped version
             vectorGlobalOpt = GetParameterVD<double>(taskSetType.tasks_, "executionTime");
             valueGlobalOpt = EstimateEnergyTaskSet(taskSetType.tasks_).sum() / weightEnergy;

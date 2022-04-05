@@ -319,6 +319,8 @@ void ReadFrequencyModeRatio(string path)
                 return;
             }
         }
+        if (frequencyRatio == 0)
+            frequencyRatio = 0.5;
     }
     else
     {

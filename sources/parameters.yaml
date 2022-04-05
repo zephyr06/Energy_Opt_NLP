@@ -2,7 +2,7 @@
 
 runMode: compare
 # TODO: v6 elimination check failed
-testDataSetName: test_n20_v16
+testDataSetName: test_n20_v6
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
@@ -20,7 +20,7 @@ core_m_dag: 2
 baselineLLCompare: 1
 
 enableMaxComputationTimeRestrict: 1
-MaxComputationTimeRestrict: 2
+MaxComputationTimeRestrict: 3
 eliminateTol: 1e0
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100
@@ -29,7 +29,7 @@ adjustEliminateMaxIte: 100
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
-roundTypeInClamp: "rough"
+roundTypeInClamp: "none"
 
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e5
@@ -40,6 +40,7 @@ relativeErrorTolerance: 1e-7
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
+
 
 punishmentFrequency: 10
 
@@ -55,12 +56,14 @@ granularityInBF: 1
 
 SA_iteration: 1000000
 
+maxIterationsOptimizer: 1e3
+gradientModify: 0
 controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
 debugMode: 1
-verbosityLM: "TRYDELTA"
+verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only

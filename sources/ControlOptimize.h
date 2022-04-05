@@ -249,6 +249,17 @@ namespace ControlOptimize
         return;
     }
 
+    bool ContainFalse(std::vector<bool> &eliminationRecord)
+    {
+        for (uint i = 0; i < eliminationRecord.size(); i++)
+        {
+            if (eliminationRecord[i] == false)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     // TODO: limit the number of outer loops
     template <typename FactorGraphType>
     pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic &coeff,

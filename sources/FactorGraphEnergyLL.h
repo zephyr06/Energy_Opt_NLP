@@ -174,12 +174,13 @@ struct FactorGraphEnergyLL
     {
     public:
         Task task_;
+        int taskIndex;
         /**
          * @brief Construct a new Inequality Factor 1 D object,
          *  mainly used in derived class because f is not defined
          */
-        EnergyFactor(Key key, Task &task,
-                     SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
+        EnergyFactor(Key key, Task &task, int index,
+                     SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key), taskIndex(index),
                                                task_(task)
         {
         }
@@ -204,6 +205,14 @@ struct FactorGraphEnergyLL
             if (H)
             {
                 *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, 1);
+                if ((*H)(0, 0) == 0)
+                {
+                    int a = 1;
+                }
+                if (gradientModify != 0)
+                {
+                    *H = *H * (1 + 0.01 * taskIndex * gradientModify);
+                }
             }
             return err;
         }
@@ -220,7 +229,7 @@ struct FactorGraphEnergyLL
         for (uint i = 0; i < tasks.size(); i++)
         {
             // energy factor
-            graph.emplace_shared<EnergyFactor>(GenerateControlKey(i, "executionTime"), tasks[i], modelNormal);
+            graph.emplace_shared<EnergyFactor>(GenerateControlKey(i, "executionTime"), tasks[i], i, modelNormal);
 
             // add executionTime min/max limits
             graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, i, modelPunishmentSoft1);

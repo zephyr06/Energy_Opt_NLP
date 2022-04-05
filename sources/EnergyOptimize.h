@@ -15,7 +15,10 @@
 #include "FactorGraphEnergyLL.h"
 #include <chrono>
 using namespace std::chrono;
-
+gtsam::Values MergeValuesInElimination(Values initial, gtsam::VectorValues &delta)
+{
+    return initial.retract(delta);
+}
 namespace EnergyOptimize
 {
     template <typename FactorGraphType>
@@ -68,13 +71,18 @@ namespace EnergyOptimize
             LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
             result = optimizer.optimize();
             // print some messages
-            cout << "*****************************************" << endl;
-            cout << "Inner iterations " << optimizer.getInnerIterations() << endl;
-            cout << "lambda " << optimizer.lambda() << endl;
-            lambdaRes = optimizer.lambda();
+            if (debugMode == 1)
+            {
+                cout << "*****************************************" << endl;
+                cout << "Inner iterations " << optimizer.getInnerIterations() << endl;
+                cout << "lambda " << optimizer.lambda() << endl;
+            }
         }
-        eliminationRecordGlobal.Print();
-        eliminationRecordGlobal.PrintViolatedFactor();
+        if (debugMode == 1)
+        {
+            eliminationRecordGlobal.Print();
+            eliminationRecordGlobal.PrintViolatedFactor();
+        }
 
         // auto start = high_resolution_clock::now();
         // auto sth = graph.error(initialEstimateFG);
@@ -191,7 +199,7 @@ namespace EnergyOptimize
         {
             for (uint i = 0; i < tasks.size(); i++)
             {
-                if (abs(tasks[i].executionTime - int(tasks[i].executionTime)) < 0.01)
+                if (abs(tasks[i].executionTime - int(tasks[i].executionTime)) < 0.01 || int(tasks[i].executionTime) == 0)
                 {
                     tasks[i].executionTime = int(round(tasks[i].executionTime));
                 }
@@ -301,7 +309,11 @@ namespace EnergyOptimize
     void FindEliminateVariableFromRecordGlobal(TaskSet &tasks)
     {
         EliminationRecord eliminationRecordPrev = eliminationRecordGlobal;
-        eliminationRecordGlobal.Print();
+        if (debugMode == 1)
+        {
+            eliminationRecordGlobal.Print();
+        }
+
         NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
         Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
         Values result;
@@ -334,13 +346,25 @@ namespace EnergyOptimize
             params.setlambdaUpperBound(lambdaCurr);
 
             LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
-            result = optimizer.optimize();
+            // result = optimizer.optimize();
+            // result.print();
+            // cout << endl;
+            // optimizer.iterate();
+            // Values result_new = optimizer.values();
+            // result_new.print();
+            // VectorDynamic aaa = FactorGraphType::ExtractResults(result_new, tasks);
+            gtsam::VectorValues delta = optimizer.getDelta(params);
+            if (debugMode == 1)
+            {
+                delta.print();
+                cout << endl;
+            }
+            double useless = graph.error(MergeValuesInElimination(initialEstimateFG, delta));
             if (FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal))
             {
                 break;
             }
             lambdaCurr /= 10.0;
-            cout << endl;
         }
         if (debugMode == 1)
         {
@@ -350,12 +374,11 @@ namespace EnergyOptimize
             }
             else
             {
-                cout << Color::red << "Backtrack new elimination failed!" << endl
+                cout << Color::red << "No new elimination found, algorithm ends!" << endl
                      << Color::def;
             }
+            eliminationRecordGlobal.Print();
         }
-        eliminationRecordGlobal.Print();
-        int a = 1;
     }
     // TODO: limit the number of outer loops
     template <typename FactorGraphType>
