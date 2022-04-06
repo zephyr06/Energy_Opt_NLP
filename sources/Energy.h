@@ -52,8 +52,9 @@ VectorDynamic EstimateEnergyTaskSet(const TaskSet &tasks)
 
     for (int i = 0; i < N; i++)
     {
-        res(i, 0) = 1.0 / tasks[i].period *
-                    EstimateEnergyTask(tasks[i]);
+        res(i, 0) = pow(1.0 / tasks[i].period *
+                            EstimateEnergyTask(tasks[i]),
+                        1);
     }
     return res;
 }

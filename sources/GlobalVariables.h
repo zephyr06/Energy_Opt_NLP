@@ -1,6 +1,19 @@
 
 #pragma once
 #include "testMy.h"
+#include <gtsam/nonlinear/Values.h>
+
+// these two variables record the best solution ever known yet
+double valueGlobalOpt = INT64_MAX;
+VectorDynamic vectorGlobalOpt;
+
+void InitializeGlobalVector(int N)
+{
+    vectorGlobalOpt.resize(N, 1);
+    vectorGlobalOpt.setZero();
+    valueGlobalOpt = INT64_MAX;
+    TASK_NUMBER = N;
+}
 
 enum class EliminationType
 {

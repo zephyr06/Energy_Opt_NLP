@@ -156,15 +156,15 @@ namespace EnergyOptimize
             if (!r.CheckSchedulability(1 == debugMode))
             {
                 UpdateTaskSetExecutionTime(tasks, periodPrev);
-                if (debugMode == 1)
-                {
-                    std::lock_guard<std::mutex> lock(mtx);
-                    cout << Color::blue << "After one iterate on updating weight parameter,\
+                // if (debugMode == 1)
+                // {
+                std::lock_guard<std::mutex> lock(mtx);
+                cout << Color::blue << "After one iterate on updating weight parameter,\
              the execution time become unschedulable and are"
-                         << endl
-                         << executionTimeRes << endl;
-                    cout << Color::def;
-                }
+                     << endl
+                     << executionTimeRes << endl;
+                cout << Color::def;
+                // }
 
                 return make_pair(periodPrev, err);
             }
@@ -306,7 +306,7 @@ namespace EnergyOptimize
         return false;
     }
     template <typename FactorGraphType>
-    void FindEliminateVariableFromRecordGlobal(TaskSet &tasks)
+    void FindEliminateVariableFromRecordGlobal(const TaskSet &tasks)
     {
         EliminationRecord eliminationRecordPrev = eliminationRecordGlobal;
         if (debugMode == 1)
@@ -385,6 +385,7 @@ namespace EnergyOptimize
     pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks)
     {
         eliminationRecordGlobal.Initialize(tasks.size());
+        InitializeGlobalVector(tasks.size());
 
         VectorDynamic executionTimeResCurr, executionTimeResPrev;
         EliminationRecord eliminationRecordPrev = eliminationRecordGlobal;
@@ -399,12 +400,28 @@ namespace EnergyOptimize
             // store prev result
             errPrev = errCurr;
             executionTimeResPrev = GetParameterVD<double>(tasks, "executionTime");
+            // cout << "Previous execution time vector: " << endl
+            //      << executionTimeResPrev << endl;
             eliminationRecordPrev = eliminationRecordGlobal;
 
             // perform optimization
             double err;
             std::tie(executionTimeResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks);
-            UpdateTaskSetExecutionTime(tasks, executionTimeResCurr);
+            // cout << "Optimized execution time vector: " << endl
+            //      << executionTimeResCurr << endl;
+            // see whether the new update is useful
+            TaskSet tasksTry = tasks;
+            UpdateTaskSetExecutionTime(tasksTry, executionTimeResCurr);
+            if (FactorGraphType::RealObj(tasksTry) <= errPrev)
+            {
+                tasks = tasksTry;
+            }
+            else
+            {
+                CoutWarning("After one iterate, the error increases!");
+                UpdateTaskSetExecutionTime(tasks, executionTimeResPrev);
+                break;
+            }
 
             // adjust optimization settings
             loopCount++;
@@ -453,7 +470,29 @@ namespace EnergyOptimize
         //     ; //nothing else to do
         // }
 
+        double postError = FactorGraphType::RealObj(tasks);
         cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << endl;
+        cout << "Best optimal found: " << valueGlobalOpt << endl;
+        cout << "After optimiazation found: " << postError << endl;
+        if (valueGlobalOpt < postError)
+        {
+            UpdateTaskSetExecutionTime(tasks, vectorGlobalOpt);
+        }
+
+        // verify feasibility
+        RTA_LL xx(tasks);
+        if (xx.CheckSchedulability() == false)
+        {
+            CoutError("Unfeasible result found! Infeasible after optimization");
+        }
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            if (enableMaxComputationTimeRestrict && tasks[i].executionTime > MaxComputationTimeRestrict * tasks[i].executionTimeOrg + 1e-3)
+            {
+                CoutWarning("Unfeasible result found! Bound constraint violated by " + to_string(tasks[i].executionTime - MaxComputationTimeRestrict * tasks[i].executionTimeOrg));
+                break;
+            }
+        }
         return make_pair(GetParameterVD<double>(tasks, "executionTime"), FactorGraphType::RealObj(tasks));
     }
 }

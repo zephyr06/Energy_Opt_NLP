@@ -17,17 +17,57 @@
 
 struct FactorGraphEnergyLL
 {
-    static VectorDynamic ExtractResults(const Values &result, TaskSet tasks)
+    static VectorDynamic ExtractResults(const Values &result, const TaskSet &tasks)
     {
-        VectorDynamic executionTimes = GetParameterVD<double>(tasks, "executionTime");
-        for (uint i = 0; i < tasks.size(); i++)
+        VectorDynamic executionTimes = GenerateVectorDynamic(result.size());
+        for (uint i = 0; i < result.size(); i++)
         {
             if (result.exists(GenerateControlKey(i, "executionTime")))
             {
                 executionTimes(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "executionTime"))(0, 0);
             }
+            else
+            {
+                CoutError("Key not found in ExtractResults!");
+            }
         }
         return executionTimes;
+    }
+
+    static void TryUpdateGlobalVector(const TaskSet tasks, const gtsam::Values x)
+    {
+        if (x.size() != 20)
+            return;
+        // try updating global vector
+        TaskSet tasksTry = tasks;
+        VectorDynamic execTry = ExtractResults(x, tasks);
+        UpdateTaskSetExecutionTime(tasksTry, execTry);
+        double currVal = RealObj(tasksTry);
+        bool schedulable = true;
+        if (currVal < valueGlobalOpt)
+        {
+            RTA_LL r(tasksTry);
+            if (r.CheckSchedulability(false))
+            {
+                for (uint i = 0; i < tasksTry.size(); i++)
+                {
+                    if (enableMaxComputationTimeRestrict && tasksTry[i].executionTime > MaxComputationTimeRestrict * tasksTry[i].executionTimeOrg + 1e-3)
+                    {
+                        schedulable = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                schedulable = false;
+            }
+        }
+        if (schedulable && currVal < valueGlobalOpt)
+        {
+            valueGlobalOpt = currVal;
+            vectorGlobalOpt = execTry;
+        }
     }
 
     class RTARelatedFactor : public NoiseModelFactor
@@ -52,11 +92,7 @@ struct FactorGraphEnergyLL
                 RTA_LL r(tasksCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = HingeLoss(min(tasksCurr[index].period, tasksCurr[index].deadline) - rta);
-                if (debugMode == 1)
-                {
-                    cout << "Task " << index << "'s RTA is " << rta << ", "
-                         << "Deadline is " << tasks[index].deadline << endl;
-                }
+
                 eliminationRecordGlobal.AdjustEliminationError(error(0), index, EliminationType::RTA);
                 EndTimer("f_with_RTA");
                 return error;
@@ -100,6 +136,8 @@ struct FactorGraphEnergyLL
                     cout << Color::def;
                 }
             }
+            int t = x.size();
+            TryUpdateGlobalVector(tasks, x);
             EndTimer("RTARelatedFactor_unwhitenedError");
             return f_with_RTA(x);
         }
@@ -146,6 +184,7 @@ struct FactorGraphEnergyLL
             }
             coeff(index) = 1;
             error(0) = rtaAtIndex - (coeff * executionTimeVecCurr)(0, 0);
+            // cout << "Real error: " << RealObj(tasks) << endl;
             return error;
         };
         auto model = noiseModel::Constrained::All(1);
@@ -153,17 +192,18 @@ struct FactorGraphEnergyLL
     }
 
     static MultiKeyFactor GenerateLockLLFactor(TaskSet tasks,
-                                               int index, double rtaAtIndex)
+                                               int index)
     {
         std::vector<gtsam::Symbol> keys;
         keys.push_back(GenerateControlKey(index, "executionTime"));
 
-        LambdaMultiKey f = [tasks, index, rtaAtIndex](const Values &x)
+        LambdaMultiKey f = [tasks, index](const Values &x)
         {
             VectorDynamic error = GenerateVectorDynamic(1);
             TaskSet tasksCurr = tasks;
             VectorDynamic executionTimeVecCurr = x.at<VectorDynamic>(GenerateControlKey(index, "executionTime"));
             error(0) = executionTimeVecCurr(0, 0) - tasks[index].executionTime;
+
             return error;
         };
         auto model = noiseModel::Constrained::All(1);
@@ -193,8 +233,9 @@ struct FactorGraphEnergyLL
             {
                 Task taskCurr = task_;
                 taskCurr.executionTime = executionTimeVector(0, 0);
-                VectorDynamic err = GenerateVectorDynamic1D(1.0 / taskCurr.period *
-                                                            EstimateEnergyTask(taskCurr));
+                VectorDynamic err = GenerateVectorDynamic1D(pow(1.0 / taskCurr.period *
+                                                                    EstimateEnergyTask(taskCurr),
+                                                                1));
                 // if (debugMode == 1)
                 // {
                 //     cout << "Task " << task_.id << "'s Energy cost is is " << err << endl;
@@ -252,11 +293,12 @@ struct FactorGraphEnergyLL
             }
             else if (eliminationRecordGlobal[i].type == EliminationType::Bound)
             {
-                graph.add(GenerateLockLLFactor(tasks, i, rtaBase(i)));
+                graph.add(GenerateLockLLFactor(tasks, i));
                 // RTA factor
                 graph.add(GenerateRTARelatedFactor(tasks, i, rtaBase));
             }
         }
+        graph.add(GenerateRTARelatedFactor(tasks, tasks.size() - 1, rtaBase));
         return graph;
     }
 
@@ -322,7 +364,7 @@ struct FactorGraphEnergyLL
         return disturb;
     }
 
-    static double RealObj(TaskSet &tasks)
+    static double RealObj(const TaskSet tasks)
     {
         return EstimateEnergyTaskSet(tasks).sum() / weightEnergy;
     }

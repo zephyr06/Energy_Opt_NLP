@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "FrequencyModel.h"
 
+#include "GlobalVariables.h"
 #include "EnergyOptimize.h"
 
 using namespace std;
@@ -21,16 +22,6 @@ using namespace gtsam;
 
 #define numberOfTasksNeedOptimize (N - lastTaskDoNotNeedOptimize - 1)
 
-double valueGlobalOpt = INT64_MAX;
-VectorDynamic vectorGlobalOpt;
-
-void InitializeGlobalVector(int N)
-{
-    vectorGlobalOpt.resize(N, 1);
-    vectorGlobalOpt.setZero();
-    valueGlobalOpt = INT64_MAX;
-    TASK_NUMBER = N;
-}
 struct OptimizeResult
 {
     double initialError;
@@ -505,7 +496,7 @@ public:
             // clamp with rough option seems to work better
             ClampComputationTime(taskSetType,
                                  lastTaskDoNotNeedOptimize,
-                                 responseTimeInitial, "none");
+                                 responseTimeInitial, "rough");
             // update vectorGlobalOpt to be the clamped version
             vectorGlobalOpt = GetParameterVD<double>(taskSetType.tasks_, "executionTime");
             valueGlobalOpt = EstimateEnergyTaskSet(taskSetType.tasks_).sum() / weightEnergy;
@@ -624,6 +615,7 @@ public:
         double eliminateTolRef = eliminateTol;
 
         double res = OptimizeTaskSetOneIte(taskSetType);
+        cout << "After optimization: " << res << endl;
         // Some variables become 0, which actually means a failure
         if (isinf(res))
             res = 10;
