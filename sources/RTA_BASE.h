@@ -97,7 +97,11 @@ public:
             if (rta + tol > min(tasks.tasks_[i].deadline, tasks.tasks_[i].period))
             {
                 if (whetherPrint)
-                    cout << "The current task set is not schedulable!\n";
+                {
+                    cout << "The current task set is not schedulable because of task " << i << " "
+                         << "!\n";
+                }
+
                 return false;
             }
         }

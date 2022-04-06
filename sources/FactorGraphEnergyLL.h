@@ -253,6 +253,8 @@ struct FactorGraphEnergyLL
             else if (eliminationRecordGlobal[i].type == EliminationType::Bound)
             {
                 graph.add(GenerateLockLLFactor(tasks, i, rtaBase(i)));
+                // RTA factor
+                graph.add(GenerateRTARelatedFactor(tasks, i, rtaBase));
             }
         }
         return graph;

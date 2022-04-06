@@ -140,7 +140,7 @@ namespace EnergyOptimize
         RTA_LL rr(tasks);
         if (!rr.CheckSchedulability(debugMode == 1))
         {
-            cout << "The task set is not schedulable!" << endl;
+            CoutWarning("The task set is not schedulable!");
             return make_pair(GetParameterVD<double>(tasks, "executionTime"), 1e30);
         }
         VectorDynamic executionTimeRes;
