@@ -1,16 +1,16 @@
 %YAML:1.0
 
-runMode: compare
+runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_n20_v20
+testDataSetName: test_dag_n5_v2
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
 
-executionTimeModel: 1 # 1 is normal, 2 is more difficult
+executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
-EnergyMode: 1
+EnergyMode: 2
 
 printFailureFile: 1
 printRTA: 0
@@ -30,9 +30,10 @@ weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
 roundTypeInClamp: "none"
+clampTypeMiddle: "none"
 
 # This is actually a relative parameter compared with weightEnergy
-punishmentInBarrier: 1e5
+punishmentInBarrier: 1e8
 
 noiseModelSigma: 1e0
 relativeErrorToleranceInit: 1e-7
@@ -62,8 +63,8 @@ controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
-debugMode: 1
-verbosityLM: "SILENT"
+debugMode: 0
+verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only

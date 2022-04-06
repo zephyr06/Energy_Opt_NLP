@@ -2,6 +2,7 @@
 
 int main(int argc, char *argv[])
 {
+    runMode == "normal";
     if (argc == 1)
         BatchOptimize<TaskSetNormal, RTA_LL>();
     else if (argc == 2)

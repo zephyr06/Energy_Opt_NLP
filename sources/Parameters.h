@@ -69,6 +69,7 @@ string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
 string verbosityLM = (string)ConfigParameters["verbosityLM"];
 string linearOptimizerType = (string)ConfigParameters["linearOptimizerType"];
 
+string clampTypeMiddle = (string)ConfigParameters["clampTypeMiddle"];
 string controlPath = (string)ConfigParameters["controlPath"];
 string runMode = (string)ConfigParameters["runMode"];
 string batchOptimizeFolder = (string)ConfigParameters["batchOptimizeFolder"];

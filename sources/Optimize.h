@@ -77,7 +77,8 @@ public:
                 if (tasks_.tasks_[i].deadline - responseTimeVec(i, 0) < 0 ||
                     (enableMaxComputationTimeRestrict &&
                      taskDurOpt[i].executionTimeOrg * MaxComputationTimeRestrict <
-                         taskDurOpt[i].executionTime))
+                         taskDurOpt[i].executionTime) ||
+                    taskDurOpt[i].executionTimeOrg > taskDurOpt[i].executionTime)
                     return;
             }
             if (currentEnergyConsumption / weightEnergy < valueGlobalOpt)
@@ -120,6 +121,7 @@ public:
                 {
                     // barrier function part
                     err(i, 0) += Barrier(taskDurOpt.tasks_[i].deadline - responseTimeVec(i, 0));
+                    err(i, 0) += Barrier(taskDurOpt.tasks_[i].executionTime - taskDurOpt.tasks_[i].executionTimeOrg);
                     if (enableMaxComputationTimeRestrict)
                         err(i, 0) += Barrier(taskDurOpt.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict -
                                              taskDurOpt.tasks_[i].executionTime);
@@ -130,6 +132,7 @@ public:
 
             VectorDynamic err;
             err = f(executionTimeVector);
+
             if (H)
             {
 
@@ -356,7 +359,10 @@ public:
 
         Values initialEstimateFG;
         initialEstimateFG.insert(key, initialEstimate);
-
+        if (debugMode == 1)
+        {
+            double eee = graph.error(initialEstimateFG);
+        }
         // usually, when the change of variables between steps is smaller than 1,
         // we can already terminate; the corresponding minimal of relative error is
         // approximately 2e-3;
@@ -496,7 +502,7 @@ public:
             // clamp with rough option seems to work better
             ClampComputationTime(taskSetType,
                                  lastTaskDoNotNeedOptimize,
-                                 responseTimeInitial, "rough");
+                                 responseTimeInitial, clampTypeMiddle);
             // update vectorGlobalOpt to be the clamped version
             vectorGlobalOpt = GetParameterVD<double>(taskSetType.tasks_, "executionTime");
             valueGlobalOpt = EstimateEnergyTaskSet(taskSetType.tasks_).sum() / weightEnergy;
