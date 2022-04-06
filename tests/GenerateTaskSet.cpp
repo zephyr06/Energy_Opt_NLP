@@ -2,6 +2,7 @@
 #include "../sources/GenerateRandomTaskset.h"
 #include "../sources/argparse.hpp"
 #include "../sources/RTA_LL.h"
+#include "../sources/RTA_DAG.h"
 
 void deleteDirectoryContents(const std::string &dir_path)
 {
@@ -90,7 +91,7 @@ int main(int argc, char *argv[])
          << "periodMax(--periodMax): " << periodMax << endl
          << "deadlineType(--deadlineType), 1 means random, 0 means implicit: " << deadlineType << endl
          << "taskType(--taskType), type of tasksets, 0 means normal, 1 means DAG: " << taskType << endl
-         << "schedulabilityCheck(--schedulabilityCheck), 0 means no, 1 means yes via LL: " << schedulabilityCheck << endl
+         << "schedulabilityCheck(--schedulabilityCheck), 0 means no, 1 means yes via LL, 2 means yes via DAG: " << schedulabilityCheck << endl
          << endl;
 
     string outDirectory;
@@ -152,6 +153,19 @@ int main(int argc, char *argv[])
             myfile.open(outDirectory + fileName);
             WriteDAGMelani(myfile, dagTaskSet, weightVec);
             myfile.close();
+            if (schedulabilityCheck)
+            {
+                if (schedulabilityCheck == 2)
+                {
+                    TaskSetDAG tasksDAG = ReadDAG_Tasks(outDirectory + fileName, readTaskMode);
+                    RTA_DAG r(tasksDAG);
+                    if (!r.CheckSchedulability())
+                    {
+                        i--;
+                        continue;
+                    }
+                }
+            }
         }
     }
 
