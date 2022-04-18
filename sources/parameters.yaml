@@ -2,15 +2,15 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_dag_n5_v2
+testDataSetName: test_n5_v32
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
 
-executionTimeModel: 2 # 1 is normal, 2 is more difficult
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
-EnergyMode: 2
+EnergyMode: 1
 
 printFailureFile: 1
 printRTA: 0
@@ -63,7 +63,7 @@ controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
-debugMode: 0
+debugMode: 1
 verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment

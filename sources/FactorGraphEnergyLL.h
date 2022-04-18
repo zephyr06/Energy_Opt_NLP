@@ -301,6 +301,70 @@ struct FactorGraphEnergyLL
         graph.add(GenerateRTARelatedFactor(tasks, tasks.size() - 1, rtaBase));
         return graph;
     }
+    /**
+     * @brief This function and the following function consider the optimization problem:
+     * min  C^T x
+     * s.b. Jx <= 0
+     * 
+     * @param tasks 
+     * @return NonlinearFactorGraph 
+     */
+    static NonlinearFactorGraph BuildGraphForC(TaskSet &tasks)
+    {
+        NonlinearFactorGraph graph;
+        auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            // energy factor
+            graph.emplace_shared<EnergyFactor>(GenerateControlKey(i, "executionTime"), tasks[i], i, modelNormal);
+        }
+        return graph;
+    }
+    /**
+     * @brief To analyze Jacobian for constraints
+     * 
+     * @param tasks 
+     * @return NonlinearFactorGraph 
+     */
+    static NonlinearFactorGraph BuildGraphForJ(TaskSet &tasks)
+    {
+        VectorDynamic rtaBase = RTALLVector(tasks);
+        NonlinearFactorGraph graph;
+        auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
+        // auto modelPunishmentHard = noiseModel::Constrained::All(1);
+
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            // add executionTime min/max limits
+            graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, i, modelPunishmentSoft1);
+            double limit = min(tasks[i].deadline, tasks[i].period);
+            if (enableMaxComputationTimeRestrict)
+            {
+                limit = min(limit, tasks[i].executionTimeOrg * MaxComputationTimeRestrict);
+            }
+            graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), limit,
+                                                      i, modelPunishmentSoft1);
+
+            if (eliminationRecordGlobal[i].type == EliminationType::Not)
+            {
+                // RTA factor
+                graph.add(GenerateRTARelatedFactor(tasks, i, rtaBase));
+            }
+            else if (eliminationRecordGlobal[i].type == EliminationType::RTA)
+            {
+                graph.add(GenerateEliminationLLFactor(tasks, i, rtaBase(i)));
+            }
+            else if (eliminationRecordGlobal[i].type == EliminationType::Bound)
+            {
+                graph.add(GenerateLockLLFactor(tasks, i));
+                // RTA factor
+                graph.add(GenerateRTARelatedFactor(tasks, i, rtaBase));
+            }
+        }
+        graph.add(GenerateRTARelatedFactor(tasks, tasks.size() - 1, rtaBase));
+        return graph;
+    }
 
     static Values
     GenerateInitialFG(TaskSet tasks)

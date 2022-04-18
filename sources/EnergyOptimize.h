@@ -19,6 +19,29 @@ gtsam::Values MergeValuesInElimination(Values initial, gtsam::VectorValues &delt
 {
     return initial.retract(delta);
 }
+MatrixDynamic GetNonzeroRow(MatrixDynamic &m)
+{
+    vector<int> nonZeroRowIndex;
+    for (uint i = 0; i < m.rows(); i++)
+    {
+        for (uint j = 0; j < m.cols(); j++)
+        {
+            if (m(i, j) != 0)
+            {
+                nonZeroRowIndex.push_back(i);
+                break;
+            }
+        }
+    }
+    int rows = nonZeroRowIndex.size();
+    int cols = m.cols();
+    MatrixDynamic res = GenerateMatrixDynamic(rows, cols);
+    for (uint i = 0; i < nonZeroRowIndex.size(); i++)
+    {
+        res.block(i, 0, 1, cols) = m.block(nonZeroRowIndex[i], 0, 1, cols);
+    }
+    return res;
+}
 namespace EnergyOptimize
 {
     template <typename FactorGraphType>
@@ -27,6 +50,9 @@ namespace EnergyOptimize
         BeginTimer(__func__);
 
         NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
+
+        NonlinearFactorGraph graphForC = FactorGraphEnergyLL::BuildGraphForC(tasks);
+        NonlinearFactorGraph graphForJ = FactorGraphEnergyLL::BuildGraphForJ(tasks);
         if (debugMode == 1)
         {
             graph.print();
@@ -78,11 +104,30 @@ namespace EnergyOptimize
                 cout << "lambda " << optimizer.lambda() << endl;
             }
         }
+
         if (debugMode == 1)
         {
             eliminationRecordGlobal.Print();
             eliminationRecordGlobal.PrintViolatedFactor();
         }
+
+        cout << "Analyze descent direction:--------------------------" << endl;
+        MatrixDynamic cDDMatrix = graphForC.linearize(result)->jacobian().first;
+        VectorDynamic cDD = cDDMatrix.diagonal();
+        cout << cDD << endl;
+        cout << endl;
+        int exactJacobianRef = exactJacobian;
+        exactJacobian = 1;
+        auto jPair = graphForJ.linearize(result)->jacobian();
+        MatrixDynamic jDDRaw = jPair.first;
+        cout << jDDRaw << endl
+             << endl;
+        MatrixDynamic jDD = GetNonzeroRow(jDDRaw);
+        cout << jDD << endl;
+        VectorDynamic jError = jPair.second;
+        exactJacobian = exactJacobianRef;
+        cout << jDD << endl;
+        int a = 1;
 
         // auto start = high_resolution_clock::now();
         // auto sth = graph.error(initialEstimateFG);
