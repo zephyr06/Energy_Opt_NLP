@@ -12,7 +12,7 @@
 #include "InequalifyFactor.h"
 #include "FactorGraphForceManifold.h"
 #include "FactorGraphInManifold.h"
-#include "Optimize.h"
+// #include "Optimize.h"
 #include "Parameters.h"
 #include "ReadControlCases.h"
 #include "RTAFactor.h"

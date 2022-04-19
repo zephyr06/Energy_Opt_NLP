@@ -5,14 +5,14 @@
 #include <utility>
 #include <numeric>
 #include <CppUnitLite/TestHarness.h>
-#include "../sources/Parameters.h"
-#include "../sources/Declaration.h"
-#include "../sources/ReadControlCases.h"
-#include "../sources/RTAFactor.h"
-#include "../sources/InequalifyFactor.h"
+#include "sources/Parameters.h"
+#include "sources/Declaration.h"
+#include "sources/ReadControlCases.h"
+#include "sources/RTAFactor.h"
+#include "sources/InequalifyFactor.h"
 
-#include "ControlFactorGraphUtils.h"
-#include "FactorGraphEnergyLL.h"
+#include "sources/ControlFactorGraphUtils.h"
+#include "sources/FactorGraphEnergyLL.h"
 #include <chrono>
 using namespace std::chrono;
 gtsam::Values MergeValuesInElimination(Values initial, gtsam::VectorValues &delta)
