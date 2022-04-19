@@ -59,6 +59,7 @@ public:
     InequalityFactor1D(Key key,
                        SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key)
     {
+        index = -1;
         dimension = 1;
     }
 
@@ -73,23 +74,33 @@ public:
                        SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
                                                  f(f)
     {
+        index = -1;
         dimension = 1;
     }
 
     /** active when constraint *NOT* met */
-    // bool active(const Values &c) const override
-    // {
-    //     // note: still active at equality to avoid zigzagging?
-    //     VectorDynamic x = (c.at<VectorDynamic>(this->key()));
-    //     return f(x)(0, 0) > 0;
-    // }
+    bool active(const Values &c) const override
+    {
+        if (index == -1)
+        {
+            // note: still active at equality to avoid zigzagging?
+            VectorDynamic x = (c.at<VectorDynamic>(this->key()));
+            return f(x)(0, 0) > 0;
+        }
+        else // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
+        {
+            return true;
+        }
+    }
 
     Vector evaluateError(const VectorDynamic &x,
                          boost::optional<Matrix &> H = boost::none) const override
     {
         VectorDynamic err = f(x);
-
-        eliminationRecordGlobal.AdjustEliminationError(err(0), index, EliminationType::Bound);
+        if (index >= 0) // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
+        {
+            eliminationRecordGlobal.AdjustEliminationError(err(0), index, EliminationType::Bound);
+        }
 
         if (H)
         {

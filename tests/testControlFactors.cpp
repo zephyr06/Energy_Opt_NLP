@@ -143,6 +143,7 @@ TEST(RTAFactor, J)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
+    eliminationRecordGlobal.Initialize(tasks.size());
     std::vector<bool> maskForElimination(tasks.size() * 2, false);
     RTA_LL r(tasks);
     auto rta = r.ResponseTimeOfTaskSet();
@@ -179,6 +180,7 @@ TEST(GenerateSchedulabilityFactor, v1)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
+    eliminationRecordGlobal.Initialize(tasks.size());
     VectorDynamic periodInitial1 = GenerateVectorDynamic(5);
     periodInitial1 << 127.008,
         127.077,
@@ -202,6 +204,7 @@ TEST(GenerateSchedulabilityFactor, v2)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
+    eliminationRecordGlobal.Initialize(tasks.size());
     coeff << 1, 2, 1, 4, 1, 1, 1, 1, 1, 1;
     std::vector<bool> maskForElimination(tasks.size(), false);
     VectorDynamic rtaBase = RTALLVector(tasks);
@@ -293,7 +296,6 @@ TEST(FactorGraphInManifold, inference)
     NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
-
     MatrixDynamic jacobianCurr = sth.first;
     // std::cout << "Current Jacobian matrix:" << endl;
     // std::cout << jacobianCurr << endl;
