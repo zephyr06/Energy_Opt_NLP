@@ -1,7 +1,11 @@
 
 #pragma once
-#include "testMy.h"
 #include <gtsam/nonlinear/Values.h>
+
+#include "Declaration.h"
+#include "Parameters.h"
+#include "Tasks.h"
+#include "testMy.h"
 
 // these two variables record the best solution ever known yet
 double valueGlobalOpt = INT64_MAX;

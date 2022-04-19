@@ -60,8 +60,8 @@ struct FactorGraphForceManifold
             [](VectorDynamic x1, VectorDynamic x2)
         {
             // x1 <= x2
-            if (x2(0, 0) < x1(0, 0))
-                int a = 1;
+            // if (x2(0, 0) < x1(0, 0))
+            //     int a = 1;
             return GenerateVectorDynamic1D(HingeLoss((x2 - x1)(0, 0)) * weightHardConstraint);
         };
         // this factor is explained as: r_i <= T_i

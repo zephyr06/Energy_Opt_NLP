@@ -74,7 +74,6 @@ namespace EnergyOptimize
         }
 
         Values result;
-        double lambdaRes;
         if (optimizerType == 1)
         {
             DoglegParams params;
@@ -127,7 +126,7 @@ namespace EnergyOptimize
         VectorDynamic jError = jPair.second;
         exactJacobian = exactJacobianRef;
         cout << jDD << endl;
-        int a = 1;
+        // int a = 1;
 
         // auto start = high_resolution_clock::now();
         // auto sth = graph.error(initialEstimateFG);
@@ -404,7 +403,7 @@ namespace EnergyOptimize
                 delta.print();
                 cout << endl;
             }
-            double useless = graph.error(MergeValuesInElimination(initialEstimateFG, delta));
+            // double useless = graph.error(MergeValuesInElimination(initialEstimateFG, delta));
             if (FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal))
             {
                 break;
@@ -437,7 +436,7 @@ namespace EnergyOptimize
         double errPrev = 1e30;
         double errCurr = FactorGraphType::RealObj(tasks);
         int loopCount = 0;
-        double disturbIte = eliminateTol;
+        // double disturbIte = eliminateTol;
         bool whether_new_eliminate = false;
         while (whether_new_eliminate || (loopCount < MaxLoopControl && errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop))) // &&
         {

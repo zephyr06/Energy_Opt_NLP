@@ -2,6 +2,7 @@
 
 #include "Parameters.h"
 #include "Declaration.h"
+#include "Tasks.h"
 /**
  * barrier function for the optimization
  **/

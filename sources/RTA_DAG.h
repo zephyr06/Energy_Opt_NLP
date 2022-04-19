@@ -1,5 +1,6 @@
 #pragma once
 #include "DAG_Task.h"
+#include "RTA_BASE.h"
 
 class RTA_DAG : public RTA_BASE<TaskSetDAG>
 {

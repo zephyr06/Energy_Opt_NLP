@@ -16,7 +16,7 @@ vector<double> Uunifast(int N, double utilAll)
     vector<double> utilVec(N, 0);
 
     double nextU;
-    for (size_t i = 1; i < N; i++)
+    for (int i = 1; i < N; i++)
     {
 
         nextU = sumU * pow(double(rand()) / RAND_MAX, 1.0 / (N - 1));
@@ -33,7 +33,7 @@ TaskSet GenerateTaskSet(int N, double totalUtilization,
 {
     vector<double> utilVec = Uunifast(N, totalUtilization);
     TaskSet tasks;
-    int periodMaxRatio = periodMax / periodMin;
+    // int periodMaxRatio = periodMax / periodMin;
 
     for (int i = 0; i < N; i++)
     {
