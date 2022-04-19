@@ -46,7 +46,7 @@ TEST(GetFrequency, tasks2)
     comp << 17 * 2, 12, 253;
     UpdateTaskSetExecutionTime(tasks, comp);
 
-    AssertEqualScalar(0.9 / 1.9, GetFrequency(tasks[0]));
+    AssertEqualScalar(0.9 / 1.9, GetFrequency(tasks[0]), 1e-6, __LINE__);
 }
 TEST(Jacobian, v1)
 {

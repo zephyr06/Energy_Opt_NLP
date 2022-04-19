@@ -1,6 +1,6 @@
 #pragma once
-#include <gtsam/inference/Key.h>
 #include <gtsam/inference/Symbol.h>
+
 #include "GlobalVariables.h"
 
 bool ContainFalse(EliminationRecord &eliminationRecord)

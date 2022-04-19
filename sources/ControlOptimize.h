@@ -4,17 +4,19 @@
 #include <string>
 #include <utility>
 #include <numeric>
-#include <CppUnitLite/TestHarness.h>
-#include "../sources/Parameters.h"
-#include "../sources/Optimize.h"
-#include "../sources/ReadControlCases.h"
-#include "../sources/CoeffFactor.h"
-#include "../sources/RTAFactor.h"
-#include "../sources/InequalifyFactor.h"
 
+#include <CppUnitLite/TestHarness.h>
+
+#include "CoeffFactor.h"
 #include "ControlFactorGraphUtils.h"
+#include "InequalifyFactor.h"
 #include "FactorGraphForceManifold.h"
 #include "FactorGraphInManifold.h"
+#include "Optimize.h"
+#include "Parameters.h"
+#include "ReadControlCases.h"
+#include "RTAFactor.h"
+
 namespace ControlOptimize
 {
     template <typename FactorGraphType>

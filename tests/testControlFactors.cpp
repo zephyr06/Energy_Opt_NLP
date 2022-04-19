@@ -4,32 +4,32 @@ using namespace std;
 using namespace std::chrono;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 using namespace ControlOptimize;
-TEST(ExtractResults, v1)
-{
-    noiseModelSigma = 1;
-    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
-    TaskSet tasks;
-    VectorDynamic coeff;
-    std::tie(tasks, coeff) = ReadControlCase(path1);
-    std::vector<bool> maskForElimination(tasks.size() * 2, false);
-    maskForElimination[1] = true;
-    Values result;
-    result.insert(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(1));
-    result.insert(GenerateControlKey(2, "period"), GenerateVectorDynamic1D(1));
-    result.insert(GenerateControlKey(3, "period"), GenerateVectorDynamic1D(1));
-    result.insert(GenerateControlKey(4, "period"), GenerateVectorDynamic1D(1));
-    result.insert(GenerateControlKey(0, "response"), GenerateVectorDynamic1D(1));
-    result.insert(GenerateControlKey(1, "response"), GenerateVectorDynamic1D(1));
-    result.insert(GenerateControlKey(2, "response"), GenerateVectorDynamic1D(1));
-    result.insert(GenerateControlKey(3, "response"), GenerateVectorDynamic1D(1));
-    result.insert(GenerateControlKey(4, "response"), GenerateVectorDynamic1D(1));
-    VectorDynamic expectT = GenerateVectorDynamic(5);
-    expectT = expectT.array() + 1;
-    VectorDynamic expectR = expectT;
-    expectT(1, 0) = tasks[1].period;
-    AssertEigenEqualVector(expectT, FactorGraphForceManifold::ExtractResults(result, tasks).first);
-    AssertEigenEqualVector(expectR, FactorGraphForceManifold::ExtractResults(result, tasks).second);
-}
+// TEST(ExtractResults, v1)
+// {
+//     noiseModelSigma = 1;
+//     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+//     TaskSet tasks;
+//     VectorDynamic coeff;
+//     std::tie(tasks, coeff) = ReadControlCase(path1);
+//     std::vector<bool> maskForElimination(tasks.size() * 2, false);
+//     maskForElimination[1] = true;
+//     Values result;
+//     result.insert(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateControlKey(2, "period"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateControlKey(3, "period"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateControlKey(4, "period"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateControlKey(0, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateControlKey(1, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateControlKey(2, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateControlKey(3, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateControlKey(4, "response"), GenerateVectorDynamic1D(1));
+//     VectorDynamic expectT = GenerateVectorDynamic(5);
+//     expectT = expectT.array() + 1;
+//     VectorDynamic expectR = expectT;
+//     expectT(1, 0) = tasks[1].period;
+//     AssertEigenEqualVector(expectT, FactorGraphForceManifold::ExtractResults(result, tasks).first);
+//     AssertEigenEqualVector(expectR, FactorGraphForceManifold::ExtractResults(result, tasks).second);
+// }
 
 TEST(coeffFactor, v1)
 {
@@ -204,7 +204,8 @@ TEST(GenerateSchedulabilityFactor, v2)
     std::tie(tasks, coeff) = ReadControlCase(path1);
     coeff << 1, 2, 1, 4, 1, 1, 1, 1, 1, 1;
     std::vector<bool> maskForElimination(tasks.size(), false);
-    auto factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 0, coeff);
+    VectorDynamic rtaBase = RTALLVector(tasks);
+    auto factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 0, coeff, rtaBase);
     auto e2Expect = GenerateVectorDynamic(2);
     e2Expect << 4, 0;
     auto initial = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
@@ -212,7 +213,7 @@ TEST(GenerateSchedulabilityFactor, v2)
 
     initial.update(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(70));
     initial.update(GenerateControlKey(3, "period"), GenerateVectorDynamic1D(110));
-    factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 3, coeff);
+    factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 3, coeff, rtaBase);
     e2Expect << INT32_MAX, INT32_MAX - 110;
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial), __LINE__);
 }
@@ -226,8 +227,9 @@ TEST(GenerateSchedulabilityFactor, v3)
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
     coeff << 1, 2, 1, 4, 1, 1, 1, 1, 1, 1;
+    VectorDynamic rtaBase = RTALLVector(tasks);
     std::vector<bool> maskForElimination(tasks.size(), false);
-    auto factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 0, coeff);
+    auto factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 0, coeff, rtaBase);
     auto e2Expect = GenerateVectorDynamic(2);
     e2Expect << 4, 0;
     auto initial = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
@@ -235,7 +237,7 @@ TEST(GenerateSchedulabilityFactor, v3)
 
     initial.update(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(70));
 
-    factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 3, coeff);
+    factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 3, coeff, rtaBase);
     e2Expect << 117, 0;
 
     std::vector<MatrixDynamic> HsExpect, HsActual;

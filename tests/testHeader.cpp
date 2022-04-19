@@ -1,6 +1,6 @@
 #include <CppUnitLite/TestHarness.h>
 
-#include "sources/RTA_DAG.h"
+#include "sources/ControlOptimize.h"
 
 int main()
 {
