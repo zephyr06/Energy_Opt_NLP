@@ -56,55 +56,55 @@ public:
     }
 };
 
-TEST(multiple_small, v1)
-{
-    auto start = high_resolution_clock::now();
-    auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-    NonlinearFactorGraph graph;
-    Values initialEstimateFG;
+// TEST(multiple_small, v1)
+// {
+//     auto start = high_resolution_clock::now();
+//     auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+//     NonlinearFactorGraph graph;
+//     Values initialEstimateFG;
 
-    for (int i = 0; i < Nvar; i++)
-    {
-        graph.emplace_shared<MyTestFactor1D>(GenerateControlKey(i, "period"), model);
-        initialEstimateFG.insert(GenerateControlKey(i, "period"), GenerateVectorDynamic1D(0));
-    }
-    Values result;
-    LevenbergMarquardtParams params;
-    params.setlambdaInitial(initialLambda);
-    params.setVerbosityLM("SUMMARY");
-    params.setlambdaLowerBound(lowerLambda);
-    params.setlambdaUpperBound(upperLambda);
-    params.setRelativeErrorTol(relativeErrorTolerance);
-    LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
-    result = optimizer.optimize();
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "multiple_small:" << duration.count() << endl;
-}
+//     for (int i = 0; i < Nvar; i++)
+//     {
+//         graph.emplace_shared<MyTestFactor1D>(GenerateControlKey(i, "period"), model);
+//         initialEstimateFG.insert(GenerateControlKey(i, "period"), GenerateVectorDynamic1D(0));
+//     }
+//     Values result;
+//     LevenbergMarquardtParams params;
+//     params.setlambdaInitial(initialLambda);
+//     params.setVerbosityLM("SUMMARY");
+//     params.setlambdaLowerBound(lowerLambda);
+//     params.setlambdaUpperBound(upperLambda);
+//     params.setRelativeErrorTol(relativeErrorTolerance);
+//     LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+//     result = optimizer.optimize();
+//     auto stop = high_resolution_clock::now();
+//     auto duration = duration_cast<microseconds>(stop - start);
+//     cout << "multiple_small:" << duration.count() << endl;
+// }
 
-TEST(single_big, v1)
-{
-    auto start = high_resolution_clock::now();
-    auto model = noiseModel::Isotropic::Sigma(Nvar, noiseModelSigma);
-    NonlinearFactorGraph graph;
-    Values initialEstimateFG;
+// TEST(single_big, v1)
+// {
+//     auto start = high_resolution_clock::now();
+//     auto model = noiseModel::Isotropic::Sigma(Nvar, noiseModelSigma);
+//     NonlinearFactorGraph graph;
+//     Values initialEstimateFG;
 
-    graph.emplace_shared<MyTestFactorND>(GenerateControlKey(0, "period"), model);
-    initialEstimateFG.insert(GenerateControlKey(0, "period"), GenerateVectorDynamic(Nvar));
+//     graph.emplace_shared<MyTestFactorND>(GenerateControlKey(0, "period"), model);
+//     initialEstimateFG.insert(GenerateControlKey(0, "period"), GenerateVectorDynamic(Nvar));
 
-    Values result;
-    LevenbergMarquardtParams params;
-    params.setlambdaInitial(initialLambda);
-    params.setVerbosityLM("SUMMARY");
-    params.setlambdaLowerBound(lowerLambda);
-    params.setlambdaUpperBound(upperLambda);
-    params.setRelativeErrorTol(relativeErrorTolerance);
-    LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
-    result = optimizer.optimize();
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "single_big:" << duration.count() << endl;
-}
+//     Values result;
+//     LevenbergMarquardtParams params;
+//     params.setlambdaInitial(initialLambda);
+//     params.setVerbosityLM("SUMMARY");
+//     params.setlambdaLowerBound(lowerLambda);
+//     params.setlambdaUpperBound(upperLambda);
+//     params.setRelativeErrorTol(relativeErrorTolerance);
+//     LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+//     result = optimizer.optimize();
+//     auto stop = high_resolution_clock::now();
+//     auto duration = duration_cast<microseconds>(stop - start);
+//     cout << "single_big:" << duration.count() << endl;
+// }
 int main()
 {
     TestResult tr;

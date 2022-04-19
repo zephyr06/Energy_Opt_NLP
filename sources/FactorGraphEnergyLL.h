@@ -136,7 +136,7 @@ struct FactorGraphEnergyLL
                     cout << Color::def;
                 }
             }
-            int t = x.size();
+            // uint t = x.size();
             TryUpdateGlobalVector(tasks, x);
             EndTimer("RTARelatedFactor_unwhitenedError");
             return f_with_RTA(x);
@@ -213,8 +213,9 @@ struct FactorGraphEnergyLL
     class EnergyFactor : public NoiseModelFactor1<VectorDynamic>
     {
     public:
-        Task task_;
         int taskIndex;
+        Task task_;
+
         /**
          * @brief Construct a new Inequality Factor 1 D object,
          *  mainly used in derived class because f is not defined
@@ -248,7 +249,7 @@ struct FactorGraphEnergyLL
                 *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, 1);
                 if ((*H)(0, 0) == 0)
                 {
-                    int a = 1;
+                    // int a = 1;
                 }
                 if (gradientModify != 0)
                 {

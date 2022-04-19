@@ -11,6 +11,8 @@ include(GtsamMakeConfigFile)
 include(GtsamBuildTypes)
 include(GtsamTesting)
 
+include_directories(${CMAKE_SOURCE_DIR})
+
 # for unittest scripts
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${GTSAM_DIR}/../GTSAMCMakeTools")
 

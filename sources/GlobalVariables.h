@@ -70,7 +70,7 @@ public:
     void Initialize(uint n)
     {
         record.clear();
-        if (static_cast<int>(record.size()) >= n)
+        if (record.size() >= n)
         {
             return;
         }

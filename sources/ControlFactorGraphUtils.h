@@ -22,7 +22,7 @@ bool ContainFalse(EliminationRecord &eliminationRecord)
  * @param type 
  * @return gtsam::Symbol 
  */
-inline gtsam::Symbol GenerateControlKey(int idtask, string type)
+gtsam::Symbol GenerateControlKey(int idtask, string type)
 {
     if (type == "period")
     {

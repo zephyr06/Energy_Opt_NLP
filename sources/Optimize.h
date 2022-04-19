@@ -361,7 +361,7 @@ public:
         initialEstimateFG.insert(key, initialEstimate);
         if (debugMode == 1)
         {
-            double eee = graph.error(initialEstimateFG);
+            // double eee = graph.error(initialEstimateFG);
         }
         // usually, when the change of variables between steps is smaller than 1,
         // we can already terminate; the corresponding minimal of relative error is
