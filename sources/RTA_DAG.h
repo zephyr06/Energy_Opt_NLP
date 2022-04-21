@@ -6,7 +6,7 @@ namespace rt_num_opt
   class RTA_DAG : public RTA_BASE<TaskSetDAG>
   {
   public:
-    vector<double> rta;
+    std::vector<double> rta;
 
     RTA_DAG() {}
     RTA_DAG(const TaskSetDAG &tasksI)

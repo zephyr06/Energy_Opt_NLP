@@ -18,7 +18,7 @@
 #include "EnergyOptimize.h"
 namespace rt_num_opt
 {
-    using namespace std;
+    // using namespace std;
     // using namespace gtsam;
 
 #define numberOfTasksNeedOptimize (N - lastTaskDoNotNeedOptimize - 1)
@@ -144,8 +144,8 @@ namespace rt_num_opt
                     else if ((exactJacobian == -1))
                     {
                         *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N);
-                        cout << "The old Jacobian is " << endl
-                             << *H << endl;
+                        std::cout << "The old Jacobian is " << std::endl
+                                  << *H << std::endl;
                         int m = N;
                         int n = executionTimeVector.rows();
                         int maxIndex = 0; // the index of variable
@@ -158,7 +158,7 @@ namespace rt_num_opt
                                 maxIndex = i;
                             }
                         }
-                        cout << "MaxIndex: " << maxIndex << endl;
+                        std::cout << "MaxIndex: " << maxIndex << std::endl;
                         for (int i = 0; i < n; i++)
                         {
                             if (i != maxIndex)
@@ -172,18 +172,18 @@ namespace rt_num_opt
                     // *H = jacobian;
                     if (debugMode == 1)
                     {
-                        cout << endl;
-                        cout << "The current evaluation point is " << endl
-                             << executionTimeVector << endl;
-                        cout << "The Jacobian is " << endl
-                             << *H << endl;
-                        // cout << "The approximated Jacobian is " << endl
-                        //      << jacobian << endl;
-                        cout << "The current error is " << endl
-                             << err << endl
-                             << endl
-                             << err.norm() << endl
-                             << endl;
+                        std::cout << std::endl;
+                        std::cout << "The current evaluation point is " << std::endl
+                                  << executionTimeVector << std::endl;
+                        std::cout << "The Jacobian is " << std::endl
+                                  << *H << std::endl;
+                        // std::cout << "The approximated Jacobian is " << std::endl
+                        //      << jacobian << std::endl;
+                        std::cout << "The current error is " << std::endl
+                                  << err << std::endl
+                                  << std::endl
+                                  << err.norm() << std::endl
+                                  << std::endl;
                     }
                 }
                 EndTimer("main_factor");
@@ -194,7 +194,7 @@ namespace rt_num_opt
         // ------------------
         // TODO: clamp turn 123.99 to 124 rather than 123
         static void ClampComputationTime(TaskSetType &tasksSetType, int lastTaskDoNotNeedOptimize,
-                                         VectorDynamic &responseTimeInitial, string roundType)
+                                         VectorDynamic &responseTimeInitial, std::string roundType)
         {
             if (roundType == "none")
                 return;
@@ -209,11 +209,11 @@ namespace rt_num_opt
             {
                 int N = tasks.size();
 
-                vector<pair<int, double>> objectiveVec;
+                std::vector<std::pair<int, double>> objectiveVec;
                 objectiveVec.reserve(N);
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                 {
-                    objectiveVec.push_back(make_pair(i, JacobianInEnergyItem(tasks, i)));
+                    objectiveVec.push_back(std::make_pair(i, JacobianInEnergyItem(tasks, i)));
                 }
                 sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
 
@@ -221,7 +221,7 @@ namespace rt_num_opt
 
                 if (debugMode == 1)
                 {
-                    cout << "before binary search, here is the task set" << endl;
+                    std::cout << "before binary search, here is the task set" << std::endl;
                     for (int i = 0; i < N; i++)
                         tasks[i].print();
                 }
@@ -292,7 +292,7 @@ namespace rt_num_opt
             }
             else
             {
-                cout << "input error in ClampComputationTime: " << roundType << endl;
+                std::cout << "input error in ClampComputationTime: " << roundType << std::endl;
                 throw;
             }
             return;
@@ -416,27 +416,27 @@ namespace rt_num_opt
             // auto sth = graph.error(initialEstimateFG);
             // auto stop = high_resolution_clock::now();
             // auto duration = duration_cast<microseconds>(stop - start);
-            // cout << "Evaluate error:" << duration.count() << endl;
+            // std::cout << "Evaluate error:" << duration.count() << std::endl;
             // start = high_resolution_clock::now();
             // auto sth2 = graph.linearize(initialEstimateFG);
             // stop = high_resolution_clock::now();
             // duration = duration_cast<microseconds>(stop - start);
-            // cout << "linearize:" << duration.count() << endl;
+            // std::cout << "linearize:" << duration.count() << std::endl;
 
-            // cout << Color::green;
+            // std::cout << Color::green;
             // // std::lock_guard<std::mutex> lock(mtx);
             // auto sth3 = graph.linearize(initialEstimateFG)->jacobian();
             // MatrixDynamic jacobianCurr = sth3.first;
-            // std::cout << "Current Jacobian matrix:" << endl;
-            // std::cout << jacobianCurr << endl;
-            // std::cout << "Current b vector: " << endl;
-            // std::cout << sth3.second << endl;
-            // cout << Color::def << endl;
+            // std::cout << "Current Jacobian matrix:" << std::endl;
+            // std::cout << jacobianCurr << std::endl;
+            // std::cout << "Current b vector: " << std::endl;
+            // std::cout << sth3.second << std::endl;
+            // std::cout << Color::def << std::endl;
 
             VectorDynamic optComp = result.at<VectorDynamic>(key);
             if (debugMode == 1)
             {
-                cout << "After optimization, the computation time vector is " << optComp << endl;
+                std::cout << "After optimization, the computation time vector is " << optComp << std::endl;
             }
 
             // if (debugMode == 1)
@@ -508,8 +508,8 @@ namespace rt_num_opt
                 vectorGlobalOpt = GetParameterVD<double>(taskSetType.tasks_, "executionTime");
                 valueGlobalOpt = EstimateEnergyTaskSet(taskSetType.tasks_).sum() / weightEnergy;
                 if (debugMode == 1)
-                    cout << "After clamp: " << endl
-                         << GetParameterVD<double>(taskSetType.tasks_, "executionTime") << endl;
+                    std::cout << "After clamp: " << std::endl
+                              << GetParameterVD<double>(taskSetType.tasks_, "executionTime") << std::endl;
                 // find variables to eliminate
                 int adjustEliminateTolNum = 0;
                 int lastTaskDoNotNeedOptimizeAfterOpt;
@@ -545,12 +545,12 @@ namespace rt_num_opt
             {
                 if (debugMode == 1)
                 {
-                    cout << "The task set is schedulable after optimization\n";
-                    cout << endl;
-                    cout << "The original task set is: " << endl;
+                    std::cout << "The task set is schedulable after optimization\n";
+                    std::cout << std::endl;
+                    std::cout << "The original task set is: " << std::endl;
                     for (int i = 0; i < N; i++)
                     {
-                        cout << i << " ";
+                        std::cout << i << " ";
                         taskSetType.tasks_[i].print();
                     }
                 }
@@ -559,10 +559,10 @@ namespace rt_num_opt
                 double initialEnergyCost = EstimateEnergyTaskSet(tasksInit).sum();
                 double afterEnergyCost = EstimateEnergyTaskSet(taskSetType.tasks_).sum();
                 if (debugMode == 1)
-                    cout << "Actual objective function is" << FactorGraphEnergyLL::RealObj(taskSetType.tasks_) << endl;
+                    std::cout << "Actual objective function is" << FactorGraphEnergyLL::RealObj(taskSetType.tasks_) << std::endl;
                 if (debugMode == 1)
                 {
-                    cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
+                    std::cout << "Normalized objective function after optimization is " << afterEnergyCost << std::endl;
                 }
                 if (debugMode >= 1)
                 {
@@ -589,7 +589,7 @@ namespace rt_num_opt
                                 {
                                     CoutWarning("Elimination failed in final verfication, \
                             eliminateTolIte used before is " +
-                                                to_string(eliminateTolIte));
+                                                std::to_string(eliminateTolIte));
                                 }
                             }
                         }
@@ -607,7 +607,7 @@ namespace rt_num_opt
             }
             else
             {
-                cout << "Unfeasible after optimization!" << endl;
+                std::cout << "Unfeasible after optimization!" << std::endl;
                 return -1;
             }
             return -1;
@@ -622,7 +622,7 @@ namespace rt_num_opt
             double eliminateTolRef = eliminateTol;
 
             double res = OptimizeTaskSetOneIte(taskSetType);
-            cout << "After optimization: " << res << endl;
+            std::cout << "After optimization: " << res << std::endl;
             // Some variables become 0, which actually means a failure
             if (isinf(res))
                 res = 10;

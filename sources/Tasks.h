@@ -17,10 +17,10 @@
 namespace rt_num_opt
 {
 
-    using namespace std;
+    // using namespace std;
 
 #define TaskSet std::vector<rt_num_opt::Task>
-    typedef std::map<int, vector<int>> ProcessorTaskSet;
+    typedef std::map<int, std::vector<int>> ProcessorTaskSet;
     Color::Modifier red(Color::FG_RED);
     Color::Modifier green(Color::FG_GREEN);
     Color::Modifier blue(Color::FG_BLUE);
@@ -87,12 +87,12 @@ namespace rt_num_opt
         /**
      * only used in ReadTaskSet because the input parameter's type is int
      **/
-        Task(vector<double> dataInLine)
+        Task(std::vector<double> dataInLine)
         {
             if (dataInLine.size() < 7)
             {
-                cout << Color::red << "The length of dataInLine in Task constructor is wrong! Must be at least 7!\n"
-                     << Color::def << endl;
+                std::cout << Color::red << "The length of dataInLine in Task constructor is wrong! Must be at least 7!\n"
+                          << Color::def << std::endl;
                 throw;
             }
             id = dataInLine[0];
@@ -107,8 +107,8 @@ namespace rt_num_opt
 
         void print()
         {
-            cout << "The period is: " << period << " The executionTime is " << executionTime << " The deadline is "
-                 << deadline << " The overhead is " << overhead << " The offset is " << offset << endl;
+            std::cout << "The period is: " << period << " The executionTime is " << executionTime << " The deadline is "
+                      << deadline << " The overhead is " << overhead << " The offset is " << offset << std::endl;
         }
 
         double utilization() const
@@ -132,21 +132,21 @@ namespace rt_num_opt
             ;
         }
         TaskSetNormal(const TaskSet &tasks) : tasks_(tasks), N(tasks.size()) {}
-        static string Type() { return "normal"; }
+        static std::string Type() { return "normal"; }
         void UpdateTaskSet(TaskSet &tasks) { tasks_ = tasks; }
     };
     void Print(TaskSet &tasks)
     {
-        cout << "The task set is printed as follows" << endl;
+        std::cout << "The task set is printed as follows" << std::endl;
         for (auto &task : tasks)
             task.print();
     }
 
     template <typename T>
-    vector<T> GetParameter(const TaskSet &taskset, string parameterType)
+    std::vector<T> GetParameter(const TaskSet &taskset, std::string parameterType)
     {
         uint N = taskset.size();
-        vector<T> parameterList;
+        std::vector<T> parameterList;
         parameterList.reserve(N);
 
         for (uint i = 0; i < N; i++)
@@ -163,15 +163,15 @@ namespace rt_num_opt
                 parameterList.push_back((T)(taskset[i].offset));
             else
             {
-                cout << Color::red << "parameterType in GetParameter is not recognized!\n"
-                     << Color::def << endl;
+                std::cout << Color::red << "parameterType in GetParameter is not recognized!\n"
+                          << Color::def << std::endl;
                 throw;
             }
         }
         return parameterList;
     }
     template <typename T>
-    VectorDynamic GetParameterVD(const TaskSet &taskset, string parameterType)
+    VectorDynamic GetParameterVD(const TaskSet &taskset, std::string parameterType)
     {
         uint N = taskset.size();
         VectorDynamic parameterList;
@@ -194,8 +194,8 @@ namespace rt_num_opt
                 parameterList(i, 0) = ((T)(taskset[i].offset));
             else
             {
-                cout << Color::red << "parameterType in GetParameter is not recognized!\n"
-                     << Color::def << endl;
+                std::cout << Color::red << "parameterType in GetParameter is not recognized!\n"
+                          << Color::def << std::endl;
                 throw;
             }
         }
@@ -203,7 +203,7 @@ namespace rt_num_opt
     }
 
     template <typename T>
-    VectorDynamic GetParameterVD(const TaskSetNormal &taskset, string parameterType)
+    VectorDynamic GetParameterVD(const TaskSetNormal &taskset, std::string parameterType)
     {
         return GetParameterVD<T>(taskset.tasks_, parameterType);
     }
@@ -223,8 +223,8 @@ namespace rt_num_opt
 
     double Utilization(const TaskSet &tasks)
     {
-        vector<int> periodHigh = GetParameter<int>(tasks, "period");
-        vector<double> executionTimeHigh = GetParameter<double>(tasks, "executionTime");
+        std::vector<int> periodHigh = GetParameter<int>(tasks, "period");
+        std::vector<double> executionTimeHigh = GetParameter<double>(tasks, "executionTime");
         int N = periodHigh.size();
         double utilization = 0;
         for (int i = 0; i < N; i++)
@@ -251,7 +251,7 @@ namespace rt_num_opt
         int N = tasks.size();
         if (N == 0)
         {
-            cout << Color::red << "Empty task set in HyperPeriod()!\n";
+            std::cout << Color::red << "Empty task set in HyperPeriod()!\n";
             throw;
         }
         else
@@ -262,7 +262,7 @@ namespace rt_num_opt
                 hyper = lcm(hyper, int(ceil(tasks[i].period)));
                 if (hyper < 0 || hyper > LLONG_MAX)
                 {
-                    // cout << Color::red <<  << Color::def << endl;
+                    // cout << Color::red <<  << Color::def << std::endl;
                     // throw;
                     if (debugMode == 1)
                         CoutWarning("The hyper-period over flows!");
@@ -273,7 +273,7 @@ namespace rt_num_opt
         }
     }
 
-    TaskSet Reorder(TaskSet tasks, string priorityType)
+    TaskSet Reorder(TaskSet tasks, std::string priorityType)
     {
         if (priorityType == "RM")
         {
@@ -293,8 +293,8 @@ namespace rt_num_opt
         }
         else
         {
-            cout << Color::red << "Unrecognized priorityType in Reorder!\n"
-                 << Color::def << endl;
+            std::cout << Color::red << "Unrecognized priorityType in Reorder!\n"
+                      << Color::def << std::endl;
             throw;
         }
         return tasks;
@@ -305,19 +305,19 @@ namespace rt_num_opt
  *
  * @param path
  */
-    void ReadFrequencyModeRatio(string path)
+    void ReadFrequencyModeRatio(std::string path)
     {
 
-        fstream file;
-        file.open(path, ios::in);
+        std::fstream file;
+        file.open(path, std::ios::in);
         if (file.is_open())
         {
-            string line;
+            std::string line;
             while (getline(file, line))
             {
                 if (line.substr(0, 17) == "Frequency_Ratio: ")
                 {
-                    frequencyRatio = stod(line.substr(17));
+                    frequencyRatio = std::stod(line.substr(17));
                     if (frequencyRatio == 0)
                         frequencyRatio = 0.5;
                     return;
@@ -332,7 +332,7 @@ namespace rt_num_opt
         }
     }
 
-    vector<std::string> SplitStringMy(std::string line, std::string delimiter = ",")
+    std::vector<std::string> SplitStringMy(std::string line, std::string delimiter = ",")
     {
         // some default parameters in this function
         std::string token;
@@ -348,10 +348,10 @@ namespace rt_num_opt
         return dataInLine;
     }
 
-    vector<double> ReadLine(string line, string delimiter = ",")
+    std::vector<double> ReadLine(std::string line, std::string delimiter = ",")
     {
         // some default parameters in this function
-
+        using namespace std;
         string token;
         size_t pos = 0;
         vector<double> dataInLine;
@@ -366,11 +366,12 @@ namespace rt_num_opt
             dataInLine.push_back(stod(line.c_str()));
         return dataInLine;
     }
-    TaskSet ReadTaskSet(string path, string priorityType = "RM")
+    TaskSet ReadTaskSet(std::string path, std::string priorityType = "RM")
     {
+        using namespace std;
         ReadFrequencyModeRatio(path);
 
-        vector<Task> taskSet;
+        std::vector<Task> taskSet;
 
         fstream file;
         file.open(path, ios::in);
@@ -391,14 +392,14 @@ namespace rt_num_opt
             TaskSet ttt(taskSet);
             ttt = Reorder(ttt, priorityType);
             if (debugMode == 1)
-                cout << "Finish reading the data file succesfully!\n";
+                std::cout << "Finish reading the data file succesfully!\n";
             return ttt;
         }
         else
         {
-            cout << Color::red << "The path does not exist in ReadTaskSet!" << endl
-                 << path
-                 << Color::def << endl;
+            std::cout << Color::red << "The path does not exist in ReadTaskSet!" << std::endl
+                      << path
+                      << Color::def << std::endl;
             throw;
         }
     }
@@ -426,7 +427,7 @@ namespace rt_num_opt
         {
             if (processorTasks.find(tasks[i].processorId) == processorTasks.end())
             {
-                vector<int> ttt{tasks[i].id};
+                std::vector<int> ttt{tasks[i].id};
                 processorTasks[tasks[i].processorId] = ttt;
             }
             else
@@ -463,7 +464,7 @@ namespace rt_num_opt
     //     {
     //         if (dataInLine.size() != 5)
     //         {
-    //             cout << red << "The length of dataInLine in Task constructor is wrong! Must be 5!\n"
+    //             std::cout << red << "The length of dataInLine in Task constructor is wrong! Must be 5!\n"
     //                  << def;
     //             throw;
     //         }
@@ -477,8 +478,8 @@ namespace rt_num_opt
 
     //     void print()
     //     {
-    //         cout << "The period is: " << period << " The executionTime is " << executionTime << " The deadline is "
-    //              << deadline << " The overhead is " << overhead << " The offset is " << offset << endl;
+    //         std::cout << "The period is: " << period << " The executionTime is " << executionTime << " The deadline is "
+    //              << deadline << " The overhead is " << overhead << " The offset is " << offset << std::endl;
     //     }
 
     //     double utilization() const
@@ -494,7 +495,7 @@ namespace rt_num_opt
 
     // void Print(TaskSet &tasks)
     // {
-    //     cout << "The task set is printed as follows" << endl;
+    //     std::cout << "The task set is printed as follows" << std::endl;
     //     for (auto &task : tasks)
     //         task.print();
     // }
@@ -520,7 +521,7 @@ namespace rt_num_opt
     //             parameterList.push_back((T)(taskset[i].offset));
     //         else
     //         {
-    //             cout << red << "parameterType in GetParameter is not recognized!\n"
+    //             std::cout << red << "parameterType in GetParameter is not recognized!\n"
     //                  << def;
     //             throw;
     //         }
@@ -549,7 +550,7 @@ namespace rt_num_opt
     //             parameterList(i, 0) = ((T)(taskset[i].offset));
     //         else
     //         {
-    //             cout << red << "parameterType in GetParameter is not recognized!\n"
+    //             std::cout << red << "parameterType in GetParameter is not recognized!\n"
     //                  << def;
     //             throw;
     //         }
@@ -597,7 +598,7 @@ namespace rt_num_opt
     //     int N = tasks.size();
     //     if (N == 0)
     //     {
-    //         cout << red << "Empty task set in HyperPeriod()!\n";
+    //         std::cout << red << "Empty task set in HyperPeriod()!\n";
     //         throw;
     //     }
     //     else
@@ -608,7 +609,7 @@ namespace rt_num_opt
     //             hyper = lcm(hyper, tasks[i].period);
     //             if (hyper < 0 || hyper > LLONG_MAX)
     //             {
-    //                 cout << red << "The hyper-period over flows!" << def << endl;
+    //                 std::cout << red << "The hyper-period over flows!" << def << std::endl;
     //                 throw;
     //             }
     //         }
@@ -632,7 +633,7 @@ namespace rt_num_opt
     //     }
     //     else
     //     {
-    //         cout << red << "Unrecognized priorityType in Reorder!\n"
+    //         std::cout << red << "Unrecognized priorityType in Reorder!\n"
     //              << def;
     //         throw;
     //     }
@@ -673,14 +674,14 @@ namespace rt_num_opt
     //         TaskSet ttt(taskSet);
     //         ttt = Reorder(ttt, priorityType);
     //         if (debugMode == 1)
-    //             cout << "Finish reading the data file succesfully!\n";
+    //             std::cout << "Finish reading the data file succesfully!\n";
     //         return ttt;
     //     }
     //     else
     //     {
-    //         cout << red << "The path does not exist in ReadTaskSet!" << endl
+    //         std::cout << red << "The path does not exist in ReadTaskSet!" << std::endl
     //              << path
-    //              << def << endl;
+    //              << def << std::endl;
     //         throw;
     //     }
     // }

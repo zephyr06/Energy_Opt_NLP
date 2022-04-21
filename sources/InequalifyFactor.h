@@ -26,7 +26,7 @@
 #include "GlobalVariables.h"
 namespace rt_num_opt
 {
-    using namespace std;
+    // using namespace std;
     // using namespace gtsam;
 
     typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;

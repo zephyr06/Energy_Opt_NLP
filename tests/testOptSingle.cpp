@@ -9,6 +9,8 @@
 #include "../sources/profilier.h"
 using namespace std::chrono;
 using namespace rt_num_opt;
+using namespace std;
+
 using Opt_LL = Energy_Opt<Task, RTA_LL>;
 using Opt_WAP = Energy_Opt<Task, RTA_WAP>;
 

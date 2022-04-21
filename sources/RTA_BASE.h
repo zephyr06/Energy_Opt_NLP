@@ -48,14 +48,14 @@ namespace rt_num_opt
             VectorDynamic res = GenerateVectorDynamic(N);
             if (printRTA)
             {
-                cout << "Response time analysis of the task set is:" << endl;
+                std::cout << "Response time analysis of the task set is:" << std::endl;
             }
             for (int i = 0; i < N; i++)
             {
                 res(i, 0) = RTA_Common_Warm(warmStart(i, 0), i);
                 if (printRTA)
                 {
-                    cout << "Task " << i << ": " << res(i, 0) << endl;
+                    std::cout << "Task " << i << ": " << res(i, 0) << std::endl;
                 }
                 if (res(i, 0) >= INT32_MAX - 10000)
                 {
@@ -95,21 +95,21 @@ namespace rt_num_opt
             {
                 double rta = RTA_Common_Warm(warmStart(i, 0), i);
                 if (whetherPrint)
-                    cout << "response time for task " << i << " is " << rta << " and deadline is "
-                         << min(tasks.tasks_[i].deadline, tasks.tasks_[i].period) << endl;
+                    std::cout << "response time for task " << i << " is " << rta << " and deadline is "
+                              << min(tasks.tasks_[i].deadline, tasks.tasks_[i].period) << std::endl;
                 if (rta + tol > min(tasks.tasks_[i].deadline, tasks.tasks_[i].period))
                 {
                     if (whetherPrint)
                     {
-                        cout << "The current task set is not schedulable because of task " << i << " "
-                             << "!\n";
+                        std::cout << "The current task set is not schedulable because of task " << i << " "
+                                  << "!\n";
                     }
 
                     return false;
                 }
             }
             if (whetherPrint)
-                cout << endl;
+                std::cout << std::endl;
             return true;
         }
 

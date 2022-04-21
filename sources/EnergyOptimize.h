@@ -23,7 +23,7 @@ namespace rt_num_opt
     }
     MatrixDynamic GetNonzeroRow(MatrixDynamic &m)
     {
-        vector<int> nonZeroRowIndex;
+        std::vector<int> nonZeroRowIndex;
         for (uint i = 0; i < m.rows(); i++)
         {
             for (uint j = 0; j < m.cols(); j++)
@@ -47,7 +47,7 @@ namespace rt_num_opt
     namespace EnergyOptimize
     {
         template <typename FactorGraphType>
-        pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks)
+        std::pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks)
         {
             BeginTimer(__func__);
 
@@ -64,15 +64,15 @@ namespace rt_num_opt
             gtsam::Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
             if (debugMode == 1)
             {
-                cout << Color::green;
+                std::cout << Color::green;
                 // std::lock_guard<std::mutex> lock(mtx);
                 auto sth = graph.linearize(initialEstimateFG)->jacobian();
                 MatrixDynamic jacobianCurr = sth.first;
-                std::cout << "Current Jacobian matrix:" << endl;
-                std::cout << jacobianCurr << endl;
-                std::cout << "Current b vector: " << endl;
-                std::cout << sth.second << endl;
-                cout << Color::def << endl;
+                std::cout << "Current Jacobian matrix:" << std::endl;
+                std::cout << jacobianCurr << std::endl;
+                std::cout << "Current b vector: " << std::endl;
+                std::cout << sth.second << std::endl;
+                std::cout << Color::def << std::endl;
             }
 
             gtsam::Values result;
@@ -100,9 +100,9 @@ namespace rt_num_opt
                 // print some messages
                 if (debugMode == 1)
                 {
-                    cout << "*****************************************" << endl;
-                    cout << "Inner iterations " << optimizer.getInnerIterations() << endl;
-                    cout << "lambda " << optimizer.lambda() << endl;
+                    std::cout << "*****************************************" << std::endl;
+                    std::cout << "Inner iterations " << optimizer.getInnerIterations() << std::endl;
+                    std::cout << "lambda " << optimizer.lambda() << std::endl;
                 }
             }
 
@@ -112,22 +112,22 @@ namespace rt_num_opt
                 eliminationRecordGlobal.PrintViolatedFactor();
             }
 
-            cout << "Analyze descent direction:--------------------------" << endl;
+            std::cout << "Analyze descent direction:--------------------------" << std::endl;
             MatrixDynamic cDDMatrix = graphForC.linearize(result)->jacobian().first;
             VectorDynamic cDD = cDDMatrix.diagonal();
-            cout << cDD << endl;
-            cout << endl;
+            std::cout << cDD << std::endl;
+            std::cout << std::endl;
             int exactJacobianRef = exactJacobian;
             exactJacobian = 1;
             auto jPair = graphForJ.linearize(result)->jacobian();
             MatrixDynamic jDDRaw = jPair.first;
-            cout << jDDRaw << endl
-                 << endl;
+            std::cout << jDDRaw << std::endl
+                      << std::endl;
             MatrixDynamic jDD = GetNonzeroRow(jDDRaw);
-            cout << jDD << endl;
+            std::cout << jDD << std::endl;
             VectorDynamic jError = jPair.second;
             exactJacobian = exactJacobianRef;
-            cout << jDD << endl;
+            std::cout << jDD << std::endl;
             // int a = 1;
 
             // auto start = high_resolution_clock::now();
@@ -157,37 +157,37 @@ namespace rt_num_opt
             rtaFromOpt = RTALLVector(tasks);
             if (debugMode == 1)
             {
-                cout << endl;
-                cout << Color::blue;
-                cout << "After optimization, the executionTime vector is " << endl
-                     << optComp << endl;
-                cout << "After optimization, the rta vector is " << endl
-                     << rtaFromOpt << endl;
-                cout << "The graph error is " << graph.error(result) << endl;
-                cout << Color::def;
-                cout << endl;
-                cout << Color::blue;
+                std::cout << std::endl;
+                std::cout << Color::blue;
+                std::cout << "After optimization, the executionTime vector is " << std::endl
+                          << optComp << std::endl;
+                std::cout << "After optimization, the rta vector is " << std::endl
+                          << rtaFromOpt << std::endl;
+                std::cout << "The graph error is " << graph.error(result) << std::endl;
+                std::cout << Color::def;
+
+                std::cout << Color::blue;
                 VectorDynamic newExecutionTime = FactorGraphEnergyLL::ExtractResults(initialEstimateFG, tasks);
                 UpdateTaskSetExecutionTime(tasks, newExecutionTime);
-                cout << "Before optimization, the total error is " << FactorGraphType::RealObj(tasks) << endl;
+                std::cout << "Before optimization, the total error is " << FactorGraphType::RealObj(tasks) << std::endl;
                 UpdateTaskSetExecutionTime(tasks, optComp);
-                cout << "After optimization, the total error is " << FactorGraphType::RealObj(tasks) << endl;
-                cout << Color::def;
+                std::cout << "After optimization, the total error is " << FactorGraphType::RealObj(tasks) << std::endl;
+                std::cout << Color::def;
             }
 
             // UpdateTaskSetExecutionTime(tasks, optComp);
             EndTimer(__func__);
-            return make_pair(optComp, FactorGraphType::RealObj(tasks));
+            return std::make_pair(optComp, FactorGraphType::RealObj(tasks));
         }
 
         template <typename FactorGraphType>
-        pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks)
+        std::pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks)
         {
             RTA_LL rr(tasks);
             if (!rr.CheckSchedulability(debugMode == 1))
             {
                 CoutWarning("The task set is not schedulable!");
-                return make_pair(GetParameterVD<double>(tasks, "executionTime"), 1e30);
+                return std::make_pair(GetParameterVD<double>(tasks, "executionTime"), 1e30);
             }
             VectorDynamic executionTimeRes;
             double err;
@@ -205,30 +205,30 @@ namespace rt_num_opt
                     // if (debugMode == 1)
                     // {
                     std::lock_guard<std::mutex> lock(mtx);
-                    cout << Color::blue << "After one iterate on updating weight parameter,\
+                    std::cout << Color::blue << "After one iterate on updating weight parameter,\
              the execution time become unschedulable and are"
-                         << endl
-                         << executionTimeRes << endl;
-                    cout << Color::def;
+                              << std::endl
+                              << executionTimeRes << std::endl;
+                    std::cout << Color::def;
                     // }
 
-                    return make_pair(periodPrev, err);
+                    return std::make_pair(periodPrev, err);
                 }
                 else
                 {
                     if (debugMode == 1)
                     {
                         std::lock_guard<std::mutex> lock(mtx);
-                        cout << Color::blue << "After one iterate on updating weight parameter,\
+                        std::cout << Color::blue << "After one iterate on updating weight parameter,\
              the execution time remain schedulable and are"
-                             << endl
-                             << executionTimeRes << endl;
-                        cout << Color::def;
+                                  << std::endl
+                                  << executionTimeRes << std::endl;
+                        std::cout << Color::def;
                     }
                 }
             }
 
-            return make_pair(executionTimeRes, err);
+            return std::make_pair(executionTimeRes, err);
         }
 
         /**
@@ -259,7 +259,7 @@ namespace rt_num_opt
             // {
             //     int N = tasks.size();
 
-            //     vector<int> wait_for_eliminate_index;
+            //     std::vector<int> wait_for_eliminate_index;
             //     for (uint i = 0; i < tasks.size(); i++)
             //     {
             //         if (maskForElimination[i] && tasks[i].period != ceil(tasks[i].period))
@@ -270,11 +270,11 @@ namespace rt_num_opt
 
             //         VectorDynamic rtaBase = RTALLVector(tasks);
 
-            //         vector<pair<int, double>> objectiveVec;
+            //         std::vector<pair<int, double>> objectiveVec;
             //         objectiveVec.reserve(wait_for_eliminate_index.size());
             //         for (uint i = 0; i < wait_for_eliminate_index.size(); i++)
             //         {
-            //             objectiveVec.push_back(make_pair(wait_for_eliminate_index[i], coeff(wait_for_eliminate_index[i] * 2) * -1));
+            //             objectiveVec.push_back(std::make_pair(wait_for_eliminate_index[i], coeff(wait_for_eliminate_index[i] * 2) * -1));
             //         }
             //         sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
             //         int iterationNumber = 0;
@@ -330,7 +330,7 @@ namespace rt_num_opt
             // }
             else
             {
-                cout << "input error in ClampComputationTime: " << roundTypeInClamp << endl;
+                std::cout << "input error in ClampComputationTime: " << roundTypeInClamp << std::endl;
                 throw;
             }
             return;
@@ -372,15 +372,15 @@ namespace rt_num_opt
             params.setlambdaUpperBound(upperLambda);
             if (debugMode == 1)
             {
-                cout << Color::green;
+                std::cout << Color::green;
                 // std::lock_guard<std::mutex> lock(mtx);
                 auto sth = graph.linearize(initialEstimateFG)->jacobian();
                 MatrixDynamic jacobianCurr = sth.first;
-                std::cout << "Current Jacobian matrix:" << endl;
-                std::cout << jacobianCurr << endl;
-                std::cout << "Current b vector: " << endl;
-                std::cout << sth.second << endl;
-                cout << Color::def << endl;
+                std::cout << "Current Jacobian matrix:" << std::endl;
+                std::cout << jacobianCurr << std::endl;
+                std::cout << "Current b vector: " << std::endl;
+                std::cout << sth.second << std::endl;
+                std::cout << Color::def << std::endl;
             }
 
             double lambdaCurr = upperLambda;
@@ -403,7 +403,7 @@ namespace rt_num_opt
                 if (debugMode == 1)
                 {
                     delta.print();
-                    cout << endl;
+                    std::cout << std::endl;
                 }
                 // double useless = graph.error(MergeValuesInElimination(initialEstimateFG, delta));
                 if (FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal))
@@ -416,19 +416,19 @@ namespace rt_num_opt
             {
                 if (FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal))
                 {
-                    cout << "Find a new elimination" << endl;
+                    std::cout << "Find a new elimination" << std::endl;
                 }
                 else
                 {
-                    cout << Color::red << "No new elimination found, algorithm ends!" << endl
-                         << Color::def;
+                    std::cout << Color::red << "No new elimination found, algorithm ends!" << std::endl
+                              << Color::def;
                 }
                 eliminationRecordGlobal.Print();
             }
         }
         // TODO: limit the number of outer loops
         template <typename FactorGraphType>
-        pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks)
+        std::pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks)
         {
             eliminationRecordGlobal.Initialize(tasks.size());
             InitializeGlobalVector(tasks.size());
@@ -517,9 +517,9 @@ namespace rt_num_opt
             // }
 
             double postError = FactorGraphType::RealObj(tasks);
-            cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << endl;
-            cout << "Best optimal found: " << valueGlobalOpt << endl;
-            cout << "After optimiazation found: " << postError << endl;
+            std::cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << std::endl;
+            std::cout << "Best optimal found: " << valueGlobalOpt << std::endl;
+            std::cout << "After optimiazation found: " << postError << std::endl;
             if (valueGlobalOpt < postError)
             {
                 UpdateTaskSetExecutionTime(tasks, vectorGlobalOpt);
@@ -535,11 +535,11 @@ namespace rt_num_opt
             {
                 if (enableMaxComputationTimeRestrict && tasks[i].executionTime > MaxComputationTimeRestrict * tasks[i].executionTimeOrg + 1e-3)
                 {
-                    CoutWarning("Unfeasible result found! Bound constraint violated by " + to_string(tasks[i].executionTime - MaxComputationTimeRestrict * tasks[i].executionTimeOrg));
+                    CoutWarning("Unfeasible result found! Bound constraint violated by " + std::to_string(tasks[i].executionTime - MaxComputationTimeRestrict * tasks[i].executionTimeOrg));
                     break;
                 }
             }
-            return make_pair(GetParameterVD<double>(tasks, "executionTime"), FactorGraphType::RealObj(tasks));
+            return std::make_pair(GetParameterVD<double>(tasks, "executionTime"), FactorGraphType::RealObj(tasks));
         }
     }
 } // namespace rt_num_opt

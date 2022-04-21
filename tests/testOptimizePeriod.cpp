@@ -292,7 +292,7 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
     UpdateTaskSetPeriod(tasks, optComp);
     cout << "The objective function is " << RealObj(tasks, coeff) << endl;
     cout << Color::def;
-    return make_pair(optComp, RealObj(tasks, coeff));
+    return std::make_pair(optComp, RealObj(tasks, coeff));
 }
 VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
                                        std::vector<bool> &eliminationMask,

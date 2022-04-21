@@ -4,20 +4,20 @@
 namespace rt_num_opt
 {
     using namespace ControlOptimize;
-    void AddEntry(string pathRes, double val)
+    void AddEntry(std::string pathRes, double val)
     {
-        ofstream outfileWrite;
+        std::ofstream outfileWrite;
         outfileWrite.open(pathRes,
                           std::ios_base::app);
-        outfileWrite << val << endl;
+        outfileWrite << val << std::endl;
         outfileWrite.close();
     }
-    void AddEntry(string pathRes, double val1, double val2)
+    void AddEntry(std::string pathRes, double val1, double val2)
     {
-        ofstream outfileWrite;
+        std::ofstream outfileWrite;
         outfileWrite.open(pathRes,
                           std::ios_base::app);
-        outfileWrite << val1 << ", " << val2 << endl;
+        outfileWrite << val1 << ", " << val2 << std::endl;
         outfileWrite.close();
     }
 
@@ -31,19 +31,19 @@ namespace rt_num_opt
  *  2 means baseline result, MUAi
  *  3 means unrelated;
  */
-    int TargetFileType(string file)
+    int TargetFileType(std::string file)
     {
-        if (file.find(".txt") == file.length() - 4 && file.find(".txt") != string::npos)
+        if (file.find(".txt") == file.length() - 4 && file.find(".txt") != std::string::npos)
             return 0;
-        else if (file.find("GPResult") != string::npos)
+        else if (file.find("GPResult") != std::string::npos)
             return 1;
-        else if (file.find("BFSResult") != string::npos)
+        else if (file.find("BFSResult") != std::string::npos)
             return 2;
         else
             return 3;
     }
     /* Extract case ID, input requirements are the same as above*/
-    int ExtractCaseID(string file)
+    int ExtractCaseID(std::string file)
     {
         int id;
         std::istringstream(SplitStringMy(file, ".")[0].substr(4)) >> id;
@@ -57,25 +57,25 @@ namespace rt_num_opt
  * @param path name of target file
  * @return pair<double, double> {runTime, obj}
  */
-    pair<double, double> ReadBaselineZhao20(string directory, string path)
+    std::pair<double, double> ReadBaselineZhao20(std::string directory, std::string path)
     {
-        fstream file;
-        file.open(directory + "/" + path, ios::in);
+        std::fstream file;
+        file.open(directory + "/" + path, std::ios::in);
         if (file.is_open())
         {
-            string line;
+            std::string line;
             getline(file, line);
             auto data = ReadLine(line, " ");
             TaskSet tasks;
             VectorDynamic coeff;
-            std::tie(tasks, coeff) = ReadControlCase(directory + "/" + "Case" + to_string(ExtractCaseID(path)) + ".txt");
+            std::tie(tasks, coeff) = ReadControlCase(directory + "/" + "Case" + std::to_string(ExtractCaseID(path)) + ".txt");
             double initialError = FactorGraphInManifold::RealObj(tasks, coeff);
             VectorDynamic periods;
             if (TargetFileType(path) == 1) // GP
             {
-                vector<double>::const_iterator first = data.begin() + 3;
-                vector<double>::const_iterator last = data.end();
-                vector<double> newVec(first, last);
+                std::vector<double>::const_iterator first = data.begin() + 3;
+                std::vector<double>::const_iterator last = data.end();
+                std::vector<double> newVec(first, last);
                 for (auto &x : newVec)
                 {
                     x = round(x);
@@ -86,9 +86,9 @@ namespace rt_num_opt
             {
                 getline(file, line);
                 auto data = ReadLine(line, " ");
-                vector<double>::const_iterator first = data.begin() + 1;
-                vector<double>::const_iterator last = data.end() - 1;
-                vector<double> newVec(first, last);
+                std::vector<double>::const_iterator first = data.begin() + 1;
+                std::vector<double>::const_iterator last = data.end() - 1;
+                std::vector<double> newVec(first, last);
                 periods = Vector2Eigen(newVec);
                 for (auto &x : newVec)
                 {
@@ -106,20 +106,20 @@ namespace rt_num_opt
             RTA_LL r(tasks);
             if (r.CheckSchedulability() || TargetFileType(path) == 2)
             {
-                return make_pair(data[0], data[1]);
+                return std::make_pair(data[0], data[1]);
             }
             else // return initial estimate
             {
                 if (TargetFileType(path) == 2)
                     CoutWarning("Find one unschedulable baseline assignment: " + path);
 
-                return make_pair(data[0], initialError);
+                return std::make_pair(data[0], initialError);
             }
         }
         else
         {
             CoutError("Path error in ReadBaselineGPR");
-            return make_pair(-1, -1);
+            return std::make_pair(-1, -1);
         }
     }
     /**
@@ -153,43 +153,43 @@ namespace rt_num_opt
     {
         runMode = "normal";
         const char *pathDataset;
-        string str = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N" + to_string(Nn) + "/";
+        std::string str = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N" + std::to_string(Nn) + "/";
         pathDataset = str.c_str();
         if (debugMode == 1)
             printf("Directory: %s\n", pathDataset);
 
-        vector<vector<double>> objVecAll;
-        vector<double> dummy;
+        std::vector<std::vector<double>> objVecAll;
+        std::vector<double> dummy;
         for (int i = 0; i < 3; i++)
             objVecAll.push_back(dummy);
-        vector<vector<double>> runTimeAll = objVecAll;
-        vector<string> failedFiles;
+        std::vector<std::vector<double>> runTimeAll = objVecAll;
+        std::vector<std::string> failedFiles;
         int N;
         if (debugMode == 1)
             printf("Directory: %s\n", pathDataset);
-        vector<string> errorFiles;
+        std::vector<std::string> errorFiles;
         double worstObjRatio = -100;
-        string worstFile = "";
+        std::string worstFile = "";
         for (const auto &file : ReadFilesInDirectory(pathDataset))
         {
             // if (debugMode)
             int type = TargetFileType(file);
 
-            string path = pathDataset + file;
+            std::string path = pathDataset + file;
             switch (type)
             {
             case 0: // perform optimization
             {
-                cout << file << endl;
+                std::cout << file << std::endl;
                 relativeErrorTolerance = relativeErrorToleranceInit;
                 TaskSet tasks;
                 VectorDynamic coeff;
                 std::tie(tasks, coeff) = ReadControlCase(path);
                 N = tasks.size();
                 std::vector<bool> maskForElimination(tasks.size(), false); // TODO: try *2 to ?
-                auto start = chrono::high_resolution_clock::now();
+                auto start = std::chrono::high_resolution_clock::now();
                 auto res = OptimizeTaskSetIterative<FactorGraphType>(tasks, coeff, maskForElimination);
-                auto stop = chrono::high_resolution_clock::now();
+                auto stop = std::chrono::high_resolution_clock::now();
                 auto duration = duration_cast<microseconds>(stop - start);
                 double timeTaken = double(duration.count()) / 1e6;
                 runTimeAll[0].push_back(timeTaken);
@@ -217,9 +217,9 @@ namespace rt_num_opt
                 runTimeAll[2].push_back(res.first);
                 objVecAll[2].push_back(res.second);
                 // record results for plot
-                string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-                                 batchOptimizeFolder + "/EnergySaveRatio/N" +
-                                 to_string(N) + ".txt";
+                std::string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                                      batchOptimizeFolder + "/EnergySaveRatio/N" +
+                                      std::to_string(N) + ".txt";
                 AddEntry(pathRes, objVecAll[0].back() / res.second);
                 double relativeGapCurr = (objVecAll[0].back() - objVecAll[2].back()) / objVecAll[2].back();
                 if (relativeGapCurr > worstObjRatio)
@@ -235,25 +235,25 @@ namespace rt_num_opt
             }
             }
         }
-        string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-                         batchOptimizeFolder + "/time_task_number.txt";
+        std::string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                              batchOptimizeFolder + "/time_task_number.txt";
         AddEntry(pathRes, Average(runTimeAll[0]), Average(runTimeAll[2]));
 
-        cout << Color::blue << endl;
-        cout << "Average relative performance gap (NO: MUA) is " << RelativeGap(objVecAll[0], objVecAll[2]) << endl;
-        cout << "Average relative performance gap (NO: MIGP) is " << RelativeGap(objVecAll[0], objVecAll[1]) << endl;
-        cout << "Speed ratio (NO: MUA) is " << SpeedRatio(runTimeAll[0], runTimeAll[2]) << endl;
-        cout << "Average time consumed is " << Average(runTimeAll[0]) << endl;
-        cout << Color::def << endl;
+        std::cout << Color::blue << std::endl;
+        std::cout << "Average relative performance gap (NO: MUA) is " << RelativeGap(objVecAll[0], objVecAll[2]) << std::endl;
+        std::cout << "Average relative performance gap (NO: MIGP) is " << RelativeGap(objVecAll[0], objVecAll[1]) << std::endl;
+        std::cout << "Speed ratio (NO: MUA) is " << SpeedRatio(runTimeAll[0], runTimeAll[2]) << std::endl;
+        std::cout << "Average time consumed is " << Average(runTimeAll[0]) << std::endl;
+        std::cout << Color::def << std::endl;
 
-        cout << "Worst relative gap is " << worstObjRatio << endl;
-        cout << "Worst file is " << worstFile << endl;
+        std::cout << "Worst relative gap is " << worstObjRatio << std::endl;
+        std::cout << "Worst file is " << worstFile << std::endl;
 
         if (printFailureFile)
         {
-            cout << endl;
+            std::cout << std::endl;
             for (auto &file : failedFiles)
-                cout << file << endl;
+                std::cout << file << std::endl;
         }
     }
 } // namespace rt_num_opt

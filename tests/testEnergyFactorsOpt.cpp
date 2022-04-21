@@ -1,6 +1,7 @@
 #include "../sources/EnergyOptimize.h"
 #include "../sources/profilier.h"
 using namespace rt_num_opt;
+using namespace std;
 TEST(case1, v1)
 {
     BeginTimer("main");

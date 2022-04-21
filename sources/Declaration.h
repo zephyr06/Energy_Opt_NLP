@@ -64,9 +64,9 @@ namespace rt_num_opt
     }
 
     template <class T>
-    vector<T> Eigen2Vector(const VectorDynamic &input)
+    std::vector<T> Eigen2Vector(const VectorDynamic &input)
     {
-        vector<T> res;
+        std::vector<T> res;
         LLint len = input.rows();
         res.reserve(len);
         for (LLint i = 0; i < len; i++)
@@ -74,7 +74,7 @@ namespace rt_num_opt
         return res;
     }
     template <class T>
-    VectorDynamic Vector2Eigen(const vector<T> &input)
+    VectorDynamic Vector2Eigen(const std::vector<T> &input)
     {
 
         LLint len = input.size();

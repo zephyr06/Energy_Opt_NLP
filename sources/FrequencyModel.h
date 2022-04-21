@@ -37,8 +37,8 @@ namespace rt_num_opt
     {
         return task.executionTime;
     }
-    void WriteFrequencyModelRatio(ofstream &file)
+    void WriteFrequencyModelRatio(std::ofstream &file)
     {
-        file << "Frequency_Ratio: " << RandRange(0.1, 0.9) << endl;
+        file << "Frequency_Ratio: " << RandRange(0.1, 0.9) << std::endl;
     }
 } // namespace rt_num_opt

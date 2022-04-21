@@ -28,7 +28,7 @@
 namespace rt_num_opt
 {
 
-    using namespace std;
+    // using namespace std;
     // using namespace gtsam;
 
     // typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
@@ -45,11 +45,11 @@ namespace rt_num_opt
     class MultiKeyFactor : public gtsam::NoiseModelFactor
     {
     public:
-        vector<gtsam::Symbol> keyVec;
+        std::vector<gtsam::Symbol> keyVec;
         uint dimension;
         LambdaMultiKey lambdaMK;
 
-        MultiKeyFactor(vector<gtsam::Symbol> keyVec, LambdaMultiKey lambdaMK,
+        MultiKeyFactor(std::vector<gtsam::Symbol> keyVec, LambdaMultiKey lambdaMK,
                        gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor(model, keyVec),
                                                         keyVec(keyVec),
                                                         dimension(keyVec.size()), lambdaMK(lambdaMK)
@@ -80,10 +80,10 @@ namespace rt_num_opt
                 if (debugMode == 1)
                 {
                     std::lock_guard<std::mutex> lock(mtx);
-                    cout << Color::blue;
+                    std::cout << Color::blue;
                     // PrintControlValues(x);
                     // x.print();
-                    cout << Color::def;
+                    std::cout << Color::def;
                 }
             }
             EndTimer("MultiKeyFactor");

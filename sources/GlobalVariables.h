@@ -36,18 +36,18 @@ namespace rt_num_opt
 
         void print()
         {
-            cout << "TaskIndex: " << taskIndex << " ";
+            std::cout << "TaskIndex: " << taskIndex << " ";
             if (type == EliminationType::Not)
             {
-                cout << "Not eliminated!" << endl;
+                std::cout << "Not eliminated!" << std::endl;
             }
             else if (type == EliminationType::RTA)
             {
-                cout << "eliminated by RTA" << endl;
+                std::cout << "eliminated by RTA" << std::endl;
             }
             else if (type == EliminationType::Bound)
             {
-                cout << "eliminated by bound constraint" << endl;
+                std::cout << "eliminated by bound constraint" << std::endl;
             }
             else
             {
@@ -131,13 +131,13 @@ namespace rt_num_opt
         }
         void Print()
         {
-            cout << "The elimination record is " << endl;
+            std::cout << "The elimination record is " << std::endl;
             for (auto x : record)
             {
-                // cout << x << ", ";
+                // std::cout << x << ", ";
                 x.print();
             }
-            cout << endl;
+            std::cout << std::endl;
         }
         void PrintViolatedFactor()
         {
@@ -149,7 +149,7 @@ namespace rt_num_opt
                     record[i].print();
                 }
             }
-            cout << endl;
+            std::cout << std::endl;
         }
     };
     EliminationRecord eliminationRecordGlobal;

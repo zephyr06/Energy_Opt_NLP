@@ -78,10 +78,10 @@ namespace rt_num_opt
             int index;
             VectorDynamic rtaBase;
             int dimension;
-            vector<gtsam::Symbol> keyVec;
+            std::vector<gtsam::Symbol> keyVec;
             LambdaMultiKey f_with_RTA;
 
-            RTARelatedFactor(vector<gtsam::Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic rtaBase,
+            RTARelatedFactor(std::vector<gtsam::Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic rtaBase,
                              gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor(model, keyVec), tasks(tasks), index(index), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
             {
                 f_with_RTA = [tasks, index, rtaBase](const gtsam::Values &x)
@@ -131,10 +131,10 @@ namespace rt_num_opt
                     if (debugMode == 1)
                     {
                         std::lock_guard<std::mutex> lock(mtx);
-                        cout << Color::blue;
+                        std::cout << Color::blue;
                         // PrintControlValues(x);
                         // x.print();
-                        cout << Color::def;
+                        std::cout << Color::def;
                     }
                 }
                 // uint t = x.size();
@@ -185,7 +185,7 @@ namespace rt_num_opt
                 }
                 coeff(index) = 1;
                 error(0) = rtaAtIndex - (coeff * executionTimeVecCurr)(0, 0);
-                // cout << "Real error: " << RealObj(tasks) << endl;
+                // std::cout << "Real error: " << RealObj(tasks) << std::endl;
                 return error;
             };
             auto model = gtsam::noiseModel::Constrained::All(1);
@@ -240,7 +240,7 @@ namespace rt_num_opt
                                                                     1));
                     // if (debugMode == 1)
                     // {
-                    //     cout << "Task " << task_.id << "'s Energy cost is is " << err << endl;
+                    //     std::cout << "Task " << task_.id << "'s Energy cost is is " << err << std::endl;
                     // }
                     return err;
                 };
@@ -387,7 +387,7 @@ namespace rt_num_opt
             whether_new_eliminate = false;
             if (debugMode == 1)
             {
-                cout << GetParameterVD<double>(tasks, "executionTime") << endl;
+                std::cout << GetParameterVD<double>(tasks, "executionTime") << std::endl;
             }
 
             RTA_LL r(tasks);
@@ -422,8 +422,8 @@ namespace rt_num_opt
                 {
                     std::lock_guard<std::mutex> lock(mtx);
                     for (auto a : maskForElimination)
-                        cout << a << ", ";
-                    cout << endl;
+                        std::cout << a << ", ";
+                    std::cout << std::endl;
                 }
             }
             EndTimer(__func__);

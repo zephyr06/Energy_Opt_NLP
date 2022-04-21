@@ -23,7 +23,7 @@ namespace rt_num_opt
  * @param type 
  * @return gtsam::Symbol 
  */
-    gtsam::Symbol GenerateControlKey(int idtask, string type)
+    gtsam::Symbol GenerateControlKey(int idtask, std::string type)
     {
         if (type == "period")
         {
@@ -102,7 +102,7 @@ namespace rt_num_opt
         }
     };
     /* in-place adjustment of tasks' order; highest order being the first in tasks */
-    void Reorder(TaskSet &tasks, VectorDynamic &coeff, string priority_type = "RM")
+    void Reorder(TaskSet &tasks, VectorDynamic &coeff, std::string priority_type = "RM")
     {
         std::vector<TaskAugment> tasksAug;
         tasksAug.reserve(tasks.size());
@@ -119,10 +119,10 @@ namespace rt_num_opt
         }
     }
 
-    /* @brief return a string with expected precision by adding leading 0 */
-    string to_string_precision(int a, int precision)
+    /* @brief return a std::string with expected precision by adding leading 0 */
+    std::string to_string_precision(int a, int precision)
     {
-        return std::string(4 - min(4, to_string(a).length()), '0') + to_string(a);
+        return std::string(4 - min(4, std::to_string(a).length()), '0') + std::to_string(a);
     }
 
     template <typename T>
@@ -130,7 +130,7 @@ namespace rt_num_opt
     {
         for (auto x : vec)
         {
-            cout << x << ", ";
+            std::cout << x << ", ";
         }
     }
 

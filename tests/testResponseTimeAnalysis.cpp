@@ -7,6 +7,7 @@
 #include "../sources/ControlOptimize.h"
 
 using namespace rt_num_opt;
+using namespace std;
 TEST(hyperPeriod, RTA)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");
@@ -120,9 +121,9 @@ TEST(RTA, ResponseTimeAnalysisWarm)
     RTA_LL r(task_set);
     double rta3Actual = r.ResponseTimeAnalysisWarm(rta3Expect - 100, task_set[2], hp);
     CHECK_EQUAL(rta3Expect, rta3Actual);
-    cout << "RTA "
-         << "ResponseTimeAnalysisWarm"
-         << " passed\n";
+    std::cout << "RTA "
+              << "ResponseTimeAnalysisWarm"
+              << " passed\n";
 }
 
 TEST(RTA_LL, v1)

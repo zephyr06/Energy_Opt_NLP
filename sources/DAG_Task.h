@@ -52,7 +52,7 @@ namespace rt_num_opt
         }
     }
 
-    pair<Graph, IndexVertexMap> EstablishGraphOnlyNodes(TaskSet &tasks)
+    std::pair<Graph, IndexVertexMap> EstablishGraphOnlyNodes(TaskSet &tasks)
     {
 
         Graph g;
@@ -105,7 +105,7 @@ namespace rt_num_opt
             volume = 0;
         }
 
-        static string Type() { return "dag"; }
+        static std::string Type() { return "dag"; }
 
         /**
      * @brief weight of edge is the same as child task's execution time
@@ -198,8 +198,9 @@ namespace rt_num_opt
         }
     };
 
-    DAG_Model ReadDAG_Task(string path, string priorityType = "orig")
+    DAG_Model ReadDAG_Task(std::string path, std::string priorityType = "orig")
     {
+        using namespace std;
         TaskSet tasks = ReadTaskSet(path, priorityType);
         // some default parameters in this function
         string delimiter = ",";
@@ -232,21 +233,21 @@ namespace rt_num_opt
             }
 
             if (debugMode == 1)
-                cout << "Finish reading the data file" << path << " succesfully!\n";
+                std::cout << "Finish reading the data file" << path << " succesfully!\n";
             return dagModel;
         }
         else
         {
-            cout << Color::red << "The path does not exist in ReadTaskSet!" << endl
-                 << path
-                 << Color::def << endl;
+            std::cout << Color::red << "The path does not exist in ReadTaskSet!" << std::endl
+                      << path
+                      << Color::def << endl;
             throw;
         }
     }
 
-    vector<int> GetDependentTasks(DAG_Model &dagTasks, int index)
+    std::vector<int> GetDependentTasks(DAG_Model &dagTasks, int index)
     {
-        vector<int> dependentIndexes;
+        std::vector<int> dependentIndexes;
         Vertex v = dagTasks.index2Vertex_[index];
         boost::graph_traits<Graph>::in_edge_iterator ei, edge_end_i;
         for (boost::tie(ei, edge_end_i) = in_edges(v, dagTasks.graph_); ei != edge_end_i; ++ei)
@@ -270,29 +271,29 @@ namespace rt_num_opt
                    std::vector<double> &longestVec, std::vector<double> &weight)
             : TaskSetNormal(tasks), volumeVec_(volumeVec),
               longestVec_(longestVec), weightVec_(weight) {}
-        static string Type() { return "dag"; }
+        static std::string Type() { return "dag"; }
     };
 
-    TaskSetDAG ReadDAG_Tasks(string path, string priorityType = "orig")
+    TaskSetDAG ReadDAG_Tasks(std::string path, std::string priorityType = "orig")
     {
         ReadFrequencyModeRatio(path);
 
-        vector<Task> taskSet;
-        vector<double> volumeVec;
-        vector<double> longestVec;
-        vector<double> weightVec;
+        std::vector<Task> taskSet;
+        std::vector<double> volumeVec;
+        std::vector<double> longestVec;
+        std::vector<double> weightVec;
 
-        fstream file;
-        file.open(path, ios::in);
+        std::fstream file;
+        file.open(path, std::ios::in);
         if (file.is_open())
         {
-            string line;
+            std::string line;
 
             while (getline(file, line))
             {
                 if (!(line[0] >= '0' && line[0] <= '9'))
                     continue;
-                vector<double> dataInLine = ReadLine(line);
+                std::vector<double> dataInLine = ReadLine(line);
                 if (dataInLine.size() < 9)
                     CoutError("The path in ReadDAG_Tasks doesn't follow Melani format!");
                 weightVec.push_back(dataInLine.back());
@@ -309,14 +310,14 @@ namespace rt_num_opt
             tasks = Reorder(tasks, priorityType);
             TaskSetDAG dagTaskSets(tasks, volumeVec, longestVec, weightVec);
             if (debugMode == 1)
-                cout << "Finish reading the data file succesfully!\n";
+                std::cout << "Finish reading the data file succesfully!\n";
             return dagTaskSets;
         }
         else
         {
-            cout << Color::red << "The path does not exist in ReadTaskSet!" << endl
-                 << path
-                 << Color::def << endl;
+            std::cout << Color::red << "The path does not exist in ReadTaskSet!" << std::endl
+                      << path
+                      << Color::def << std::endl;
             throw;
         }
     }

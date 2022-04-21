@@ -168,8 +168,8 @@ namespace rt_num_opt
             {
                 std::lock_guard<std::mutex> lock(mtx);
                 for (auto a : maskForElimination)
-                    cout << a << ", ";
-                cout << endl;
+                    std::cout << a << ", ";
+                std::cout << std::endl;
             }
         }
 

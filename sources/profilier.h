@@ -67,6 +67,7 @@ bool compareProfiler(TimerDataProfiler a, TimerDataProfiler b)
 }
 void PrintTimer()
 {
+    using namespace std;
     std::cout.precision(4);
     vector<TimerDataProfiler> vec;
     double totalProfile = 0;

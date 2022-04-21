@@ -15,7 +15,7 @@ namespace rt_num_opt
         }
         RTA_WAP(const TaskSetNormal &tasks) : RTA_BASE(tasks) {}
 
-        static string type()
+        static std::string type()
         {
             return "WAP";
         }

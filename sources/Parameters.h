@@ -9,7 +9,7 @@ namespace rt_num_opt
 {
     cv::FileStorage ConfigParameters("/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
 
-    using namespace std;
+    // using namespace std;
     // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
     // int TASK_NUMBER_DYNAMIC = 10;
     int TASK_NUMBER = 0;
@@ -65,17 +65,17 @@ namespace rt_num_opt
     double disturb_max = (double)ConfigParameters["disturb_max"];
 
     const double punishmentFrequency = (double)ConfigParameters["punishmentFrequency"];
-    const string testDataSetName = (string)ConfigParameters["testDataSetName"];
-    string roundTypeInClamp = (string)ConfigParameters["roundTypeInClamp"];
-    string verbosityLM = (string)ConfigParameters["verbosityLM"];
-    string linearOptimizerType = (string)ConfigParameters["linearOptimizerType"];
+    const std::string testDataSetName = (std::string)ConfigParameters["testDataSetName"];
+    std::string roundTypeInClamp = (std::string)ConfigParameters["roundTypeInClamp"];
+    std::string verbosityLM = (std::string)ConfigParameters["verbosityLM"];
+    std::string linearOptimizerType = (std::string)ConfigParameters["linearOptimizerType"];
 
-    string clampTypeMiddle = (string)ConfigParameters["clampTypeMiddle"];
-    string controlPath = (string)ConfigParameters["controlPath"];
-    string runMode = (string)ConfigParameters["runMode"];
-    string batchOptimizeFolder = (string)ConfigParameters["batchOptimizeFolder"];
+    std::string clampTypeMiddle = (std::string)ConfigParameters["clampTypeMiddle"];
+    std::string controlPath = (std::string)ConfigParameters["controlPath"];
+    std::string runMode = (std::string)ConfigParameters["runMode"];
+    std::string batchOptimizeFolder = (std::string)ConfigParameters["batchOptimizeFolder"];
     const double parallelFactor = (double)ConfigParameters["parallelFactor"];
-    const string readTaskMode = (string)ConfigParameters["readTaskMode"];
+    const std::string readTaskMode = (std::string)ConfigParameters["readTaskMode"];
     const int granularityInBF = (int)ConfigParameters["granularityInBF"];
     const int debugMode = (int)ConfigParameters["debugMode"];
     const int adjustEliminateMaxIte = (int)ConfigParameters["adjustEliminateMaxIte"];

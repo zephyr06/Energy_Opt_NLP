@@ -18,7 +18,7 @@ namespace rt_num_opt
         {
             if (TASK_NUMBER == 0)
             {
-                cout << Color::red << "Please set TASK_NUMBER!" << Color::def << endl;
+                std::cout << Color::red << "Please set TASK_NUMBER!" << Color::def << std::endl;
                 throw;
             }
             return punishmentInBarrier * pow(10, TASK_NUMBER - 3) * pow(-1 * x, 1);
@@ -42,8 +42,8 @@ namespace rt_num_opt
             VectorDynamic resPlus;
             resPlus.resize(mOfJacobian, 1);
             resPlus = h(xDelta);
-            // cout << "resPlus" << endl
-            //      << resPlus << endl;
+            // cout << "resPlus" << std::endl
+            //      << resPlus << std::endl;
 
             xDelta(i, 0) = xDelta(i, 0) - 2 * deltaOptimizer;
             VectorDynamic resMinus;
@@ -85,7 +85,7 @@ namespace rt_num_opt
     // ------------------  convenient function for ClampComputationTime
 
     // to sort from the  smallest to biggest (minimum negative gradient first)
-    bool comparePair(const pair<int, double> &p1, const pair<int, double> &p2)
+    bool comparePair(const std::pair<int, double> &p1, const std::pair<int, double> &p2)
     {
         return (p1.second < p2.second);
     }

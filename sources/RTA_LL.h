@@ -27,7 +27,7 @@ namespace rt_num_opt
         }
 
         // the rest are helper functions
-        static string type()
+        static std::string type()
         {
             return "LL";
         }
@@ -35,8 +35,8 @@ namespace rt_num_opt
         double ResponseTimeAnalysisWarm_util_nece(double beginTime, const Task &taskCurr,
                                                   const TaskSet &tasksHighPriority)
         {
-            const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
-            const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
+            const std::vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
+            const std::vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
             int N = periodHigh.size();
 
             if (beginTime < 0)
@@ -49,7 +49,7 @@ namespace rt_num_opt
             }
             if (isnan(taskCurr.executionTime) || isnan(beginTime))
             {
-                cout << Color::red << "Nan executionTime detected" << def << endl;
+                std::cout << Color::red << "Nan executionTime detected" << def << std::endl;
                 throw "Nan";
             }
             if (taskCurr.executionTime < 0)
@@ -107,7 +107,7 @@ namespace rt_num_opt
                     CoutError("LoopCount error in RTA_LL");
                 }
             }
-            cout << "RTA analysis stops unexpectedly!\n";
+            std::cout << "RTA analysis stops unexpectedly!\n";
             throw;
         }
 
@@ -125,7 +125,7 @@ namespace rt_num_opt
 
         double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
         {
-            const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
+            const std::vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
             double executionTimeAll = taskCurr.executionTime;
             for (auto &task : tasksHighPriority)
                 executionTimeAll += task.executionTime;

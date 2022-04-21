@@ -60,7 +60,7 @@ namespace rt_num_opt
 
         if (debugMode == 1)
         {
-            cout << "Initial estimation for SA is " << initialEstimate << endl;
+            std::cout << "Initial estimation for SA is " << initialEstimate << std::endl;
             std::cout
                 << "fitness: " << best_moe.fitness * -1 << "\n"
                 << "time spent: " << diff.count() << " seconds" << std::endl;

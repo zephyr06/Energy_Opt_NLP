@@ -16,6 +16,7 @@ namespace rt_num_opt
     }
     std::pair<TaskSet, VectorDynamic> ReadControlCase(std::string path)
     {
+        using namespace std;
         fstream newfile;
         VectorDynamic coeffVec;
         vector<double>
@@ -50,6 +51,6 @@ namespace rt_num_opt
             Task t(0, period, 0, executionTimeVector[i], period, i, 0);
             tasks.push_back(t);
         }
-        return make_pair(tasks, coeffVec);
+        return std::make_pair(tasks, coeffVec);
     }
 } // namespace rt_num_opt

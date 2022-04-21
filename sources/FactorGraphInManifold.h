@@ -38,10 +38,10 @@ namespace rt_num_opt
             VectorDynamic coeff;
             VectorDynamic rtaBase;
             int dimension;
-            vector<gtsam::Symbol> keyVec;
+            std::vector<gtsam::Symbol> keyVec;
             LambdaMultiKey f_with_RTA;
 
-            RTARelatedFactor(vector<gtsam::Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic rtaBase,
+            RTARelatedFactor(std::vector<gtsam::Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic rtaBase,
                              gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor(model, keyVec), tasks(tasks), index(index), coeff(coeff), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
             {
                 f_with_RTA = [tasks, index, coeff, rtaBase](const gtsam::Values &x)
@@ -90,10 +90,10 @@ namespace rt_num_opt
                     if (debugMode == 1)
                     {
                         std::lock_guard<std::mutex> lock(mtx);
-                        cout << Color::blue;
+                        std::cout << Color::blue;
                         // PrintControlValues(x);
                         // x.print();
-                        cout << Color::def;
+                        std::cout << Color::def;
                     }
                 }
                 EndTimer("RTARelatedFactor_unwhitenedError");
@@ -209,8 +209,8 @@ namespace rt_num_opt
                 {
                     std::lock_guard<std::mutex> lock(mtx);
                     for (auto a : maskForElimination)
-                        cout << a << ", ";
-                    cout << endl;
+                        std::cout << a << ", ";
+                    std::cout << std::endl;
                 }
             }
 

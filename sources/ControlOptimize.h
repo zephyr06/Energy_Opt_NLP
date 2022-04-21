@@ -21,8 +21,8 @@ namespace rt_num_opt
     namespace ControlOptimize
     {
         template <typename FactorGraphType>
-        pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic &coeff,
-                                                           std::vector<bool> &maskForElimination)
+        std::pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic &coeff,
+                                                                std::vector<bool> &maskForElimination)
         {
             BeginTimer(__func__);
             gtsam::NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(maskForElimination, tasks, coeff);
@@ -35,15 +35,15 @@ namespace rt_num_opt
             gtsam::Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
             if (debugMode == 1)
             {
-                cout << Color::green;
+                std::cout << Color::green;
                 // std::lock_guard<std::mutex> lock(mtx);
                 auto sth = graph.linearize(initialEstimateFG)->jacobian();
                 MatrixDynamic jacobianCurr = sth.first;
-                std::cout << "Current Jacobian matrix:" << endl;
-                std::cout << jacobianCurr << endl;
-                std::cout << "Current b vector: " << endl;
-                std::cout << sth.second << endl;
-                cout << Color::def << endl;
+                std::cout << "Current Jacobian matrix:" << std::endl;
+                std::cout << jacobianCurr << std::endl;
+                std::cout << "Current b vector: " << std::endl;
+                std::cout << sth.second << std::endl;
+                std::cout << Color::def << std::endl;
             }
 
             gtsam::Values result;
@@ -76,37 +76,38 @@ namespace rt_num_opt
             rtaFromOpt = RTALLVector(tasks);
             if (debugMode == 1)
             {
-                cout << endl;
+                using namespace std;
+                cout << std::endl;
                 cout << Color::blue;
-                cout << "After optimization, the period vector is " << endl
-                     << optComp << endl;
-                cout << "After optimization, the rta vector is " << endl
-                     << rtaFromOpt << endl;
-                cout << "The graph error is " << graph.error(result) << endl;
+                cout << "After optimization, the period vector is " << std::endl
+                     << optComp << std::endl;
+                cout << "After optimization, the rta vector is " << std::endl
+                     << rtaFromOpt << std::endl;
+                cout << "The graph error is " << graph.error(result) << std::endl;
                 cout << Color::def;
-                cout << endl;
+                cout << std::endl;
                 cout << Color::blue;
                 UpdateTaskSetPeriod(tasks, FactorGraphType::ExtractResults(initialEstimateFG, tasks));
-                cout << "Before optimization, the total error is " << FactorGraphType::RealObj(tasks, coeff) << endl;
+                cout << "Before optimization, the total error is " << FactorGraphType::RealObj(tasks, coeff) << std::endl;
                 UpdateTaskSetPeriod(tasks, optComp);
-                cout << "The objective function is " << FactorGraphType::RealObj(tasks, coeff) << endl;
+                cout << "The objective function is " << FactorGraphType::RealObj(tasks, coeff) << std::endl;
                 cout << Color::def;
             }
 
             UpdateTaskSetPeriod(tasks, optComp);
             EndTimer(__func__);
-            return make_pair(optComp, FactorGraphType::RealObj(tasks, coeff));
+            return std::make_pair(optComp, FactorGraphType::RealObj(tasks, coeff));
         }
 
         template <typename FactorGraphType>
-        pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, VectorDynamic &coeff,
-                                                                   std::vector<bool> &maskForElimination)
+        std::pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, VectorDynamic &coeff,
+                                                                        std::vector<bool> &maskForElimination)
         {
             RTA_LL rr(tasks);
             if (!rr.CheckSchedulability(debugMode == 1))
             {
-                cout << "The task set is not schedulable!" << endl;
-                return make_pair(GetParameterVD<double>(tasks, "period"), 1e30);
+                std::cout << "The task set is not schedulable!" << std::endl;
+                return std::make_pair(GetParameterVD<double>(tasks, "period"), 1e30);
             }
             VectorDynamic periodRes;
             double err;
@@ -124,30 +125,30 @@ namespace rt_num_opt
                     if (debugMode == 1)
                     {
                         std::lock_guard<std::mutex> lock(mtx);
-                        cout << Color::blue << "After one iterate on updating weight parameter,\
+                        std::cout << Color::blue << "After one iterate on updating weight parameter,\
              the periods become unschedulable and are"
-                             << endl
-                             << periodRes << endl;
-                        cout << Color::def;
+                                  << std::endl
+                                  << periodRes << std::endl;
+                        std::cout << Color::def;
                     }
 
-                    return make_pair(periodPrev, err);
+                    return std::make_pair(periodPrev, err);
                 }
                 else
                 {
                     if (debugMode == 1)
                     {
                         std::lock_guard<std::mutex> lock(mtx);
-                        cout << Color::blue << "After one iterate on updating weight parameter,\
+                        std::cout << Color::blue << "After one iterate on updating weight parameter,\
              the periods remain schedulable and are"
-                             << endl
-                             << periodRes << endl;
-                        cout << Color::def;
+                                  << std::endl
+                                  << periodRes << std::endl;
+                        std::cout << Color::def;
                     }
                 }
             }
 
-            return make_pair(periodRes, err);
+            return std::make_pair(periodRes, err);
         }
 
         /**
@@ -175,7 +176,7 @@ namespace rt_num_opt
             {
                 int N = tasks.size();
 
-                vector<int> wait_for_eliminate_index;
+                std::vector<int> wait_for_eliminate_index;
                 for (uint i = 0; i < tasks.size(); i++)
                 {
                     if (maskForElimination[i] && tasks[i].period != ceil(tasks[i].period))
@@ -186,11 +187,11 @@ namespace rt_num_opt
 
                     VectorDynamic rtaBase = RTALLVector(tasks);
 
-                    vector<pair<int, double>> objectiveVec;
+                    std::vector<std::pair<int, double>> objectiveVec;
                     objectiveVec.reserve(wait_for_eliminate_index.size());
                     for (uint i = 0; i < wait_for_eliminate_index.size(); i++)
                     {
-                        objectiveVec.push_back(make_pair(wait_for_eliminate_index[i], coeff(wait_for_eliminate_index[i] * 2) * -1));
+                        objectiveVec.push_back(std::make_pair(wait_for_eliminate_index[i], coeff(wait_for_eliminate_index[i] * 2) * -1));
                     }
                     sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
                     int iterationNumber = 0;
@@ -246,7 +247,7 @@ namespace rt_num_opt
             }
             else
             {
-                cout << "input error in ClampComputationTime: " << roundTypeInClamp << endl;
+                std::cout << "input error in ClampComputationTime: " << roundTypeInClamp << std::endl;
                 throw;
             }
             return;
@@ -265,8 +266,8 @@ namespace rt_num_opt
         }
         // TODO: limit the number of outer loops
         template <typename FactorGraphType>
-        pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic &coeff,
-                                                             std::vector<bool> &maskForElimination)
+        std::pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic &coeff,
+                                                                  std::vector<bool> &maskForElimination)
         {
 
             VectorDynamic periodResCurr, periodResPrev;
@@ -337,9 +338,10 @@ namespace rt_num_opt
                 }
                 if (debugMode)
                 {
-                    cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + to_string(errCurr) << Color::def << endl;
+                    using namespace std;
+                    cout << Color::green << "Loop " + to_string_precision(loopCount, 4) + ": " + std::to_string(errCurr) << Color::def << std::endl;
                     print(maskForElimination);
-                    cout << endl;
+                    cout << std::endl;
                 }
             }
             if (ContainFalse(maskForElimination))
@@ -352,8 +354,8 @@ namespace rt_num_opt
                 ; //nothing else to do
             }
 
-            cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << endl;
-            return make_pair(GetParameterVD<double>(tasks, "period"), FactorGraphType::RealObj(tasks, coeff));
+            std::cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << std::endl;
+            return std::make_pair(GetParameterVD<double>(tasks, "period"), FactorGraphType::RealObj(tasks, coeff));
         }
     }
 } // namespace rt_num_opt

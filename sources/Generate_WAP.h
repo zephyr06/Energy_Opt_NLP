@@ -23,7 +23,7 @@ namespace rt_num_opt
 
         void print()
         {
-            cout << "The value of the entry is " << value << "\nThe index (Not id): " << index << "\nThe pattern: " << pattern << endl;
+            std::cout << "The value of the entry is " << value << "\nThe index (Not id): " << index << "\nThe pattern: " << pattern << std::endl;
         }
     };
     bool compareDataMetaWAP(DataMetaWAP &a, DataMetaWAP &b)
@@ -75,13 +75,13 @@ namespace rt_num_opt
     bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDynamic &P)
     {
         int N = tasks.size();
-        vector<DataMetaWAP> list4Sort;
+        std::vector<DataMetaWAP> list4Sort;
         for (int i = index + 1; i < N; i++)
         {
             list4Sort.push_back(DataMetaWAP(tasks[i].executionTime - 1, i, 'a'));
             list4Sort.push_back(DataMetaWAP(tasks[i].overhead, i, 'p'));
         }
-        sort(list4Sort.begin(), list4Sort.end(), compareDataMetaWAP);
+        std::sort(list4Sort.begin(), list4Sort.end(), compareDataMetaWAP);
 
         bool success = false;
         size_t index_first_available = -1;
@@ -116,7 +116,7 @@ namespace rt_num_opt
         else
         {
             // Update A P based on index_first_available
-            vector<bool> decidedEntry(N, 0);
+            std::vector<bool> decidedEntry(N, 0);
             // first iteration, go through entries after the first entry found
             for (size_t i = index_first_available; i < list4Sort.size(); i++)
             {
@@ -151,7 +151,7 @@ namespace rt_num_opt
         return true;
     }
 
-    tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
+    std::tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
     {
         int N = tasks.size();
         MatrixDynamic A = GenerateMatrixDynamic(N, N);
@@ -162,7 +162,7 @@ namespace rt_num_opt
             if (not AssignLogicWAP(i, tasks, A, P))
             {
                 // Not schedulable
-                return make_tuple(0, A, P);
+                return std::make_tuple(0, A, P);
             }
         }
         A_Global = A;
@@ -173,16 +173,16 @@ namespace rt_num_opt
         RTA_WAP rtaWap(tasks);
         if (rtaWap.RTA_Common(N - 1) <= tasks.at(N - 1).deadline)
         {
-            return make_tuple(1, A, P);
+            return std::make_tuple(1, A, P);
         }
         else
         {
             A_Global = GenerateMatrixDynamic(0, 0);
             P_Global = GenerateMatrixDynamic(0, 0);
-            return make_tuple(0, A, P);
+            return std::make_tuple(0, A, P);
         }
         A_Global = GenerateMatrixDynamic(0, 0);
         P_Global = GenerateMatrixDynamic(0, 0);
-        return make_tuple(0, A, P);
+        return std::make_tuple(0, A, P);
     }
 } // namespace rt_num_opt

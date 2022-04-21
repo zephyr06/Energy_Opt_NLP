@@ -11,7 +11,7 @@
 namespace rt_num_opt
 {
 
-    double Average(vector<double> &data)
+    double Average(std::vector<double> &data)
     {
         if (data.size())
         {
@@ -26,9 +26,9 @@ namespace rt_num_opt
         }
     }
 
-    vector<string> ReadFilesInDirectory(const char *path)
+    std::vector<std::string> ReadFilesInDirectory(const char *path)
     {
-        vector<string> files;
+        std::vector<std::string> files;
         DIR *dr;
         struct dirent *en;
         dr = opendir(path);
@@ -48,9 +48,9 @@ namespace rt_num_opt
  * @brief 
  * 
  * @param path periodic-set-1-syntheticJobs.csv
- * @return string "1"
+ * @return std::string "1"
  */
-    int ExtractIndex(string path, string delimiter = "-")
+    int ExtractIndex(std::string path, std::string delimiter = "-")
     {
         int pos = 0;
 
@@ -60,7 +60,7 @@ namespace rt_num_opt
             path.erase(0, pos + delimiter.length());
         }
         pos = path.find(delimiter);
-        string token = path.substr(0, pos);
+        std::string token = path.substr(0, pos);
         int temp = atoi(token.c_str());
         return temp;
     }
@@ -70,35 +70,35 @@ namespace rt_num_opt
  * @param path like, periodic-set-1-syntheticJobs.csv
  * @return pair<double, double> objective, time
  */
-    pair<double, double> ReadBaselineResult(string &pathInPeriodicDataset, int N)
+    std::pair<double, double> ReadBaselineResult(std::string &pathInPeriodicDataset, int N)
     {
-        string yechengRepoPath = "/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + to_string(N) + "/";
+        std::string yechengRepoPath = "/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + std::to_string(N) + "/";
 
         int index = ExtractIndex(pathInPeriodicDataset);
-        string targetFilePathGP = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_GPResult.txt";
-        string targetFilePathBF = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_BFSResult.txt";
+        std::string targetFilePathGP = yechengRepoPath + "Case" + std::to_string(index) + ".txt" + "_RM_GPResult.txt";
+        std::string targetFilePathBF = yechengRepoPath + "Case" + std::to_string(index) + ".txt" + "_RM_BFSResult.txt";
         if (debugMode == 1)
-            cout << "targetFilePathBF " << targetFilePathBF << endl;
-        string fileName;
+            std::cout << "targetFilePathBF " << targetFilePathBF << std::endl;
+        std::string fileName;
         if (baselineLLCompare == 1)
             fileName = targetFilePathBF;
         else if (baselineLLCompare == 2)
             fileName = targetFilePathGP;
         else
         {
-            CoutError("Unrecognized baselineLLCompare! Current value is " + to_string(baselineLLCompare));
+            CoutError("Unrecognized baselineLLCompare! Current value is " + std::to_string(baselineLLCompare));
         }
 
-        ifstream cResultFile(fileName.data());
+        std::ifstream cResultFile(fileName.data());
         try
         {
             assert(cResultFile.is_open());
         }
         catch (...)
         {
-            cout << "Error in reading "
-                 << batchOptimizeFolder
-                 << "'s result files" << fileName << endl;
+            std::cout << "Error in reading "
+                      << batchOptimizeFolder
+                      << "'s result files" << fileName << std::endl;
         }
 
         double runTime = 0, obj = 0;
@@ -106,7 +106,7 @@ namespace rt_num_opt
         double nd = 0;
         cResultFile >> nd;
         int n = round(nd);
-        vector<int> values(n, 0);
+        std::vector<int> values(n, 0);
         for (int i = 0; i < n; i++)
         {
             double val = 0;
