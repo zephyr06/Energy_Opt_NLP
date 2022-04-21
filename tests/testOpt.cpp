@@ -7,6 +7,9 @@
 #include "sources/ControlFactorGraphUtils.h"
 using namespace std::chrono;
 using namespace rt_num_opt;
+using namespace std;
+
+using namespace gtsam;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 
 // There are two types of tests, strict deadline test, or period & 2xExecution test
@@ -78,7 +81,7 @@ TEST(NumericalDerivativeDynamic, A1)
     // f: R2 -> R4
     enableMaxComputationTimeRestrict = 0;
     MaxComputationTimeRestrict = 100;
-    boost::function<Matrix(const VectorDynamic &)> f =
+    boost::function<gtsam::Matrix(const VectorDynamic &)> f =
         [this](const VectorDynamic &input)
     {
         int variablesNumber = 2;

@@ -1,5 +1,8 @@
 #include "../sources/ControlOptimize.h"
 using namespace rt_num_opt;
+using namespace std;
+
+using namespace gtsam;
 double Fobj(double x)
 {
     return x * x * x + sin(x) + cos(3 * x * x);
@@ -11,7 +14,7 @@ double Jobj(double x)
 }
 int Nvar = 20;
 
-class MyTestFactor1D : public NoiseModelFactor1<VectorDynamic>
+class MyTestFactor1D : public gtsam::NoiseModelFactor1<VectorDynamic>
 {
 public:
     MyTestFactor1D(Key key,

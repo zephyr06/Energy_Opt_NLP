@@ -17,7 +17,7 @@
 using namespace std::chrono;
 namespace rt_num_opt
 {
-    gtsam::Values MergeValuesInElimination(Values initial, gtsam::VectorValues &delta)
+    gtsam::Values MergeValuesInElimination(gtsam::Values initial, gtsam::VectorValues &delta)
     {
         return initial.retract(delta);
     }
@@ -51,17 +51,17 @@ namespace rt_num_opt
         {
             BeginTimer(__func__);
 
-            NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
+            gtsam::NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
 
-            NonlinearFactorGraph graphForC = FactorGraphEnergyLL::BuildGraphForC(tasks);
-            NonlinearFactorGraph graphForJ = FactorGraphEnergyLL::BuildGraphForJ(tasks);
+            gtsam::NonlinearFactorGraph graphForC = FactorGraphEnergyLL::BuildGraphForC(tasks);
+            gtsam::NonlinearFactorGraph graphForJ = FactorGraphEnergyLL::BuildGraphForJ(tasks);
             if (debugMode == 1)
             {
                 graph.print();
             }
             // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
             // initialEstimate << 68.000000, 321, 400, 131, 308;
-            Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
+            gtsam::Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
             if (debugMode == 1)
             {
                 cout << Color::green;
@@ -75,27 +75,27 @@ namespace rt_num_opt
                 cout << Color::def << endl;
             }
 
-            Values result;
+            gtsam::Values result;
             if (optimizerType == 1)
             {
-                DoglegParams params;
+                gtsam::DoglegParams params;
                 // if (debugMode == 1)
                 //     params.setVerbosityDL("VERBOSE");
                 params.setDeltaInitial(deltaInitialDogleg);
                 params.setRelativeErrorTol(relativeErrorTolerance);
-                DoglegOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::DoglegOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
             else if (optimizerType == 2)
             {
-                LevenbergMarquardtParams params;
+                gtsam::LevenbergMarquardtParams params;
                 params.setlambdaInitial(initialLambda);
                 params.setVerbosityLM(verbosityLM);
                 params.setlambdaLowerBound(lowerLambda);
                 params.setlambdaUpperBound(upperLambda);
                 params.setRelativeErrorTol(relativeErrorTolerance);
                 params.setLinearSolverType(linearOptimizerType);
-                LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
                 // print some messages
                 if (debugMode == 1)
@@ -360,10 +360,10 @@ namespace rt_num_opt
                 eliminationRecordGlobal.Print();
             }
 
-            NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
-            Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
-            Values result;
-            LevenbergMarquardtParams params;
+            gtsam::NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
+            gtsam::Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
+            gtsam::Values result;
+            gtsam::LevenbergMarquardtParams params;
             params.setlambdaInitial(initialLambda);
             params.setVerbosityLM(verbosityLM);
             params.setlambdaLowerBound(lowerLambda);
@@ -391,7 +391,7 @@ namespace rt_num_opt
                 params.setlambdaLowerBound(lambdaCurr / 10);
                 params.setlambdaUpperBound(lambdaCurr);
 
-                LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
                 // result = optimizer.optimize();
                 // result.print();
                 // cout << endl;

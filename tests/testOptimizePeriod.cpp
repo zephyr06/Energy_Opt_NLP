@@ -8,6 +8,7 @@
 #include "../sources/ReadControlCases.h"
 using namespace std;
 using namespace std::chrono;
+using namespace gtsam;
 using namespace rt_num_opt;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 using namespace ControlOptimize;
@@ -234,8 +235,8 @@ public:
 double RealObj(TaskSet &tasks, VectorDynamic coeff)
 {
     double res = 0;
-    Symbol key('a', 0);
-    auto model = noiseModel::Isotropic::Sigma(tasks.size() * 5, 1);
+    gtsam::Symbol key('a', 0);
+    auto model = gtsam::noiseModel::Isotropic::Sigma(tasks.size() * 5, 1);
     std::vector<bool> eliminationMask(tasks.size(), false);
     ControlFactorT factor(key, tasks, coeff, eliminationMask, model);
     return factor.evaluateError(GetParameterVD<double>(tasks, "period")).sum();
@@ -245,38 +246,38 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks, VectorDynamic
                                                    std::vector<bool> &eliminationMask, VectorDynamic &initialEstimate)
 {
     int N = tasks.size();
-    auto model = noiseModel::Isotropic::Sigma(N * 5, noiseModelSigma);
-    NonlinearFactorGraph graph;
-    Symbol key('a', 0);
+    auto model = gtsam::noiseModel::Isotropic::Sigma(N * 5, noiseModelSigma);
+    gtsam::NonlinearFactorGraph graph;
+    gtsam::Symbol key('a', 0);
     // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
     // initialEstimate << 68.000000, 321, 400, 131, 308;
 
     graph.emplace_shared<ControlFactorT>(key, tasks, coeff, eliminationMask, model);
 
-    Values initialEstimateFG;
+    gtsam::Values initialEstimateFG;
     initialEstimateFG.insert(key, initialEstimate);
 
-    Values result;
+    gtsam::Values result;
     if (optimizerType == 1)
     {
-        DoglegParams params;
+        gtsam::DoglegParams params;
         // if (debugMode == 1)
         //     params.setVerbosityDL("VERBOSE");
         params.setDeltaInitial(deltaInitialDogleg);
         params.setRelativeErrorTol(relativeErrorTolerance);
-        DoglegOptimizer optimizer(graph, initialEstimateFG, params);
+        gtsam::DoglegOptimizer optimizer(graph, initialEstimateFG, params);
         result = optimizer.optimize();
     }
     else if (optimizerType == 2)
     {
-        LevenbergMarquardtParams params;
+        gtsam::LevenbergMarquardtParams params;
         params.setlambdaInitial(initialLambda);
         // if (debugMode > 1 && debugMode < 5)
         params.setVerbosityLM("SUMMARY");
         params.setlambdaLowerBound(lowerLambda);
         params.setlambdaUpperBound(upperLambda);
         params.setRelativeErrorTol(relativeErrorTolerance);
-        LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+        gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
         result = optimizer.optimize();
     }
 

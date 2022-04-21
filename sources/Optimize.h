@@ -19,7 +19,7 @@
 namespace rt_num_opt
 {
     using namespace std;
-    using namespace gtsam;
+    // using namespace gtsam;
 
 #define numberOfTasksNeedOptimize (N - lastTaskDoNotNeedOptimize - 1)
 
@@ -54,7 +54,7 @@ namespace rt_num_opt
     {
     public:
         // TODO: whether warmStart assume sustainable?
-        class ComputationFactor : public NoiseModelFactor1<VectorDynamic>
+        class ComputationFactor : public gtsam::NoiseModelFactor1<VectorDynamic>
         {
         public:
             TaskSetType tasks_;
@@ -62,10 +62,10 @@ namespace rt_num_opt
             VectorDynamic responseTimeInitial;
             int N;
 
-            ComputationFactor(Key key, TaskSetType &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic responseTimeInitial,
-                              SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
-                                                        tasks_(tasks), lastTaskDoNotNeedOptimize(lastTaskDoNotNeedOptimize),
-                                                        responseTimeInitial(responseTimeInitial)
+            ComputationFactor(gtsam::Key key, TaskSetType &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic responseTimeInitial,
+                              gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor1<VectorDynamic>(model, key),
+                                                               tasks_(tasks), lastTaskDoNotNeedOptimize(lastTaskDoNotNeedOptimize),
+                                                               responseTimeInitial(responseTimeInitial)
             {
                 N = tasks_.tasks_.size();
             }
@@ -96,12 +96,12 @@ namespace rt_num_opt
          * @param H 
          * @return Vector 
          */
-            Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
+            gtsam::Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<gtsam::Matrix &> H = boost::none) const override
             {
                 BeginTimer("main_factor");
                 TaskSetType taskDurOpt = tasks_;
 
-                boost::function<Matrix(const VectorDynamic &)> f2 =
+                boost::function<gtsam::Matrix(const VectorDynamic &)> f2 =
                     [this](const VectorDynamic &executionTimeVector)
                 {
                     TaskSetType taskT = tasks_;
@@ -109,7 +109,7 @@ namespace rt_num_opt
                     return EstimateEnergyTaskSet(taskT.tasks_);
                 };
 
-                boost::function<Matrix(const VectorDynamic &)> f =
+                boost::function<gtsam::Matrix(const VectorDynamic &)> f =
                     [&taskDurOpt, &f2, this](const VectorDynamic &executionTimeVector)
                 {
                     UpdateTaskSetExecutionTime(taskDurOpt.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
@@ -353,12 +353,12 @@ namespace rt_num_opt
             int N = tasks.tasks_.size();
 
             // build the factor graph
-            auto model = noiseModel::Isotropic::Sigma(N, noiseModelSigma);
-            NonlinearFactorGraph graph;
-            Symbol key('a', 0);
+            auto model = gtsam::noiseModel::Isotropic::Sigma(N, noiseModelSigma);
+            gtsam::NonlinearFactorGraph graph;
+            gtsam::Symbol key('a', 0);
             graph.emplace_shared<ComputationFactor>(key, tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, model);
 
-            Values initialEstimateFG;
+            gtsam::Values initialEstimateFG;
             initialEstimateFG.insert(key, initialEstimate);
             if (debugMode == 1)
             {
@@ -368,20 +368,20 @@ namespace rt_num_opt
             // we can already terminate; the corresponding minimal of relative error is
             // approximately 2e-3;
 
-            Values result;
+            gtsam::Values result;
             if (optimizerType == 1)
             {
-                DoglegParams params;
+                gtsam::DoglegParams params;
                 // if (debugMode == 1)
                 //     params.setVerbosityDL("VERBOSE");
                 params.setDeltaInitial(deltaInitialDogleg);
                 params.setRelativeErrorTol(relativeErrorTolerance);
-                DoglegOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::DoglegOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
             else if (optimizerType == 2)
             {
-                LevenbergMarquardtParams params;
+                gtsam::LevenbergMarquardtParams params;
                 params.setlambdaInitial(initialLambda);
                 // if (debugMode > 1 && debugMode < 5)
                 params.setVerbosityLM(verbosityLM);
@@ -390,25 +390,25 @@ namespace rt_num_opt
                 params.setlambdaUpperBound(upperLambda);
                 params.setMaxIterations(maxIterationsOptimizer);
                 params.setRelativeErrorTol(relativeErrorTolerance);
-                LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
             else if (optimizerType == 3)
             {
-                GaussNewtonParams params;
+                gtsam::GaussNewtonParams params;
                 if (debugMode == 1)
                     params.setVerbosity("DELTA");
                 params.setRelativeErrorTol(relativeErrorTolerance);
-                GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
             else if (optimizerType == 4)
             {
-                NonlinearOptimizerParams params;
+                gtsam::NonlinearOptimizerParams params;
                 params.setRelativeErrorTol(relativeErrorTolerance);
                 if (debugMode == 1)
                     params.setVerbosity("DELTA");
-                NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
 

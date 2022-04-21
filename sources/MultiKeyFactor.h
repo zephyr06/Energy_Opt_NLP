@@ -29,39 +29,39 @@ namespace rt_num_opt
 {
 
     using namespace std;
-    using namespace gtsam;
+    // using namespace gtsam;
 
     // typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
     typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
     // typedef Eigen::SparseMatrix<double, Eigen::ColMajor> SM_Dynamic;
     typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;
     // typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic &)> NormalErrorFunction2D;
-    typedef boost::function<Vector(const Values &x)> LambdaMultiKey;
+    typedef boost::function<gtsam::Vector(const gtsam::Values &x)> LambdaMultiKey;
 
     typedef long long int LLint;
 
     typedef std::vector<VectorDynamic> VVec;
 
-    class MultiKeyFactor : public NoiseModelFactor
+    class MultiKeyFactor : public gtsam::NoiseModelFactor
     {
     public:
-        vector<Symbol> keyVec;
+        vector<gtsam::Symbol> keyVec;
         uint dimension;
         LambdaMultiKey lambdaMK;
 
-        MultiKeyFactor(vector<Symbol> keyVec, LambdaMultiKey lambdaMK,
-                       SharedNoiseModel model) : NoiseModelFactor(model, keyVec),
-                                                 keyVec(keyVec),
-                                                 dimension(keyVec.size()), lambdaMK(lambdaMK)
+        MultiKeyFactor(vector<gtsam::Symbol> keyVec, LambdaMultiKey lambdaMK,
+                       gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor(model, keyVec),
+                                                        keyVec(keyVec),
+                                                        dimension(keyVec.size()), lambdaMK(lambdaMK)
         {
         }
         /* no need to optimize if it contains no keys */
-        bool active(const Values &c) const override
+        bool active(const gtsam::Values &c) const override
         {
             return keyVec.size() != 0;
         }
-        Vector unwhitenedError(const Values &x,
-                               boost::optional<std::vector<Matrix> &> H = boost::none) const override
+        gtsam::Vector unwhitenedError(const gtsam::Values &x,
+                                      boost::optional<std::vector<gtsam::Matrix> &> H = boost::none) const override
         {
             BeginTimer("MultiKeyFactor");
             if (H)
@@ -71,7 +71,7 @@ namespace rt_num_opt
                     NormalErrorFunction1D f =
                         [x, i, this](const VectorDynamic xi)
                     {
-                        Values xx = x;
+                        gtsam::Values xx = x;
                         xx.update(keyVec.at(i), xi);
                         return lambdaMK(xx);
                     };

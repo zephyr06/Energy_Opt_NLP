@@ -17,7 +17,7 @@ namespace rt_num_opt
 
     struct FactorGraphInManifold
     {
-        static VectorDynamic ExtractResults(const Values &result, TaskSet tasks)
+        static VectorDynamic ExtractResults(const gtsam::Values &result, TaskSet tasks)
         {
             VectorDynamic periods = GetParameterVD<double>(tasks, "period");
             for (uint i = 0; i < tasks.size(); i++)
@@ -30,7 +30,7 @@ namespace rt_num_opt
             return periods;
         }
 
-        class RTARelatedFactor : public NoiseModelFactor
+        class RTARelatedFactor : public gtsam::NoiseModelFactor
         {
         public:
             TaskSet tasks;
@@ -38,13 +38,13 @@ namespace rt_num_opt
             VectorDynamic coeff;
             VectorDynamic rtaBase;
             int dimension;
-            vector<Symbol> keyVec;
+            vector<gtsam::Symbol> keyVec;
             LambdaMultiKey f_with_RTA;
 
-            RTARelatedFactor(vector<Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic rtaBase,
-                             SharedNoiseModel model) : NoiseModelFactor(model, keyVec), tasks(tasks), index(index), coeff(coeff), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
+            RTARelatedFactor(vector<gtsam::Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic rtaBase,
+                             gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor(model, keyVec), tasks(tasks), index(index), coeff(coeff), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
             {
-                f_with_RTA = [tasks, index, coeff, rtaBase](const Values &x)
+                f_with_RTA = [tasks, index, coeff, rtaBase](const gtsam::Values &x)
                 {
                     BeginTimer("f_with_RTA");
                     VectorDynamic error = GenerateVectorDynamic(2);
@@ -59,12 +59,12 @@ namespace rt_num_opt
                 };
             }
             /* no need to optimize if it contains no keys */
-            bool active(const Values &c) const override
+            bool active(const gtsam::Values &c) const override
             {
                 return keyVec.size() != 0;
             }
-            Vector unwhitenedError(const Values &x,
-                                   boost::optional<std::vector<Matrix> &> H = boost::none) const override
+            gtsam::Vector unwhitenedError(const gtsam::Values &x,
+                                          boost::optional<std::vector<gtsam::Matrix> &> H = boost::none) const override
             {
                 BeginTimer("RTARelatedFactor_unwhitenedError");
                 if (H)
@@ -76,8 +76,8 @@ namespace rt_num_opt
                             NormalErrorFunction1D f =
                                 [x, i, this](const VectorDynamic xi)
                             {
-                                Symbol a = keyVec.at(i);
-                                Values xx = x;
+                                gtsam::Symbol a = keyVec.at(i);
+                                gtsam::Values xx = x;
                                 xx.update(a, xi);
                                 return f_with_RTA(xx);
                             };
@@ -117,7 +117,7 @@ namespace rt_num_opt
 
             VectorDynamic sigma = GenerateVectorDynamic(2);
             sigma << noiseModelSigma, noiseModelSigma / weightSchedulability;
-            auto model = noiseModel::Diagonal::Sigmas(sigma);
+            auto model = gtsam::noiseModel::Diagonal::Sigmas(sigma);
             // return MultiKeyFactor(keys, f, model);
             EndTimer(__func__);
             return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model);
@@ -134,13 +134,13 @@ namespace rt_num_opt
             return false;
         }
 
-        static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
+        static gtsam::NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
         {
             BeginTimer(__func__);
-            NonlinearFactorGraph graph;
+            gtsam::NonlinearFactorGraph graph;
             double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
-            auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-            auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
+            auto modelNormal = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+            auto modelPunishmentSoft1 = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
             VectorDynamic rtaBase = RTALLVector(tasks);
             for (uint i = 0; i < tasks.size(); i++)
             {
@@ -163,9 +163,9 @@ namespace rt_num_opt
             return graph;
         }
 
-        static Values GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
+        static gtsam::Values GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
         {
-            Values initialEstimateFG;
+            gtsam::Values initialEstimateFG;
             for (uint i = 0; i < tasks.size(); i++)
             {
                 if (!maskForElimination[i])

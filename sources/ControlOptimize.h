@@ -25,14 +25,14 @@ namespace rt_num_opt
                                                            std::vector<bool> &maskForElimination)
         {
             BeginTimer(__func__);
-            NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(maskForElimination, tasks, coeff);
+            gtsam::NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(maskForElimination, tasks, coeff);
             if (debugMode == 1)
             {
                 graph.print();
             }
             // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
             // initialEstimate << 68.000000, 321, 400, 131, 308;
-            Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
+            gtsam::Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
             if (debugMode == 1)
             {
                 cout << Color::green;
@@ -46,27 +46,27 @@ namespace rt_num_opt
                 cout << Color::def << endl;
             }
 
-            Values result;
+            gtsam::Values result;
             if (optimizerType == 1)
             {
-                DoglegParams params;
+                gtsam::DoglegParams params;
                 // if (debugMode == 1)
                 //     params.setVerbosityDL("VERBOSE");
                 params.setDeltaInitial(deltaInitialDogleg);
                 params.setRelativeErrorTol(relativeErrorTolerance);
-                DoglegOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::DoglegOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
             else if (optimizerType == 2)
             {
-                LevenbergMarquardtParams params;
+                gtsam::LevenbergMarquardtParams params;
                 params.setlambdaInitial(initialLambda);
                 params.setVerbosityLM(verbosityLM);
                 params.setlambdaLowerBound(lowerLambda);
                 params.setlambdaUpperBound(upperLambda);
                 params.setRelativeErrorTol(relativeErrorTolerance);
                 params.setLinearSolverType(linearOptimizerType);
-                LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+                gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
 

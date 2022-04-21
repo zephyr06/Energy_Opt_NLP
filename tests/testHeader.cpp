@@ -1,6 +1,6 @@
 #include <CppUnitLite/TestHarness.h>
 
-#include "sources/ControlOptimize.h"
+#include "sources/Optimize.h"
 
 int main()
 {

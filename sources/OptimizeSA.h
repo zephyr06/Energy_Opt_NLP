@@ -26,8 +26,8 @@ namespace rt_num_opt
         if (!r.CheckSchedulabilityDirect(responseTimeInitial))
             return {INT_MAX, INT_MAX,
                     initialEstimate, initialEstimate};
-        Symbol key('a', 0);
-        auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
+        gtsam::Symbol key('a', 0);
+        auto model = gtsam::noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
         typename Energy_Opt<TaskSetType, RTA_LL>::ComputationFactor factor(key, tasks, lastTaskDoNotNeedOptimize,
                                                                            responseTimeInitial, model);
 

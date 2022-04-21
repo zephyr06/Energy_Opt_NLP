@@ -6,6 +6,9 @@ using namespace std::chrono;
 using namespace rt_num_opt;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 using namespace ControlOptimize;
+using namespace std;
+
+using namespace gtsam;
 // TEST(ExtractResults, v1)
 // {
 //     noiseModelSigma = 1;
@@ -65,7 +68,7 @@ TEST(RTAFactor, v1)
     std::vector<bool> maskForElimination(tasks.size(), false);
     RTA_LL r(tasks);
     VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
-    NonlinearFactorGraph graph;
+    gtsam::NonlinearFactorGraph graph;
     for (int index = 0; index < int(tasks.size()); index++)
     {
         MultiKeyFactor f = GenerateTaskRTAFactor(maskForElimination, tasks, index, rtaBase);
@@ -101,10 +104,10 @@ TEST(BuildGraph, v1)
     coeff << 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1;
     std::vector<bool> maskForElimination(tasks.size() * 2, false);
-    NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    gtsam::NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     RTA_LL r(tasks);
     auto rta = r.ResponseTimeOfTaskSet();
-    Values initialEstimateFG;
+    gtsam::Values initialEstimateFG;
     for (uint i = 0; i < tasks.size(); i++)
     {
         initialEstimateFG.insert(GenerateControlKey(i, "period"), GenerateVectorDynamic1D(tasks[i].period));
@@ -128,10 +131,10 @@ TEST(BuildGraph, v2)
     std::tie(tasks, coeff) = ReadControlCase(path1);
 
     std::vector<bool> maskForElimination(tasks.size() * 2, false);
-    NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    gtsam::NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     RTA_LL r(tasks);
     auto rta = r.ResponseTimeOfTaskSet();
-    Values initialEstimateFG = FactorGraphForceManifold::GenerateInitialFG(tasks, maskForElimination);
+    gtsam::Values initialEstimateFG = FactorGraphForceManifold::GenerateInitialFG(tasks, maskForElimination);
     AssertEqualScalar(436274310542.5, graph.error(initialEstimateFG), 1e-6, __LINE__);
     // initialEstimateFG.update(GenerateControlKey(1000, "response"), GenerateVectorDynamic1D(1));
     // AssertEqualScalar(25948729015644.5, graph.error(initialEstimateFG), 1e-6, __LINE__);
@@ -295,7 +298,7 @@ TEST(FactorGraphInManifold, inference)
         131.088,
         308.676;
     UpdateTaskSetPeriod(tasks, initial);
-    NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    gtsam::NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
     MatrixDynamic jacobianCurr = sth.first;
@@ -330,7 +333,7 @@ TEST(FactorGraphInManifold, inference2)
         131.088,
         308.676;
     UpdateTaskSetPeriod(tasks, initial);
-    NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    gtsam::NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
     FactorGraphInManifold::FindEliminatedVariables(tasks, maskForElimination);
     AssertEqualVectorExact({1, 0, 0, 0, 0}, maskForElimination);
@@ -371,7 +374,7 @@ TEST(jacobian, vn)
         237.366,
         444.963;
     UpdateTaskSetPeriod(tasks, initial);
-    NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    gtsam::NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     auto initialEstimateFG = FactorGraphForceManifold::GenerateInitialFG(tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
 
@@ -439,7 +442,7 @@ TEST(eliminate, ForceManifold)
     maskForElimination[0] = true;
     maskForElimination[9] = true;
 
-    NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    gtsam::NonlinearFactorGraph graph = FactorGraphForceManifold::BuildControlGraph(maskForElimination, tasks, coeff);
     auto initialEstimateFG = FactorGraphForceManifold::GenerateInitialFG(tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
 
@@ -612,36 +615,36 @@ TEST(assumption, bigJacobian)
 {
     int m = 6;
     int n = 5;
-    NonlinearFactorGraph graph;
+    gtsam::NonlinearFactorGraph graph;
     auto key = Symbol('a', 0);
     auto model = noiseModel::Isotropic::Sigma(m, noiseModelSigma);
     graph.emplace_shared<TestBigJacobian1>(key, model);
 
     // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
     // initialEstimate << 68.000000, 321, 400, 131, 308;
-    Values initialEstimateFG;
+    gtsam::Values initialEstimateFG;
     initialEstimateFG.insert(key, GenerateVectorDynamic(n));
 
-    Values result;
+    gtsam::Values result;
     if (optimizerType == 1)
     {
-        DoglegParams params;
+        gtsam::DoglegParams params;
         // if (debugMode == 1)
         //     params.setVerbosityDL("VERBOSE");
         params.setDeltaInitial(deltaInitialDogleg);
         params.setRelativeErrorTol(relativeErrorTolerance);
-        DoglegOptimizer optimizer(graph, initialEstimateFG, params);
+        gtsam::DoglegOptimizer optimizer(graph, initialEstimateFG, params);
         result = optimizer.optimize();
     }
     else if (optimizerType == 2)
     {
-        LevenbergMarquardtParams params;
+        gtsam::LevenbergMarquardtParams params;
         params.setlambdaInitial(initialLambda);
         params.setVerbosityLM(verbosityLM);
         params.setlambdaLowerBound(lowerLambda);
         params.setlambdaUpperBound(upperLambda);
         params.setRelativeErrorTol(relativeErrorTolerance);
-        LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+        gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
         result = optimizer.optimize();
     }
     cout << result.at<VectorDynamic>(key);

@@ -16,8 +16,8 @@ TEST(EliminationRecordUpdate, v1)
     execCurr << 6, 46, 50, 138, 8;
     UpdateTaskSetExecutionTime(tasks, execCurr);
     eliminationRecordGlobal.Initialize(tasks.size());
-    NonlinearFactorGraph graph = FactorGraphEnergyLL::BuildControlGraph(tasks);
-    Values initialEstimateFG = FactorGraphEnergyLL::GenerateInitialFG(tasks);
+    gtsam::NonlinearFactorGraph graph = FactorGraphEnergyLL::BuildControlGraph(tasks);
+    gtsam::Values initialEstimateFG = FactorGraphEnergyLL::GenerateInitialFG(tasks);
     auto sth = graph.error(initialEstimateFG);
     eliminationRecordGlobal.Print();
     EXPECT(EliminationType::Not == eliminationRecordGlobal[0].type);

@@ -27,7 +27,7 @@
 namespace rt_num_opt
 {
     using namespace std;
-    using namespace gtsam;
+    // using namespace gtsam;
 
     typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;
     typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic &)> NormalErrorFunction2D;
@@ -47,7 +47,7 @@ namespace rt_num_opt
  * @brief Constraint of x <= b
  *
  */
-    class InequalityFactor1D : public NoiseModelFactor1<VectorDynamic>
+    class InequalityFactor1D : public gtsam::NoiseModelFactor1<VectorDynamic>
     {
     public:
         NormalErrorFunction1D f;
@@ -57,30 +57,30 @@ namespace rt_num_opt
      * @brief Construct a new Inequality Factor 1 D object,
      *  mainly used in derived class because f is not defined
      */
-        InequalityFactor1D(Key key,
-                           SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key)
+        InequalityFactor1D(gtsam::Key key,
+                           gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor1<VectorDynamic>(model, key)
         {
             index = -1;
             dimension = 1;
         }
 
-        InequalityFactor1D(Key key, int index,
-                           SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
-                                                     index(index)
+        InequalityFactor1D(gtsam::Key key, int index,
+                           gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor1<VectorDynamic>(model, key),
+                                                            index(index)
         {
             dimension = 1;
         }
 
-        InequalityFactor1D(Key key, NormalErrorFunction1D f,
-                           SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
-                                                     f(f)
+        InequalityFactor1D(gtsam::Key key, NormalErrorFunction1D f,
+                           gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor1<VectorDynamic>(model, key),
+                                                            f(f)
         {
             index = -1;
             dimension = 1;
         }
 
         /** active when constraint *NOT* met */
-        bool active(const Values &c) const override
+        bool active(const gtsam::Values &c) const override
         {
             if (index == -1)
             {
@@ -94,8 +94,8 @@ namespace rt_num_opt
             }
         }
 
-        Vector evaluateError(const VectorDynamic &x,
-                             boost::optional<Matrix &> H = boost::none) const override
+        gtsam::Vector evaluateError(const VectorDynamic &x,
+                                    boost::optional<gtsam::Matrix &> H = boost::none) const override
         {
             VectorDynamic err = f(x);
             if (index >= 0) // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
@@ -120,8 +120,8 @@ namespace rt_num_opt
     {
     public:
         double b;
-        SmallerThanFactor1D(Key key, double b,
-                            SharedNoiseModel model) : InequalityFactor1D(key, model)
+        SmallerThanFactor1D(gtsam::Key key, double b,
+                            gtsam::SharedNoiseModel model) : InequalityFactor1D(key, model)
         {
             f = [b](const VectorDynamic &x)
             {
@@ -131,8 +131,8 @@ namespace rt_num_opt
             };
         }
 
-        SmallerThanFactor1D(Key key, double b, int indexInEliminationRecord,
-                            SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
+        SmallerThanFactor1D(gtsam::Key key, double b, int indexInEliminationRecord,
+                            gtsam::SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
         {
             f = [b](const VectorDynamic &x)
             {
@@ -151,8 +151,8 @@ namespace rt_num_opt
     {
     public:
         double b;
-        LargerThanFactor1D(Key key, double b,
-                           SharedNoiseModel model) : InequalityFactor1D(key, model)
+        LargerThanFactor1D(gtsam::Key key, double b,
+                           gtsam::SharedNoiseModel model) : InequalityFactor1D(key, model)
         {
             f = [b](const VectorDynamic &x)
             {
@@ -162,8 +162,8 @@ namespace rt_num_opt
             };
         }
 
-        LargerThanFactor1D(Key key, double b, int indexInEliminationRecord,
-                           SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
+        LargerThanFactor1D(gtsam::Key key, double b, int indexInEliminationRecord,
+                           gtsam::SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
         {
             f = [b](const VectorDynamic &x)
             {
@@ -216,7 +216,7 @@ namespace rt_num_opt
  * x1 and x2 are vectors of size (1,1)
  *
  */
-    class InequalityFactor2D : public NoiseModelFactor2<VectorDynamic, VectorDynamic>
+    class InequalityFactor2D : public gtsam::NoiseModelFactor2<VectorDynamic, VectorDynamic>
     {
     public:
         /**
@@ -228,14 +228,14 @@ namespace rt_num_opt
      */
         NormalErrorFunction2D f;
 
-        InequalityFactor2D(Key key1, Key key2, NormalErrorFunction2D f,
-                           SharedNoiseModel model) : NoiseModelFactor2<VectorDynamic, VectorDynamic>(model, key1, key2),
-                                                     f(f)
+        InequalityFactor2D(gtsam::Key key1, gtsam::Key key2, NormalErrorFunction2D f,
+                           gtsam::SharedNoiseModel model) : NoiseModelFactor2<VectorDynamic, VectorDynamic>(model, key1, key2),
+                                                            f(f)
         {
         }
 
         /** active when constraint *NOT* met */
-        bool active(const Values &c) const override
+        bool active(const gtsam::Values &c) const override
         {
             // note: still active at equality to avoid zigzagging??
             VectorDynamic x0 = (c.at<VectorDynamic>(this->keys()[0]));
@@ -244,8 +244,8 @@ namespace rt_num_opt
             // return true;
         }
 
-        Vector evaluateError(const VectorDynamic &x1, const VectorDynamic &x2,
-                             boost::optional<Matrix &> H1 = boost::none, boost::optional<Matrix &> H2 = boost::none) const override
+        gtsam::Vector evaluateError(const VectorDynamic &x1, const VectorDynamic &x2,
+                                    boost::optional<gtsam::Matrix &> H1 = boost::none, boost::optional<gtsam::Matrix &> H2 = boost::none) const override
         {
             VectorDynamic err = f(x1, x2);
             if (H1)

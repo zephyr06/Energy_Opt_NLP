@@ -30,7 +30,7 @@ namespace rt_num_opt
      * @return pair<VectorDynamic, VectorDynamic> periods, rta; rta is raw rta, which could include -1 (eliminated before)
      */
         // Issue in this function! not able to extract rta because of consistency
-        static VectorDynamic ExtractResults(const Values &result, TaskSet &tasks)
+        static VectorDynamic ExtractResults(const gtsam::Values &result, TaskSet &tasks)
         {
             VectorDynamic periods = GenerateVectorDynamic(tasks.size());
             VectorDynamic rta = GenerateVectorDynamic(tasks.size());
@@ -57,7 +57,7 @@ namespace rt_num_opt
         }
         static InequalityFactor2D GenerateSchedulabilityFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index)
         {
-            auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
+            auto modelPunishmentSoft1 = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
             NormalErrorFunction2D DBF2D =
                 [](VectorDynamic x1, VectorDynamic x2)
             {
@@ -70,12 +70,12 @@ namespace rt_num_opt
             return InequalityFactor2D(GenerateControlKey(index, "response"),
                                       GenerateControlKey(index, "period"), DBF2D, modelPunishmentSoft1);
         }
-        static NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
+        static gtsam::NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
         {
-            NonlinearFactorGraph graph;
+            gtsam::NonlinearFactorGraph graph;
             double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
-            auto modelNormal = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-            auto modelPunishmentSoft1 = noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
+            auto modelNormal = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+            auto modelPunishmentSoft1 = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
             RTA_LL r(tasks);
             VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
             for (uint i = 0; i < tasks.size(); i++)
@@ -119,11 +119,11 @@ namespace rt_num_opt
             return graph;
         }
 
-        static Values GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
+        static gtsam::Values GenerateInitialFG(TaskSet tasks, std::vector<bool> &maskForElimination)
         {
             RTA_LL r(tasks);
             auto rta = r.ResponseTimeOfTaskSet();
-            Values initialEstimateFG;
+            gtsam::Values initialEstimateFG;
             for (uint i = 0; i < tasks.size(); i++)
             {
                 if (!maskForElimination[i])
