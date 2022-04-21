@@ -7,7 +7,7 @@
 #include "../sources/RTA_DAG.h"
 #include "../sources/profilier.h"
 using namespace std::chrono;
-
+using namespace rt_num_opt;
 TEST(OptimizeTaskSet, RTA_LL_V1)
 {
     BeginTimer("main");

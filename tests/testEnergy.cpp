@@ -1,7 +1,7 @@
 #include "../sources/Energy.h"
 #include "../sources/Declaration.h"
 #include "../sources/testMy.h"
-
+using namespace rt_num_opt;
 TEST(energy, tasks)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv";

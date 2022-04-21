@@ -1,6 +1,8 @@
 #include <CppUnitLite/TestHarness.h>
 #include "../sources/Optimize.h"
 #include "../sources/testMy.h"
+
+using namespace rt_num_opt;
 TEST(evaluateError, v1)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v23.csv";

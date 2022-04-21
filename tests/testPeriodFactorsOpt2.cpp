@@ -1,5 +1,6 @@
 #include "../sources/ControlOptimize.h"
 #include "../sources/profilier.h"
+using namespace rt_num_opt;
 using namespace ControlOptimize;
 TEST(case1, v1)
 {

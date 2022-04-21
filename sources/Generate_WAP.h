@@ -4,33 +4,34 @@
 #include <tuple>
 #include <string.h>
 #include "RTA_WAP.h"
-
-class DataMetaWAP
+namespace rt_num_opt
 {
-public:
-    double value;
-    int index;
-    char pattern;
-    /**
+    class DataMetaWAP
+    {
+    public:
+        double value;
+        int index;
+        char pattern;
+        /**
      * @brief Construct a new Data Meta WAP object, this function is mainly used for GenerateWAP
      * 
      * @param value 
      * @param index: this is not task id!!! 
      * @param pattern 
      */
-    DataMetaWAP(double value, int index, char pattern) : value(value), index(index), pattern(pattern) {}
+        DataMetaWAP(double value, int index, char pattern) : value(value), index(index), pattern(pattern) {}
 
-    void print()
+        void print()
+        {
+            cout << "The value of the entry is " << value << "\nThe index (Not id): " << index << "\nThe pattern: " << pattern << endl;
+        }
+    };
+    bool compareDataMetaWAP(DataMetaWAP &a, DataMetaWAP &b)
     {
-        cout << "The value of the entry is " << value << "\nThe index (Not id): " << index << "\nThe pattern: " << pattern << endl;
+        return a.value > b.value;
     }
-};
-bool compareDataMetaWAP(DataMetaWAP &a, DataMetaWAP &b)
-{
-    return a.value > b.value;
-}
 
-/**
+    /**
  * @brief 
  * 
  * ***************************************************Explanation**********************************************************
@@ -71,116 +72,117 @@ bool compareDataMetaWAP(DataMetaWAP &a, DataMetaWAP &b)
  * @return true 
  * @return false 
  */
-bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDynamic &P)
-{
-    int N = tasks.size();
-    vector<DataMetaWAP> list4Sort;
-    for (int i = index + 1; i < N; i++)
+    bool AssignLogicWAP(int index, const TaskSet &tasks, MatrixDynamic &A, MatrixDynamic &P)
     {
-        list4Sort.push_back(DataMetaWAP(tasks[i].executionTime - 1, i, 'a'));
-        list4Sort.push_back(DataMetaWAP(tasks[i].overhead, i, 'p'));
-    }
-    sort(list4Sort.begin(), list4Sort.end(), compareDataMetaWAP);
-
-    bool success = false;
-    size_t index_first_available = -1;
-    for (size_t i = 0; i < list4Sort.size(); i++)
-    {
-        if (RTA_WAP::RTA_block(tasks, A, P, index, list4Sort[i].value) <= tasks.at(index).deadline)
+        int N = tasks.size();
+        vector<DataMetaWAP> list4Sort;
+        for (int i = index + 1; i < N; i++)
         {
-            success = true;
-            index_first_available = i;
-            break;
+            list4Sort.push_back(DataMetaWAP(tasks[i].executionTime - 1, i, 'a'));
+            list4Sort.push_back(DataMetaWAP(tasks[i].overhead, i, 'p'));
         }
-    }
+        sort(list4Sort.begin(), list4Sort.end(), compareDataMetaWAP);
 
-    if (!success)
-    {
-        // The current task cannot tolerate any block from lp tasks
-        // Let's try if all block items are 0, will it be schedulable
-        if (RTA_WAP::RTA_block(tasks, A, P, index, 0) <= tasks.at(index).deadline)
+        bool success = false;
+        size_t index_first_available = -1;
+        for (size_t i = 0; i < list4Sort.size(); i++)
         {
-            success = true;
-            for (int l = index + 1; l < N; l++)
+            if (RTA_WAP::RTA_block(tasks, A, P, index, list4Sort[i].value) <= tasks.at(index).deadline)
             {
-                A(index, l) = 1;
-                A(index, l) = 0;
+                success = true;
+                index_first_available = i;
+                break;
             }
-            return success;
+        }
+
+        if (!success)
+        {
+            // The current task cannot tolerate any block from lp tasks
+            // Let's try if all block items are 0, will it be schedulable
+            if (RTA_WAP::RTA_block(tasks, A, P, index, 0) <= tasks.at(index).deadline)
+            {
+                success = true;
+                for (int l = index + 1; l < N; l++)
+                {
+                    A(index, l) = 1;
+                    A(index, l) = 0;
+                }
+                return success;
+            }
+            else
+                // not schedulable!
+                return false;
         }
         else
-            // not schedulable!
-            return false;
-    }
-    else
-    {
-        // Update A P based on index_first_available
-        vector<bool> decidedEntry(N, 0);
-        // first iteration, go through entries after the first entry found
-        for (size_t i = index_first_available; i < list4Sort.size(); i++)
         {
-            DataMetaWAP entry = list4Sort[i];
-            if (entry.pattern == 'a')
+            // Update A P based on index_first_available
+            vector<bool> decidedEntry(N, 0);
+            // first iteration, go through entries after the first entry found
+            for (size_t i = index_first_available; i < list4Sort.size(); i++)
             {
-                A(index, entry.index) = 0;
-                P(index, entry.index) = 0;
-                decidedEntry[entry.index] = 1;
+                DataMetaWAP entry = list4Sort[i];
+                if (entry.pattern == 'a')
+                {
+                    A(index, entry.index) = 0;
+                    P(index, entry.index) = 0;
+                    decidedEntry[entry.index] = 1;
+                }
+                else if (entry.pattern == 'p' && decidedEntry[entry.index] == 0)
+                {
+                    A(index, entry.index) = 0;
+                    P(index, entry.index) = 1;
+                    decidedEntry[entry.index] = 1;
+                }
             }
-            else if (entry.pattern == 'p' && decidedEntry[entry.index] == 0)
+            // second iteration, go through entries before the first entry found
+            for (size_t i = 0; i < index_first_available; i++)
             {
-                A(index, entry.index) = 0;
-                P(index, entry.index) = 1;
-                decidedEntry[entry.index] = 1;
+                DataMetaWAP entry = list4Sort[i];
+                if (decidedEntry[entry.index] == 0)
+                {
+                    A(index, entry.index) = 1;
+                    P(index, entry.index) = 0;
+                    decidedEntry[entry.index] = 1;
+                }
             }
+            return true;
         }
-        // second iteration, go through entries before the first entry found
-        for (size_t i = 0; i < index_first_available; i++)
-        {
-            DataMetaWAP entry = list4Sort[i];
-            if (decidedEntry[entry.index] == 0)
-            {
-                A(index, entry.index) = 1;
-                P(index, entry.index) = 0;
-                decidedEntry[entry.index] = 1;
-            }
-        }
+        CoutError("Not expected to happen in Generate_WAP!");
         return true;
     }
-    CoutError("Not expected to happen in Generate_WAP!");
-    return true;
-}
 
-tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
-{
-    int N = tasks.size();
-    MatrixDynamic A = GenerateMatrixDynamic(N, N);
-    MatrixDynamic P = GenerateMatrixDynamic(N, N);
-
-    for (int i = 0; i < N - 1; i++)
+    tuple<bool, MatrixDynamic, MatrixDynamic> Generate_WAP(const TaskSet &tasks)
     {
-        if (not AssignLogicWAP(i, tasks, A, P))
+        int N = tasks.size();
+        MatrixDynamic A = GenerateMatrixDynamic(N, N);
+        MatrixDynamic P = GenerateMatrixDynamic(N, N);
+
+        for (int i = 0; i < N - 1; i++)
         {
-            // Not schedulable
+            if (not AssignLogicWAP(i, tasks, A, P))
+            {
+                // Not schedulable
+                return make_tuple(0, A, P);
+            }
+        }
+        A_Global = A;
+        P_Global = P;
+        // check the last task
+        TaskSet tasksT = tasks;
+        TaskSetNormal tasksNormal(tasksT);
+        RTA_WAP rtaWap(tasks);
+        if (rtaWap.RTA_Common(N - 1) <= tasks.at(N - 1).deadline)
+        {
+            return make_tuple(1, A, P);
+        }
+        else
+        {
+            A_Global = GenerateMatrixDynamic(0, 0);
+            P_Global = GenerateMatrixDynamic(0, 0);
             return make_tuple(0, A, P);
         }
-    }
-    A_Global = A;
-    P_Global = P;
-    // check the last task
-    TaskSet tasksT = tasks;
-    TaskSetNormal tasksNormal(tasksT);
-    RTA_WAP rtaWap(tasks);
-    if (rtaWap.RTA_Common(N - 1) <= tasks.at(N - 1).deadline)
-    {
-        return make_tuple(1, A, P);
-    }
-    else
-    {
         A_Global = GenerateMatrixDynamic(0, 0);
         P_Global = GenerateMatrixDynamic(0, 0);
         return make_tuple(0, A, P);
     }
-    A_Global = GenerateMatrixDynamic(0, 0);
-    P_Global = GenerateMatrixDynamic(0, 0);
-    return make_tuple(0, A, P);
-}
+} // namespace rt_num_opt

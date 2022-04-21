@@ -15,85 +15,87 @@
 
 #include "testMy.h"
 #include "profilier.h"
+namespace rt_num_opt
+{
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
+    typedef long long int LLint;
+    std::mutex mtx;
+    // extern MatrixDynamic A_Global;
+    // extern MatrixDynamic P_Global;
+    MatrixDynamic A_Global;
+    MatrixDynamic P_Global;
 
-typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
-typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
-typedef long long int LLint;
-std::mutex mtx;
-// extern MatrixDynamic A_Global;
-// extern MatrixDynamic P_Global;
-MatrixDynamic A_Global;
-MatrixDynamic P_Global;
-
-double min(double a, double b)
-{
-    if (a <= b)
-        return a;
-    else
-        return b;
-    return 0;
-}
-double max(double a, double b)
-{
-    if (a >= b)
-        return a;
-    else
-        return b;
-    return 0;
-}
-
-inline MatrixDynamic GenerateMatrixDynamic(int m, int n)
-{
-    MatrixDynamic M;
-    M.resize(m, n);
-    M.setZero();
-    return M;
-}
-inline MatrixDynamic GenerateOneMatrix(int m, int n)
-{
-    MatrixDynamic M;
-    M.resize(m, n);
-    M.setZero();
-    for (int i = 0; i < m; i++)
+    double min(double a, double b)
     {
-        for (int j = 0; j < n; j++)
-            M(i, j) = 1;
+        if (a <= b)
+            return a;
+        else
+            return b;
+        return 0;
     }
-    return M;
-}
+    double max(double a, double b)
+    {
+        if (a >= b)
+            return a;
+        else
+            return b;
+        return 0;
+    }
 
-template <class T>
-vector<T> Eigen2Vector(const VectorDynamic &input)
-{
-    vector<T> res;
-    LLint len = input.rows();
-    res.reserve(len);
-    for (LLint i = 0; i < len; i++)
-        res.push_back(input.coeff(i, 0));
-    return res;
-}
-template <class T>
-VectorDynamic Vector2Eigen(const vector<T> &input)
-{
+    inline MatrixDynamic GenerateMatrixDynamic(int m, int n)
+    {
+        MatrixDynamic M;
+        M.resize(m, n);
+        M.setZero();
+        return M;
+    }
+    MatrixDynamic GenerateOneMatrix(int m, int n)
+    {
+        MatrixDynamic M;
+        M.resize(m, n);
+        M.setZero();
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+                M(i, j) = 1;
+        }
+        return M;
+    }
 
-    LLint len = input.size();
-    VectorDynamic res;
-    res.resize(len, 1);
-    for (LLint i = 0; i < len; i++)
-        res(i, 0) = input.at(i);
-    return res;
-}
-inline VectorDynamic GenerateVectorDynamic(LLint N)
-{
-    VectorDynamic v;
-    v.resize(N, 1);
-    v.setZero();
-    return v;
-}
+    template <class T>
+    vector<T> Eigen2Vector(const VectorDynamic &input)
+    {
+        vector<T> res;
+        LLint len = input.rows();
+        res.reserve(len);
+        for (LLint i = 0; i < len; i++)
+            res.push_back(input.coeff(i, 0));
+        return res;
+    }
+    template <class T>
+    VectorDynamic Vector2Eigen(const vector<T> &input)
+    {
 
-inline VectorDynamic GenerateVectorDynamic1D(double x)
-{
-    VectorDynamic res = GenerateVectorDynamic(1);
-    res << x;
-    return res;
-}
+        LLint len = input.size();
+        VectorDynamic res;
+        res.resize(len, 1);
+        for (LLint i = 0; i < len; i++)
+            res(i, 0) = input.at(i);
+        return res;
+    }
+    inline VectorDynamic GenerateVectorDynamic(LLint N)
+    {
+        VectorDynamic v;
+        v.resize(N, 1);
+        v.setZero();
+        return v;
+    }
+
+    inline VectorDynamic GenerateVectorDynamic1D(double x)
+    {
+        VectorDynamic res = GenerateVectorDynamic(1);
+        res << x;
+        return res;
+    }
+} // namespace rt_num_opt

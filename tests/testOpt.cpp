@@ -6,6 +6,7 @@
 #include "sources/FactorGraphEnergyLL.h"
 #include "sources/ControlFactorGraphUtils.h"
 using namespace std::chrono;
+using namespace rt_num_opt;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 
 // There are two types of tests, strict deadline test, or period & 2xExecution test
@@ -453,7 +454,7 @@ TEST(GenerateEliminationLLFactor, v1)
     std::vector<MatrixDynamic> Hs, HsExpect;
     Hs.reserve(dimension);
     HsExpect.reserve(dimension);
-    for (uint i = 0; i < dimension; i++)
+    for (int i = 0; i < dimension; i++)
     {
         MatrixDynamic m = GenerateMatrixDynamic(1, 1);
         Hs.push_back(m);

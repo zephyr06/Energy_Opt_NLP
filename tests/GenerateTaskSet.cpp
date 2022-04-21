@@ -3,7 +3,7 @@
 #include "../sources/argparse.hpp"
 #include "../sources/RTA_LL.h"
 #include "../sources/RTA_DAG.h"
-
+using namespace rt_num_opt;
 void deleteDirectoryContents(const std::string &dir_path)
 {
 

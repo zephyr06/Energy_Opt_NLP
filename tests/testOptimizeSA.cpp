@@ -1,6 +1,7 @@
 #include "../sources/OptimizeSA.h"
-#include "../sources/Generate_WAP.h"
+// #include "../sources/Generate_WAP.h"
 using namespace std::chrono;
+using namespace rt_num_opt;
 TEST(SA, v1)
 {
     TaskSet tasks = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv", "orig");

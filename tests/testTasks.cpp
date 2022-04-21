@@ -7,7 +7,7 @@
 #include "../sources/Parameters.h"
 #include "../sources/DAG_Task.h"
 #include "../sources/BatchTestutils.h"
-
+using namespace rt_num_opt;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 TEST(ReadTaskSet, p1)
 {

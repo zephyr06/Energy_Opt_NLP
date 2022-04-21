@@ -3,141 +3,143 @@
 #include "Tasks.h"
 #include "Declaration.h"
 #include "RTA_BASE.h"
-
-class RTA_LL : public RTA_BASE<TaskSetNormal>
+namespace rt_num_opt
 {
-
-public:
-    RTA_LL(const TaskSet &tasksI)
+    class RTA_LL : public RTA_BASE<TaskSetNormal>
     {
-        TaskSetNormal tasksN(tasksI);
-        tasks = tasksN;
-    }
-    RTA_LL(const TaskSetNormal &tasks) : RTA_BASE(tasks) {}
 
-    double RTA_Common_Warm(double beginTime, int index) override
-    {
-        TaskSet tasksHp;
-        for (int i = 0; i < index; i++)
+    public:
+        RTA_LL(const TaskSet &tasksI)
         {
-            tasksHp.push_back(tasks.tasks_.at(i));
+            TaskSetNormal tasksN(tasksI);
+            tasks = tasksN;
         }
-        return ResponseTimeAnalysisWarm(beginTime, tasks.tasks_.at(index), tasksHp);
-    }
+        RTA_LL(const TaskSetNormal &tasks) : RTA_BASE(tasks) {}
 
-    // the rest are helper functions
-    static string type()
-    {
-        return "LL";
-    }
-
-    double ResponseTimeAnalysisWarm_util_nece(double beginTime, const Task &taskCurr,
-                                              const TaskSet &tasksHighPriority)
-    {
-        const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
-        const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
-        int N = periodHigh.size();
-
-        if (beginTime < 0)
+        double RTA_Common_Warm(double beginTime, int index) override
         {
-            if (debugMode == 1)
+            TaskSet tasksHp;
+            for (int i = 0; i < index; i++)
             {
-                CoutWarning("During optimization, some variables drop below 0\n");
+                tasksHp.push_back(tasks.tasks_.at(i));
             }
-            beginTime = 0;
+            return ResponseTimeAnalysisWarm(beginTime, tasks.tasks_.at(index), tasksHp);
         }
-        if (isnan(taskCurr.executionTime) || isnan(beginTime))
+
+        // the rest are helper functions
+        static string type()
         {
-            cout << Color::red << "Nan executionTime detected" << def << endl;
-            throw "Nan";
+            return "LL";
         }
-        if (taskCurr.executionTime < 0)
+
+        double ResponseTimeAnalysisWarm_util_nece(double beginTime, const Task &taskCurr,
+                                                  const TaskSet &tasksHighPriority)
         {
-            return INT32_MAX;
-        }
-        for (int i = 0; i < int(executionTimeHigh.size()); i++)
-        {
-            if (executionTimeHigh[i] < 0)
+            const vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
+            const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
+            int N = periodHigh.size();
+
+            if (beginTime < 0)
             {
-                if (debugMode)
+                if (debugMode == 1)
                 {
                     CoutWarning("During optimization, some variables drop below 0\n");
                 }
+                beginTime = 0;
+            }
+            if (isnan(taskCurr.executionTime) || isnan(beginTime))
+            {
+                cout << Color::red << "Nan executionTime detected" << def << endl;
+                throw "Nan";
+            }
+            if (taskCurr.executionTime < 0)
+            {
                 return INT32_MAX;
             }
-        }
-        double utilAll = Utilization(tasksHighPriority);
-        if (utilAll >= 1.0 - utilTol)
-        {
-            // cout << "The given task set is unschedulable\n";
-            return INT32_MAX;
-        }
-        for (uint i = 0; i < tasksHighPriority.size(); i++)
-        {
-            if (tasksHighPriority[i].period < 0)
-                return INT32_MAX;
-        }
-
-        bool stop_flag = false;
-
-        double responseTimeBefore = beginTime;
-        int loopCount = 0;
-        while (not stop_flag)
-        {
-            double responseTime = taskCurr.executionTime;
-            for (int i = 0; i < N; i++)
-                responseTime += ceil(responseTimeBefore / double(periodHigh[i])) * executionTimeHigh[i];
-            if (responseTime == responseTimeBefore)
+            for (int i = 0; i < int(executionTimeHigh.size()); i++)
             {
-                stop_flag = true;
-                if (responseTime > taskCurr.period)
+                if (executionTimeHigh[i] < 0)
                 {
+                    if (debugMode)
+                    {
+                        CoutWarning("During optimization, some variables drop below 0\n");
+                    }
                     return INT32_MAX;
                 }
-                return responseTime;
             }
-            else
+            double utilAll = Utilization(tasksHighPriority);
+            if (utilAll >= 1.0 - utilTol)
             {
-                responseTimeBefore = responseTime;
+                // cout << "The given task set is unschedulable\n";
+                return INT32_MAX;
             }
-            loopCount++;
-            if (loopCount > 1000)
+            for (uint i = 0; i < tasksHighPriority.size(); i++)
             {
-                CoutError("LoopCount error in RTA_LL");
+                if (tasksHighPriority[i].period < 0)
+                    return INT32_MAX;
             }
-        }
-        cout << "RTA analysis stops unexpectedly!\n";
-        throw;
-    }
 
-    double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr,
-                                    const TaskSet &tasksHighPriority)
-    {
-        if (Utilization(tasksHighPriority) + taskCurr.utilization() > 1.0 + 1e-6)
+            bool stop_flag = false;
+
+            double responseTimeBefore = beginTime;
+            int loopCount = 0;
+            while (not stop_flag)
+            {
+                double responseTime = taskCurr.executionTime;
+                for (int i = 0; i < N; i++)
+                    responseTime += ceil(responseTimeBefore / double(periodHigh[i])) * executionTimeHigh[i];
+                if (responseTime == responseTimeBefore)
+                {
+                    stop_flag = true;
+                    if (responseTime > taskCurr.period)
+                    {
+                        return INT32_MAX;
+                    }
+                    return responseTime;
+                }
+                else
+                {
+                    responseTimeBefore = responseTime;
+                }
+                loopCount++;
+                if (loopCount > 1000)
+                {
+                    CoutError("LoopCount error in RTA_LL");
+                }
+            }
+            cout << "RTA analysis stops unexpectedly!\n";
+            throw;
+        }
+
+        double ResponseTimeAnalysisWarm(const double beginTime, const Task &taskCurr,
+                                        const TaskSet &tasksHighPriority)
         {
-            // double u1 = Utilization(tasksHighPriority);
-            // double u2 = taskCurr.utilization();
-            return INT32_MAX;
+            if (Utilization(tasksHighPriority) + taskCurr.utilization() > 1.0 + 1e-6)
+            {
+                // double u1 = Utilization(tasksHighPriority);
+                // double u2 = taskCurr.utilization();
+                return INT32_MAX;
+            }
+            return ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHighPriority);
         }
-        return ResponseTimeAnalysisWarm_util_nece(beginTime, taskCurr, tasksHighPriority);
-    }
 
-    double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
+        double ResponseTimeAnalysis(const Task &taskCurr, const TaskSet &tasksHighPriority)
+        {
+            const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
+            double executionTimeAll = taskCurr.executionTime;
+            for (auto &task : tasksHighPriority)
+                executionTimeAll += task.executionTime;
+            return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
+        }
+    };
+
+    VectorDynamic RTALLVector(const TaskSet &tasks)
     {
-        const vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
-        double executionTimeAll = taskCurr.executionTime;
-        for (auto &task : tasksHighPriority)
-            executionTimeAll += task.executionTime;
-        return ResponseTimeAnalysisWarm(executionTimeAll, taskCurr, tasksHighPriority);
+        BeginTimer(__func__);
+        RTA_LL r(tasks);
+        auto res = r.ResponseTimeOfTaskSet();
+
+        EndTimer(__func__);
+        return res;
     }
-};
-
-VectorDynamic RTALLVector(const TaskSet &tasks)
-{
-    BeginTimer(__func__);
-    RTA_LL r(tasks);
-    auto res = r.ResponseTimeOfTaskSet();
-
-    EndTimer(__func__);
-    return res;
-}
+} // namespace rt_num_opt

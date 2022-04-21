@@ -8,6 +8,7 @@
 #include "../sources/ReadControlCases.h"
 using namespace std;
 using namespace std::chrono;
+using namespace rt_num_opt;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 using namespace ControlOptimize;
 TEST(ReadControlCase1, v1)

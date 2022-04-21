@@ -1,5 +1,5 @@
 #include "../sources/BatchOptimize.h"
-
+using namespace rt_num_opt;
 int main(int argc, char *argv[])
 {
     if (argc == 1)

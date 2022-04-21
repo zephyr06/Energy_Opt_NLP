@@ -6,6 +6,7 @@
 #include "../sources/RTA_DAG.h"
 #include "../sources/ControlOptimize.h"
 
+using namespace rt_num_opt;
 TEST(hyperPeriod, RTA)
 {
     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv", "orig");

@@ -1,6 +1,6 @@
 #include "../sources/BatchControlOptimize.h"
 #include "../sources/profilier.h"
-
+using namespace rt_num_opt;
 int main(int argc, char *argv[])
 {
     BeginTimer(__func__);

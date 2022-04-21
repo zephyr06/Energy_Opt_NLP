@@ -24,241 +24,243 @@
 #include "testMy.h"
 #include "utils.h"
 #include "GlobalVariables.h"
+namespace rt_num_opt
+{
+    using namespace std;
+    using namespace gtsam;
 
-using namespace std;
-using namespace gtsam;
+    typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;
+    typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic &)> NormalErrorFunction2D;
 
-typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;
-typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic &)> NormalErrorFunction2D;
-
-/**
+    /**
  * @brief returns 0 if x>=0
  *
  * @param x
  * @return double
  */
-double HingeLoss(double x)
-{
-    return max(0, -1 * x);
-}
+    double HingeLoss(double x)
+    {
+        return max(0, -1 * x);
+    }
 
-/**
+    /**
  * @brief Constraint of x <= b
  *
  */
-class InequalityFactor1D : public NoiseModelFactor1<VectorDynamic>
-{
-public:
-    NormalErrorFunction1D f;
-    int dimension;
-    int index;
-    /**
+    class InequalityFactor1D : public NoiseModelFactor1<VectorDynamic>
+    {
+    public:
+        NormalErrorFunction1D f;
+        int dimension;
+        int index;
+        /**
      * @brief Construct a new Inequality Factor 1 D object,
      *  mainly used in derived class because f is not defined
      */
-    InequalityFactor1D(Key key,
-                       SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key)
-    {
-        index = -1;
-        dimension = 1;
-    }
-
-    InequalityFactor1D(Key key, int index,
-                       SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
-                                                 index(index)
-    {
-        dimension = 1;
-    }
-
-    InequalityFactor1D(Key key, NormalErrorFunction1D f,
-                       SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
-                                                 f(f)
-    {
-        index = -1;
-        dimension = 1;
-    }
-
-    /** active when constraint *NOT* met */
-    bool active(const Values &c) const override
-    {
-        if (index == -1)
+        InequalityFactor1D(Key key,
+                           SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key)
         {
-            // note: still active at equality to avoid zigzagging?
-            VectorDynamic x = (c.at<VectorDynamic>(this->key()));
-            return f(x)(0, 0) > 0;
-        }
-        else // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
-        {
-            return true;
-        }
-    }
-
-    Vector evaluateError(const VectorDynamic &x,
-                         boost::optional<Matrix &> H = boost::none) const override
-    {
-        VectorDynamic err = f(x);
-        if (index >= 0) // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
-        {
-            eliminationRecordGlobal.AdjustEliminationError(err(0), index, EliminationType::Bound);
+            index = -1;
+            dimension = 1;
         }
 
-        if (H)
+        InequalityFactor1D(Key key, int index,
+                           SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
+                                                     index(index)
         {
-            // *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
-            *H = GenerateVectorDynamic(dimension);
+            dimension = 1;
         }
-        return err;
-    }
-};
 
-/**
+        InequalityFactor1D(Key key, NormalErrorFunction1D f,
+                           SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
+                                                     f(f)
+        {
+            index = -1;
+            dimension = 1;
+        }
+
+        /** active when constraint *NOT* met */
+        bool active(const Values &c) const override
+        {
+            if (index == -1)
+            {
+                // note: still active at equality to avoid zigzagging?
+                VectorDynamic x = (c.at<VectorDynamic>(this->key()));
+                return f(x)(0, 0) > 0;
+            }
+            else // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
+            {
+                return true;
+            }
+        }
+
+        Vector evaluateError(const VectorDynamic &x,
+                             boost::optional<Matrix &> H = boost::none) const override
+        {
+            VectorDynamic err = f(x);
+            if (index >= 0) // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
+            {
+                eliminationRecordGlobal.AdjustEliminationError(err(0), index, EliminationType::Bound);
+            }
+
+            if (H)
+            {
+                // *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
+                *H = GenerateVectorDynamic(dimension);
+            }
+            return err;
+        }
+    };
+
+    /**
  * @brief Constraint of x <= b
  *
  */
-class SmallerThanFactor1D : public InequalityFactor1D
-{
-public:
-    double b;
-    SmallerThanFactor1D(Key key, double b,
-                        SharedNoiseModel model) : InequalityFactor1D(key, model)
+    class SmallerThanFactor1D : public InequalityFactor1D
     {
-        f = [b](const VectorDynamic &x)
+    public:
+        double b;
+        SmallerThanFactor1D(Key key, double b,
+                            SharedNoiseModel model) : InequalityFactor1D(key, model)
         {
-            VectorDynamic res = x;
-            res << HingeLoss(b - x(0, 0));
-            return res;
-        };
-    }
+            f = [b](const VectorDynamic &x)
+            {
+                VectorDynamic res = x;
+                res << HingeLoss(b - x(0, 0));
+                return res;
+            };
+        }
 
-    SmallerThanFactor1D(Key key, double b, int indexInEliminationRecord,
-                        SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
-    {
-        f = [b](const VectorDynamic &x)
+        SmallerThanFactor1D(Key key, double b, int indexInEliminationRecord,
+                            SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
         {
-            VectorDynamic res = x;
-            res << HingeLoss(b - x(0, 0));
-            return res;
-        };
-    }
-};
+            f = [b](const VectorDynamic &x)
+            {
+                VectorDynamic res = x;
+                res << HingeLoss(b - x(0, 0));
+                return res;
+            };
+        }
+    };
 
-/**
+    /**
  * @brief Constraint of x >= b
  *
  */
-class LargerThanFactor1D : public InequalityFactor1D
-{
-public:
-    double b;
-    LargerThanFactor1D(Key key, double b,
-                       SharedNoiseModel model) : InequalityFactor1D(key, model)
+    class LargerThanFactor1D : public InequalityFactor1D
     {
-        f = [b](const VectorDynamic &x)
+    public:
+        double b;
+        LargerThanFactor1D(Key key, double b,
+                           SharedNoiseModel model) : InequalityFactor1D(key, model)
         {
-            VectorDynamic res = x;
-            res << HingeLoss(x(0, 0) - b);
-            return res;
-        };
-    }
+            f = [b](const VectorDynamic &x)
+            {
+                VectorDynamic res = x;
+                res << HingeLoss(x(0, 0) - b);
+                return res;
+            };
+        }
 
-    LargerThanFactor1D(Key key, double b, int indexInEliminationRecord,
-                       SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
-    {
-        f = [b](const VectorDynamic &x)
+        LargerThanFactor1D(Key key, double b, int indexInEliminationRecord,
+                           SharedNoiseModel model) : InequalityFactor1D(key, indexInEliminationRecord, model)
         {
-            VectorDynamic res = x;
-            res << HingeLoss(x(0, 0) - b);
-            // if (res(0, 0) != 0)
-            // {
-            //     int a = 1;
-            // }
-            return res;
-        };
-    }
-};
-
-MatrixDynamic NumericalDerivativeDynamic2D1(NormalErrorFunction2D h,
-                                            const VectorDynamic &x1,
-                                            const VectorDynamic &x2,
-                                            double deltaOptimizer,
-                                            int mOfJacobian)
-{
-    int n = x1.rows();
-    MatrixDynamic jacobian;
-    jacobian.resize(mOfJacobian, n);
-    NormalErrorFunction1D f = [h, x2](const VectorDynamic &x1)
-    {
-        return h(x1, x2);
+            f = [b](const VectorDynamic &x)
+            {
+                VectorDynamic res = x;
+                res << HingeLoss(x(0, 0) - b);
+                // if (res(0, 0) != 0)
+                // {
+                //     int a = 1;
+                // }
+                return res;
+            };
+        }
     };
 
-    return NumericalDerivativeDynamic(f, x1, deltaOptimizer, mOfJacobian);
-}
-MatrixDynamic NumericalDerivativeDynamic2D2(NormalErrorFunction2D h,
-                                            const VectorDynamic &x1,
-                                            const VectorDynamic &x2,
-                                            double deltaOptimizer,
-                                            int mOfJacobian)
-{
-    int n = x2.rows();
-    MatrixDynamic jacobian;
-    jacobian.resize(mOfJacobian, n);
-    NormalErrorFunction1D f = [h, x1](const VectorDynamic &x2)
+    MatrixDynamic NumericalDerivativeDynamic2D1(NormalErrorFunction2D h,
+                                                const VectorDynamic &x1,
+                                                const VectorDynamic &x2,
+                                                double deltaOptimizer,
+                                                int mOfJacobian)
     {
-        return h(x1, x2);
-    };
+        int n = x1.rows();
+        MatrixDynamic jacobian;
+        jacobian.resize(mOfJacobian, n);
+        NormalErrorFunction1D f = [h, x2](const VectorDynamic &x1)
+        {
+            return h(x1, x2);
+        };
 
-    return NumericalDerivativeDynamic(f, x2, deltaOptimizer, mOfJacobian);
-}
+        return NumericalDerivativeDynamic(f, x1, deltaOptimizer, mOfJacobian);
+    }
+    MatrixDynamic NumericalDerivativeDynamic2D2(NormalErrorFunction2D h,
+                                                const VectorDynamic &x1,
+                                                const VectorDynamic &x2,
+                                                double deltaOptimizer,
+                                                int mOfJacobian)
+    {
+        int n = x2.rows();
+        MatrixDynamic jacobian;
+        jacobian.resize(mOfJacobian, n);
+        NormalErrorFunction1D f = [h, x1](const VectorDynamic &x2)
+        {
+            return h(x1, x2);
+        };
 
-/**
+        return NumericalDerivativeDynamic(f, x2, deltaOptimizer, mOfJacobian);
+    }
+
+    /**
  * @brief Constraint of f(x1, x2) <= 0;
  * x1 and x2 are vectors of size (1,1)
  *
  */
-class InequalityFactor2D : public NoiseModelFactor2<VectorDynamic, VectorDynamic>
-{
-public:
-    /**
+    class InequalityFactor2D : public NoiseModelFactor2<VectorDynamic, VectorDynamic>
+    {
+    public:
+        /**
      * @brief an example of the f function
      * f = [](const VectorDynamic &x1, const VectorDynamic &x2)
          {
              return (x1 + x2);
          };
      */
-    NormalErrorFunction2D f;
+        NormalErrorFunction2D f;
 
-    InequalityFactor2D(Key key1, Key key2, NormalErrorFunction2D f,
-                       SharedNoiseModel model) : NoiseModelFactor2<VectorDynamic, VectorDynamic>(model, key1, key2),
-                                                 f(f)
-    {
-    }
-
-    /** active when constraint *NOT* met */
-    bool active(const Values &c) const override
-    {
-        // note: still active at equality to avoid zigzagging??
-        VectorDynamic x0 = (c.at<VectorDynamic>(this->keys()[0]));
-        VectorDynamic x1 = (c.at<VectorDynamic>(this->keys()[1]));
-        return f(x0, x1)(0, 0) >= 0;
-        // return true;
-    }
-
-    Vector evaluateError(const VectorDynamic &x1, const VectorDynamic &x2,
-                         boost::optional<Matrix &> H1 = boost::none, boost::optional<Matrix &> H2 = boost::none) const override
-    {
-        VectorDynamic err = f(x1, x2);
-        if (H1)
+        InequalityFactor2D(Key key1, Key key2, NormalErrorFunction2D f,
+                           SharedNoiseModel model) : NoiseModelFactor2<VectorDynamic, VectorDynamic>(model, key1, key2),
+                                                     f(f)
         {
-            *H1 = NumericalDerivativeDynamic2D1(f, x1, x2, deltaOptimizer, 1);
         }
-        if (H2)
+
+        /** active when constraint *NOT* met */
+        bool active(const Values &c) const override
         {
-            *H2 = NumericalDerivativeDynamic2D2(f, x1, x2, deltaOptimizer, 1);
+            // note: still active at equality to avoid zigzagging??
+            VectorDynamic x0 = (c.at<VectorDynamic>(this->keys()[0]));
+            VectorDynamic x1 = (c.at<VectorDynamic>(this->keys()[1]));
+            return f(x0, x1)(0, 0) >= 0;
+            // return true;
         }
-        // if (err(0, 0) != 0)
-        // {
-        //     int a = 1;
-        // }
-        return err;
-    }
-};
+
+        Vector evaluateError(const VectorDynamic &x1, const VectorDynamic &x2,
+                             boost::optional<Matrix &> H1 = boost::none, boost::optional<Matrix &> H2 = boost::none) const override
+        {
+            VectorDynamic err = f(x1, x2);
+            if (H1)
+            {
+                *H1 = NumericalDerivativeDynamic2D1(f, x1, x2, deltaOptimizer, 1);
+            }
+            if (H2)
+            {
+                *H2 = NumericalDerivativeDynamic2D2(f, x1, x2, deltaOptimizer, 1);
+            }
+            // if (err(0, 0) != 0)
+            // {
+            //     int a = 1;
+            // }
+            return err;
+        }
+    };
+} // namespace rt_num_opt

@@ -2,19 +2,20 @@
 #include <gtsam/inference/Symbol.h>
 
 #include "GlobalVariables.h"
-
-bool ContainFalse(EliminationRecord &eliminationRecord)
+namespace rt_num_opt
 {
-    for (uint i = 0; i < eliminationRecord.record.size(); i++)
+    bool ContainFalse(EliminationRecord &eliminationRecord)
     {
-        if (eliminationRecord[i].type == EliminationType::Not)
+        for (uint i = 0; i < eliminationRecord.record.size(); i++)
         {
-            return true;
+            if (eliminationRecord[i].type == EliminationType::Not)
+            {
+                return true;
+            }
         }
+        return false;
     }
-    return false;
-}
-/**
+    /**
  * @brief generate keys for factor graph modeling the control problem
  * keys' attributes can be extracted via key.chr(). key.index()
  * 
@@ -22,29 +23,29 @@ bool ContainFalse(EliminationRecord &eliminationRecord)
  * @param type 
  * @return gtsam::Symbol 
  */
-gtsam::Symbol GenerateControlKey(int idtask, string type)
-{
-    if (type == "period")
+    gtsam::Symbol GenerateControlKey(int idtask, string type)
     {
-        return gtsam::Symbol('t', idtask);
+        if (type == "period")
+        {
+            return gtsam::Symbol('t', idtask);
+        }
+        else if (type == "response")
+        {
+            return gtsam::Symbol('r', idtask);
+        }
+        else if (type == "executionTime")
+        {
+            return gtsam::Symbol('c', idtask);
+        }
+        else
+        {
+            CoutError("Unrecognized type in GenerateControlKey");
+            gtsam::Symbol key('a', idtask);
+            return key;
+        }
     }
-    else if (type == "response")
-    {
-        return gtsam::Symbol('r', idtask);
-    }
-    else if (type == "executionTime")
-    {
-        return gtsam::Symbol('c', idtask);
-    }
-    else
-    {
-        CoutError("Unrecognized type in GenerateControlKey");
-        gtsam::Symbol key('a', idtask);
-        return key;
-    }
-}
 
-/**
+    /**
  * @brief perform customized quotient operation for two double type numbers
  * return result is min_k |a - k b|, where k is an integer, a & b >0;
  * 
@@ -53,97 +54,98 @@ gtsam::Symbol GenerateControlKey(int idtask, string type)
  * @param b 
  * @return double 
  */
-double QuotientDouble(double a, double b)
-{
-    double remainder = a - int(a / b) * b;
-    return min(remainder, abs(remainder - b));
-}
-
-template <typename T>
-bool Equals(std::vector<T> &v1, std::vector<T> &v2)
-{
-    if (v1.size() != v2.size())
+    double QuotientDouble(double a, double b)
     {
-        return false;
+        double remainder = a - int(a / b) * b;
+        return min(remainder, abs(remainder - b));
     }
-    for (uint i = 0; i < v1.size(); i++)
+
+    template <typename T>
+    bool Equals(std::vector<T> &v1, std::vector<T> &v2)
     {
-        if (v1[i] != v2[i])
+        if (v1.size() != v2.size())
         {
             return false;
         }
-    }
-    return true;
-}
-
-/* only used in Reorder function */
-struct TaskAugment
-{
-    Task task_;
-    double coeff_T;
-    double coeff_R;
-    TaskAugment(Task &task, double coeffT, double coeffR) : task_(task), coeff_T(coeffT), coeff_R(coeffR) {}
-    static bool Compare(const TaskAugment &t1, const TaskAugment &t2)
-    {
-        if (enableReorder == 1)
+        for (uint i = 0; i < v1.size(); i++)
         {
-            return t1.task_.period < t2.task_.period;
-        }
-        else
-        {
-            if (t1.task_.period != t2.task_.period)
-                return t1.task_.period < t2.task_.period;
-            else
+            if (v1[i] != v2[i])
             {
-                return t1.task_.executionTime < t2.task_.executionTime;
+                return false;
             }
         }
+        return true;
     }
-};
-/* in-place adjustment of tasks' order; highest order being the first in tasks */
-void Reorder(TaskSet &tasks, VectorDynamic &coeff, string priority_type = "RM")
-{
-    std::vector<TaskAugment> tasksAug;
-    tasksAug.reserve(tasks.size());
-    for (uint i = 0; i < tasks.size(); i++)
-    {
-        tasksAug.push_back({tasks[i], coeff(i * 2), coeff(i * 2 + 1)});
-    }
-    stable_sort(tasksAug.begin(), tasksAug.end(), TaskAugment::Compare);
-    for (uint i = 0; i < tasks.size(); i++)
-    {
-        tasks[i] = tasksAug[i].task_;
-        coeff(2 * i) = tasksAug[i].coeff_T;
-        coeff(2 * i + 1) = tasksAug[i].coeff_R;
-    }
-}
 
-/* @brief return a string with expected precision by adding leading 0 */
-string to_string_precision(int a, int precision)
-{
-    return std::string(4 - min(4, to_string(a).length()), '0') + to_string(a);
-}
-
-template <typename T>
-void print(const std::vector<T> &vec)
-{
-    for (auto x : vec)
+    /* only used in Reorder function */
+    struct TaskAugment
     {
-        cout << x << ", ";
+        Task task_;
+        double coeff_T;
+        double coeff_R;
+        TaskAugment(Task &task, double coeffT, double coeffR) : task_(task), coeff_T(coeffT), coeff_R(coeffR) {}
+        static bool Compare(const TaskAugment &t1, const TaskAugment &t2)
+        {
+            if (enableReorder == 1)
+            {
+                return t1.task_.period < t2.task_.period;
+            }
+            else
+            {
+                if (t1.task_.period != t2.task_.period)
+                    return t1.task_.period < t2.task_.period;
+                else
+                {
+                    return t1.task_.executionTime < t2.task_.executionTime;
+                }
+            }
+        }
+    };
+    /* in-place adjustment of tasks' order; highest order being the first in tasks */
+    void Reorder(TaskSet &tasks, VectorDynamic &coeff, string priority_type = "RM")
+    {
+        std::vector<TaskAugment> tasksAug;
+        tasksAug.reserve(tasks.size());
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            tasksAug.push_back({tasks[i], coeff(i * 2), coeff(i * 2 + 1)});
+        }
+        stable_sort(tasksAug.begin(), tasksAug.end(), TaskAugment::Compare);
+        for (uint i = 0; i < tasks.size(); i++)
+        {
+            tasks[i] = tasksAug[i].task_;
+            coeff(2 * i) = tasksAug[i].coeff_T;
+            coeff(2 * i + 1) = tasksAug[i].coeff_R;
+        }
     }
-}
 
-template <typename T>
-bool EqualVector(std::vector<T> &v1, std::vector<T> &v2)
-{
-    if (v1.size() != v2.size())
+    /* @brief return a string with expected precision by adding leading 0 */
+    string to_string_precision(int a, int precision)
     {
-        return false;
+        return std::string(4 - min(4, to_string(a).length()), '0') + to_string(a);
     }
-    for (uint i = 0; i < v1.size(); i++)
+
+    template <typename T>
+    void print(const std::vector<T> &vec)
     {
-        if (v1[i] != v2[i])
+        for (auto x : vec)
+        {
+            cout << x << ", ";
+        }
+    }
+
+    template <typename T>
+    bool EqualVector(std::vector<T> &v1, std::vector<T> &v2)
+    {
+        if (v1.size() != v2.size())
+        {
             return false;
+        }
+        for (uint i = 0; i < v1.size(); i++)
+        {
+            if (v1[i] != v2[i])
+                return false;
+        }
+        return true;
     }
-    return true;
-}
+} // namespace rt_num_opt

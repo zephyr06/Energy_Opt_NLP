@@ -3,12 +3,15 @@
 #include "Tasks.h"
 #include "Declaration.h"
 #include "profilier.h"
-/**
+
+namespace rt_num_opt
+{
+    /**
  * @brief All customized TaskSetType must inherit from TaskSetNormal in Tasks.h
  * 
  */
 
-/**
+    /**
  * @brief RTA_BASE encapsulate all the interafaces required
  *  by Energy_optimization.
  * All kinds of RTA should inherit 
@@ -16,63 +19,63 @@
  * 
  */
 
-template <class TaskSetType>
-class RTA_BASE
-{
-public:
-    TaskSetType tasks;
-    RTA_BASE() {}
-    RTA_BASE(const TaskSetType &tasks) : tasks(tasks) {}
+    template <class TaskSetType>
+    class RTA_BASE
+    {
+    public:
+        TaskSetType tasks;
+        RTA_BASE() {}
+        RTA_BASE(const TaskSetType &tasks) : tasks(tasks) {}
 
-    /**
+        /**
      * @brief 
      * 
      * @param tasks inverse priority ordered
      * @param index 
      * @return double 
      */
-    virtual double RTA_Common_Warm(double beginTime, int index)
-    {
-        CoutError("Calling RTA_Common_Warm that is supposed to be overwriten!");
-        return 0;
-    }
-
-    //*** the following functions are actually used in optimzie.h
-
-    VectorDynamic ResponseTimeOfTaskSet(const VectorDynamic &warmStart)
-    {
-        int N = tasks.tasks_.size();
-        VectorDynamic res = GenerateVectorDynamic(N);
-        if (printRTA)
+        virtual double RTA_Common_Warm(double beginTime, int index)
         {
-            cout << "Response time analysis of the task set is:" << endl;
+            CoutError("Calling RTA_Common_Warm that is supposed to be overwriten!");
+            return 0;
         }
-        for (int i = 0; i < N; i++)
+
+        //*** the following functions are actually used in optimzie.h
+
+        VectorDynamic ResponseTimeOfTaskSet(const VectorDynamic &warmStart)
         {
-            res(i, 0) = RTA_Common_Warm(warmStart(i, 0), i);
+            int N = tasks.tasks_.size();
+            VectorDynamic res = GenerateVectorDynamic(N);
             if (printRTA)
             {
-                cout << "Task " << i << ": " << res(i, 0) << endl;
+                cout << "Response time analysis of the task set is:" << endl;
             }
-            if (res(i, 0) >= INT32_MAX - 10000)
+            for (int i = 0; i < N; i++)
             {
-                int a = 1;
-                a *= a;
+                res(i, 0) = RTA_Common_Warm(warmStart(i, 0), i);
+                if (printRTA)
+                {
+                    cout << "Task " << i << ": " << res(i, 0) << endl;
+                }
+                if (res(i, 0) >= INT32_MAX - 10000)
+                {
+                    int a = 1;
+                    a *= a;
+                }
             }
+            return res;
         }
-        return res;
-    }
 
-    VectorDynamic ResponseTimeOfTaskSet()
-    {
-        BeginTimer("ResponseTimeOfTaskSet");
+        VectorDynamic ResponseTimeOfTaskSet()
+        {
+            BeginTimer("ResponseTimeOfTaskSet");
 
-        VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
-        auto res = ResponseTimeOfTaskSet(warmStart);
-        EndTimer("ResponseTimeOfTaskSet");
-        return res;
-    }
-    /**
+            VectorDynamic warmStart = GetParameterVD<double>(tasks, "executionTime");
+            auto res = ResponseTimeOfTaskSet(warmStart);
+            EndTimer("ResponseTimeOfTaskSet");
+            return res;
+        }
+        /**
      * @brief 
      * 
      * @tparam Schedul_Analysis 
@@ -84,48 +87,50 @@ public:
      * @return false: system is not schedulable
      */
 
-    bool CheckSchedulability(VectorDynamic warmStart,
-                             bool whetherPrint = false, double tol = 0)
-    {
-        int N = tasks.tasks_.size();
-        for (int i = 0; i < N; i++)
+        bool CheckSchedulability(VectorDynamic warmStart,
+                                 bool whetherPrint = false, double tol = 0)
         {
-            double rta = RTA_Common_Warm(warmStart(i, 0), i);
-            if (whetherPrint)
-                cout << "response time for task " << i << " is " << rta << " and deadline is "
-                     << min(tasks.tasks_[i].deadline, tasks.tasks_[i].period) << endl;
-            if (rta + tol > min(tasks.tasks_[i].deadline, tasks.tasks_[i].period))
+            int N = tasks.tasks_.size();
+            for (int i = 0; i < N; i++)
             {
+                double rta = RTA_Common_Warm(warmStart(i, 0), i);
                 if (whetherPrint)
+                    cout << "response time for task " << i << " is " << rta << " and deadline is "
+                         << min(tasks.tasks_[i].deadline, tasks.tasks_[i].period) << endl;
+                if (rta + tol > min(tasks.tasks_[i].deadline, tasks.tasks_[i].period))
                 {
-                    cout << "The current task set is not schedulable because of task " << i << " "
-                         << "!\n";
+                    if (whetherPrint)
+                    {
+                        cout << "The current task set is not schedulable because of task " << i << " "
+                             << "!\n";
+                    }
+
+                    return false;
                 }
-
-                return false;
             }
+            if (whetherPrint)
+                cout << endl;
+            return true;
         }
-        if (whetherPrint)
-            cout << endl;
-        return true;
-    }
 
-    bool CheckSchedulability(bool whetherPrint = false)
-    {
-        VectorDynamic warmStart = GetParameterVD<double>(tasks.tasks_, "executionTime");
-        return CheckSchedulability(warmStart, whetherPrint);
-    }
-
-    bool CheckSchedulabilityDirect(const VectorDynamic &rta)
-    {
-        int N = tasks.tasks_.size();
-        for (int i = 0; i < N; i++)
+        bool CheckSchedulability(bool whetherPrint = false)
         {
-            if (rta(i, 0) > min(tasks.tasks_[i].deadline, tasks.tasks_[i].period))
-            {
-                return false;
-            }
+            VectorDynamic warmStart = GetParameterVD<double>(tasks.tasks_, "executionTime");
+            return CheckSchedulability(warmStart, whetherPrint);
         }
-        return true;
-    }
-};
+
+        bool CheckSchedulabilityDirect(const VectorDynamic &rta)
+        {
+            int N = tasks.tasks_.size();
+            for (int i = 0; i < N; i++)
+            {
+                if (rta(i, 0) > min(tasks.tasks_[i].deadline, tasks.tasks_[i].period))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    };
+
+} // namespace rt_num_opt

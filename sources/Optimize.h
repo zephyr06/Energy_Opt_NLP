@@ -16,616 +16,618 @@
 
 #include "GlobalVariables.h"
 #include "EnergyOptimize.h"
-
-using namespace std;
-using namespace gtsam;
+namespace rt_num_opt
+{
+    using namespace std;
+    using namespace gtsam;
 
 #define numberOfTasksNeedOptimize (N - lastTaskDoNotNeedOptimize - 1)
 
-struct OptimizeResult
-{
-    double initialError;
-    double optimizeError;
-    VectorDynamic initialVariable;
-    VectorDynamic optimizeVariable;
-    OptimizeResult() : initialError(-1), optimizeError(-1)
+    struct OptimizeResult
     {
-        ;
-    }
-    OptimizeResult(double ie, double oe, VectorDynamic iv, VectorDynamic ov) : initialError(ie),
-                                                                               optimizeError(oe), initialVariable(iv), optimizeVariable(ov) {}
-};
+        double initialError;
+        double optimizeError;
+        VectorDynamic initialVariable;
+        VectorDynamic optimizeVariable;
+        OptimizeResult() : initialError(-1), optimizeError(-1)
+        {
+            ;
+        }
+        OptimizeResult(double ie, double oe, VectorDynamic iv, VectorDynamic ov) : initialError(ie),
+                                                                                   optimizeError(oe), initialVariable(iv), optimizeVariable(ov) {}
+    };
 
-bool CheckExecutionTimeBound(VectorDynamic &exec, TaskSet &tasksOrg)
-{
-    if (not enableMaxComputationTimeRestrict)
+    bool CheckExecutionTimeBound(VectorDynamic &exec, TaskSet &tasksOrg)
+    {
+        if (not enableMaxComputationTimeRestrict)
+            return true;
+        for (uint i = 0; i < tasksOrg.size(); i++)
+        {
+            if (exec(i, 0) > tasksOrg[i].executionTime * 2)
+                return false;
+        }
         return true;
-    for (uint i = 0; i < tasksOrg.size(); i++)
-    {
-        if (exec(i, 0) > tasksOrg[i].executionTime * 2)
-            return false;
     }
-    return true;
-}
 
-template <class TaskSetType, class Schedul_Analysis>
-class Energy_Opt
-{
-public:
-    // TODO: whether warmStart assume sustainable?
-    class ComputationFactor : public NoiseModelFactor1<VectorDynamic>
+    template <class TaskSetType, class Schedul_Analysis>
+    class Energy_Opt
     {
     public:
-        TaskSetType tasks_;
-        int lastTaskDoNotNeedOptimize;
-        VectorDynamic responseTimeInitial;
-        int N;
-
-        ComputationFactor(Key key, TaskSetType &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic responseTimeInitial,
-                          SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
-                                                    tasks_(tasks), lastTaskDoNotNeedOptimize(lastTaskDoNotNeedOptimize),
-                                                    responseTimeInitial(responseTimeInitial)
+        // TODO: whether warmStart assume sustainable?
+        class ComputationFactor : public NoiseModelFactor1<VectorDynamic>
         {
-            N = tasks_.tasks_.size();
-        }
+        public:
+            TaskSetType tasks_;
+            int lastTaskDoNotNeedOptimize;
+            VectorDynamic responseTimeInitial;
+            int N;
 
-        void UpdateGlobalVector(VectorDynamic &responseTimeVec, double currentEnergyConsumption,
-                                const TaskSet &taskDurOpt) const
-        {
-            for (int i = 0; i < N; i++)
+            ComputationFactor(Key key, TaskSetType &tasks, int lastTaskDoNotNeedOptimize, VectorDynamic responseTimeInitial,
+                              SharedNoiseModel model) : NoiseModelFactor1<VectorDynamic>(model, key),
+                                                        tasks_(tasks), lastTaskDoNotNeedOptimize(lastTaskDoNotNeedOptimize),
+                                                        responseTimeInitial(responseTimeInitial)
             {
-                if (tasks_.tasks_[i].deadline - responseTimeVec(i, 0) < 0 ||
-                    (enableMaxComputationTimeRestrict &&
-                     taskDurOpt[i].executionTimeOrg * MaxComputationTimeRestrict <
-                         taskDurOpt[i].executionTime) ||
-                    taskDurOpt[i].executionTimeOrg > taskDurOpt[i].executionTime)
-                    return;
+                N = tasks_.tasks_.size();
             }
-            if (currentEnergyConsumption / weightEnergy < valueGlobalOpt)
+
+            void UpdateGlobalVector(VectorDynamic &responseTimeVec, double currentEnergyConsumption,
+                                    const TaskSet &taskDurOpt) const
             {
-                // update globalOptVector
-                vectorGlobalOpt = GetParameterVD<double>(taskDurOpt, "executionTime");
-                valueGlobalOpt = currentEnergyConsumption / weightEnergy;
+                for (int i = 0; i < N; i++)
+                {
+                    if (tasks_.tasks_[i].deadline - responseTimeVec(i, 0) < 0 ||
+                        (enableMaxComputationTimeRestrict &&
+                         taskDurOpt[i].executionTimeOrg * MaxComputationTimeRestrict <
+                             taskDurOpt[i].executionTime) ||
+                        taskDurOpt[i].executionTimeOrg > taskDurOpt[i].executionTime)
+                        return;
+                }
+                if (currentEnergyConsumption / weightEnergy < valueGlobalOpt)
+                {
+                    // update globalOptVector
+                    vectorGlobalOpt = GetParameterVD<double>(taskDurOpt, "executionTime");
+                    valueGlobalOpt = currentEnergyConsumption / weightEnergy;
+                }
             }
-        }
-        /**
+            /**
          * @brief 
          * 
          * @param executionTimeVector (numberOfTasksNeedOptimize, 1)
          * @param H 
          * @return Vector 
          */
-        Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
-        {
-            BeginTimer("main_factor");
-            TaskSetType taskDurOpt = tasks_;
-
-            boost::function<Matrix(const VectorDynamic &)> f2 =
-                [this](const VectorDynamic &executionTimeVector)
+            Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
             {
-                TaskSetType taskT = tasks_;
-                UpdateTaskSetExecutionTime(taskT.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
-                return EstimateEnergyTaskSet(taskT.tasks_);
-            };
+                BeginTimer("main_factor");
+                TaskSetType taskDurOpt = tasks_;
 
-            boost::function<Matrix(const VectorDynamic &)> f =
-                [&taskDurOpt, &f2, this](const VectorDynamic &executionTimeVector)
-            {
-                UpdateTaskSetExecutionTime(taskDurOpt.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
-                Schedul_Analysis r(taskDurOpt);
-                VectorDynamic responseTimeVec = r.ResponseTimeOfTaskSet(responseTimeInitial);
-                VectorDynamic err = f2(executionTimeVector);
-
-                double currentEnergyConsumption = err.sum();
-                for (int i = 0; i < N; i++)
+                boost::function<Matrix(const VectorDynamic &)> f2 =
+                    [this](const VectorDynamic &executionTimeVector)
                 {
-                    // barrier function part
-                    err(i, 0) += Barrier(taskDurOpt.tasks_[i].deadline - responseTimeVec(i, 0));
-                    err(i, 0) += Barrier(taskDurOpt.tasks_[i].executionTime - taskDurOpt.tasks_[i].executionTimeOrg);
-                    if (enableMaxComputationTimeRestrict)
-                        err(i, 0) += Barrier(taskDurOpt.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict -
-                                             taskDurOpt.tasks_[i].executionTime);
+                    TaskSetType taskT = tasks_;
+                    UpdateTaskSetExecutionTime(taskT.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
+                    return EstimateEnergyTaskSet(taskT.tasks_);
+                };
+
+                boost::function<Matrix(const VectorDynamic &)> f =
+                    [&taskDurOpt, &f2, this](const VectorDynamic &executionTimeVector)
+                {
+                    UpdateTaskSetExecutionTime(taskDurOpt.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
+                    Schedul_Analysis r(taskDurOpt);
+                    VectorDynamic responseTimeVec = r.ResponseTimeOfTaskSet(responseTimeInitial);
+                    VectorDynamic err = f2(executionTimeVector);
+
+                    double currentEnergyConsumption = err.sum();
+                    for (int i = 0; i < N; i++)
+                    {
+                        // barrier function part
+                        err(i, 0) += Barrier(taskDurOpt.tasks_[i].deadline - responseTimeVec(i, 0));
+                        err(i, 0) += Barrier(taskDurOpt.tasks_[i].executionTime - taskDurOpt.tasks_[i].executionTimeOrg);
+                        if (enableMaxComputationTimeRestrict)
+                            err(i, 0) += Barrier(taskDurOpt.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict -
+                                                 taskDurOpt.tasks_[i].executionTime);
+                    }
+                    UpdateGlobalVector(responseTimeVec, currentEnergyConsumption, taskDurOpt.tasks_);
+                    return err;
+                };
+
+                VectorDynamic err;
+                err = f(executionTimeVector);
+
+                if (H)
+                {
+
+                    if (exactJacobian == 1)
+                        *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, N);
+                    else if (exactJacobian == 0)
+                        *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N);
+                    else if ((exactJacobian == -1))
+                    {
+                        *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N);
+                        cout << "The old Jacobian is " << endl
+                             << *H << endl;
+                        int m = N;
+                        int n = executionTimeVector.rows();
+                        int maxIndex = 0; // the index of variable
+                        double maxElement = abs((*H)(m - n + maxIndex, maxIndex));
+                        for (int i = 1; i < n; i++)
+                        {
+                            if ((*H)(m - n + i, i) > maxElement)
+                            {
+                                maxElement = abs((*H)(m - n + i, i));
+                                maxIndex = i;
+                            }
+                        }
+                        cout << "MaxIndex: " << maxIndex << endl;
+                        for (int i = 0; i < n; i++)
+                        {
+                            if (i != maxIndex)
+                            {
+                                (*H)(m - n + i, i) = 0;
+                            }
+                        }
+                    }
+
+                    // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
+                    // *H = jacobian;
+                    if (debugMode == 1)
+                    {
+                        cout << endl;
+                        cout << "The current evaluation point is " << endl
+                             << executionTimeVector << endl;
+                        cout << "The Jacobian is " << endl
+                             << *H << endl;
+                        // cout << "The approximated Jacobian is " << endl
+                        //      << jacobian << endl;
+                        cout << "The current error is " << endl
+                             << err << endl
+                             << endl
+                             << err.norm() << endl
+                             << endl;
+                    }
                 }
-                UpdateGlobalVector(responseTimeVec, currentEnergyConsumption, taskDurOpt.tasks_);
+                EndTimer("main_factor");
                 return err;
-            };
+            }
+        };
 
-            VectorDynamic err;
-            err = f(executionTimeVector);
-
-            if (H)
+        // ------------------
+        // TODO: clamp turn 123.99 to 124 rather than 123
+        static void ClampComputationTime(TaskSetType &tasksSetType, int lastTaskDoNotNeedOptimize,
+                                         VectorDynamic &responseTimeInitial, string roundType)
+        {
+            if (roundType == "none")
+                return;
+            TaskSet &tasks = tasksSetType.tasks_;
+            for (uint i = 0; i < tasks.size(); i++)
+                tasks[i].executionTime = int(tasks[i].executionTime);
+            if (roundType == "rough")
             {
+                return;
+            }
+            else if (roundType == "fine")
+            {
+                int N = tasks.size();
 
-                if (exactJacobian == 1)
-                    *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, N);
-                else if (exactJacobian == 0)
-                    *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N);
-                else if ((exactJacobian == -1))
+                vector<pair<int, double>> objectiveVec;
+                objectiveVec.reserve(N);
+                for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                 {
-                    *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, N);
-                    cout << "The old Jacobian is " << endl
-                         << *H << endl;
-                    int m = N;
-                    int n = executionTimeVector.rows();
-                    int maxIndex = 0; // the index of variable
-                    double maxElement = abs((*H)(m - n + maxIndex, maxIndex));
-                    for (int i = 1; i < n; i++)
-                    {
-                        if ((*H)(m - n + i, i) > maxElement)
-                        {
-                            maxElement = abs((*H)(m - n + i, i));
-                            maxIndex = i;
-                        }
-                    }
-                    cout << "MaxIndex: " << maxIndex << endl;
-                    for (int i = 0; i < n; i++)
-                    {
-                        if (i != maxIndex)
-                        {
-                            (*H)(m - n + i, i) = 0;
-                        }
-                    }
+                    objectiveVec.push_back(make_pair(i, JacobianInEnergyItem(tasks, i)));
                 }
+                sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
 
-                // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
-                // *H = jacobian;
+                int iterationNumber = 0;
+
                 if (debugMode == 1)
                 {
-                    cout << endl;
-                    cout << "The current evaluation point is " << endl
-                         << executionTimeVector << endl;
-                    cout << "The Jacobian is " << endl
-                         << *H << endl;
-                    // cout << "The approximated Jacobian is " << endl
-                    //      << jacobian << endl;
-                    cout << "The current error is " << endl
-                         << err << endl
-                         << endl
-                         << err.norm() << endl
-                         << endl;
-                }
-            }
-            EndTimer("main_factor");
-            return err;
-        }
-    };
-
-    // ------------------
-    // TODO: clamp turn 123.99 to 124 rather than 123
-    static void ClampComputationTime(TaskSetType &tasksSetType, int lastTaskDoNotNeedOptimize,
-                                     VectorDynamic &responseTimeInitial, string roundType)
-    {
-        if (roundType == "none")
-            return;
-        TaskSet &tasks = tasksSetType.tasks_;
-        for (uint i = 0; i < tasks.size(); i++)
-            tasks[i].executionTime = int(tasks[i].executionTime);
-        if (roundType == "rough")
-        {
-            return;
-        }
-        else if (roundType == "fine")
-        {
-            int N = tasks.size();
-
-            vector<pair<int, double>> objectiveVec;
-            objectiveVec.reserve(N);
-            for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-            {
-                objectiveVec.push_back(make_pair(i, JacobianInEnergyItem(tasks, i)));
-            }
-            sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
-
-            int iterationNumber = 0;
-
-            if (debugMode == 1)
-            {
-                cout << "before binary search, here is the task set" << endl;
-                for (int i = 0; i < N; i++)
-                    tasks[i].print();
-            }
-
-            // int left = 0, right = 0;
-            while (objectiveVec.size() > 0)
-            {
-                int currentIndex = objectiveVec[0].first;
-
-                // try to round up, if success, keep the loop; otherwise, eliminate it and high priority tasks
-                // can be speeded up, if necessary, by binary search
-                int left = tasks[currentIndex].executionTime;
-                int right = tasks[currentIndex].deadline;
-                if (enableMaxComputationTimeRestrict)
-                {
-                    right = min(right, tasks[currentIndex].executionTimeOrg * MaxComputationTimeRestrict);
+                    cout << "before binary search, here is the task set" << endl;
+                    for (int i = 0; i < N; i++)
+                        tasks[i].print();
                 }
 
-                if (left > right)
+                // int left = 0, right = 0;
+                while (objectiveVec.size() > 0)
                 {
-                    CoutError("left > right error in clamp!");
-                }
-                int rightOrg = right;
-                bool schedulale_flag;
-                while (left < right)
-                {
-                    int mid = ceil((left + right) / 2.0);
+                    int currentIndex = objectiveVec[0].first;
 
-                    tasks[currentIndex].executionTime = mid;
-                    Schedul_Analysis r(tasksSetType);
-                    schedulale_flag = r.CheckSchedulability(
-                        responseTimeInitial, debugMode == 1);
-                    if ((not schedulale_flag) ||
-                        not WithInBound(tasks))
+                    // try to round up, if success, keep the loop; otherwise, eliminate it and high priority tasks
+                    // can be speeded up, if necessary, by binary search
+                    int left = tasks[currentIndex].executionTime;
+                    int right = tasks[currentIndex].deadline;
+                    if (enableMaxComputationTimeRestrict)
                     {
-                        right = mid - 1;
+                        right = min(right, tasks[currentIndex].executionTimeOrg * MaxComputationTimeRestrict);
                     }
-                    else
+
+                    if (left > right)
                     {
-                        // comp(currentIndex, 0) = mid;
+                        CoutError("left > right error in clamp!");
+                    }
+                    int rightOrg = right;
+                    bool schedulale_flag;
+                    while (left < right)
+                    {
+                        int mid = ceil((left + right) / 2.0);
+
                         tasks[currentIndex].executionTime = mid;
-                        left = mid;
-                    }
-                }
-
-                // post processing, left=right is the value we want
-                tasks[currentIndex].executionTime = left;
-                objectiveVec.erase(objectiveVec.begin() + 0);
-                if (left != rightOrg)
-                {
-                    // remove hp because they cannot be optimized anymore
-                    for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
-                    {
-                        if (objectiveVec[i].first < currentIndex)
+                        Schedul_Analysis r(tasksSetType);
+                        schedulale_flag = r.CheckSchedulability(
+                            responseTimeInitial, debugMode == 1);
+                        if ((not schedulale_flag) ||
+                            not WithInBound(tasks))
                         {
-                            objectiveVec.erase(objectiveVec.begin() + i);
+                            right = mid - 1;
+                        }
+                        else
+                        {
+                            // comp(currentIndex, 0) = mid;
+                            tasks[currentIndex].executionTime = mid;
+                            left = mid;
                         }
                     }
-                }
 
-                iterationNumber++;
-                if (iterationNumber > N)
-                {
-                    CoutWarning("iterationNumber error in Clamp!");
-                    break;
-                }
-            };
-        }
-        else
-        {
-            cout << "input error in ClampComputationTime: " << roundType << endl;
-            throw;
-        }
-        return;
-    }
+                    // post processing, left=right is the value we want
+                    tasks[currentIndex].executionTime = left;
+                    objectiveVec.erase(objectiveVec.begin() + 0);
+                    if (left != rightOrg)
+                    {
+                        // remove hp because they cannot be optimized anymore
+                        for (int i = objectiveVec.size() - 1; i > lastTaskDoNotNeedOptimize; i--)
+                        {
+                            if (objectiveVec[i].first < currentIndex)
+                            {
+                                objectiveVec.erase(objectiveVec.begin() + i);
+                            }
+                        }
+                    }
 
-    /**
+                    iterationNumber++;
+                    if (iterationNumber > N)
+                    {
+                        CoutWarning("iterationNumber error in Clamp!");
+                        break;
+                    }
+                };
+            }
+            else
+            {
+                cout << "input error in ClampComputationTime: " << roundType << endl;
+                throw;
+            }
+            return;
+        }
+
+        /**
      * find the tasks that do not need to optimize;
      * i means i-th task do not need optimization,  while i+1, ..., N need
      * -1 means all tasks need optimization
      * N-1 means all tasks do not need optimization
      **/
-    static int FindTaskDoNotNeedOptimize(const TaskSetType &tasks, int lastTaskDoNotNeedOptimize,
-                                         VectorDynamic &computationTimeWarmStart, double eliminateTolIte)
-    {
-        BeginTimer(__func__);
-        // update the tasks with the new optimal computationTimeVector
-        TaskSetType tasksCurr = tasks;
-        int N = tasks.tasks_.size();
-        for (int i = N - 1; i >= 0; i--)
+        static int FindTaskDoNotNeedOptimize(const TaskSetType &tasks, int lastTaskDoNotNeedOptimize,
+                                             VectorDynamic &computationTimeWarmStart, double eliminateTolIte)
         {
-            tasksCurr.tasks_[i].executionTime += eliminateTolIte;
-
-            // we cannot use a more strict criteria in detecting schedulability,
-            //  because it may trigger early detection of termination
-
-            // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-            double tolerance = 0.0;
-            Schedul_Analysis r(tasksCurr);
-            bool schedulable = r.CheckSchedulability(
-                computationTimeWarmStart,
-                false, tolerance);
-            // bool schedulable = Schedul_Analysis::CheckSchedulability(tasksCurr,
-            //                                                          computationTimeWarmStart,
-            //                                                          debugMode == 1, tolerance);
-            if ((!schedulable) ||
-                (enableMaxComputationTimeRestrict &&
-                 tasksCurr.tasks_[i].executionTime - eliminateTolIte > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict))
-
-            // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-            // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
-            //     tasksCurr[i].executionTime - eliminateTolIte + tolerance > tasks[i].executionTimeOrg * MaxComputationTimeRestrict)
+            BeginTimer(__func__);
+            // update the tasks with the new optimal computationTimeVector
+            TaskSetType tasksCurr = tasks;
+            int N = tasks.tasks_.size();
+            for (int i = N - 1; i >= 0; i--)
             {
-                EndTimer(__func__);
-                return i;
+                tasksCurr.tasks_[i].executionTime += eliminateTolIte;
+
+                // we cannot use a more strict criteria in detecting schedulability,
+                //  because it may trigger early detection of termination
+
+                // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
+                double tolerance = 0.0;
+                Schedul_Analysis r(tasksCurr);
+                bool schedulable = r.CheckSchedulability(
+                    computationTimeWarmStart,
+                    false, tolerance);
+                // bool schedulable = Schedul_Analysis::CheckSchedulability(tasksCurr,
+                //                                                          computationTimeWarmStart,
+                //                                                          debugMode == 1, tolerance);
+                if ((!schedulable) ||
+                    (enableMaxComputationTimeRestrict &&
+                     tasksCurr.tasks_[i].executionTime - eliminateTolIte > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict))
+
+                // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
+                // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
+                //     tasksCurr[i].executionTime - eliminateTolIte + tolerance > tasks[i].executionTimeOrg * MaxComputationTimeRestrict)
+                {
+                    EndTimer(__func__);
+                    return i;
+                }
+                // recover tasksCurr[i].executionTime
+                tasksCurr.tasks_[i].executionTime -= eliminateTolIte;
             }
-            // recover tasksCurr[i].executionTime
-            tasksCurr.tasks_[i].executionTime -= eliminateTolIte;
+            EndTimer(__func__);
+            return -1;
         }
-        EndTimer(__func__);
-        return -1;
-    }
 
-    static VectorDynamic UnitOptimization(TaskSetType &tasks,
-                                          int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate,
-                                          VectorDynamic &responseTimeInitial)
-    {
-        BeginTimer(__func__);
-        int N = tasks.tasks_.size();
-
-        // build the factor graph
-        auto model = noiseModel::Isotropic::Sigma(N, noiseModelSigma);
-        NonlinearFactorGraph graph;
-        Symbol key('a', 0);
-        graph.emplace_shared<ComputationFactor>(key, tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, model);
-
-        Values initialEstimateFG;
-        initialEstimateFG.insert(key, initialEstimate);
-        if (debugMode == 1)
+        static VectorDynamic UnitOptimization(TaskSetType &tasks,
+                                              int lastTaskDoNotNeedOptimize, VectorDynamic &initialEstimate,
+                                              VectorDynamic &responseTimeInitial)
         {
-            // double eee = graph.error(initialEstimateFG);
-        }
-        // usually, when the change of variables between steps is smaller than 1,
-        // we can already terminate; the corresponding minimal of relative error is
-        // approximately 2e-3;
+            BeginTimer(__func__);
+            int N = tasks.tasks_.size();
 
-        Values result;
-        if (optimizerType == 1)
-        {
-            DoglegParams params;
+            // build the factor graph
+            auto model = noiseModel::Isotropic::Sigma(N, noiseModelSigma);
+            NonlinearFactorGraph graph;
+            Symbol key('a', 0);
+            graph.emplace_shared<ComputationFactor>(key, tasks, lastTaskDoNotNeedOptimize, responseTimeInitial, model);
+
+            Values initialEstimateFG;
+            initialEstimateFG.insert(key, initialEstimate);
+            if (debugMode == 1)
+            {
+                // double eee = graph.error(initialEstimateFG);
+            }
+            // usually, when the change of variables between steps is smaller than 1,
+            // we can already terminate; the corresponding minimal of relative error is
+            // approximately 2e-3;
+
+            Values result;
+            if (optimizerType == 1)
+            {
+                DoglegParams params;
+                // if (debugMode == 1)
+                //     params.setVerbosityDL("VERBOSE");
+                params.setDeltaInitial(deltaInitialDogleg);
+                params.setRelativeErrorTol(relativeErrorTolerance);
+                DoglegOptimizer optimizer(graph, initialEstimateFG, params);
+                result = optimizer.optimize();
+            }
+            else if (optimizerType == 2)
+            {
+                LevenbergMarquardtParams params;
+                params.setlambdaInitial(initialLambda);
+                // if (debugMode > 1 && debugMode < 5)
+                params.setVerbosityLM(verbosityLM);
+                // params.setVerbosityLM("TRYDELTA");
+                params.setlambdaLowerBound(lowerLambda);
+                params.setlambdaUpperBound(upperLambda);
+                params.setMaxIterations(maxIterationsOptimizer);
+                params.setRelativeErrorTol(relativeErrorTolerance);
+                LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+                result = optimizer.optimize();
+            }
+            else if (optimizerType == 3)
+            {
+                GaussNewtonParams params;
+                if (debugMode == 1)
+                    params.setVerbosity("DELTA");
+                params.setRelativeErrorTol(relativeErrorTolerance);
+                GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
+                result = optimizer.optimize();
+            }
+            else if (optimizerType == 4)
+            {
+                NonlinearOptimizerParams params;
+                params.setRelativeErrorTol(relativeErrorTolerance);
+                if (debugMode == 1)
+                    params.setVerbosity("DELTA");
+                NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
+                result = optimizer.optimize();
+            }
+
+            // auto start = high_resolution_clock::now();
+            // auto sth = graph.error(initialEstimateFG);
+            // auto stop = high_resolution_clock::now();
+            // auto duration = duration_cast<microseconds>(stop - start);
+            // cout << "Evaluate error:" << duration.count() << endl;
+            // start = high_resolution_clock::now();
+            // auto sth2 = graph.linearize(initialEstimateFG);
+            // stop = high_resolution_clock::now();
+            // duration = duration_cast<microseconds>(stop - start);
+            // cout << "linearize:" << duration.count() << endl;
+
+            // cout << Color::green;
+            // // std::lock_guard<std::mutex> lock(mtx);
+            // auto sth3 = graph.linearize(initialEstimateFG)->jacobian();
+            // MatrixDynamic jacobianCurr = sth3.first;
+            // std::cout << "Current Jacobian matrix:" << endl;
+            // std::cout << jacobianCurr << endl;
+            // std::cout << "Current b vector: " << endl;
+            // std::cout << sth3.second << endl;
+            // cout << Color::def << endl;
+
+            VectorDynamic optComp = result.at<VectorDynamic>(key);
+            if (debugMode == 1)
+            {
+                cout << "After optimization, the computation time vector is " << optComp << endl;
+            }
+
             // if (debugMode == 1)
-            //     params.setVerbosityDL("VERBOSE");
-            params.setDeltaInitial(deltaInitialDogleg);
-            params.setRelativeErrorTol(relativeErrorTolerance);
-            DoglegOptimizer optimizer(graph, initialEstimateFG, params);
-            result = optimizer.optimize();
-        }
-        else if (optimizerType == 2)
-        {
-            LevenbergMarquardtParams params;
-            params.setlambdaInitial(initialLambda);
-            // if (debugMode > 1 && debugMode < 5)
-            params.setVerbosityLM(verbosityLM);
-            // params.setVerbosityLM("TRYDELTA");
-            params.setlambdaLowerBound(lowerLambda);
-            params.setlambdaUpperBound(upperLambda);
-            params.setMaxIterations(maxIterationsOptimizer);
-            params.setRelativeErrorTol(relativeErrorTolerance);
-            LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
-            result = optimizer.optimize();
-        }
-        else if (optimizerType == 3)
-        {
-            GaussNewtonParams params;
-            if (debugMode == 1)
-                params.setVerbosity("DELTA");
-            params.setRelativeErrorTol(relativeErrorTolerance);
-            GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
-            result = optimizer.optimize();
-        }
-        else if (optimizerType == 4)
-        {
-            NonlinearOptimizerParams params;
-            params.setRelativeErrorTol(relativeErrorTolerance);
-            if (debugMode == 1)
-                params.setVerbosity("DELTA");
-            NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
-            result = optimizer.optimize();
+            //     cout << "After clamp, the computation time vector is " << optComp << endl;
+            EndTimer(__func__);
+            return optComp;
         }
 
-        // auto start = high_resolution_clock::now();
-        // auto sth = graph.error(initialEstimateFG);
-        // auto stop = high_resolution_clock::now();
-        // auto duration = duration_cast<microseconds>(stop - start);
-        // cout << "Evaluate error:" << duration.count() << endl;
-        // start = high_resolution_clock::now();
-        // auto sth2 = graph.linearize(initialEstimateFG);
-        // stop = high_resolution_clock::now();
-        // duration = duration_cast<microseconds>(stop - start);
-        // cout << "linearize:" << duration.count() << endl;
-
-        // cout << Color::green;
-        // // std::lock_guard<std::mutex> lock(mtx);
-        // auto sth3 = graph.linearize(initialEstimateFG)->jacobian();
-        // MatrixDynamic jacobianCurr = sth3.first;
-        // std::cout << "Current Jacobian matrix:" << endl;
-        // std::cout << jacobianCurr << endl;
-        // std::cout << "Current b vector: " << endl;
-        // std::cout << sth3.second << endl;
-        // cout << Color::def << endl;
-
-        VectorDynamic optComp = result.at<VectorDynamic>(key);
-        if (debugMode == 1)
-        {
-            cout << "After optimization, the computation time vector is " << optComp << endl;
-        }
-
-        // if (debugMode == 1)
-        //     cout << "After clamp, the computation time vector is " << optComp << endl;
-        EndTimer(__func__);
-        return optComp;
-    }
-
-    /**
+        /**
      * Perform optimization for one task set;
      * this function only performs optimization and elimination, it does not change weights
      **/
-    static double OptimizeTaskSetOneIte(TaskSetType &taskSetType)
-    {
-        int N = taskSetType.tasks_.size();
-
-        // this function also checks schedulability
-        Schedul_Analysis r(taskSetType);
-        VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
-        if (!r.CheckSchedulabilityDirect(responseTimeInitial))
-            return -2;
-
-        VectorDynamic initialExecutionTime = GetParameterVD<int>(taskSetType, "executionTimeOrg");
-        int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(taskSetType,
-                                                                  -1, responseTimeInitial, eliminateTol);
-
-        // computationTimeVectorLocalOpt is always stored in tasks
-        vectorGlobalOpt = initialExecutionTime;
-        int numberOfIteration = 0;
-        // eliminateTolIte must be inherited from one iteration to its next, otherwise,
-        // circular elimination will occur
-        double eliminateTolIte = eliminateTol;
-
-        while (numberOfTasksNeedOptimize > 0)
+        static double OptimizeTaskSetOneIte(TaskSetType &taskSetType)
         {
-            VectorDynamic initialEstimateDuringOpt;
-            initialEstimateDuringOpt.resize(numberOfTasksNeedOptimize, 1);
-            for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-                initialEstimateDuringOpt(i - lastTaskDoNotNeedOptimize - 1, 0) =
-                    taskSetType.tasks_[i].executionTime;
-            Schedul_Analysis r2(taskSetType);
-            responseTimeInitial = r2.ResponseTimeOfTaskSet();
-            // perform optimization
-            if (exactJacobian)
+            int N = taskSetType.tasks_.size();
+
+            // this function also checks schedulability
+            Schedul_Analysis r(taskSetType);
+            VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
+            if (!r.CheckSchedulabilityDirect(responseTimeInitial))
+                return -2;
+
+            VectorDynamic initialExecutionTime = GetParameterVD<int>(taskSetType, "executionTimeOrg");
+            int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(taskSetType,
+                                                                      -1, responseTimeInitial, eliminateTol);
+
+            // computationTimeVectorLocalOpt is always stored in tasks
+            vectorGlobalOpt = initialExecutionTime;
+            int numberOfIteration = 0;
+            // eliminateTolIte must be inherited from one iteration to its next, otherwise,
+            // circular elimination will occur
+            double eliminateTolIte = eliminateTol;
+
+            while (numberOfTasksNeedOptimize > 0)
             {
-                try
+                VectorDynamic initialEstimateDuringOpt;
+                initialEstimateDuringOpt.resize(numberOfTasksNeedOptimize, 1);
+                for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
+                    initialEstimateDuringOpt(i - lastTaskDoNotNeedOptimize - 1, 0) =
+                        taskSetType.tasks_[i].executionTime;
+                Schedul_Analysis r2(taskSetType);
+                responseTimeInitial = r2.ResponseTimeOfTaskSet();
+                // perform optimization
+                if (exactJacobian)
+                {
+                    try
+                    {
+                        auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
+                                                        initialEstimateDuringOpt, responseTimeInitial);
+                    }
+                    catch (...)
+                    {
+                        ;
+                    }
+                }
+                else
                 {
                     auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
                                                     initialEstimateDuringOpt, responseTimeInitial);
                 }
-                catch (...)
+
+                // formulate new computationTime
+                UpdateTaskSetExecutionTime(taskSetType.tasks_, vectorGlobalOpt);
+                // clamp with rough option seems to work better
+                ClampComputationTime(taskSetType,
+                                     lastTaskDoNotNeedOptimize,
+                                     responseTimeInitial, clampTypeMiddle);
+                // update vectorGlobalOpt to be the clamped version
+                vectorGlobalOpt = GetParameterVD<double>(taskSetType.tasks_, "executionTime");
+                valueGlobalOpt = EstimateEnergyTaskSet(taskSetType.tasks_).sum() / weightEnergy;
+                if (debugMode == 1)
+                    cout << "After clamp: " << endl
+                         << GetParameterVD<double>(taskSetType.tasks_, "executionTime") << endl;
+                // find variables to eliminate
+                int adjustEliminateTolNum = 0;
+                int lastTaskDoNotNeedOptimizeAfterOpt;
+
+                while (adjustEliminateTolNum < adjustEliminateMaxIte)
                 {
-                    ;
+                    lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
+                        taskSetType, lastTaskDoNotNeedOptimize, responseTimeInitial, eliminateTolIte);
+                    if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
+                        eliminateTolIte *= eliminateStep;
+                    else
+                        break;
+                    adjustEliminateTolNum++;
                 }
-            }
-            else
-            {
-                auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
-                                                initialEstimateDuringOpt, responseTimeInitial);
-            }
-
-            // formulate new computationTime
-            UpdateTaskSetExecutionTime(taskSetType.tasks_, vectorGlobalOpt);
-            // clamp with rough option seems to work better
-            ClampComputationTime(taskSetType,
-                                 lastTaskDoNotNeedOptimize,
-                                 responseTimeInitial, clampTypeMiddle);
-            // update vectorGlobalOpt to be the clamped version
-            vectorGlobalOpt = GetParameterVD<double>(taskSetType.tasks_, "executionTime");
-            valueGlobalOpt = EstimateEnergyTaskSet(taskSetType.tasks_).sum() / weightEnergy;
-            if (debugMode == 1)
-                cout << "After clamp: " << endl
-                     << GetParameterVD<double>(taskSetType.tasks_, "executionTime") << endl;
-            // find variables to eliminate
-            int adjustEliminateTolNum = 0;
-            int lastTaskDoNotNeedOptimizeAfterOpt;
-
-            while (adjustEliminateTolNum < adjustEliminateMaxIte)
-            {
-                lastTaskDoNotNeedOptimizeAfterOpt = FindTaskDoNotNeedOptimize(
-                    taskSetType, lastTaskDoNotNeedOptimize, responseTimeInitial, eliminateTolIte);
                 if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
-                    eliminateTolIte *= eliminateStep;
-                else
                     break;
-                adjustEliminateTolNum++;
-            }
-            if (lastTaskDoNotNeedOptimizeAfterOpt == lastTaskDoNotNeedOptimize)
-                break;
 
-            lastTaskDoNotNeedOptimize = lastTaskDoNotNeedOptimizeAfterOpt;
+                lastTaskDoNotNeedOptimize = lastTaskDoNotNeedOptimizeAfterOpt;
 
-            numberOfIteration++;
-            if (numberOfIteration > min(N, elimIte))
-            {
-                CoutWarning("numberOfIteration reaches the maximum limits, the algorithm decides to give up!");
-                break;
-            }
-        }
-        ClampComputationTime(taskSetType,
-                             -1,
-                             responseTimeInitial, roundTypeInClamp);
-        // performance evaluation
-        Schedul_Analysis r2(taskSetType);
-        if (r2.CheckSchedulability())
-        {
-            if (debugMode == 1)
-            {
-                cout << "The task set is schedulable after optimization\n";
-                cout << endl;
-                cout << "The original task set is: " << endl;
-                for (int i = 0; i < N; i++)
+                numberOfIteration++;
+                if (numberOfIteration > min(N, elimIte))
                 {
-                    cout << i << " ";
-                    taskSetType.tasks_[i].print();
+                    CoutWarning("numberOfIteration reaches the maximum limits, the algorithm decides to give up!");
+                    break;
                 }
             }
-            TaskSet tasksInit = taskSetType.tasks_;
-            UpdateTaskSetExecutionTime(tasksInit, initialExecutionTime);
-            double initialEnergyCost = EstimateEnergyTaskSet(tasksInit).sum();
-            double afterEnergyCost = EstimateEnergyTaskSet(taskSetType.tasks_).sum();
-            if (debugMode == 1)
-                cout << "Actual objective function is" << FactorGraphEnergyLL::RealObj(taskSetType.tasks_) << endl;
-            if (debugMode == 1)
+            ClampComputationTime(taskSetType,
+                                 -1,
+                                 responseTimeInitial, roundTypeInClamp);
+            // performance evaluation
+            Schedul_Analysis r2(taskSetType);
+            if (r2.CheckSchedulability())
             {
-                cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
-            }
-            if (debugMode >= 1)
-            {
-                double granularity = GetParameterVD<double>(taskSetType, "executionTime").maxCoeff() * 3e-5;
-                // verify whether elimination is successful
-                Schedul_Analysis r1(taskSetType);
-                if (r1.CheckSchedulability())
-                // if (Schedul_Analysis::CheckSchedulability(taskSetType))
+                if (debugMode == 1)
                 {
-                    Task &taskLast = taskSetType.tasks_[taskSetType.tasks_.size() - 1];
-                    taskLast.executionTime += granularity;
-                    Schedul_Analysis r2(taskSetType);
-                    if (r2.CheckSchedulability())
+                    cout << "The task set is schedulable after optimization\n";
+                    cout << endl;
+                    cout << "The original task set is: " << endl;
+                    for (int i = 0; i < N; i++)
                     {
-
-                        if (enableMaxComputationTimeRestrict &&
-                            taskLast.executionTime <
-                                taskLast.executionTimeOrg * MaxComputationTimeRestrict)
+                        cout << i << " ";
+                        taskSetType.tasks_[i].print();
+                    }
+                }
+                TaskSet tasksInit = taskSetType.tasks_;
+                UpdateTaskSetExecutionTime(tasksInit, initialExecutionTime);
+                double initialEnergyCost = EstimateEnergyTaskSet(tasksInit).sum();
+                double afterEnergyCost = EstimateEnergyTaskSet(taskSetType.tasks_).sum();
+                if (debugMode == 1)
+                    cout << "Actual objective function is" << FactorGraphEnergyLL::RealObj(taskSetType.tasks_) << endl;
+                if (debugMode == 1)
+                {
+                    cout << "Normalized objective function after optimization is " << afterEnergyCost << endl;
+                }
+                if (debugMode >= 1)
+                {
+                    double granularity = GetParameterVD<double>(taskSetType, "executionTime").maxCoeff() * 3e-5;
+                    // verify whether elimination is successful
+                    Schedul_Analysis r1(taskSetType);
+                    if (r1.CheckSchedulability())
+                    // if (Schedul_Analysis::CheckSchedulability(taskSetType))
+                    {
+                        Task &taskLast = taskSetType.tasks_[taskSetType.tasks_.size() - 1];
+                        taskLast.executionTime += granularity;
+                        Schedul_Analysis r2(taskSetType);
+                        if (r2.CheckSchedulability())
                         {
-                            if (taskLast.executionTimeOrg /
-                                        taskLast.period >
-                                    0.03 &&
-                                eliminateTolIte / taskLast.executionTime > 0.015)
+
+                            if (enableMaxComputationTimeRestrict &&
+                                taskLast.executionTime <
+                                    taskLast.executionTimeOrg * MaxComputationTimeRestrict)
                             {
-                                CoutWarning("Elimination failed in final verfication, \
+                                if (taskLast.executionTimeOrg /
+                                            taskLast.period >
+                                        0.03 &&
+                                    eliminateTolIte / taskLast.executionTime > 0.015)
+                                {
+                                    CoutWarning("Elimination failed in final verfication, \
                             eliminateTolIte used before is " +
-                                            to_string(eliminateTolIte));
+                                                to_string(eliminateTolIte));
+                                }
                             }
                         }
+                        taskLast.executionTime -= granularity;
                     }
-                    taskLast.executionTime -= granularity;
+                }
+                if (runMode == "compare")
+                    return afterEnergyCost / weightEnergy;
+                else if (runMode == "normal")
+                    return afterEnergyCost / initialEnergyCost;
+                else
+                {
+                    CoutError("Unrecognized runMode!!");
                 }
             }
-            if (runMode == "compare")
-                return afterEnergyCost / weightEnergy;
-            else if (runMode == "normal")
-                return afterEnergyCost / initialEnergyCost;
             else
             {
-                CoutError("Unrecognized runMode!!");
+                cout << "Unfeasible after optimization!" << endl;
+                return -1;
             }
-        }
-        else
-        {
-            cout << "Unfeasible after optimization!" << endl;
             return -1;
         }
-        return -1;
-    }
 
-    /**
+        /**
  * initialize all the global variables
  */
-    static double OptimizeTaskSet(TaskSetType &taskSetType)
-    {
-        InitializeGlobalVector(taskSetType.tasks_.size());
-        double eliminateTolRef = eliminateTol;
+        static double OptimizeTaskSet(TaskSetType &taskSetType)
+        {
+            InitializeGlobalVector(taskSetType.tasks_.size());
+            double eliminateTolRef = eliminateTol;
 
-        double res = OptimizeTaskSetOneIte(taskSetType);
-        cout << "After optimization: " << res << endl;
-        // Some variables become 0, which actually means a failure
-        if (isinf(res))
-            res = 10;
-        eliminateTol = eliminateTolRef;
-        return res;
-    }
-};
+            double res = OptimizeTaskSetOneIte(taskSetType);
+            cout << "After optimization: " << res << endl;
+            // Some variables become 0, which actually means a failure
+            if (isinf(res))
+                res = 10;
+            eliminateTol = eliminateTolRef;
+            return res;
+        }
+    };
+} // namespace rt_num_opt

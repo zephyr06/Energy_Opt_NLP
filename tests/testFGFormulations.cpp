@@ -1,5 +1,5 @@
 #include "../sources/ControlOptimize.h"
-
+using namespace rt_num_opt;
 double Fobj(double x)
 {
     return x * x * x + sin(x) + cos(3 * x * x);

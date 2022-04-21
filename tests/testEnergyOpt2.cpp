@@ -5,7 +5,7 @@
 #include "../sources/Optimize.h"
 #include "../sources/FactorGraphEnergyLL.h"
 using namespace std::chrono;
-
+using namespace rt_num_opt;
 TEST(EliminationRecordUpdate, v1)
 {
     optimizerType = 2;
