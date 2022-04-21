@@ -5,15 +5,15 @@
 
 namespace rt_num_opt
 {
-    void AddEntry(string pathRes, double val)
+    void AddEntry(std::string pathRes, double val)
     {
-        ofstream outfileWrite;
-        // string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+        std::ofstream outfileWrite;
+        // std::string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
         //                  batchOptimizeFolder + "/EnergySaveRatio/N" +
-        //                  to_string(N) + ".txt";
+        //                  std::to_string(N) + ".txt";
         outfileWrite.open(pathRes,
                           std::ios_base::app);
-        outfileWrite << val << endl;
+        outfileWrite << val << std::endl;
         outfileWrite.close();
     }
 
@@ -22,7 +22,7 @@ namespace rt_num_opt
     {
         runMode = "normal";
         const char *pathDataset;
-        string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" + to_string(Nn) + "/";
+        std::string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" + std::to_string(Nn) + "/";
         if (Nn == -1)
             pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/";
         else
@@ -31,20 +31,20 @@ namespace rt_num_opt
             if (debugMode == 1)
                 printf("Directory: %s\n", pathDataset);
         }
-        vector<double> energySaveRatioVec;
-        vector<double> runTime;
+        std::vector<double> energySaveRatioVec;
+        std::vector<double> runTime;
         int N;
         if (debugMode == 1)
             printf("Directory: %s\n", pathDataset);
-        vector<string> errorFiles;
+        std::vector<std::string> errorFiles;
         for (const auto &file : ReadFilesInDirectory(pathDataset))
         {
             if (debugMode)
-                cout << file << endl;
-            string delimiter = "-";
+                std::cout << file << std::endl;
+            std::string delimiter = "-";
             if (file.substr(0, file.find(delimiter)) == "periodic")
             {
-                string path = pathDataset + file;
+                std::string path = pathDataset + file;
                 TaskSetType tasksN;
                 if (TaskSetType::Type() == "normal")
                 {
@@ -63,11 +63,11 @@ namespace rt_num_opt
                     CoutError("Unrecognized TaskSetType!");
                 }
 
-                auto start = chrono::high_resolution_clock::now();
+                auto start = std::chrono::high_resolution_clock::now();
                 double res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
-                // cout << "The energy saving ratio is " << res << endl;
-                auto stop = chrono::high_resolution_clock::now();
-                auto duration = duration_cast<microseconds>(stop - start);
+                // std::cout << "The energy saving ratio is " << res << std::endl;
+                auto stop = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
                 double timeTaken = double(duration.count()) / 1e6;
                 if (res >= 0 && res <= 1)
                 {
@@ -89,14 +89,14 @@ namespace rt_num_opt
             avEnergy = Average(energySaveRatioVec);
             aveTime = Average(runTime);
         }
-        cout << Color::blue << endl;
-        cout << "Average energy saving ratio is " << avEnergy << endl;
-        cout << "Average time consumed is " << aveTime << endl;
-        cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
+        std::cout << Color::blue << std::endl;
+        std::cout << "Average energy saving ratio is " << avEnergy << std::endl;
+        std::cout << "Average time consumed is " << aveTime << std::endl;
+        std::cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << std::endl;
 
-        string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-                         batchOptimizeFolder + "/EnergySaveRatio/N" +
-                         to_string(N) + ".txt";
+        std::string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                              batchOptimizeFolder + "/EnergySaveRatio/N" +
+                              std::to_string(N) + ".txt";
         AddEntry(pathRes, avEnergy);
         pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
                   batchOptimizeFolder + "/time_task_number.txt";
@@ -104,13 +104,13 @@ namespace rt_num_opt
 
         if (printFailureFile)
         {
-            cout << endl;
+            std::cout << std::endl;
             for (auto &file : errorFiles)
-                cout << file << endl;
+                std::cout << file << std::endl;
         }
         // if (debugMode)
-        cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
-        cout << Color::def << endl;
+        std::cout << "The total number of optimization failure files is " << errorFiles.size() << std::endl;
+        std::cout << Color::def << std::endl;
         return;
     }
 } // namespace rt_num_opt

@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
         char *pEnd;
         int N = strtol(argv[1], &pEnd, 10);
         if (debugMode == 1)
-            cout << "Task sets under analyzation is N" + to_string(N) << endl;
+            std::cout << "Task sets under analyzation is N" + std::to_string(N) << std::endl;
         if (N >= 0)
             BatchOptimize<TaskSetDAG, RTA_DAG>(N);
         else

@@ -12,10 +12,10 @@ namespace rt_num_opt
 
     namespace po = boost::program_options;
 
-    vector<double> Uunifast(int N, double utilAll)
+    std::vector<double> Uunifast(int N, double utilAll)
     {
         double sumU = utilAll;
-        vector<double> utilVec(N, 0);
+        std::vector<double> utilVec(N, 0);
 
         double nextU;
         for (int i = 1; i < N; i++)
@@ -33,7 +33,7 @@ namespace rt_num_opt
                             int numberOfProcessor, int periodMin,
                             int periodMax, int deadlineType = 0)
     {
-        vector<double> utilVec = Uunifast(N, totalUtilization);
+        std::vector<double> utilVec = Uunifast(N, totalUtilization);
         TaskSet tasks;
         // int periodMaxRatio = periodMax / periodMin;
 
@@ -56,7 +56,7 @@ namespace rt_num_opt
         return tasks;
     }
 
-    void WriteTaskSets(ofstream &file, TaskSet &tasks)
+    void WriteTaskSets(std::ofstream &file, TaskSet &tasks)
     {
         int N = tasks.size();
         file << "JobID,Offset,Period,Overhead,ExecutionTime,DeadLine,processorId\n";
@@ -93,7 +93,7 @@ namespace rt_num_opt
         return dagModel;
     }
 
-    void WriteDAGMelani(ofstream &file, std::vector<DAG_Model> &tasks, std::vector<double> &weightVec)
+    void WriteDAGMelani(std::ofstream &file, std::vector<DAG_Model> &tasks, std::vector<double> &weightVec)
     {
         int NN = tasks.size();
         file << "JobID,Offset,Period,Overhead,ExecutionTime,DeadLine,processorId,volume,longestPath,weightInControl\n";
