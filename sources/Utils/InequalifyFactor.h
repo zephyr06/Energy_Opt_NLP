@@ -19,14 +19,13 @@
 
 #include <boost/function.hpp>
 
-#include "Parameters.h"
-#include "colormod.h"
-#include "testMy.h"
-#include "utils.h"
-#include "GlobalVariables.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/Tools/colormod.h"
+#include "sources/Tools/testMy.h"
+#include "sources/OptimizationUtils/utils.h"
+#include "sources/Utils/GlobalVariables.h"
 namespace rt_num_opt
 {
-    // using namespace std;
     // using namespace gtsam;
 
     typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;

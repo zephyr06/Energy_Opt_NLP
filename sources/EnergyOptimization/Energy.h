@@ -10,11 +10,11 @@
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Values.h>
 
-#include "Tasks.h"
-#include "Parameters.h"
-#include "Declaration.h"
-#include "FrequencyModel.h"
-#include "utils.h"
+#include "sources/TaskModel/Tasks.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/EnergyOptimization/FrequencyModel.h"
+#include "sources/OptimizationUtils/utils.h"
 
 namespace rt_num_opt
 {

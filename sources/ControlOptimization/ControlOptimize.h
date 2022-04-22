@@ -7,15 +7,15 @@
 
 #include <CppUnitLite/TestHarness.h>
 
-#include "CoeffFactor.h"
-#include "ControlFactorGraphUtils.h"
-#include "InequalifyFactor.h"
-#include "FactorGraphForceManifold.h"
-#include "FactorGraphInManifold.h"
+#include "sources/ControlOptimization/CoeffFactor.h"
+#include "sources/Utils/FactorGraphUtils.h"
+#include "sources/Utils/InequalifyFactor.h"
+#include "sources/ControlOptimization/FactorGraphForceManifold.h"
+#include "sources/ControlOptimization/FactorGraphInManifold.h"
 // #include "Optimize.h"
-#include "Parameters.h"
-#include "ReadControlCases.h"
-#include "RTAFactor.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/ControlOptimization/ReadControlCases.h"
+#include "sources/Utils/MultiKeyFactor.h"
 namespace rt_num_opt
 {
     namespace ControlOptimize

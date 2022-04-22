@@ -1,7 +1,7 @@
 #pragma once
 #include <gtsam/inference/Symbol.h>
 
-#include "GlobalVariables.h"
+#include "sources/Utils/GlobalVariables.h"
 namespace rt_num_opt
 {
     bool ContainFalse(EliminationRecord &eliminationRecord)
@@ -134,18 +134,4 @@ namespace rt_num_opt
         }
     }
 
-    template <typename T>
-    bool EqualVector(std::vector<T> &v1, std::vector<T> &v2)
-    {
-        if (v1.size() != v2.size())
-        {
-            return false;
-        }
-        for (uint i = 0; i < v1.size(); i++)
-        {
-            if (v1[i] != v2[i])
-                return false;
-        }
-        return true;
-    }
 } // namespace rt_num_opt

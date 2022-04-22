@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Tasks.h"
-#include "Declaration.h"
-#include "profilier.h"
+#include "sources/TaskModel/Tasks.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/Tools/profilier.h"
 
 namespace rt_num_opt
 {

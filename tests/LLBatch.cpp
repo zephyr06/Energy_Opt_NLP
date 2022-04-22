@@ -1,4 +1,4 @@
-#include "../sources/BatchOptimize.h"
+#include "sources/BatchOptimize.h"
 using namespace rt_num_opt;
 int main(int argc, char *argv[])
 {

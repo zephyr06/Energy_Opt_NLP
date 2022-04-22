@@ -1,6 +1,6 @@
 #pragma once
-#include "Parameters.h"
-#include "Tasks.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/TaskModel/Tasks.h"
 namespace rt_num_opt
 {
 

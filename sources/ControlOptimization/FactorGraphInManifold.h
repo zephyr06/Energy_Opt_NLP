@@ -4,14 +4,17 @@
 #include <string>
 #include <utility>
 #include <numeric>
+
 #include <CppUnitLite/TestHarness.h>
-#include "Parameters.h"
-#include "Optimize.h"
-#include "ReadControlCases.h"
-#include "CoeffFactor.h"
-#include "RTAFactor.h"
-#include "InequalifyFactor.h"
-#include "ControlFactorGraphUtils.h"
+
+#include "sources/Utils/Parameters.h"
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/ControlOptimization/ReadControlCases.h"
+#include "sources/ControlOptimization/CoeffFactor.h"
+#include "sources/Utils/MultiKeyFactor.h"
+#include "sources/Utils/InequalifyFactor.h"
+#include "sources/Utils/FactorGraphUtils.h"
+#include "sources/ControlOptimization/RTAFactor.h"
 namespace rt_num_opt
 {
 

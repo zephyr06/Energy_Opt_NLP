@@ -19,16 +19,14 @@
 
 #include <boost/function.hpp>
 
-#include "Parameters.h"
-#include "colormod.h"
-#include "testMy.h"
-#include "utils.h"
-
-#include "ControlFactorGraphUtils.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/Tools/colormod.h"
+#include "sources/Tools/testMy.h"
+#include "sources/OptimizationUtils/utils.h"
+// #include "sources/Utils/FactorGraphUtils.h"
 namespace rt_num_opt
 {
 
-    // using namespace std;
     // using namespace gtsam;
 
     // typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;

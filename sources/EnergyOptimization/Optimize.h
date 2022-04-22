@@ -3,22 +3,25 @@
 #include <chrono>
 #include <math.h>
 
-#pragma once
-
-#include "Parameters.h"
 #include <Eigen/Dense>
-#include "Declaration.h"
-#include "Tasks.h"
-#include "RTA_LL.h"
-#include "Energy.h"
-#include "utils.h"
-#include "FrequencyModel.h"
 
-#include "GlobalVariables.h"
-#include "EnergyOptimize.h"
+#include <gtsam/nonlinear/GaussNewtonOptimizer.h>
+#include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/NonlinearConjugateGradientOptimizer.h>
+#include <gtsam/nonlinear/DoglegOptimizer.h>
+#include <gtsam/nonlinear/NonlinearFactorGraph.h>
+
+#include "sources/Utils/Parameters.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/TaskModel/Tasks.h"
+#include "sources/RTA/RTA_LL.h"
+#include "sources/EnergyOptimization/Energy.h"
+#include "sources/OptimizationUtils/utils.h"
+#include "sources/EnergyOptimization/FrequencyModel.h"
+#include "sources/Utils/GlobalVariables.h"
+#include "sources/EnergyOptimization/EnergyOptimize.h"
 namespace rt_num_opt
 {
-    // using namespace std;
     // using namespace gtsam;
 
 #define numberOfTasksNeedOptimize (N - lastTaskDoNotNeedOptimize - 1)

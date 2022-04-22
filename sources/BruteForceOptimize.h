@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Optimize.h"
+#include "sources/EnergyOptimization/Optimize.h"
 
 double OptimizeTaskSetBf3(TaskSet &tasks, int granularity = granularityInBF)
 {

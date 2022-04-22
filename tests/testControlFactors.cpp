@@ -1,5 +1,5 @@
-#include "../sources/ControlOptimize.h"
-#include "../sources/BatchControlOptimize.h"
+#include "sources/ControlOptimization/ControlOptimize.h"
+#include "sources/BatchControlOptimize.h"
 using namespace std;
 using namespace std::chrono;
 

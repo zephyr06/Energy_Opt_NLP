@@ -1,10 +1,10 @@
 #include <chrono>
 
 #include <CppUnitLite/TestHarness.h>
-#include "sources/Parameters.h"
-#include "sources/Optimize.h"
-#include "sources/FactorGraphEnergyLL.h"
-#include "sources/ControlFactorGraphUtils.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
+#include "sources/Utils/FactorGraphUtils.h"
 using namespace std::chrono;
 using namespace rt_num_opt;
 using namespace std;

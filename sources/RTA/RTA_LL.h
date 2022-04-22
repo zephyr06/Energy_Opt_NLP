@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Tasks.h"
-#include "Declaration.h"
-#include "RTA_BASE.h"
+#include "sources/TaskModel/Tasks.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/RTA/RTA_BASE.h"
 namespace rt_num_opt
 {
     class RTA_LL : public RTA_BASE<TaskSetNormal>

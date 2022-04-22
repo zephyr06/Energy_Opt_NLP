@@ -3,10 +3,10 @@
 
 #include <boost/program_options/options_description.hpp>
 
-#include "Tasks.h"
-#include "DAG_Task.h"
-#include "Parameters.h"
-#include "FrequencyModel.h"
+#include "sources/TaskModel/Tasks.h"
+#include "sources/TaskModel/DAG_Task.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/EnergyOptimization/FrequencyModel.h"
 namespace rt_num_opt
 {
 

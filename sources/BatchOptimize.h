@@ -1,7 +1,7 @@
 #pragma once
-#include "BatchTestutils.h"
-#include "Optimize.h"
-#include "RTA_DAG.h"
+#include "sources/BatchTestutils.h"
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/RTA/RTA_DAG.h"
 
 namespace rt_num_opt
 {

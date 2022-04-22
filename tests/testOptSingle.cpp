@@ -1,12 +1,12 @@
 #include <chrono>
 
 #include <CppUnitLite/TestHarness.h>
-#include "../sources/Parameters.h"
-#include "../sources/Optimize.h"
-#include "../sources/RTA_LL.h"
-// #include "../sources/RTA_WAP.h"
-// #include "../sources/Generate_WAP.h"
-#include "../sources/profilier.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/RTA/RTA_LL.h"
+// #include "sources/RTA_WAP.h"
+// #include "sources/Generate_WAP.h"
+#include "sources/Tools/profilier.h"
 using namespace std::chrono;
 using namespace rt_num_opt;
 using namespace std;

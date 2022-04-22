@@ -1,5 +1,5 @@
-#include "../sources/EnergyOptimize.h"
-#include "../sources/profilier.h"
+#include "sources/EnergyOptimization/EnergyOptimize.h"
+#include "sources/Tools/profilier.h"
 using namespace rt_num_opt;
 using namespace std;
 TEST(case1, v1)

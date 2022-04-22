@@ -1,6 +1,6 @@
 #pragma once
-#include "DAG_Task.h"
-#include "RTA_BASE.h"
+#include "sources/TaskModel/DAG_Task.h"
+#include "sources/RTA/RTA_BASE.h"
 namespace rt_num_opt
 {
   class RTA_DAG : public RTA_BASE<TaskSetDAG>

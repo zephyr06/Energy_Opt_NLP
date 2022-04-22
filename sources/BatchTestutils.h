@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <chrono>
 
-#include "../sources/Optimize.h"
+#include "sources/EnergyOptimization/Optimize.h"
 // using namespace std::chrono;
 namespace rt_num_opt
 {

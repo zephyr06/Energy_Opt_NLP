@@ -1,6 +1,6 @@
 #include <CppUnitLite/TestHarness.h>
-#include "../sources/Optimize.h"
-#include "../sources/testMy.h"
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/Tools/testMy.h"
 
 using namespace rt_num_opt;
 using namespace gtsam;

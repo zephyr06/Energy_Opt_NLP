@@ -2,7 +2,7 @@
 
 #include <CppUnitLite/TestHarness.h>
 
-#include "../sources/BruteForceOptimize.h"
+#include "sources/BruteForceOptimize.h"
 using namespace std::chrono;
 
 TEST(OptimizeTaskSet, a2)

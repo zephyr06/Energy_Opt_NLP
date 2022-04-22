@@ -1,30 +1,15 @@
 #pragma once
 
-#include <boost/function.hpp>
-#include <gtsam/base/numericalDerivative.h>
-#include <gtsam/geometry/Point3.h>
-#include <gtsam/inference/Key.h>
-#include <gtsam/inference/Symbol.h>
-#include <gtsam/linear/VectorValues.h>
-#include <gtsam/nonlinear/GaussNewtonOptimizer.h>
-#include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
-#include <gtsam/nonlinear/NonlinearConjugateGradientOptimizer.h>
-#include <gtsam/nonlinear/DoglegOptimizer.h>
-#include <gtsam/nonlinear/NonlinearFactorGraph.h>
-#include <gtsam/nonlinear/Values.h>
+#include <Eigen/Core>
 
-#include "testMy.h"
-#include "profilier.h"
+#include "sources/Tools/testMy.h"
+#include "sources/Tools/profilier.h"
 namespace rt_num_opt
 {
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
     typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorDynamic;
     typedef long long int LLint;
     std::mutex mtx;
-    // extern MatrixDynamic A_Global;
-    // extern MatrixDynamic P_Global;
-    MatrixDynamic A_Global;
-    MatrixDynamic P_Global;
 
     double min(double a, double b)
     {

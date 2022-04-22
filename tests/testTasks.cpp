@@ -2,11 +2,11 @@
 
 #include <CppUnitLite/TestHarness.h>
 
-#include "../sources/Tasks.h"
-#include "../sources/RTA_LL.h"
-#include "../sources/Parameters.h"
-#include "../sources/DAG_Task.h"
-#include "../sources/BatchTestutils.h"
+#include "sources/TaskModel/Tasks.h"
+#include "sources/RTA/RTA_LL.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/TaskModel/DAG_Task.h"
+#include "sources/BatchTestutils.h"
 using namespace rt_num_opt;
 using namespace std;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;

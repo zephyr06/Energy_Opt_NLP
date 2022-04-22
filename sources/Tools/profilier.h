@@ -6,9 +6,10 @@
 #include <chrono>
 #include <vector>
 #include <unordered_map>
-#include "colormod.h"
-#include "testMy.h"
-// using namespace std::;
+
+#include "sources/Tools/colormod.h"
+#include "sources/Tools/testMy.h"
+
 #define CurrentTime std::chrono::high_resolution_clock::now()
 #define BeginTimerApp BeginTimer(__FUNCTION__);
 #define EndTimerApp EndTimer(__FUNCTION__);

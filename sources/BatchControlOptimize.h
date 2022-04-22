@@ -1,6 +1,6 @@
 #pragma once
-#include "BatchTestutils.h"
-#include "ControlOptimize.h"
+#include "sources/BatchTestutils.h"
+#include "sources/ControlOptimization/ControlOptimize.h"
 namespace rt_num_opt
 {
     using namespace ControlOptimize;

@@ -2,8 +2,10 @@
 #include <chrono>
 #include <cmath>
 #include <time.h>
-#include "Optimize.h"
-#include "RTA_LL.h"
+
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/RTA/RTA_LL.h"
+
 #include "../includeMoe/moe/moe.hpp"
 namespace rt_num_opt
 {

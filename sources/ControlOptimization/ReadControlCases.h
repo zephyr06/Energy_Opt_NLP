@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Tasks.h"
+#include "sources/TaskModel/Tasks.h"
 namespace rt_num_opt
 {
     std::vector<double> String2IntVector(std::vector<std::string> vecS)

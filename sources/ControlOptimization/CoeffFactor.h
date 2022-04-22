@@ -3,8 +3,8 @@
 #include <boost/function.hpp>
 #include <gtsam/nonlinear/NonlinearFactor.h>
 
-#include "testMy.h"
-#include "profilier.h"
+#include "sources/Tools/testMy.h"
+#include "sources/Tools/profilier.h"
 namespace rt_num_opt
 {
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;

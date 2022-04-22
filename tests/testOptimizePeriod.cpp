@@ -3,9 +3,9 @@
 #include <utility>
 #include <numeric>
 #include <CppUnitLite/TestHarness.h>
-#include "../sources/Parameters.h"
-#include "../sources/ControlOptimize.h"
-#include "../sources/ReadControlCases.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/ControlOptimization/ControlOptimize.h"
+#include "sources/ControlOptimization/ReadControlCases.h"
 using namespace std;
 using namespace std::chrono;
 using namespace gtsam;

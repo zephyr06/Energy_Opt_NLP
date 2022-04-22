@@ -5,14 +5,14 @@
 #include <utility>
 #include <numeric>
 #include <CppUnitLite/TestHarness.h>
-#include "sources/Parameters.h"
-#include "sources/Declaration.h"
-#include "sources/ReadControlCases.h"
-#include "sources/RTAFactor.h"
-#include "sources/InequalifyFactor.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/ControlOptimization/ReadControlCases.h"
+#include "sources/Utils/MultiKeyFactor.h"
+#include "sources/Utils/InequalifyFactor.h"
 
-#include "sources/ControlFactorGraphUtils.h"
-#include "sources/FactorGraphEnergyLL.h"
+#include "sources/Utils/FactorGraphUtils.h"
+#include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
 #include <chrono>
 using namespace std::chrono;
 namespace rt_num_opt

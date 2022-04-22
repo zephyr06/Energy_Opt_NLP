@@ -1,6 +1,6 @@
 #include <CppUnitLite/TestHarness.h>
 
-#include "sources/Optimize.h"
+#include "sources/MatirxConvenient.h"
 
 int main()
 {

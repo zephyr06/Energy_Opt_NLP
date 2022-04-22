@@ -9,7 +9,6 @@ namespace rt_num_opt
 {
     cv::FileStorage ConfigParameters("/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
 
-    // using namespace std;
     // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
     // int TASK_NUMBER_DYNAMIC = 10;
     int TASK_NUMBER = 0;

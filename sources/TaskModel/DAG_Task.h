@@ -12,7 +12,7 @@
 #include <boost/graph/bellman_ford_shortest_paths.hpp>
 #include <boost/graph/topological_sort.hpp>
 
-#include "Tasks.h"
+#include "sources/TaskModel/Tasks.h"
 namespace rt_num_opt
 {
     typedef std::map<int, TaskSet> MAP_Prev;

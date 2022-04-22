@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Parameters.h"
-#include "Declaration.h"
-#include "Tasks.h"
+#include <boost/function.hpp>
+
+#include "sources/Utils/Parameters.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/TaskModel/Tasks.h"
 
 namespace rt_num_opt
 {

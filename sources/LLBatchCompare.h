@@ -1,8 +1,8 @@
 
 #pragma once
-#include "BatchTestutils.h"
-#include "FactorGraphEnergyLL.h"
-#include "EnergyOptimize.h"
+#include "sources/BatchTestutils.h"
+#include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
+#include "sources/EnergyOptimization/EnergyOptimize.h"
 
 namespace rt_num_opt
 {

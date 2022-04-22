@@ -1,4 +1,4 @@
-#include "../sources/ControlOptimize.h"
+#include "sources/ControlOptimization/ControlOptimize.h"
 using namespace rt_num_opt;
 using namespace std;
 

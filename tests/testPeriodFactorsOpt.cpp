@@ -1,5 +1,5 @@
-#include "../sources/ControlOptimize.h"
-#include "../sources/profilier.h"
+#include "sources/ControlOptimization/ControlOptimize.h"
+#include "sources/Tools/profilier.h"
 using namespace rt_num_opt;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 using namespace ControlOptimize;

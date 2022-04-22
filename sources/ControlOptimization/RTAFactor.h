@@ -1,6 +1,8 @@
 #pragma once
-#include "MultiKeyFactor.h"
-#include "ControlFactorGraphUtils.h"
+
+#include "sources/Utils/MultiKeyFactor.h"
+#include "sources/Utils/FactorGraphUtils.h"
+
 namespace rt_num_opt
 {
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;

@@ -1,10 +1,8 @@
 #include <CppUnitLite/TestHarness.h>
-#include "../sources/RTA_LL.h"
-// #include "../sources/RTA_WAP.h"
-// #include "../sources/Generate_WAP.h"
-#include "../sources/testMy.h"
-#include "../sources/RTA_DAG.h"
-#include "../sources/ControlOptimize.h"
+#include "sources/RTA/RTA_LL.h"
+#include "sources/Tools/testMy.h"
+#include "sources/RTA/RTA_DAG.h"
+#include "sources/ControlOptimization/ControlOptimize.h"
 
 using namespace rt_num_opt;
 using namespace std;

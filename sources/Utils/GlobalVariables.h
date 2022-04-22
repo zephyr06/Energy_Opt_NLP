@@ -2,10 +2,10 @@
 #pragma once
 #include <gtsam/nonlinear/Values.h>
 
-#include "Declaration.h"
-#include "Parameters.h"
-#include "Tasks.h"
-#include "testMy.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/TaskModel/Tasks.h"
+#include "sources/Tools/testMy.h"
 namespace rt_num_opt
 {
     // these two variables record the best solution ever known yet

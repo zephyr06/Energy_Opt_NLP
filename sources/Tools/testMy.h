@@ -9,9 +9,7 @@
 #include <bits/stdc++.h>
 #include <Eigen/Dense>
 
-#include "colormod.h"
-
-// using namespace std;
+#include "sources/Tools/colormod.h"
 
 void CoutWarning(std::string message)
 {

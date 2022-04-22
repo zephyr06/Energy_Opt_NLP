@@ -1,6 +1,6 @@
-#include "../sources/Energy.h"
-#include "../sources/Declaration.h"
-#include "../sources/testMy.h"
+#include "sources/EnergyOptimization/Energy.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/Tools/testMy.h"
 using namespace rt_num_opt;
 using namespace std;
 TEST(energy, tasks)
