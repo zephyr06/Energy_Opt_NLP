@@ -1,3 +1,4 @@
+// Not used anymore
 #include "../sources/WAPbatchOptimize.h"
 TEST(parameters, a1)
 {

@@ -1,7 +1,7 @@
 #include <CppUnitLite/TestHarness.h>
 #include "../sources/RTA_LL.h"
-#include "../sources/RTA_WAP.h"
-#include "../sources/Generate_WAP.h"
+// #include "../sources/RTA_WAP.h"
+// #include "../sources/Generate_WAP.h"
 #include "../sources/testMy.h"
 #include "../sources/RTA_DAG.h"
 #include "../sources/ControlOptimize.h"
@@ -68,48 +68,49 @@ TEST(RTA, RTA4)
     VectorDynamic actual = r.ResponseTimeOfTaskSet();
     AssertEigenEqualVector(expect, actual);
 }
-TEST(GetBusyPeriod, v1)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    int N = task_set.size();
-    int busyExpect = 74;
-    MatrixDynamic A = GenerateMatrixDynamic(N, N);
-    MatrixDynamic P = GenerateMatrixDynamic(N, N);
-    int busyActual = RTA_WAP::GetBusyPeriod(task_set, A, P, 4);
-    AssertEqualScalar(busyExpect, busyActual);
-}
 
-TEST(GetBusyPeriod, v2)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    int N = task_set.size();
-    int busyExpect = 74;
-    MatrixDynamic A = GenerateMatrixDynamic(N, N);
-    MatrixDynamic P = GenerateMatrixDynamic(N, N);
-    P << 1, 0, 1, 0, 1,
-        0, 1, 0, 1, 0,
-        1, 0, 1, 0, 1,
-        0, 1, 0, 1, 0,
-        1, 1, 1, 1, 1;
-    int busyActual = RTA_WAP::GetBusyPeriod(task_set, A, P, 4);
-    AssertEqualScalar(busyExpect, busyActual);
-}
+// TEST(GetBusyPeriod, v1)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+//     int N = task_set.size();
+//     int busyExpect = 74;
+//     MatrixDynamic A = GenerateMatrixDynamic(N, N);
+//     MatrixDynamic P = GenerateMatrixDynamic(N, N);
+//     int busyActual = RTA_WAP::GetBusyPeriod(task_set, A, P, 4);
+//     AssertEqualScalar(busyExpect, busyActual);
+// }
 
-TEST(GetBusyPeriod, v3)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v16.csv", "orig");
-    int N = task_set.size();
-    int busyExpect = 80;
-    MatrixDynamic A = GenerateMatrixDynamic(N, N);
-    MatrixDynamic P = GenerateMatrixDynamic(N, N);
-    P << 1, 0, 1, 0, 1,
-        0, 1, 0, 1, 0,
-        1, 0, 1, 0, 1,
-        0, 1, 0, 1, 0,
-        1, 1, 1, 1, 1;
-    int busyActual = RTA_WAP::GetBusyPeriod(task_set, A, P, 4);
-    AssertEqualScalar(busyExpect, busyActual);
-}
+// TEST(GetBusyPeriod, v2)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+//     int N = task_set.size();
+//     int busyExpect = 74;
+//     MatrixDynamic A = GenerateMatrixDynamic(N, N);
+//     MatrixDynamic P = GenerateMatrixDynamic(N, N);
+//     P << 1, 0, 1, 0, 1,
+//         0, 1, 0, 1, 0,
+//         1, 0, 1, 0, 1,
+//         0, 1, 0, 1, 0,
+//         1, 1, 1, 1, 1;
+//     int busyActual = RTA_WAP::GetBusyPeriod(task_set, A, P, 4);
+//     AssertEqualScalar(busyExpect, busyActual);
+// }
+
+// TEST(GetBusyPeriod, v3)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v16.csv", "orig");
+//     int N = task_set.size();
+//     int busyExpect = 80;
+//     MatrixDynamic A = GenerateMatrixDynamic(N, N);
+//     MatrixDynamic P = GenerateMatrixDynamic(N, N);
+//     P << 1, 0, 1, 0, 1,
+//         0, 1, 0, 1, 0,
+//         1, 0, 1, 0, 1,
+//         0, 1, 0, 1, 0,
+//         1, 1, 1, 1, 1;
+//     int busyActual = RTA_WAP::GetBusyPeriod(task_set, A, P, 4);
+//     AssertEqualScalar(busyExpect, busyActual);
+// }
 
 TEST(RTA, ResponseTimeAnalysisWarm)
 {
@@ -145,162 +146,162 @@ TEST(RTA, ResponseTimeOfTaskSet)
     CHECK_EQUAL(rta3Expect, rta3Actual);
 }
 
-TEST(wap, v1)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    A_Global = GenerateMatrixDynamic(5, 5);
-    P_Global = GenerateOneMatrix(5, 5);
-    TaskSetNormal tasks(task_set);
-    VectorDynamic expect;
-    expect.resize(5, 1);
-    expect << 10, 21, 33, 46, 60;
-    RTA_WAP r(task_set);
-    VectorDynamic actual = r.ResponseTimeOfTaskSet();
-    AssertEigenEqualVector(expect, actual);
-}
+// TEST(wap, v1)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+//     A_Global = GenerateMatrixDynamic(5, 5);
+//     P_Global = GenerateOneMatrix(5, 5);
+//     TaskSetNormal tasks(task_set);
+//     VectorDynamic expect;
+//     expect.resize(5, 1);
+//     expect << 10, 21, 33, 46, 60;
+//     RTA_WAP r(task_set);
+//     VectorDynamic actual = r.ResponseTimeOfTaskSet();
+//     AssertEigenEqualVector(expect, actual);
+// }
 
-TEST(wap, v2)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    P_Global = GenerateMatrixDynamic(5, 5);
-    A_Global = GenerateOneMatrix(5, 5);
+// TEST(wap, v2)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+//     P_Global = GenerateMatrixDynamic(5, 5);
+//     A_Global = GenerateOneMatrix(5, 5);
 
-    VectorDynamic expect;
-    expect.resize(5, 1);
-    expect << 10, 31, 55, 82, 112;
-    RTA_WAP r(task_set);
-    VectorDynamic actual = r.ResponseTimeOfTaskSet();
-    AssertEigenEqualVector(expect, actual);
-}
+//     VectorDynamic expect;
+//     expect.resize(5, 1);
+//     expect << 10, 31, 55, 82, 112;
+//     RTA_WAP r(task_set);
+//     VectorDynamic actual = r.ResponseTimeOfTaskSet();
+//     AssertEigenEqualVector(expect, actual);
+// }
 
-TEST(wap, v3)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    A_Global = GenerateMatrixDynamic(5, 5);
-    A_Global << 0, 1, 0, 1, 0,
-        1, 0, 1, 0, 1,
-        0, 1, 0, 1, 0,
-        1, 0, 1, 0, 1,
-        0, 0, 0, 0, 0;
-    P_Global = GenerateMatrixDynamic(5, 5);
-    P_Global << 1, 0, 1, 0, 1,
-        0, 1, 0, 1, 0,
-        1, 0, 1, 0, 1,
-        0, 1, 0, 1, 0,
-        1, 1, 1, 1, 1;
+// TEST(wap, v3)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+//     A_Global = GenerateMatrixDynamic(5, 5);
+//     A_Global << 0, 1, 0, 1, 0,
+//         1, 0, 1, 0, 1,
+//         0, 1, 0, 1, 0,
+//         1, 0, 1, 0, 1,
+//         0, 0, 0, 0, 0;
+//     P_Global = GenerateMatrixDynamic(5, 5);
+//     P_Global << 1, 0, 1, 0, 1,
+//         0, 1, 0, 1, 0,
+//         1, 0, 1, 0, 1,
+//         0, 1, 0, 1, 0,
+//         1, 1, 1, 1, 1;
 
-    VectorDynamic expect;
-    expect.resize(5, 1);
-    expect << 10, 31, 54, 81, 110;
-    RTA_WAP r(task_set);
-    VectorDynamic actual = r.ResponseTimeOfTaskSet();
-    AssertEigenEqualVector(expect, actual);
-}
+//     VectorDynamic expect;
+//     expect.resize(5, 1);
+//     expect << 10, 31, 54, 81, 110;
+//     RTA_WAP r(task_set);
+//     VectorDynamic actual = r.ResponseTimeOfTaskSet();
+//     AssertEigenEqualVector(expect, actual);
+// }
 
-TEST(GenerateWAP, v1)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
-    int N = task_set.size();
-    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
-    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
-    auto sth = Generate_WAP(task_set);
-    MatrixDynamic actualA, actualP;
-    bool success;
-    std::tie(success, actualA, actualP) = sth;
-    AssertBool(true, success);
-    AssertEigenEqualMatrix(expectA, actualA);
-    AssertEigenEqualMatrix(expectA, A_Global);
-    AssertEigenEqualMatrix(expectP, P_Global);
-}
-TEST(GenerateWAP, v2)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v11.csv", "RM");
-    int N = task_set.size();
-    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
-    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
-    expectP << 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 1,
-        0, 0, 0, 0, 1,
-        0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0;
-    auto sth = Generate_WAP(task_set);
-    MatrixDynamic actualA, actualP;
-    bool success;
-    std::tie(success, actualA, actualP) = sth;
-    AssertBool(true, success);
-    if (success)
-    {
-        AssertEigenEqualMatrix(expectA, A_Global);
-        AssertEigenEqualMatrix(expectP, P_Global);
-    }
-}
-TEST(GenerateWAP, v3)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v5.csv", "orig");
-    int N = task_set.size();
-    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
-    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
-    expectP << 0, 1, 1, 1, 0,
-        0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0;
-    auto sth = Generate_WAP(task_set);
-    MatrixDynamic actualA, actualP;
-    bool success;
-    std::tie(success, actualA, actualP) = sth;
-    AssertBool(false, success);
-    if (success)
-    {
-        AssertEigenEqualMatrix(expectA, A_Global);
-        AssertEigenEqualMatrix(expectP, P_Global);
-    }
-}
-TEST(GenerateWAP, v4)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v12.csv", "RM");
-    int N = task_set.size();
-    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
-    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
-    expectP << 0, 1, 0, 1, 1,
-        0, 0, 0, 1, 0,
-        0, 0, 0, 1, 1,
-        0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0;
-    auto sth = Generate_WAP(task_set);
-    MatrixDynamic actualA, actualP;
-    bool success;
-    std::tie(success, actualA, actualP) = sth;
-    AssertBool(true, success);
-    if (success)
-    {
-        AssertEigenEqualMatrix(expectA, A_Global);
-        AssertEigenEqualMatrix(expectP, P_Global);
-    }
-}
-TEST(GenerateWAP, v5)
-{
-    auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v13.csv", "RM");
-    int N = task_set.size();
-    MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
-    expectA(2, 4) = 1;
-    MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
-    expectP << 0, 1, 0, 1, 1,
-        0, 0, 0, 1, 0,
-        0, 0, 0, 1, 0,
-        0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0;
-    auto sth = Generate_WAP(task_set);
-    MatrixDynamic actualA, actualP;
-    bool success;
-    std::tie(success, actualA, actualP) = sth;
-    AssertBool(true, success);
-    if (success)
-    {
-        AssertEigenEqualMatrix(expectA, A_Global);
-        AssertEigenEqualMatrix(expectP, P_Global);
-    }
-}
+// TEST(GenerateWAP, v1)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v10.csv", "orig");
+//     int N = task_set.size();
+//     MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+//     MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
+//     auto sth = Generate_WAP(task_set);
+//     MatrixDynamic actualA, actualP;
+//     bool success;
+//     std::tie(success, actualA, actualP) = sth;
+//     AssertBool(true, success);
+//     AssertEigenEqualMatrix(expectA, actualA);
+//     AssertEigenEqualMatrix(expectA, A_Global);
+//     AssertEigenEqualMatrix(expectP, P_Global);
+// }
+// TEST(GenerateWAP, v2)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v11.csv", "RM");
+//     int N = task_set.size();
+//     MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+//     MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
+//     expectP << 0, 0, 0, 0, 0,
+//         0, 0, 0, 0, 1,
+//         0, 0, 0, 0, 1,
+//         0, 0, 0, 0, 0,
+//         0, 0, 0, 0, 0;
+//     auto sth = Generate_WAP(task_set);
+//     MatrixDynamic actualA, actualP;
+//     bool success;
+//     std::tie(success, actualA, actualP) = sth;
+//     AssertBool(true, success);
+//     if (success)
+//     {
+//         AssertEigenEqualMatrix(expectA, A_Global);
+//         AssertEigenEqualMatrix(expectP, P_Global);
+//     }
+// }
+// TEST(GenerateWAP, v3)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v5.csv", "orig");
+//     int N = task_set.size();
+//     MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+//     MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
+//     expectP << 0, 1, 1, 1, 0,
+//         0, 0, 0, 0, 0,
+//         0, 0, 0, 0, 0,
+//         0, 0, 0, 0, 0,
+//         0, 0, 0, 0, 0;
+//     auto sth = Generate_WAP(task_set);
+//     MatrixDynamic actualA, actualP;
+//     bool success;
+//     std::tie(success, actualA, actualP) = sth;
+//     AssertBool(false, success);
+//     if (success)
+//     {
+//         AssertEigenEqualMatrix(expectA, A_Global);
+//         AssertEigenEqualMatrix(expectP, P_Global);
+//     }
+// }
+// TEST(GenerateWAP, v4)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v12.csv", "RM");
+//     int N = task_set.size();
+//     MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+//     MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
+//     expectP << 0, 1, 0, 1, 1,
+//         0, 0, 0, 1, 0,
+//         0, 0, 0, 1, 1,
+//         0, 0, 0, 0, 0,
+//         0, 0, 0, 0, 0;
+//     auto sth = Generate_WAP(task_set);
+//     MatrixDynamic actualA, actualP;
+//     bool success;
+//     std::tie(success, actualA, actualP) = sth;
+//     AssertBool(true, success);
+//     if (success)
+//     {
+//         AssertEigenEqualMatrix(expectA, A_Global);
+//         AssertEigenEqualMatrix(expectP, P_Global);
+//     }
+// }
+// TEST(GenerateWAP, v5)
+// {
+//     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v13.csv", "RM");
+//     int N = task_set.size();
+//     MatrixDynamic expectA = GenerateMatrixDynamic(N, N);
+//     expectA(2, 4) = 1;
+//     MatrixDynamic expectP = GenerateMatrixDynamic(N, N);
+//     expectP << 0, 1, 0, 1, 1,
+//         0, 0, 0, 1, 0,
+//         0, 0, 0, 1, 0,
+//         0, 0, 0, 0, 0,
+//         0, 0, 0, 0, 0;
+//     auto sth = Generate_WAP(task_set);
+//     MatrixDynamic actualA, actualP;
+//     bool success;
+//     std::tie(success, actualA, actualP) = sth;
+//     AssertBool(true, success);
+//     if (success)
+//     {
+//         AssertEigenEqualMatrix(expectA, A_Global);
+//         AssertEigenEqualMatrix(expectP, P_Global);
+//     }
+// }
 // TEST(GenerateWAP, v6)
 // {
 //     auto task_set = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v15.csv", "RM");

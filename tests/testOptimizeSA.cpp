@@ -1,5 +1,4 @@
 #include "../sources/OptimizeSA.h"
-// #include "../sources/Generate_WAP.h"
 using namespace std;
 using namespace std::chrono;
 using namespace rt_num_opt;

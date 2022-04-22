@@ -4,15 +4,15 @@
 #include "../sources/Parameters.h"
 #include "../sources/Optimize.h"
 #include "../sources/RTA_LL.h"
-#include "../sources/RTA_WAP.h"
-#include "../sources/Generate_WAP.h"
+// #include "../sources/RTA_WAP.h"
+// #include "../sources/Generate_WAP.h"
 #include "../sources/profilier.h"
 using namespace std::chrono;
 using namespace rt_num_opt;
 using namespace std;
 
 using Opt_LL = Energy_Opt<Task, RTA_LL>;
-using Opt_WAP = Energy_Opt<Task, RTA_WAP>;
+// using Opt_WAP = Energy_Opt<Task, RTA_WAP>;
 
 TEST(OptimizeTaskSet, RTA_LL_V1)
 {

@@ -4,7 +4,6 @@
 #include <time.h>
 #include "Optimize.h"
 #include "RTA_LL.h"
-// #include "RTA_WAP.h"
 #include "../includeMoe/moe/moe.hpp"
 namespace rt_num_opt
 {
