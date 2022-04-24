@@ -11,6 +11,11 @@ include(GtsamMakeConfigFile)
 include(GtsamBuildTypes)
 include(GtsamTesting)
 
+add_subdirectory(DAG-scheduling_Verucchi)
+include_directories(${CMAKE_SOURCE_DIR}/DAG-scheduling_Verucchi/include)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include matplotlib-cpp 
+#                     ${CMAKE_CURRENT_SOURCE_DIR}/np-schedulability-analysis/include 
+#                     ${Python3_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR})
 
 # for unittest scripts
@@ -35,6 +40,8 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} gtsam)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${CONVENIENCE_LIB_NAME} CppUnitLite)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
+target_link_libraries(${CONVENIENCE_LIB_NAME} dag-sched)
+
 
 add_subdirectory(sources)
 add_subdirectory(tests)

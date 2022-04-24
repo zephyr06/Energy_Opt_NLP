@@ -3,6 +3,8 @@
 #include "NumericAlgorithmImpl.hpp"
 #include "../parameters/SAParameters.hpp"
 
+#include "sources/TaskModel/Tasks.h"
+
 namespace moe
 {
 
@@ -15,7 +17,7 @@ namespace moe
 
         void run(unsigned int _iterations) override;
         void runSA(unsigned int _iterations, std::vector<double> initialSA,
-                   int whetherRandomInitialize, TaskSet &tasks)
+                   int whetherRandomInitialize, rt_num_opt::TaskSet &tasks)
         {
 
             // this->init(_iterations);

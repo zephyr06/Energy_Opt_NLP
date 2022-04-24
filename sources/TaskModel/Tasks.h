@@ -17,7 +17,6 @@
 namespace rt_num_opt
 {
 
-#define TaskSet std::vector<rt_num_opt::Task>
     typedef std::map<int, std::vector<int>> ProcessorTaskSet;
     Color::Modifier red(Color::FG_RED);
     Color::Modifier green(Color::FG_GREEN);
@@ -119,6 +118,8 @@ namespace rt_num_opt
             return deadline - executionTime;
         }
     };
+
+    typedef std::vector<rt_num_opt::Task> TaskSet;
 
     class TaskSetNormal
     {

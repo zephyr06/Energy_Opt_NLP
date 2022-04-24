@@ -104,7 +104,7 @@ namespace rt_num_opt
             longestPath = 0;
             volume = 0;
         }
-
+        inline TaskSet GetNormalTaskSet() { return tasks_; }
         static std::string Type() { return "dag"; }
 
         /**

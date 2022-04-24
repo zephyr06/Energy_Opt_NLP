@@ -10,9 +10,9 @@
 #include "sources/Tools/colormod.h"
 #include "sources/Tools/testMy.h"
 
-#define CurrentTime std::chrono::high_resolution_clock::now()
-#define BeginTimerApp BeginTimer(__FUNCTION__);
-#define EndTimerApp EndTimer(__FUNCTION__);
+#define CurrentTimeInProfiler std::chrono::high_resolution_clock::now()
+#define BeginTimerAppInProfiler BeginTimer(__FUNCTION__);
+#define EndTimerAppInProfiler EndTimer(__FUNCTION__);
 std::mutex mtx_profiler;
 struct ProfilerData
 {
@@ -41,7 +41,7 @@ void BeginTimer(std::string funcName)
     }
     else
     {
-        profilerMap[funcName].begin = CurrentTime;
+        profilerMap[funcName].begin = CurrentTimeInProfiler;
     }
 }
 
@@ -53,7 +53,7 @@ void EndTimer(std::string funcName)
     {
         CoutError("Timer cannot find entry!");
     }
-    profilerMap[funcName].end = CurrentTime;
+    profilerMap[funcName].end = CurrentTimeInProfiler;
     profilerMap[funcName].UpdateAccum();
 }
 
