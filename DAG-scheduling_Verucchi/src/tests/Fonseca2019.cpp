@@ -244,13 +244,12 @@ namespace dagSched
             // if (R[i] > taskset.tasks[i].getDeadline())
             //     return false;
         }
-        std::cout << std::endl
-                  << "Response time from GP_FP_FTP_Fonseca2019 is: " << std::endl;
-        for (int i = 0; i < R.size(); i++)
-        {
-            std::cout << i << ", " << R[i] << std::endl;
-        }
+        // std::cout << std::endl
+        //           << "Response time from GP_FP_FTP_Fonseca2019 is: " << std::endl;
+        // for (int i = 0; i < R.size(); i++)
+        // {
+        //     std::cout << i << ", " << R[i] << std::endl;
+        // }
         return R;
     }
-
 }
