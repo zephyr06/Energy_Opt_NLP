@@ -13,6 +13,7 @@
 #include <boost/graph/topological_sort.hpp>
 
 #include "sources/TaskModel/Tasks.h"
+
 namespace rt_num_opt
 {
     typedef std::map<int, TaskSet> MAP_Prev;
@@ -29,6 +30,7 @@ namespace rt_num_opt
     typedef Graph::edge_descriptor Edge;
     // map from task index to Vertex
     typedef std::unordered_map<int, Vertex> IndexVertexMap;
+    typedef boost::graph_traits<rt_num_opt::Graph>::edge_iterator edge_iter;
 
     void AddVertexMy(Graph &g, IndexVertexMap &indexesBGL, int taskIndex)
     {
@@ -118,7 +120,6 @@ namespace rt_num_opt
             // mapPrev[nextIndex].push_back(tasks_[prevIndex]);
             auto sth = boost::add_edge(prevIndex, nextIndex, graph_);
             Edge edge = sth.first;
-
             boost::property_map<Graph,
                                 boost::edge_weight_t>::type EdgeWeightMap = get(boost::edge_weight, graph_);
 
@@ -126,7 +127,6 @@ namespace rt_num_opt
             {
                 EdgeWeightMap[edge] = tasks_[nextIndex].executionTime * -1;
             }
-
             else
             {
                 EdgeWeightMap[edge] = 0;
@@ -195,6 +195,39 @@ namespace rt_num_opt
                                             .predecessor_map(&parent[0]));
 
             return distance.back() * -1;
+        }
+
+        /**
+         * @brief add a dummy node to graph for the convenience of analysis by Fonseca2019;
+         * this should only be applied during RTA analysis
+         * 
+         */
+        void AddDummyNode()
+        {
+            tasks_.push_back(Task(0, 1, 0, 0, 1, N, 0));
+
+            std::unordered_map<int, bool> umap;
+            auto vertex2index_ = boost::get(boost::vertex_name, graph_);
+            std::pair<rt_num_opt::edge_iter, rt_num_opt::edge_iter> ep;
+            rt_num_opt::edge_iter ei, ei_end;
+            for (tie(ei, ei_end) = boost::edges(graph_); ei != ei_end; ++ei)
+            {
+                rt_num_opt::Vertex vt = boost::target(*ei, graph_);
+                int to_id = vertex2index_[vt];
+                umap[to_id] = true;
+            }
+            if (umap.size() == N - 1)
+            {
+                return;
+            }
+            AddVertexMy(graph_, index2Vertex_, N);
+            for (int i = 0; i < N; i++)
+            {
+                if (!umap[i])
+                {
+                    AddEdge(N, i);
+                }
+            }
         }
     };
 
