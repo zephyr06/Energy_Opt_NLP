@@ -2,6 +2,7 @@
 #include "sources/BatchTestutils.h"
 #include "sources/EnergyOptimization/Optimize.h"
 #include "sources/RTA/RTA_DAG.h"
+#include "sources/RTA/RTA_Fonseca2019.h"
 
 namespace rt_num_opt
 {
@@ -52,10 +53,14 @@ namespace rt_num_opt
                     tasksN.UpdateTaskSet(tasks);
                     N = tasks.size();
                 }
-
-                else if (TaskSetType::Type() == "dag")
+                // else if (TaskSetType::Type() == "dag")
+                // {
+                //     tasksN = ReadDAG_Tasks(path, readTaskMode);
+                //     N = tasksN.tasks_.size();
+                // }
+                else if (TaskSetType::Type() == "Fonseca")
                 {
-                    tasksN = ReadDAG_Tasks(path, readTaskMode);
+                    tasksN = ReadDAGFonseca_Tasks(path, readTaskMode);
                     N = tasksN.tasks_.size();
                 }
                 else

@@ -11,6 +11,7 @@ namespace rt_num_opt
         Vertex_name_map_t vertex2index_;
 
     public:
+        DAG_Fonseca() {}
         DAG_Fonseca(DAG_Model dagTasks)
         {
             TaskSetNormal(dagTasks.GetNormalTaskSet());
@@ -23,6 +24,12 @@ namespace rt_num_opt
         {
             return DAG_Model(tasks_, graph_, index2Vertex_, vertex2index_);
         }
-    };
 
+        inline static std::string Type() { return "Fonseca"; }
+    };
+    DAG_Fonseca ReadDAGFonseca_Tasks(std::string path, std::string priorityType = "orig")
+    {
+        DAG_Model dagTasks = ReadDAG_Task(path, priorityType);
+        return DAG_Fonseca(dagTasks);
+    }
 }
