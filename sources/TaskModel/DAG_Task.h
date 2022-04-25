@@ -17,16 +17,16 @@
 namespace rt_num_opt
 {
     typedef std::map<int, TaskSet> MAP_Prev;
-    using namespace boost;
-    typedef property<edge_weight_t, float> edge_weight_property;
-    typedef adjacency_list<vecS, vecS, bidirectionalS,
-                           property<vertex_name_t, int>,
-                           edge_weight_property>
+    // using namespace boost;
+    typedef boost::property<boost::edge_weight_t, float> edge_weight_property;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
+                                  boost::property<boost::vertex_name_t, int>,
+                                  edge_weight_property>
         Graph;
     // map to access properties of vertex from the graph
-    typedef property_map<Graph, vertex_name_t>::type Vertex_name_map_t;
-    typedef graph_traits<Graph>::vertex_descriptor Vertex;
-    typedef property_map<Graph, edge_weight_t>::type edge_name_map_t;
+    typedef boost::property_map<Graph, boost::vertex_name_t>::type Vertex_name_map_t;
+    typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+    typedef boost::property_map<Graph, boost::edge_weight_t>::type edge_name_map_t;
     typedef Graph::edge_descriptor Edge;
     // map from task index to Vertex
     typedef std::unordered_map<int, Vertex> IndexVertexMap;
@@ -35,7 +35,7 @@ namespace rt_num_opt
     void AddVertexMy(Graph &g, IndexVertexMap &indexesBGL, int taskIndex)
     {
         // map to access vertex from its global index
-        Vertex_name_map_t vertex2index = get(vertex_name, g);
+        Vertex_name_map_t vertex2index = get(boost::vertex_name, g);
         IndexVertexMap::iterator pos;
         bool inserted;
         Vertex u;
@@ -90,7 +90,7 @@ namespace rt_num_opt
             auto ss = EstablishGraphOnlyNodes(tasks);
             graph_ = ss.first;
             index2Vertex_ = ss.second;
-            vertex2index_ = get(vertex_name, graph_);
+            vertex2index_ = get(boost::vertex_name, graph_);
             longestPath = 0;
             volume = 0;
         }
@@ -131,7 +131,7 @@ namespace rt_num_opt
             {
                 EdgeWeightMap[edge] = 0;
             }
-            vertex2index_ = get(vertex_name, graph_);
+            vertex2index_ = get(boost::vertex_name, graph_);
         }
         TaskSet GetTasks() const
         {
@@ -182,7 +182,7 @@ namespace rt_num_opt
             }
 
             // Using bellman_ford_shortest_paths
-            edge_name_map_t weight_pmap = get(edge_weight, graph_);
+            edge_name_map_t weight_pmap = get(boost::edge_weight, graph_);
             std::vector<int> distance(N + 2, (std::numeric_limits<short>::max)());
             distance[N] = 0;
             std::vector<std::size_t> parent(N + 2);
