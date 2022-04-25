@@ -107,6 +107,9 @@ namespace rt_num_opt
             volume = 0;
         }
         inline TaskSet GetNormalTaskSet() { return tasks_; }
+        inline Graph GetGraph() { return graph_; }
+        inline IndexVertexMap GetIndexVertexMap() { return index2Vertex_; }
+        inline Vertex_name_map_t GetVertex_name_map_t() { return vertex2index_; }
         static std::string Type() { return "dag"; }
 
         /**
@@ -216,7 +219,7 @@ namespace rt_num_opt
                 int to_id = vertex2index_[vt];
                 umap[to_id] = true;
             }
-            if (umap.size() == N - 1)
+            if (static_cast<int>(umap.size()) == N - 1)
             {
                 return;
             }
@@ -354,4 +357,5 @@ namespace rt_num_opt
             throw;
         }
     }
+
 } // namespace rt_num_opt
