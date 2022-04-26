@@ -110,5 +110,10 @@ namespace rt_num_opt
                  << "\n";
         }
         WriteFrequencyModelRatio(file);
+        // for (auto itr = tasksDAG.mapPrev.begin(); itr != tasksDAG.mapPrev.end(); itr++)
+        // {
+        //     for (uint i = 0; i < itr->second.size(); i++)
+        //         file << "*" << (itr->first) << "," << ((itr->second)[i].id) << "\n";
+        // }
     }
 } // namespace rt_num_opt

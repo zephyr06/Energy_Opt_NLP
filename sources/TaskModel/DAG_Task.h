@@ -207,7 +207,7 @@ namespace rt_num_opt
          */
         void AddDummyNode()
         {
-            tasks_.push_back(Task(0, 1, 0, 0, 1, N, 0));
+            tasks_.push_back(Task(0, 1000, 0, 1, 1000, N, 0));
 
             std::unordered_map<int, bool> umap;
             auto vertex2index_ = boost::get(boost::vertex_name, graph_);

@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         .help("type of tasksets, 0 means implicit, 1 means random")
         .scan<'i', int>();
     program.add_argument("--taskType")
-        .default_value(0)
+        .default_value(1)
         .help("type of tasksets, 0 means normal, 1 means DAG")
         .scan<'i', int>();
     program.add_argument("--schedulabilityCheck")
