@@ -9,9 +9,6 @@ namespace rt_num_opt
     void AddEntry(std::string pathRes, double val)
     {
         std::ofstream outfileWrite;
-        // std::string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-        //                  batchOptimizeFolder + "/EnergySaveRatio/N" +
-        //                  std::to_string(N) + ".txt";
         outfileWrite.open(pathRes,
                           std::ios_base::app);
         outfileWrite << val << std::endl;

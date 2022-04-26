@@ -2,15 +2,15 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_n5_v32
+testDataSetName: test_n5_v34
 optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
 
-executionTimeModel: 1 # 1 is normal, 2 is more difficult
+executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
 elimIte: 1000
-EnergyMode: 1
+EnergyMode: 2
 
 printFailureFile: 1
 printRTA: 0

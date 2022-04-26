@@ -14,7 +14,8 @@ namespace rt_num_opt
         DAG_Fonseca() {}
         DAG_Fonseca(DAG_Model dagTasks)
         {
-            TaskSetNormal(dagTasks.GetNormalTaskSet());
+            TaskSet taskSet = dagTasks.GetNormalTaskSet();
+            UpdateTaskSet(taskSet);
             graph_ = dagTasks.GetGraph();
             index2Vertex_ = dagTasks.GetIndexVertexMap();
             vertex2index_ = dagTasks.GetVertex_name_map_t();

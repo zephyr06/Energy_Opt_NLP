@@ -131,8 +131,12 @@ namespace rt_num_opt
             ;
         }
         TaskSetNormal(const TaskSet &tasks) : tasks_(tasks), N(tasks.size()) {}
-        static std::string Type() { return "normal"; }
-        void UpdateTaskSet(TaskSet &tasks) { tasks_ = tasks; }
+        static inline std::string Type() { return "normal"; }
+        void UpdateTaskSet(TaskSet &tasks)
+        {
+            tasks_ = tasks;
+            N = tasks.size();
+        }
     };
     void Print(TaskSet &tasks)
     {
