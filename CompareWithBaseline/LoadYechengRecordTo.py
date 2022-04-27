@@ -21,8 +21,8 @@ def txt2data(line):
 if __name__ == "__main__":
     # import arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument('--baseline', type=str, default="Zhao20",
-                        help='0')
+    # parser.add_argument('--baseline', type=str, default="Zhao20",
+    #                     help='0')
     parser.add_argument('--application', type=str, default="energy",
                         help='0')
     parser.add_argument('--taskSize', type=int, default=5,
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    baseline = args.baseline
+    # baseline = args.baseline
     application = args.application
     taskSize = args.taskSize
     YechengDirectory = args.directory
