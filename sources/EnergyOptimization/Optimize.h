@@ -535,7 +535,7 @@ namespace rt_num_opt
                 numberOfIteration++;
                 if (numberOfIteration > min(N, elimIte))
                 {
-                    CoutWarning("numberOfIteration reaches the maximum limits, the algorithm decides to give up!");
+                    // CoutWarning("numberOfIteration reaches the maximum limits, the algorithm decides to give up!");
                     break;
                 }
             }

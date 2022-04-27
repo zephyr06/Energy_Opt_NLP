@@ -3,13 +3,13 @@
 runMode: normal
 # TODO: v6 elimination check failed
 testDataSetName: test_n5_v34
-optimizerType: 1
+optimizerType: 2 # 1 means dogleg, 2 means LM
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
 
 executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 0
+elimIte: 1000
 EnergyMode: 2
 
 printFailureFile: 1
@@ -61,7 +61,7 @@ maxIterationsOptimizer: 1e3
 gradientModify: 0
 controlPath: "N5/Case0"
 MaxLoopControl: 1e4
-exactJacobian: 1
+exactJacobian: 0
 utilTol: 1e-3
 debugMode: 0
 verbosityLM: "SILENT"
