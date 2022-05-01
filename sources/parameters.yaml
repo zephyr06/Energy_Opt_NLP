@@ -16,7 +16,7 @@ printFailureFile: 1
 printRTA: 0
 readTaskMode: RM
 batchOptimizeFolder: Overall_Energy_DAG
-core_m_dag: 8
+core_m_dag: 3
 baselineLLCompare: 1
 
 enableMaxComputationTimeRestrict: 1
@@ -57,6 +57,8 @@ granularityInBF: 1
 
 SA_iteration: 1000000
 
+granularity_FindUnsustainable: 0.01
+taskSetSize_FindUnsustainable: 3
 maxIterationsOptimizer: 1e3
 gradientModify: 0
 controlPath: "N5/Case0"

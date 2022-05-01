@@ -3,7 +3,9 @@
 #include <fstream>
 #include <algorithm>
 
+#ifndef _WIN32
 #include <sys/resource.h>
+#endif
 
 #include "OptionParser.h"
 
@@ -205,10 +207,14 @@ static void process_file(const std::string& fname)
 			}
 		}
 
+#ifdef _WIN32 // rusage does not work under Windows
+		long mem_used = 0;
+#else
 		struct rusage u;
 		long mem_used = 0;
 		if (getrusage(RUSAGE_SELF, &u) == 0)
 			mem_used = u.ru_maxrss;
+#endif
 
 		std::cout << fname;
 

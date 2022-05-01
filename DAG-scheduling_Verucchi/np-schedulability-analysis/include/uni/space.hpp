@@ -326,14 +326,14 @@ namespace NP {
 					// If the job is not IIP-eligible when it is certainly
 					// released, then there exists a schedule where it doesn't
 					// count, so skip it.
-					if (!iip_eligible(s, j, j.latest_arrival()))
+					if (!iip_eligible(s, j, std::max(j.latest_arrival(), s.latest_finish_time())))
 						continue;
 
 					// It must be priority-eligible when released, too.
 					// Relevant only if we have an IIP, otherwise the job is
 					// trivially priority-eligible.
 					if (iip.can_block &&
-					    !priority_eligible(s, j, j.latest_arrival()))
+					    !priority_eligible(s, j, std::max(j.latest_arrival(), s.latest_finish_time())))
 						continue;
 
 					// great, this job fits the bill
@@ -372,30 +372,30 @@ namespace NP {
 
 // define a couple of iteration helpers
 
-// Iterate over all incomplete jobs in state __s.
-// __j is of type const Job<Time>*
-#define foreach_possibly_pending_job(__s, __j) 	\
-	for (auto __it = jobs_by_earliest_arrival			\
-                     .lower_bound((__s).earliest_job_release()); \
-	     __it != jobs_by_earliest_arrival.end() 				\
-	        && (__j = __it->second); 	\
-	     __it++) \
-		if (incomplete(__s, *__j))
+// Iterate over all incomplete jobs in state ppj_macro_local_s.
+// ppj_macro_local_j is of type const Job<Time>*
+#define foreach_possibly_pending_job(ppj_macro_local_s, ppj_macro_local_j) 	\
+	for (auto ppj_macro_local_it = jobs_by_earliest_arrival			\
+                     .lower_bound((ppj_macro_local_s).earliest_job_release()); \
+	     ppj_macro_local_it != jobs_by_earliest_arrival.end() 				\
+	        && (ppj_macro_local_j = ppj_macro_local_it->second); 	\
+	     ppj_macro_local_it++) \
+		if (incomplete(ppj_macro_local_s, *ppj_macro_local_j))
 
-// Iterate over all incomplete jobs that are released no later than __until
-#define foreach_possbly_pending_job_until(__s, __j, __until) 	\
-	for (auto __it = jobs_by_earliest_arrival			\
-                     .lower_bound((__s).earliest_job_release()); \
-	     __it != jobs_by_earliest_arrival.end() 				\
-	        && (__j = __it->second, __j->earliest_arrival() <= (__until)); 	\
-	     __it++) \
-		if (incomplete(__s, *__j))
+// Iterate over all incomplete jobs that are released no later than ppju_macro_local_until
+#define foreach_possbly_pending_job_until(ppju_macro_local_s, ppju_macro_local_j, ppju_macro_local_until) 	\
+	for (auto ppju_macro_local_it = jobs_by_earliest_arrival			\
+                     .lower_bound((ppju_macro_local_s).earliest_job_release()); \
+	     ppju_macro_local_it != jobs_by_earliest_arrival.end() 				\
+	        && (ppju_macro_local_j = ppju_macro_local_it->second, ppju_macro_local_j->earliest_arrival() <= (ppju_macro_local_until)); 	\
+	     ppju_macro_local_it++) \
+		if (incomplete(ppju_macro_local_s, *ppju_macro_local_j))
 
 // Iterare over all incomplete jobs that are certainly released no later than
-// __until
-#define foreach_certainly_pending_job_until(__s, __j, __until) \
-	foreach_possbly_pending_job_until(__s, __j, (__until)) \
-		if (__j->latest_arrival() <= (__until))
+// cpju_macro_local_until
+#define foreach_certainly_pending_job_until(cpju_macro_local_s, cpju_macro_local_j, cpju_macro_local_until) \
+	foreach_possbly_pending_job_until(cpju_macro_local_s, cpju_macro_local_j, (cpju_macro_local_until)) \
+		if (cpju_macro_local_j->latest_arrival() <= (cpju_macro_local_until))
 
 			// returns true if there is certainly some pending job of higher
 			// priority at the given time ready to be scheduled
@@ -496,9 +496,6 @@ namespace NP {
 				// job is trivially potentially next, so check the other case.
 
 				if (t_latest < j.earliest_arrival()) {
-					if (exists_certainly_pending_job(s))
-						return false;
-
 					Time r = next_certain_job_release(s);
 					// if something else is certainly released before j and IIP-
 					// eligible at the time of certain release, then j can't
@@ -657,6 +654,26 @@ namespace NP {
 				return earliest_start + j.least_cost();
 			}
 
+			Time next_eligible_job_ready(const State& s) {
+			    const Scheduled& already_scheduled = s.get_scheduled_jobs();
+
+			    for (auto it = jobs_by_latest_arrival.begin(); it != jobs_by_latest_arrival.end(); it++) {
+			        const Job<Time>& j = *(it->second);
+
+			        // not relevant if already scheduled
+			        if (!incomplete(already_scheduled, j))
+			            continue;
+
+			        auto t = std::max(j.latest_arrival(), s.latest_finish_time());
+
+			        if (priority_eligible(s, j, t) && iip_eligible(s, j, t))
+			            return j.latest_arrival();
+
+			    }
+
+			    return Time_model::constants<Time>::infinity();
+			}
+
 			// l_k, equation 6
 			Time next_latest_finish_time(
 				const State &s,
@@ -670,8 +687,9 @@ namespace NP {
 				Time iip_latest_start = iip.latest_start(j, t_s, s);
 
 				// t_s'
+				// t_L
 				Time own_latest_start = std::max(s.latest_finish_time(),
-				                                 j.latest_arrival());
+                                                 next_eligible_job_ready(s));
 
 				// t_R, t_I
 				Time last_start_before_other = std::min(
@@ -774,10 +792,10 @@ namespace NP {
 					// Identify relevant interval for next job
 					// relevant job buckets
 					auto ts_min = s.earliest_finish_time();
-					auto latest_idle = next_certain_job_release(s);
+					auto rel_min = s.earliest_job_release();
+					auto t_l = std::max(next_eligible_job_ready(s), s.latest_finish_time());
 
-					Interval<Time> next_range{ts_min,
-					    std::max(latest_idle, s.latest_finish_time())};
+					Interval<Time> next_range{std::min(ts_min, rel_min), t_l};
 
 					DM("ts_min = " << ts_min << std::endl <<
 					   "latest_idle = " << latest_idle << std::endl <<
@@ -877,10 +895,9 @@ namespace NP {
 					// relevant job buckets
 					auto ts_min = s.earliest_finish_time();
 					auto rel_min = s.earliest_job_release();
-					auto latest_idle = next_certain_job_release(s);
+					auto t_l = std::max(next_eligible_job_ready(s), s.latest_finish_time());
 
-					Interval<Time> next_range{ts_min,
-					    std::max(latest_idle, s.latest_finish_time())};
+					Interval<Time> next_range{std::min(ts_min, rel_min), t_l};
 
 					DM("ts_min = " << ts_min << std::endl <<
 					   "rel_min = " << rel_min << std::endl <<

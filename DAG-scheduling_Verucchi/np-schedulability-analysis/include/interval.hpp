@@ -5,6 +5,7 @@
 #include <ostream>
 #include <memory>
 #include <vector>
+#include <ciso646>
 
 template<class T> class Interval {
 	T a, b;

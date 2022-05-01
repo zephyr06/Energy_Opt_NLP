@@ -113,11 +113,11 @@ namespace rt_num_opt
         static std::string Type() { return "dag"; }
 
         /**
-     * @brief weight of edge is the same as child task's execution time
-     *
-     * @param prevIndex
-     * @param nextIndex
-     */
+         * @brief weight of edge is the same as child task's execution time
+         *
+         * @param prevIndex
+         * @param nextIndex
+         */
         void AddEdge(int prevIndex, int nextIndex)
         {
             // mapPrev[nextIndex].push_back(tasks_[prevIndex]);
@@ -203,12 +203,10 @@ namespace rt_num_opt
         /**
          * @brief add a dummy node to graph for the convenience of analysis by Fonseca2019;
          * this should only be applied during RTA analysis
-         * 
+         *
          */
         void AddDummyNode()
         {
-            tasks_.push_back(Task(0, 1000, 0, 1, 1000, N, 0));
-
             std::unordered_map<int, bool> umap;
             auto vertex2index_ = boost::get(boost::vertex_name, graph_);
             std::pair<rt_num_opt::edge_iter, rt_num_opt::edge_iter> ep;
@@ -219,18 +217,25 @@ namespace rt_num_opt
                 int to_id = vertex2index_[vt];
                 umap[to_id] = true;
             }
-            if (static_cast<int>(umap.size()) == N - 1)
+            if (static_cast<int>(umap.size()) >= N - 1)
             {
                 return;
             }
+            // for (auto it : umap)
+            // {
+            //     std::cout << it.first << ", " << it.second << std::endl;
+            // }
+            // std::cout << std::endl;
+            tasks_.push_back(Task(0, 1000, 0, 1, 1000, N, 0));
             AddVertexMy(graph_, index2Vertex_, N);
             for (int i = 0; i < N; i++)
             {
-                if (!umap[i])
+                // if (!umap[i])
                 {
                     AddEdge(N, i);
                 }
             }
+            N++;
         }
     };
 

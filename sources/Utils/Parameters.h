@@ -81,6 +81,9 @@ namespace rt_num_opt
     int core_m_dag = (int)ConfigParameters["core_m_dag"];
     int baselineLLCompare = (int)ConfigParameters["baselineLLCompare"]; // baselineLLCompare: 1 means Zhao20, 2 means MILP
 
+    double granularity_FindUnsustainable = (double)ConfigParameters["granularity_FindUnsustainable"];
+    const int taskSetSize_FindUnsustainable = (int)ConfigParameters["taskSetSize_FindUnsustainable"];
+
     int printRTA = (int)ConfigParameters["printRTA"];
     const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
     const double eliminateStep = (double)ConfigParameters["eliminateStep"];

@@ -8,7 +8,7 @@
 namespace dagSched
 {
 
-    //common
+    // common
     enum PartitioningTaskOrder_t
     {
         INC_DEAD,
@@ -31,10 +31,10 @@ namespace dagSched
     bool WorstFitProcessorsAssignment(Taskset &taskset, const int m);
     bool BestFitProcessorsAssignment(Taskset &taskset, const int m);
 
-    //methods from here
+    // methods from here
     bool Graham1969(const DAGTask &task, const int m);
 
-    //global policy, fully preemptive
+    // global policy, fully preemptive
     bool GP_FP_EDF_Baruah2012_C(const DAGTask &task, const int m);
     bool GP_FP_EDF_Baruah2012_A(const DAGTask &task, const int m);
 
@@ -69,11 +69,11 @@ namespace dagSched
     bool GP_FP_He2019_C(DAGTask task, const int m);
     bool GP_FP_FTP_He2019_C(Taskset taskset, const int m);
 
-    //global policy, limited preemptive
+    // global policy, limited preemptive
 
     bool GP_LP_FTP_Serrano16_C(Taskset taskset, const int m);
 
-    //partitioned policy
+    // partitioned policy
 
     class SSTask
     {
@@ -102,6 +102,7 @@ namespace dagSched
 
     bool G_LP_FTP_Nasri2019_C(Taskset taskset, const int m);
 
+    std::vector<double> RTA_G_LP_FTP_Nasri2019_C(Taskset taskset, const int m);
 #ifdef ZAHAF2019
     bool P_LP_EDF_Zahaf2019_C(const Taskset &taskset, const int m);
 #endif
