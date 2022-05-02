@@ -92,17 +92,17 @@ namespace rt_num_opt
         return taskset;
     }
 
-    class RTA_Fonseca2019 : public RTA_BASE<DAG_Fonseca>
+    class RTA_Narsi19 : public RTA_BASE<DAG_Fonseca>
     {
     private:
         DAG_Model dagModel_;
 
     public:
-        RTA_Fonseca2019(DAG_Fonseca &dagModelFonseca) : RTA_BASE<DAG_Fonseca>(dagModelFonseca)
+        RTA_Narsi19(DAG_Fonseca &dagModelFonseca) : RTA_BASE<DAG_Fonseca>(dagModelFonseca)
         {
             dagModel_ = dagModelFonseca.GetDAG_Model();
         }
-        RTA_Fonseca2019(DAG_Model &dagModel) : RTA_BASE<DAG_Fonseca>(DAG_Fonseca(dagModel))
+        RTA_Narsi19(DAG_Model &dagModel) : RTA_BASE<DAG_Fonseca>(DAG_Fonseca(dagModel))
         {
             dagModel_ = dagModel;
         }
@@ -118,7 +118,7 @@ namespace rt_num_opt
             else
             {
                 // dagSched::Taskset taskSetVerucchi = TransformTaskSetNumOpt2dagSched(dagModel_);
-                // return dagSched::RTA_Fonseca2019(taskSetVerucchi, rt_num_opt::core_m_dag)[0];
+                // return dagSched::RTA_G_LP_FTP_Nasri2019_C(taskSetVerucchi, rt_num_opt::core_m_dag)[0];
                 return 0;
             }
         }

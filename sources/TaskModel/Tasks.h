@@ -24,13 +24,13 @@ namespace rt_num_opt
     Color::Modifier def(Color::FG_DEFAULT);
 
     /**
- * @brief generate a random number within the range [a,b];
- * a must be smaller than b
- *
- * @param a
- * @param b
- * @return double
- */
+     * @brief generate a random number within the range [a,b];
+     * a must be smaller than b
+     *
+     * @param a
+     * @param b
+     * @return double
+     */
     double RandRange(double a, double b)
     {
         if (b < a)
@@ -82,8 +82,8 @@ namespace rt_num_opt
         }
 
         /**
-     * only used in ReadTaskSet because the input parameter's type is int
-     **/
+         * only used in ReadTaskSet because the input parameter's type is int
+         **/
         Task(std::vector<double> dataInLine)
         {
             if (dataInLine.size() < 7)
@@ -121,9 +121,8 @@ namespace rt_num_opt
 
     typedef std::vector<rt_num_opt::Task> TaskSet;
 
-    class TaskSetNormal
+    struct TaskSetNormal
     {
-    public:
         TaskSet tasks_;
         int N;
         TaskSetNormal()
@@ -136,6 +135,21 @@ namespace rt_num_opt
         {
             tasks_ = tasks;
             N = tasks.size();
+        }
+        void UpdateTaskSetParameter(int index, double value, std::string parameter = "executionTime")
+        {
+            if (parameter == "executionTime")
+            {
+                tasks_[index].executionTime = value;
+            }
+            else if (parameter == "period")
+            {
+                tasks_[index].period = value;
+            }
+            else
+            {
+                CoutError("Please provide Update parameter for " + parameter);
+            }
         }
     };
     void Print(TaskSet &tasks)
@@ -304,10 +318,10 @@ namespace rt_num_opt
     }
 
     /**
- * @brief read from WriteFrequencyModelRatio()
- *
- * @param path
- */
+     * @brief read from WriteFrequencyModelRatio()
+     *
+     * @param path
+     */
     void ReadFrequencyModeRatio(std::string path)
     {
 

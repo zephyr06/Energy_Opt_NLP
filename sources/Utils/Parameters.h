@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+// #include <Eigen/Core>
+// #include <Eigen/Geometry>
 
 #include <opencv2/core/core.hpp>
 namespace rt_num_opt

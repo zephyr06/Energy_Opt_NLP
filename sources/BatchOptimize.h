@@ -2,7 +2,7 @@
 #include "sources/BatchTestutils.h"
 #include "sources/EnergyOptimization/Optimize.h"
 #include "sources/RTA/RTA_DAG.h"
-#include "sources/RTA/RTA_Fonseca2019.h"
+#include "sources/RTA/RTA_Narsi19.h"
 
 namespace rt_num_opt
 {

@@ -1,7 +1,7 @@
 #include <CppUnitLite/TestHarness.h>
 
 #include "sources/Utils/Parameters.h"
-#include "sources/RTA/RTA_Fonseca2019.h"
+#include "sources/RTA/RTA_Narsi19.h"
 #include "sources/BatchTestutils.h"
 
 TEST(addDummy, v1)
@@ -18,9 +18,9 @@ TEST(transform, v1)
     // paths.push_back("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/dag-set-002-syntheticJobs.csv");
     // paths.push_back("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/dag-set-003-syntheticJobs.csv");
     // paths.push_back("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/dag-set-004-syntheticJobs.csv");
-    auto dagTasksNumOpt = rt_num_opt::TransformTaskSetNumOpt2dagSched(paths);
-    dagSched::Taskset taskSetVerucchi = rt_num_opt::TransformTaskSetNumOpt2dagSched(dagTasksNumOpt);
-    double rtaBase = dagSched::RTA_Fonseca2019(taskSetVerucchi, rt_num_opt::core_m_dag)[0];
+    // auto dagTasksNumOpt = rt_num_opt::TransformTaskSetNumOpt2dagSched(paths);
+    // dagSched::Taskset taskSetVerucchi = rt_num_opt::TransformTaskSetNumOpt2dagSched(dagTasksNumOpt);
+    // double rtaBase = dagSched::RTA_Narsi19(taskSetVerucchi, rt_num_opt::core_m_dag)[0];
 }
 
 int main()

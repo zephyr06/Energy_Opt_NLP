@@ -63,10 +63,10 @@ maxIterationsOptimizer: 1e3
 gradientModify: 0
 controlPath: "N5/Case0"
 MaxLoopControl: 1e4
-exactJacobian: 1
+exactJacobian: 0
 utilTol: 1e-3
-debugMode: 0
-verbosityLM: "SILENT"
+debugMode: 1
+verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
