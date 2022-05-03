@@ -4,6 +4,7 @@
 
 #include "sources/TaskModel/DAG_Task.h"
 #include "sources/TaskModel/ReadWriteYaml.h"
+#include "sources/TaskModel/DAG_Narsi19.h"
 
 TEST(IO, v1)
 {
@@ -51,7 +52,13 @@ TEST(io, no_edge)
     EXPECT_LONGS_EQUAL(0, boost::num_edges(dag.graph_));
     EXPECT_LONGS_EQUAL(0, boost::num_edges(dagsRead[0].graph_));
 }
-
+TEST(io, narsi)
+{
+    std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
+    auto dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
+    rt_num_opt::DAG_Narsi19 dagNarsi(dags);
+    auto str = dagNarsi.ConvertTasksetToCsv();
+}
 int main()
 {
     TestResult tr;

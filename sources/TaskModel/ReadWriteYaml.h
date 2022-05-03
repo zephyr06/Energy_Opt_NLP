@@ -1,3 +1,5 @@
+#pragma once
+
 #include <yaml-cpp/yaml.h>
 #include "sources/TaskModel/DAG_Task.h"
 
