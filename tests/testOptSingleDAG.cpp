@@ -4,7 +4,7 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/EnergyOptimization/Optimize.h"
 #include "sources/RTA/RTA_LL.h"
-#include "sources/RTA/RTA_DAG.h"
+#include "sources/RTA/RTA_Melani.h"
 #include "sources/RTA/RTA_Narsi19.h"
 #include "sources/Tools/profilier.h"
 using namespace rt_num_opt;

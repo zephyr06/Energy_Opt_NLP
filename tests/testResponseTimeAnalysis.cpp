@@ -1,7 +1,7 @@
 #include <CppUnitLite/TestHarness.h>
 #include "sources/RTA/RTA_LL.h"
 #include "sources/Tools/testMy.h"
-#include "sources/RTA/RTA_DAG.h"
+#include "sources/RTA/RTA_Melani.h"
 #include "sources/ControlOptimization/ControlOptimize.h"
 
 using namespace rt_num_opt;

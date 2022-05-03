@@ -42,29 +42,25 @@ namespace rt_num_opt
     {
     public:
         // Member list
-        int offset;
-        double period;
-        int overhead;
-        double executionTimeOrg;
-        double executionTime;
         int deadline;
+        double executionTime;
+        double executionTimeOrg;
         int id;
-        int processorId;
+        int offset;
+        int overhead;
+        double period;
         double periodOrg;
+        int processorId;
 
         // initializer
 
-        Task() : offset(0), period(0),
-                 overhead(0), executionTime(0.0),
-                 deadline(0)
+        Task() : deadline(0), executionTime(0.0), id(0), offset(0), overhead(0), period(0), processorId(0)
         {
             executionTimeOrg = executionTime;
             periodOrg = period;
         }
         Task(int offset, int period, int overhead, double executionTime,
-             int deadline) : offset(offset), period(period),
-                             overhead(overhead), executionTime(executionTime),
-                             deadline(deadline)
+             int deadline) : deadline(deadline), executionTime(executionTime), offset(offset), overhead(overhead), period(period)
         {
             id = -1;
             processorId = -1;
@@ -72,9 +68,7 @@ namespace rt_num_opt
             periodOrg = period;
         }
         Task(int offset, int period, int overhead, double executionTime,
-             int deadline, int id, int processorId) : offset(offset), period(period),
-                                                      overhead(overhead), executionTime(executionTime),
-                                                      deadline(deadline), id(id),
+             int deadline, int id, int processorId) : deadline(deadline), executionTime(executionTime), id(id), offset(offset), overhead(overhead), period(period),
                                                       processorId(processorId)
         {
             executionTimeOrg = executionTime;
@@ -125,6 +119,7 @@ namespace rt_num_opt
     {
         TaskSet tasks_;
         int N;
+
         TaskSetNormal()
         {
             ;
