@@ -80,6 +80,23 @@ TEST(rta, narsi)
     // EXPECT(gtsam::assert_equal<rt_num_opt::VectorDynamic>(rtaExpect, rta));
     AssertEigenEqualVector(rtaExpect, rta);
 }
+
+TEST(rta, narsi_no_edge)
+{
+    rt_num_opt::core_m_dag = 3;
+    std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test2.yaml";
+    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
+    rt_num_opt::DAG_Narsi19 dagNarsi(dags);
+    auto str = dagNarsi.ConvertTasksetToCsv();
+    rt_num_opt::RTA_Narsi19 r(dagNarsi);
+    rt_num_opt::VectorDynamic rta = r.ResponseTimeOfTaskSet();
+
+    std::cout << rta << std::endl;
+    rt_num_opt::VectorDynamic rtaExpect = rt_num_opt::GenerateVectorDynamic(5);
+    rtaExpect << 10, 11, 12, 23, 25;
+    // EXPECT(gtsam::assert_equal<rt_num_opt::VectorDynamic>(rtaExpect, rta));
+    AssertEigenEqualVector(rtaExpect, rta);
+}
 int main()
 {
     TestResult tr;
