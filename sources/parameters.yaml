@@ -2,7 +2,7 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_n5_v34
+testDataSetName: taskset
 optimizerType: 1
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
@@ -25,7 +25,7 @@ eliminateTol: 1e0
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100
 
-
+parallelFactor: 0.2
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5

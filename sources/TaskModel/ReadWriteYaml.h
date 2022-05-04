@@ -10,6 +10,16 @@ namespace rt_num_opt
         YAML::Node config = YAML::LoadFile(path);
         YAML::Node tasksNode = config["tasks"];
 
+        // read frequency ratio, if any
+        if (config["frequencyRatio"])
+        {
+            frequencyRatio = config["frequencyRatio"].as<double>();
+        }
+        else
+        {
+            frequencyRatio = 0.5;
+        }
+
         std::vector<rt_num_opt::DAG_Model> dags;
         dags.reserve(tasksNode.size());
 

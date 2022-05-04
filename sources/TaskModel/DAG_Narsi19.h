@@ -218,9 +218,10 @@ namespace rt_num_opt
         }
     };
 
-    // DAG_Narsi19 ReadDAGNarsi19_Tasks(std::string path) // std::string priorityType = "orig"
-    // {
-    //     std::vector<rt_num_opt::DAG_Model> dagsNum = ReadDAG_NarsiFromYaml(path);
-    //     return DAG_Narsi19(dagsNum);
-    // }
+    DAG_Narsi19 ReadDAGNarsi19_Tasks(std::string path) // std::string priorityType = "orig"
+    {
+        std::vector<rt_num_opt::DAG_Model> dagsNum = ReadDAG_NarsiFromYaml(path);
+
+        return DAG_Narsi19(dagsNum);
+    }
 }

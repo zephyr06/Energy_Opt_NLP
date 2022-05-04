@@ -3,6 +3,7 @@
 #include "sources/argparse.hpp"
 #include "sources/RTA/RTA_LL.h"
 #include "sources/RTA/RTA_Melani.h"
+#include "sources/RTA/RTA_Narsi19.h"
 using namespace rt_num_opt;
 using namespace std;
 void deleteDirectoryContents(const std::string &dir_path)
@@ -167,6 +168,37 @@ int main(int argc, char *argv[])
                     }
                 }
             }
+        }
+        else if (taskType == 2)
+        {
+            std::vector<DAG_Model> dagTaskSet;
+            vector<double> utilVec = Uunifast(N, totalUtilization);
+            vector<double> weightVec;
+            for (int i = 0; i < N; i++)
+            {
+                int periodCurr = RandRange(periodMin, periodMax);
+                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, 2 * N)), utilVec[i],
+                                                 numberOfProcessor,
+                                                 periodCurr,
+                                                 periodCurr, deadlineType));
+            }
+
+            string fileName = "periodic-dag-Narsi-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".yaml";
+
+            if (schedulabilityCheck)
+            {
+                if (schedulabilityCheck == 2)
+                {
+                    DAG_Narsi19 dagNarsi19(dagTaskSet);
+                    RTA_Narsi19 r(dagNarsi19);
+                    if (!r.CheckSchedulability())
+                    {
+                        i--;
+                        continue;
+                    }
+                }
+            }
+            WriteDAG_NarsiToYaml(dagTaskSet, outDirectory + fileName);
         }
     }
 

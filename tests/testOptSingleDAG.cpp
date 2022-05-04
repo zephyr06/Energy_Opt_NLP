@@ -11,13 +11,13 @@ using namespace rt_num_opt;
 TEST(OptimizeTaskSet, RTA_LL_V1)
 {
     BeginTimer("main");
-    std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
+    std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".yaml";
 
-    DAG_Fonseca tasksN = ReadDAGFonseca_Tasks(path, readTaskMode);
+    rt_num_opt::DAG_Narsi19 tasksN = rt_num_opt::ReadDAGNarsi19_Tasks(path);
     InitializeGlobalVector(tasksN.tasks_.size());
     AssertBool(true, tasksN.tasks_.size() > 0, __LINE__);
     auto start = std::chrono::high_resolution_clock::now();
-    double res = Energy_Opt<DAG_Fonseca, RTA_Narsi19>::OptimizeTaskSet(tasksN);
+    double res = Energy_Opt<rt_num_opt::DAG_Narsi19, rt_num_opt::RTA_Narsi19>::OptimizeTaskSet(tasksN);
     std::cout << blue << "The energy saving ratio is " << res << def << std::endl;
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
