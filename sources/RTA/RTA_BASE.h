@@ -7,17 +7,17 @@
 namespace rt_num_opt
 {
     /**
- * @brief All customized TaskSetType must inherit from TaskSetNormal in Tasks.h
- * 
- */
+     * @brief All customized TaskSetType must inherit from TaskSetNormal in Tasks.h
+     *
+     */
 
     /**
- * @brief RTA_BASE encapsulate all the interafaces required
- *  by Energy_optimization.
- * All kinds of RTA should inherit 
- * from RTA_BASE and implement its virtual function
- * 
- */
+     * @brief RTA_BASE encapsulate all the interafaces required
+     *  by Energy_optimization.
+     * All kinds of RTA should inherit
+     * from RTA_BASE and implement its virtual function
+     *
+     */
 
     template <class TaskSetType>
     class RTA_BASE
@@ -28,12 +28,12 @@ namespace rt_num_opt
         RTA_BASE(const TaskSetType &tasks) : tasks(tasks) {}
 
         /**
-     * @brief 
-     * 
-     * @param tasks inverse priority ordered
-     * @param index 
-     * @return double 
-     */
+         * @brief
+         *
+         * @param tasks inverse priority ordered
+         * @param index
+         * @return double
+         */
         virtual double RTA_Common_Warm(double beginTime, int index)
         {
             CoutError("Calling RTA_Common_Warm that is supposed to be overwriten!");
@@ -76,16 +76,16 @@ namespace rt_num_opt
             return res;
         }
         /**
-     * @brief 
-     * 
-     * @tparam Schedul_Analysis 
-     * @param tasks 
-     * @param warmStart 
-     * @param whetherPrint 
-     * @param tol positive value, makes schedulability check more strict
-     * @return true: system is schedulable
-     * @return false: system is not schedulable
-     */
+         * @brief
+         *
+         * @tparam Schedul_Analysis
+         * @param tasks
+         * @param warmStart
+         * @param whetherPrint
+         * @param tol positive value, makes schedulability check more strict
+         * @return true: system is schedulable
+         * @return false: system is not schedulable
+         */
 
         bool CheckSchedulability(VectorDynamic warmStart,
                                  bool whetherPrint = false, double tol = 0)

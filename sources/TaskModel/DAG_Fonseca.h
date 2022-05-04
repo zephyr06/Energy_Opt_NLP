@@ -4,6 +4,27 @@
 
 namespace rt_num_opt
 {
+    // dagSched::Taskset TransformTaskSetNumOpt2dagSched(std::vector<rt_num_opt::DAG_Model> dagTasksNumOpt)
+    //     {
+    //         dagSched::Taskset taskset;
+    //         size_t taskSetSize = dagTasksNumOpt.size();
+    //         for (size_t i = 0; i < taskSetSize; i++)
+    //         {
+    //             auto dagTasks = dagTasksNumOpt[i];
+    //             dagSched::DAGTask taskDAGCurr = TransformSingleTaskNumOpt2dagSched(dagTasks);
+    //             taskset.tasks.push_back(taskDAGCurr);
+    //         }
+    //         taskset.computeUtilization();
+    //         taskset.computeHyperPeriod();
+    //         taskset.computeMaxDensity();
+    //         return taskset;
+    //     }
+
+    //     dagSched::Taskset TransformTaskSetNumOpt2dagSched(DAG_Narsi19 dagTasksNumOpt)
+    //     {
+    //         dagTasksNumOpt.SyncTaskSet();
+    //         return TransformTaskSetNumOpt2dagSched(dagTasksNumOpt.tasksVecNarsi_);
+    //     }
     dagSched::DAGTask TransformSingleTaskNumOpt2dagSched(rt_num_opt::DAG_Model dagTasks)
     {
         dagTasks.AddDummyNode();

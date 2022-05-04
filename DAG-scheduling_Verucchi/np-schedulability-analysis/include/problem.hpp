@@ -5,11 +5,13 @@
 #include "precedence.hpp"
 #include "aborts.hpp"
 
-namespace NP {
+namespace NP
+{
 
 	// Description of a non-preemptive scheduling problem
-	template<class Time>
-	struct Scheduling_problem {
+	template <class Time>
+	struct Scheduling_problem
+	{
 
 		typedef typename Job<Time>::Job_set Workload;
 		typedef typename std::vector<Abort_action<Time>> Abort_actions;
@@ -29,10 +31,8 @@ namespace NP {
 
 		// Classic default setup: no abort actions
 		Scheduling_problem(Workload jobs, Precedence_constraints dag,
-		                   unsigned int num_processors = 1)
-		: num_processors(num_processors)
-		, jobs(jobs)
-		, dag(dag)
+						   unsigned int num_processors = 1)
+			: jobs(jobs), dag(dag), num_processors(num_processors)
 		{
 			assert(num_processors > 0);
 			validate_prec_refs<Time>(dag, jobs);
@@ -40,12 +40,9 @@ namespace NP {
 
 		// Full constructor with abort actions
 		Scheduling_problem(Workload jobs, Precedence_constraints dag,
-		                   Abort_actions aborts,
-		                   unsigned int num_processors)
-		: num_processors(num_processors)
-		, jobs(jobs)
-		, dag(dag)
-		, aborts(aborts)
+						   Abort_actions aborts,
+						   unsigned int num_processors)
+			: jobs(jobs), dag(dag), aborts(aborts), num_processors(num_processors)
 		{
 			assert(num_processors > 0);
 			validate_prec_refs<Time>(dag, jobs);
@@ -54,16 +51,16 @@ namespace NP {
 
 		// Convenience constructor: no DAG, no abort actions
 		Scheduling_problem(Workload jobs,
-		                   unsigned int num_processors = 1)
-		: jobs(jobs)
-		, num_processors(num_processors)
+						   unsigned int num_processors = 1)
+			: jobs(jobs), num_processors(num_processors)
 		{
 			assert(num_processors > 0);
 		}
 	};
 
 	// Common options to pass to the analysis engines
-	struct Analysis_options {
+	struct Analysis_options
+	{
 		// After how many seconds of CPU time should we give up?
 		// Zero means unlimited.
 		double timeout;
@@ -77,21 +74,17 @@ namespace NP {
 		// deadline miss?
 		bool early_exit;
 
+		// Implementation-specific: how large should the lookup table
+		// of the main workload index be?
+		std::size_t num_buckets;
+
 		// Should we use state-merging techniques or naively explore the
 		// whole state space in a brute-force manner (only useful as a
 		// baseline).
 		bool be_naive;
 
-		// Implementation-specific: how large should the lookup table
-		// of the main workload index be?
-		std::size_t num_buckets;
-
 		Analysis_options()
-		: timeout(0)
-		, max_depth(0)
-		, early_exit(true)
-		, num_buckets(1000)
-		, be_naive(false)
+			: timeout(0), max_depth(0), early_exit(true), num_buckets(1000), be_naive(false)
 		{
 		}
 	};

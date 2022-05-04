@@ -5,6 +5,7 @@
 #include "sources/TaskModel/DAG_Task.h"
 #include "sources/TaskModel/ReadWriteYaml.h"
 #include "sources/TaskModel/DAG_Narsi19.h"
+#include "sources/RTA/RTA_Narsi19.h"
 
 TEST(IO, v1)
 {
@@ -55,9 +56,25 @@ TEST(io, no_edge)
 TEST(io, narsi)
 {
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
-    auto dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
+    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
+    rt_num_opt::DAG_Narsi19 dagNarsi(dags);
+    dagNarsi.tasks_[0].executionTime = 11;
+    auto str = dagNarsi.ConvertTasksetToCsv();
+}
+
+TEST(rta, narsi)
+{
+    std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
+    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
     rt_num_opt::DAG_Narsi19 dagNarsi(dags);
     auto str = dagNarsi.ConvertTasksetToCsv();
+    // rt_num_opt::RTA_Narsi19 r(dagNarsi);
+    // rt_num_opt::VectorDynamic rta = r.ResponseTimeOfTaskSet();
+
+    // std::cout << rta << std::endl;
+
+    // rt_num_opt::VectorDynamic rtaExpect = rt_num_opt::GenerateVectorDynamic(57);
+    // rtaExpect;
 }
 int main()
 {

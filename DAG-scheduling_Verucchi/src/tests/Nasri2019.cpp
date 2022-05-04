@@ -20,7 +20,7 @@ namespace dagSched
             NP::parse_file<dtime_t>(in),
             NP::parse_dag_file(dag_in),
             NP::parse_abort_file<dtime_t>(aborts_in),
-            m};
+            static_cast<unsigned int>(m)};
 
         // Set common analysis options
         NP::Analysis_options opts;
@@ -163,7 +163,7 @@ namespace dagSched
             NP::parse_file<dtime_t>(in),
             NP::parse_dag_file(dag_in),
             NP::parse_abort_file<dtime_t>(aborts_in),
-            m};
+            static_cast<unsigned int>(m)};
 
         // Set common analysis options
         NP::Analysis_options opts;

@@ -11,8 +11,8 @@
 #define CONFIG_PARALLEL
 #endif
 
-#ifndef NDEBUG
-#define TBB_USE_DEBUG 1
-#endif
+// #ifndef NDEBUG
+// #define TBB_USE_DEBUG 1
+// #endif
 
 #endif

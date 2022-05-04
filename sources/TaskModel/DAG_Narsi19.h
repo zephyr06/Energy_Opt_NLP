@@ -10,23 +10,42 @@ namespace rt_num_opt
     struct DAG_Narsi19 : public TaskSetNormal
     {
         std::vector<rt_num_opt::DAG_Model> tasksVecNarsi_; // it mainly stores the graphical structure of DAGs
-        std::vector<int> nodeSizes_;
+        // std::vector<int> nodeSizes_;
         std::string dagCsv;
+        long long int hyperPeriod;
 
         DAG_Narsi19() {}
+        /**
+         * @brief Construct a new dag narsi19 object
+         *               ...
+         * @param dagsNum
+         */
         DAG_Narsi19(std::vector<rt_num_opt::DAG_Model> &dagsNum)
         {
+            hyperPeriod = GetHyperPeriodNarsi(dagsNum);
+
             tasksVecNarsi_ = dagsNum;
-            for (size_t i = 0; i < dagsNum.size(); i++)
+            for (size_t taskId = 0; taskId < tasksVecNarsi_.size(); taskId++)
             {
-                nodeSizes_.push_back(dagsNum[i].tasks_.size());
-                N += dagsNum[i].tasks_.size();
-                for (size_t j = 0; j < dagsNum[i].tasks_.size(); j++)
+                for (size_t jobId = 0; jobId < tasksVecNarsi_[taskId].tasks_.size(); jobId++)
                 {
-                    tasks_.push_back(dagsNum[i].tasks_[j]);
+                    // for (int instanceId = 0; instanceId < hyperPeriod / tasksVecNarsi_[i].tasks_[0].period; instanceId++)
+                    // {
+                    tasks_.push_back(tasksVecNarsi_[taskId].tasks_[jobId]);
                 }
             }
+            N = tasks_.size();
             dagCsv = convertDAGsToCsv();
+        }
+
+        static long long int GetHyperPeriodNarsi(std::vector<rt_num_opt::DAG_Model> &dagsNum)
+        {
+            TaskSet tasks;
+            for (size_t taskId = 0; taskId < dagsNum.size(); taskId++)
+            {
+                tasks.push_back(dagsNum[taskId].tasks_[0]);
+            }
+            return HyperPeriod(tasks);
         }
 
         static inline std::string Type() { return "Nasri"; }
@@ -34,11 +53,11 @@ namespace rt_num_opt
         void SyncTaskSet()
         {
             int index = 0;
-            for (uint i = 0; i < tasksVecNarsi_.size(); i++)
+            for (size_t taskId = 0; taskId < tasksVecNarsi_.size(); taskId++)
             {
-                for (uint j = 0; j < tasksVecNarsi_[i].tasks_.size(); j++)
+                for (size_t jobId = 0; jobId < tasksVecNarsi_[taskId].tasks_.size(); jobId++)
                 {
-                    tasksVecNarsi_[i].tasks_[j] = tasks_[index++];
+                    tasksVecNarsi_[taskId].tasks_[jobId] = tasks_[index++];
                 }
             }
         }
@@ -57,10 +76,29 @@ namespace rt_num_opt
 
             return std::to_string(taskId) + ", " + std::to_string(jobId) + ", " + std::to_string(release) + ", " + std::to_string(release) + ", " + std::to_string(cost) + ", " + std::to_string(cost) + ", " + std::to_string(deadline) + ", " + std::to_string(deadline) + "\n";
         }
+
+        /**
+         * @brief
+         * This decides the order to iterate all the jobs, and should be followed in the following implementation to avoid confusion; For example:
+         * TaskId | JobId | InstanceId | JobIdGlobal
+         *        |       |
+         *    0   |   0   |     0      |      0
+         *    0   |   0   |     1      |      1
+         *    0   |   0   |     2      |      2
+         *    0   |   1   |     0      |      3
+         *    0   |   1   |     1      |      4
+         *    0   |   1   |     2      |      5
+         *    1   |   0   |     0      |      6
+         *    0   |   0   |     1      |      7
+         *
+         * @param taskId
+         * @param jobId
+         * @param taskIndex
+         * @return int
+         */
         int IdJob2Global(int taskId, int jobId, int taskIndex)
         {
             int globalId = 0;
-            auto hyperPeriod = HyperPeriod(tasks_);
             for (int i = 0; i < taskId; i++)
             {
                 for (size_t j = 0; j < tasksVecNarsi_[i].tasks_.size(); j++)
@@ -76,18 +114,63 @@ namespace rt_num_opt
 
             return globalId + taskIndex;
         }
+
+        struct Ids
+        {
+            size_t taskId;
+            size_t jobId;
+            size_t instanceId;
+        };
+
+        Ids IdsGlobal2Job(size_t globalId)
+        {
+            size_t taskId, jobId;
+            for (taskId = 0; taskId < tasksVecNarsi_.size(); taskId++)
+            {
+                for (jobId = 0; jobId < tasksVecNarsi_[taskId].tasks_.size(); jobId++)
+                {
+                    if (globalId > hyperPeriod / tasksVecNarsi_[taskId].tasks_[jobId].period)
+                    {
+                        globalId -= hyperPeriod / tasksVecNarsi_[taskId].tasks_[jobId].period;
+                    }
+                    else
+                    {
+                        return {taskId, jobId, globalId};
+                    }
+                }
+            }
+            CoutError("Out-of-range in IdsGlobal2Job");
+            return {0, 0, 0};
+        }
+
+        /**
+         * @brief this one doesn't considering taskIndex, mainly used to obtain job-level WCRT
+         *
+         * @param taskId
+         * @param jobId
+         * @return int
+         */
+        int IdJobTaskLevel(int taskId, int jobId)
+        {
+            int id = 0;
+            for (int i = 0; i < taskId; i++)
+            {
+                id += tasksVecNarsi_[i].tasks_.size();
+            }
+            return id + jobId;
+        }
+
         std::string ConvertTasksetToCsv(bool saveOnDisk = true)
         {
             SyncTaskSet();
 
-            auto hyperPeriod = HyperPeriod(tasks_);
             std::string taskSetStr = "   Task ID,     Job ID,          Arrival min,          Arrival max,             Cost min,             Cost max,             Deadline,             Priority\n";
             for (size_t taskId = 0; taskId < tasksVecNarsi_.size(); taskId++)
             {
                 DAG_Model &dag = tasksVecNarsi_[taskId];
-                for (size_t taskIndex = 0; taskIndex < hyperPeriod / dag.tasks_[0].period; taskIndex++)
+                for (size_t jobId = 0; jobId < dag.tasks_.size(); jobId++)
                 {
-                    for (size_t jobId = 0; jobId < dag.tasks_.size(); jobId++)
+                    for (size_t taskIndex = 0; taskIndex < hyperPeriod / dag.tasks_[0].period; taskIndex++)
                     {
                         int globalId = IdJob2Global(taskId, jobId, taskIndex);
                         taskSetStr += LineInTaskCsv(taskId, globalId, tasks_[0].offset + taskIndex * dag.tasks_[0].period, dag.tasks_[jobId].executionTime, tasks_[0].offset + taskIndex * dag.tasks_[0].period + dag.tasks_[0].deadline);
@@ -109,7 +192,6 @@ namespace rt_num_opt
         }
         std::string convertDAGsToCsv(bool saveOnDisk = true)
         {
-            auto hyperPeriod = HyperPeriod(tasks_);
             std::string dependStr = "Predecessor TID,	Predecessor JID,	Successor TID, Successor JID\n";
             for (uint taskId = 0; taskId < tasksVecNarsi_.size(); taskId++)
             {
