@@ -25,7 +25,7 @@ namespace NP
 		public:
 			// initial state -- nothing yet has finished, nothing is running
 			Schedule_state(unsigned int num_processors)
-				: scheduled_jobs(), num_jobs_scheduled(0), core_avail{num_processors, Interval<Time>(Time(0), Time(0))}, lookup_key{0x9a9a9a9a9a9a9a9aUL}
+				: num_jobs_scheduled(0), scheduled_jobs(), core_avail{num_processors, Interval<Time>(Time(0), Time(0))}, lookup_key{0x9a9a9a9a9a9a9a9aUL}
 			{
 				assert(core_avail.size() > 0);
 			}
@@ -57,7 +57,7 @@ namespace NP
 				ca.push_back(lft);
 
 				// skip first element in from.core_avail
-				for (int i = 1; i < from.core_avail.size(); i++)
+				for (size_t i = 1; i < from.core_avail.size(); i++)
 				{
 					pa.push_back(std::max(est, from.core_avail[i].min()));
 					ca.push_back(std::max(est, from.core_avail[i].max()));
@@ -127,7 +127,7 @@ namespace NP
 					return false;
 				if (!same_jobs_scheduled(other))
 					return false;
-				for (int i = 0; i < core_avail.size(); i++)
+				for (size_t i = 0; i < core_avail.size(); i++)
 					if (!core_avail[i].intersects(other.core_avail[i]))
 						return false;
 				return true;
@@ -138,7 +138,7 @@ namespace NP
 				if (!can_merge_with(other))
 					return false;
 
-				for (int i = 0; i < core_avail.size(); i++)
+				for (size_t i = 0; i < core_avail.size(); i++)
 					core_avail[i] |= other.core_avail[i];
 
 				// vector to collect joint certain jobs

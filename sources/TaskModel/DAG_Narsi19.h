@@ -129,7 +129,7 @@ namespace rt_num_opt
             {
                 for (jobId = 0; jobId < tasksVecNarsi_[taskId].tasks_.size(); jobId++)
                 {
-                    if (globalId > hyperPeriod / tasksVecNarsi_[taskId].tasks_[jobId].period)
+                    if (globalId >= hyperPeriod / tasksVecNarsi_[taskId].tasks_[jobId].period)
                     {
                         globalId -= hyperPeriod / tasksVecNarsi_[taskId].tasks_[jobId].period;
                     }

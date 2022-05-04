@@ -73,8 +73,9 @@ namespace rt_num_opt
                 for (const auto &j : problem.jobs)
                 {
                     Interval<dtime_t> finish = space.get_finish_times(j);
-                    std::cout << "[" << j.get_task_id() << ", " << j.get_job_id() << "] ";
-                    std::cout << std::max<long long>(0, (finish.from() - j.earliest_arrival())) << " ";
+                    // std::cout << "[" << j.get_task_id() << ", " << j.get_job_id() << "] ";
+                    // std::cout << std::max<long long>(0, (finish.from() - j.earliest_arrival())) << " ";
+                    // std::cout << std::endl;
                     int globalJobId = j.get_job_id();
                     auto idTuple = dagNarsi_.IdsGlobal2Job(globalJobId);
                     // obtain WCRT from all the same job instances
