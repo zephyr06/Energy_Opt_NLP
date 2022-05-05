@@ -16,13 +16,13 @@ namespace rt_num_opt
         return false;
     }
     /**
- * @brief generate keys for factor graph modeling the control problem
- * keys' attributes can be extracted via key.chr(). key.index()
- * 
- * @param idtask 
- * @param type 
- * @return gtsam::Symbol 
- */
+     * @brief generate keys for factor graph modeling the control problem
+     * keys' attributes can be extracted via key.chr(). key.index()
+     *
+     * @param idtask
+     * @param type
+     * @return gtsam::Symbol
+     */
     gtsam::Symbol GenerateControlKey(int idtask, std::string type)
     {
         if (type == "period")
@@ -46,14 +46,14 @@ namespace rt_num_opt
     }
 
     /**
- * @brief perform customized quotient operation for two double type numbers
- * return result is min_k |a - k b|, where k is an integer, a & b >0;
- * 
- * Brute force solution, find minimum remainder by finding minimum rem=(a-=b)
- * @param a 
- * @param b 
- * @return double 
- */
+     * @brief perform customized quotient operation for two double type numbers
+     * return result is min_k |a - k b|, where k is an integer, a & b >0;
+     *
+     * Brute force solution, find minimum remainder by finding minimum rem=(a-=b)
+     * @param a
+     * @param b
+     * @return double
+     */
     double QuotientDouble(double a, double b)
     {
         double remainder = a - int(a / b) * b;
@@ -86,7 +86,7 @@ namespace rt_num_opt
         TaskAugment(Task &task, double coeffT, double coeffR) : task_(task), coeff_T(coeffT), coeff_R(coeffR) {}
         static bool Compare(const TaskAugment &t1, const TaskAugment &t2)
         {
-            if (enableReorder == 1)
+            if (enableReorder <= 1)
             {
                 return t1.task_.period < t2.task_.period;
             }
@@ -102,7 +102,7 @@ namespace rt_num_opt
         }
     };
     /* in-place adjustment of tasks' order; highest order being the first in tasks */
-    void Reorder(TaskSet &tasks, VectorDynamic &coeff, std::string priority_type = "RM")
+    void Reorder(TaskSet &tasks, VectorDynamic &coeff)
     {
         std::vector<TaskAugment> tasksAug;
         tasksAug.reserve(tasks.size());

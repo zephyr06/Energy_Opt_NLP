@@ -22,15 +22,15 @@ namespace rt_num_opt
     }
 
     /**
- * @brief check whether the file in the directory is what we're looking for; this function assumes the possible input are only one of the following: Case<n>.m, Case<n>.txt, Case<n>.txt_RM_BFSResult.txt, Case<n>.txt_RM_GPResult.txt
- *
- * @param file
- * @return int
- *  0 means target source file;
- *  1 means baseline result, MILP
- *  2 means baseline result, MUAi
- *  3 means unrelated;
- */
+     * @brief check whether the file in the directory is what we're looking for; this function assumes the possible input are only one of the following: Case<n>.m, Case<n>.txt, Case<n>.txt_RM_BFSResult.txt, Case<n>.txt_RM_GPResult.txt
+     *
+     * @param file
+     * @return int
+     *  0 means target source file;
+     *  1 means baseline result, MILP
+     *  2 means baseline result, MUAi
+     *  3 means unrelated;
+     */
     int TargetFileType(std::string file)
     {
         if (file.find(".txt") == file.length() - 4 && file.find(".txt") != std::string::npos)
@@ -51,12 +51,12 @@ namespace rt_num_opt
     }
 
     /**
- * @brief read baseline result file, e.g., Case0.txt_RM_GPResult.txt, or Case0.txt_RM_BFSResult.txt
- *
- * @param directory absolute folder directory
- * @param path name of target file
- * @return pair<double, double> {runTime, obj}
- */
+     * @brief read baseline result file, e.g., Case0.txt_RM_GPResult.txt, or Case0.txt_RM_BFSResult.txt
+     *
+     * @param directory absolute folder directory
+     * @param path name of target file
+     * @return pair<double, double> {runTime, obj}
+     */
     std::pair<double, double> ReadBaselineZhao20(std::string directory, std::string path)
     {
         std::fstream file;
@@ -123,12 +123,12 @@ namespace rt_num_opt
         }
     }
     /**
- * @brief
- *
- * @param v1
- * @param v2
- * @return (v1[i]-v2[i])/v2[i]
- */
+     * @brief
+     *
+     * @param v1
+     * @param v2
+     * @return (v1[i]-v2[i])/v2[i]
+     */
     double RelativeGap(std::vector<double> &v1, std::vector<double> &v2)
     {
         double gap = 0;
@@ -248,6 +248,14 @@ namespace rt_num_opt
 
         std::cout << "Worst relative gap is " << worstObjRatio << std::endl;
         std::cout << "Worst file is " << worstFile << std::endl;
+
+        // used for ControlPerformance's speed figure
+        std::ofstream outfileWrite;
+        outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/Time/N" +
+                              std::to_string(Nn) + ".txt",
+                          std::ios_base::app);
+        outfileWrite << Average(runTimeAll[0]) << std::endl;
+        outfileWrite.close();
 
         if (printFailureFile)
         {

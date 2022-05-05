@@ -52,6 +52,7 @@ namespace rt_num_opt
     double relativeErrorTolerance = (double)ConfigParameters["relativeErrorTolerance"];
     double relativeErrorToleranceMin = (double)ConfigParameters["relativeErrorToleranceMin"];
     const double relativeErrorToleranceInit = (double)ConfigParameters["relativeErrorToleranceInit"];
+    // enableReorder: 0 means no re-order, 1 means purely based on period with random priority assignment for tasks with same period, 2 means mainly based on period, prefer tasks with smaller execution time if tasks have same period;
     int enableReorder = (int)ConfigParameters["enableReorder"];
     int MaxLoopControl = (int)ConfigParameters["MaxLoopControl"];
 

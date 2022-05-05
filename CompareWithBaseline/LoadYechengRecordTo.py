@@ -23,9 +23,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # parser.add_argument('--baseline', type=str, default="Zhao20",
     #                     help='0')
-    parser.add_argument('--application', type=str, default="Energy",
+    parser.add_argument('--application', type=str, default="Control",
                         help='0')
-    parser.add_argument('--taskSize', type=int, default=16,
+    parser.add_argument('--taskSize', type=int, default=5,
                         help='N')
     parser.add_argument('--directory', type=str,
                         default='/home/zephyr/Programming/others/YechengRepo/',
@@ -96,5 +96,6 @@ if __name__ == "__main__":
     with open(target_file_name_energy, "a") as f:
         for i in range(len(energy_bfs)):
             f.write(str(energy_bfs[i])+"\n")
+        # if (application == "Energy"):
         for i in range(len(energy_gp)):
             f.write(str(energy_gp[i])+"\n")

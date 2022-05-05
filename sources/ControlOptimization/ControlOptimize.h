@@ -152,12 +152,12 @@ namespace rt_num_opt
         }
 
         /**
- * @brief round period into int type, we assume the given task set is schedulable!
- *
- * @param tasks
- * @param maskForElimination
- * @param coeff
- */
+         * @brief round period into int type, we assume the given task set is schedulable!
+         *
+         * @param tasks
+         * @param maskForElimination
+         * @param coeff
+         */
         void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination, VectorDynamic &coeff)
         {
             if (roundTypeInClamp == "none")
@@ -280,7 +280,7 @@ namespace rt_num_opt
                 errCurr = FactorGraphType::RealObj(tasks, coeff);
                 TaskSet tasksTry = tasks;
                 VectorDynamic coeffTry = coeff;
-                Reorder(tasksTry, coeffTry, "RM");
+                Reorder(tasksTry, coeffTry);
                 double errCurrTry = FactorGraphType::RealObj(tasksTry, coeffTry);
                 if (errCurrTry < errCurr)
                 {
@@ -307,7 +307,7 @@ namespace rt_num_opt
                     errCurr = FactorGraphType::RealObj(tasks, coeff);
                     TaskSet tasksTry = tasks;
                     VectorDynamic coeffTry = coeff;
-                    Reorder(tasksTry, coeffTry, "RM");
+                    Reorder(tasksTry, coeffTry);
                     double errCurrTry = FactorGraphType::RealObj(tasksTry, coeffTry);
                     if (errCurrTry < errCurr)
                     {
@@ -351,7 +351,7 @@ namespace rt_num_opt
             }
             else
             {
-                ; //nothing else to do
+                ; // nothing else to do
             }
 
             std::cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << std::endl;
