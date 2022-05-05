@@ -66,6 +66,8 @@ namespace rt_num_opt
                                       std::ios_base::app);
                     outfileWrite << energySaveRatioVec.back() << std::endl;
                     outfileWrite.close();
+
+                    N = taskSet1.size();
                 }
                 else if (res == -1 || res > 1)
                 {
@@ -100,6 +102,13 @@ namespace rt_num_opt
             std::cout << file << std::endl;
         // if (debugMode)
         std::cout << "The total number of optimization failure files is " << errorFiles.size() << std::endl;
+
+        std::ofstream outfileWrite;
+        outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/Time/N" +
+                              std::to_string(N) + ".txt",
+                          std::ios_base::app);
+        outfileWrite << Average(runTimeW) << std::endl;
+        outfileWrite.close();
 
         return;
     }
