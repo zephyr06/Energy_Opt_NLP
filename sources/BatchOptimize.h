@@ -55,9 +55,9 @@ namespace rt_num_opt
                 //     tasksN = ReadDAG_Tasks(path, readTaskMode);
                 //     N = tasksN.tasks_.size();
                 // }
-                else if (TaskSetType::Type() == "Fonseca")
+                else if (TaskSetType::Type() == "Narsi19")
                 {
-                    tasksN = ReadDAGFonseca_Tasks(path, readTaskMode);
+                    tasksN = ReadDAGNarsi19_Tasks(path);
                     N = tasksN.tasks_.size();
                 }
                 else

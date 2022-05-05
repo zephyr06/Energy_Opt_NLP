@@ -2,15 +2,15 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: taskset
-optimizerType: 1
+testDataSetName: test_n3_v5
+optimizerType: 2
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
 
-executionTimeModel: 2 # 1 is normal, 2 is more difficult
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 0
-EnergyMode: 2
+elimIte: 100
+EnergyMode: 1
 
 printFailureFile: 1
 printRTA: 0
@@ -25,7 +25,6 @@ eliminateTol: 1e0
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100
 
-parallelFactor: 0.2
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
 weightDrawEnd: 1e5
@@ -65,8 +64,8 @@ controlPath: "N5/Case0"
 MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
-debugMode: 1
-verbosityLM: "SUMMARY"
+debugMode: 0
+verbosityLM: "SILENT"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
@@ -81,3 +80,7 @@ relativeErrorToleranceOuterLoop: 1e-7
 LLCompareWithGeneralizedElimination: 0
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0
+
+parallelFactor: 0.2
+PeriodSetAM: [1, 2, 5, 10, 20, 50,100,200,1000]
+timeScaleFactor: 1e4

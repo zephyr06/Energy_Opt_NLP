@@ -1,11 +1,14 @@
 #include <filesystem>
-#include "sources/TaskModel/GenerateRandomTaskset.h"
 #include "sources/argparse.hpp"
+#include "sources/Utils/Parameters.h"
 #include "sources/RTA/RTA_LL.h"
 #include "sources/RTA/RTA_Melani.h"
 #include "sources/RTA/RTA_Narsi19.h"
+#include "sources/TaskModel/GenerateRandomTaskset.h"
 using namespace rt_num_opt;
 using namespace std;
+
+// std::vector<int> PeriodSetAM = {1, 2, 5, 10, 20, 50, 100, 200, 1000};
 void deleteDirectoryContents(const std::string &dir_path)
 {
 
@@ -49,14 +52,14 @@ int main(int argc, char *argv[])
         .scan<'i', int>();
     program.add_argument("--deadlineType")
         .default_value(0)
-        .help("type of tasksets, 0 means implicit, 1 means random")
+        .help("type of deadline, 0 means implicit, 1 means random")
         .scan<'i', int>();
     program.add_argument("--taskType")
         .default_value(1)
         .help("type of tasksets, 0 means normal, 1 means DAG")
         .scan<'i', int>();
     program.add_argument("--schedulabilityCheck")
-        .default_value(0)
+        .default_value(2)
         .help("schedulabilityCheck in generate task sets? If so, all the task sets are schedulable")
         .scan<'i', int>();
     // program.add_argument("--parallelismFactor")
@@ -74,6 +77,8 @@ int main(int argc, char *argv[])
         std::cout << program;
         exit(0);
     }
+
+    rt_num_opt::ReadVec("PeriodSetAM"); // read period set for Narsi19
 
     int N = program.get<int>("--N");
     int DAG_taskSetNumber = program.get<int>("--taskSetNumber");
@@ -176,8 +181,9 @@ int main(int argc, char *argv[])
             vector<double> weightVec;
             for (int i = 0; i < N; i++)
             {
-                int periodCurr = RandRange(periodMin, periodMax);
-                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, 2 * N)), utilVec[i],
+                // int periodCurr = (1 + rand() % 9) * pow(10, rand() % 2);
+                int periodCurr = int(PeriodSetAM[rand() % PeriodSetAM.size()] * timeScaleFactor);
+                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, N)), utilVec[i],
                                                  numberOfProcessor,
                                                  periodCurr,
                                                  periodCurr, deadlineType));
@@ -187,15 +193,12 @@ int main(int argc, char *argv[])
 
             if (schedulabilityCheck)
             {
-                if (schedulabilityCheck == 2)
+                DAG_Narsi19 dagNarsi19(dagTaskSet);
+                RTA_Narsi19 r(dagNarsi19);
+                if (!r.CheckSchedulability())
                 {
-                    DAG_Narsi19 dagNarsi19(dagTaskSet);
-                    RTA_Narsi19 r(dagNarsi19);
-                    if (!r.CheckSchedulability())
-                    {
-                        i--;
-                        continue;
-                    }
+                    i--;
+                    continue;
                 }
             }
             WriteDAG_NarsiToYaml(dagTaskSet, outDirectory + fileName);

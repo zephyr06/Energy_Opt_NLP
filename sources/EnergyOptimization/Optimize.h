@@ -93,12 +93,12 @@ namespace rt_num_opt
                 }
             }
             /**
-         * @brief 
-         * 
-         * @param executionTimeVector (numberOfTasksNeedOptimize, 1)
-         * @param H 
-         * @return Vector 
-         */
+             * @brief
+             *
+             * @param executionTimeVector (numberOfTasksNeedOptimize, 1)
+             * @param H
+             * @return Vector
+             */
             gtsam::Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<gtsam::Matrix &> H = boost::none) const override
             {
                 BeginTimer("main_factor");
@@ -302,11 +302,11 @@ namespace rt_num_opt
         }
 
         /**
-     * find the tasks that do not need to optimize;
-     * i means i-th task do not need optimization,  while i+1, ..., N need
-     * -1 means all tasks need optimization
-     * N-1 means all tasks do not need optimization
-     **/
+         * find the tasks that do not need to optimize;
+         * i means i-th task do not need optimization,  while i+1, ..., N need
+         * -1 means all tasks need optimization
+         * N-1 means all tasks do not need optimization
+         **/
         static int FindTaskDoNotNeedOptimize(const TaskSetType &tasks, int lastTaskDoNotNeedOptimize,
                                              VectorDynamic &computationTimeWarmStart, double eliminateTolIte)
         {
@@ -449,9 +449,9 @@ namespace rt_num_opt
         }
 
         /**
-     * Perform optimization for one task set;
-     * this function only performs optimization and elimination, it does not change weights
-     **/
+         * Perform optimization for one task set;
+         * this function only performs optimization and elimination, it does not change weights
+         **/
         static double OptimizeTaskSetOneIte(TaskSetType &taskSetType)
         {
             int N = taskSetType.tasks_.size();
@@ -511,8 +511,17 @@ namespace rt_num_opt
                 vectorGlobalOpt = GetParameterVD<double>(taskSetType.tasks_, "executionTime");
                 valueGlobalOpt = EstimateEnergyTaskSet(taskSetType.tasks_).sum() / weightEnergy;
                 if (debugMode == 1)
+                {
                     std::cout << "After clamp: " << std::endl
                               << GetParameterVD<double>(taskSetType.tasks_, "executionTime") << std::endl;
+                    Schedul_Analysis r(taskSetType);
+                    std::cout << "Execution time of tasks: " << std::endl;
+                    std::cout << vectorGlobalOpt << std::endl;
+                    VectorDynamic rtaTemp = r.ResponseTimeOfTaskSet();
+                    std::cout << "RTA after optimization: " << rtaTemp << std::endl;
+                    int a = 1;
+                }
+
                 // find variables to eliminate
                 int adjustEliminateTolNum = 0;
                 int lastTaskDoNotNeedOptimizeAfterOpt;
@@ -617,8 +626,8 @@ namespace rt_num_opt
         }
 
         /**
- * initialize all the global variables
- */
+         * initialize all the global variables
+         */
         static double OptimizeTaskSet(TaskSetType &taskSetType)
         {
             InitializeGlobalVector(taskSetType.tasks_.size());

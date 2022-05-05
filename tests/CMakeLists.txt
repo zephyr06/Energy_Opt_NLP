@@ -20,8 +20,8 @@ gtsamAddTestsGlob(EnergyOptNLP "test*.cpp" "testBF*" "${CONVENIENCE_LIB_NAME}")
 ADD_EXECUTABLE(GenerateTaskSet GenerateTaskSet.cpp)
 TARGET_LINK_LIBRARIES(GenerateTaskSet ${CONVENIENCE_LIB_NAME})
 
-ADD_EXECUTABLE(FindUnsustainableCase FindUnsustainableCase.cpp)
-TARGET_LINK_LIBRARIES(FindUnsustainableCase ${CONVENIENCE_LIB_NAME})
+# ADD_EXECUTABLE(FindUnsustainableCase FindUnsustainableCase.cpp)
+# TARGET_LINK_LIBRARIES(FindUnsustainableCase ${CONVENIENCE_LIB_NAME})
 
 ADD_EXECUTABLE(LLCompare1 LLBatchCompare.cpp)
 TARGET_LINK_LIBRARIES(LLCompare1 ${CONVENIENCE_LIB_NAME})

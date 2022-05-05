@@ -4,10 +4,22 @@
 #include <gtsam/base/Testable.h>
 
 #include "sources/Tools/testMy.h"
+#include "sources/Utils/Parameters.h"
 #include "sources/TaskModel/DAG_Task.h"
 #include "sources/TaskModel/ReadWriteYaml.h"
 #include "sources/TaskModel/DAG_Narsi19.h"
 #include "sources/RTA/RTA_Narsi19.h"
+
+TEST(io, read_vector)
+{
+    rt_num_opt::ReadVec("PeriodSetAM");
+    for (auto x : rt_num_opt::PeriodSetAM)
+    {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+    // AssertEqualVectorExact({1, 2, 5, 10, 20, 50, 100, 200, 1000}, rt_num_opt::PeriodSetAM);
+}
 
 TEST(IO, v1)
 {
@@ -97,6 +109,24 @@ TEST(rta, narsi_no_edge)
     // EXPECT(gtsam::assert_equal<rt_num_opt::VectorDynamic>(rtaExpect, rta));
     AssertEigenEqualVector(rtaExpect, rta);
 }
+
+TEST(rta, Sync)
+{
+    rt_num_opt::core_m_dag = 3;
+    std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
+    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
+    rt_num_opt::DAG_Narsi19 dagNarsi(dags);
+    rt_num_opt::RTA_Narsi19 r(dagNarsi);
+    rt_num_opt::VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    std::cout << rta << std::endl
+              << std::endl;
+
+    dagNarsi.tasks_[0].executionTime += 2;
+    rt_num_opt::RTA_Narsi19 r2(dagNarsi);
+    rta = r2.ResponseTimeOfTaskSet();
+    std::cout << rta << std::endl;
+}
+
 int main()
 {
     TestResult tr;

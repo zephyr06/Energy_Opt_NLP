@@ -3,7 +3,7 @@
 #include <vector>
 // #include <Eigen/Core>
 // #include <Eigen/Geometry>
-
+#include <yaml-cpp/yaml.h>
 #include <opencv2/core/core.hpp>
 namespace rt_num_opt
 {
@@ -88,4 +88,17 @@ namespace rt_num_opt
     const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
     const double eliminateStep = (double)ConfigParameters["eliminateStep"];
     double frequencyRatio = (double)ConfigParameters["frequencyRatio"];
+    double timeScaleFactor = (double)ConfigParameters["timeScaleFactor"];
+
+    std::vector<int> PeriodSetAM;
+    void ReadVec(std::string str)
+    {
+        YAML::Node config = YAML::LoadFile("/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml");
+        YAML::Node nodeVecPeriodSet = config[str];
+        for (size_t i = 0; i < nodeVecPeriodSet.size(); i++)
+        {
+            PeriodSetAM.push_back(nodeVecPeriodSet[i].as<int>());
+        }
+    }
+
 } // namespace rt_num_opt

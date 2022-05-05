@@ -88,6 +88,13 @@ namespace rt_num_opt
                     }
                 }
             }
+            else
+            {
+                for (long int i = 0; i < rta.rows(); i++)
+                {
+                    rta(i) = INT32_MAX;
+                }
+            }
             return rta;
         }
         bool CheckSchedulability(VectorDynamic warmStart,

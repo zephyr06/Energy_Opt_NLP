@@ -48,7 +48,7 @@ namespace rt_num_opt
             return HyperPeriod(tasks);
         }
 
-        static inline std::string Type() { return "Nasri"; }
+        static inline std::string Type() { return "Narsi19"; }
 
         void SyncTaskSet()
         {
@@ -164,7 +164,7 @@ namespace rt_num_opt
         {
             SyncTaskSet();
 
-            std::string taskSetStr = "   Task ID,     Job ID,          Arrival min,          Arrival max,             Cost min,             Cost max,             Deadline,             Priority\n";
+            std::string taskSetStr = "Task ID,     Job ID,          Arrival min,          Arrival max,             Cost min,             Cost max,             Deadline,             Priority\n";
             for (size_t taskId = 0; taskId < tasksVecNarsi_.size(); taskId++)
             {
                 DAG_Model &dag = tasksVecNarsi_[taskId];
