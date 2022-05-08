@@ -32,7 +32,11 @@ namespace rt_num_opt
             energy = task.period * 1.0;
         // energy = task.executionTime * (pow(frequency, 3) + 0.09 * pow(frequency, 2));
         else
+        {
             CoutError("Not recognized EnergyMode!");
+            energy = 0; // just to suppress a warning
+        }
+
         energy *= weightEnergy;
         if (frequency > 0 && frequency <= 1.1)
             return energy;

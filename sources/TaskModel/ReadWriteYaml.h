@@ -8,7 +8,15 @@ namespace rt_num_opt
     std::vector<rt_num_opt::DAG_Model> ReadDAG_NarsiFromYaml(std::string path)
     {
         YAML::Node config = YAML::LoadFile(path);
-        YAML::Node tasksNode = config["tasks"];
+        YAML::Node tasksNode;
+        if (config["tasks"])
+        {
+            tasksNode = config["tasks"];
+        }
+        else
+        {
+            CoutError("Input file doesn't follow Narsi format: " + path);
+        }
 
         // read frequency ratio, if any
         if (config["frequencyRatio"])
@@ -63,6 +71,8 @@ namespace rt_num_opt
 
             dags.push_back(dag);
         }
+        sort(dags.begin(), dags.end(), [](const rt_num_opt::DAG_Model &a, const rt_num_opt::DAG_Model &b) -> bool
+             { return a.tasks_[0].deadline < b.tasks_[0].deadline; });
         return dags;
     }
 

@@ -2,7 +2,7 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_n3_v5
+testDataSetName: test_n5_v3
 optimizerType: 2
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
@@ -16,14 +16,14 @@ printFailureFile: 1
 printRTA: 0
 readTaskMode: RM
 batchOptimizeFolder: ControlPerformance
-core_m_dag: 1
+core_m_dag: 16
 baselineLLCompare: 1
 
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
 eliminateTol: 1e0
-eliminateStep: 1.5
-adjustEliminateMaxIte: 100
+eliminateStep: 5
+adjustEliminateMaxIte: 10
 
 weightLogBarrier: 0
 weightDrawBegin: 1e-6
@@ -35,9 +35,9 @@ clampTypeMiddle: "none"
 punishmentInBarrier: 1e8
 
 noiseModelSigma: 1e0
-relativeErrorToleranceInit: 1e-7
-relativeErrorTolerance: 1e-7
-relativeErrorToleranceMin: 1e-10
+relativeErrorToleranceInit: 1e-5
+relativeErrorTolerance: 1e-5
+relativeErrorToleranceMin: 1e-5
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
 
@@ -58,14 +58,14 @@ SA_iteration: 1000000
 
 granularity_FindUnsustainable: 0.01
 taskSetSize_FindUnsustainable: 3
-maxIterationsOptimizer: 1e3
+maxIterationsOptimizer: 1e2
 gradientModify: 0
 controlPath: "N5/Case0"
 MaxLoopControl: 1
-exactJacobian: 1
+exactJacobian: 0
 utilTol: 1e-3
 debugMode: 0
-verbosityLM: "SILENT"
+verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_QR"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
@@ -81,6 +81,10 @@ LLCompareWithGeneralizedElimination: 0
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0
 
+maxNode_GenerateTaskSet: 10
 parallelFactor: 0.2
-PeriodSetAM: [1, 2, 5, 10, 20, 50,100,200,1000]
+PeriodSetAM: [1,2,5,10,20,50,200,1000]
 timeScaleFactor: 1e4
+whetherWriteNarsiTaskSet: 1
+SpeedOptimizeOption: 0
+SkipRateFindElimination: 0.5

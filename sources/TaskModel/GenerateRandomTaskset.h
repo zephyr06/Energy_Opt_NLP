@@ -44,7 +44,17 @@ namespace rt_num_opt
             int periodCurr = RandRange(periodMin, periodMax);
             double deadline = periodCurr;
             if (deadlineType == 1)
-                deadline = RandRange(ceil(periodCurr * utilVec[i]), periodCurr);
+            {
+                if (ceil(periodCurr * utilVec[i]) < periodCurr)
+                {
+                    deadline = RandRange(ceil(periodCurr * utilVec[i]), periodCurr);
+                }
+                else
+                {
+                    deadline = 0; // don't consider this case
+                }
+            }
+
             double randomRatio = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
             Task task(0, periodCurr,
                       ceil(periodCurr * utilVec[i]) * 0.1 * randomRatio,

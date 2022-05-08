@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
             BatchOptimize<DAG_Narsi19, RTA_Narsi19>(N);
         else
             CoutError("Unrecognized arguments in LLBatch!");
+        PrintTimer();
     }
     else
     {

@@ -160,7 +160,7 @@ namespace rt_num_opt
             return id + jobId;
         }
 
-        std::string ConvertTasksetToCsv(bool saveOnDisk = true)
+        std::string ConvertTasksetToCsv(bool saveOnDisk = whetherWriteNarsiTaskSet)
         {
             SyncTaskSet();
 
@@ -190,7 +190,7 @@ namespace rt_num_opt
         {
             return std::to_string(predTId) + ", " + std::to_string(predJId) + ", " + std::to_string(SuccTId) + ", " + std::to_string(succJId) + "\n";
         }
-        std::string convertDAGsToCsv(bool saveOnDisk = true)
+        std::string convertDAGsToCsv(bool saveOnDisk = whetherWriteNarsiTaskSet)
         {
             std::string dependStr = "Predecessor TID,	Predecessor JID,	Successor TID, Successor JID\n";
             for (uint taskId = 0; taskId < tasksVecNarsi_.size(); taskId++)

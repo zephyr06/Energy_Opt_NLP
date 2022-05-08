@@ -314,8 +314,12 @@ namespace rt_num_opt
             // update the tasks with the new optimal computationTimeVector
             TaskSetType tasksCurr = tasks;
             int N = tasks.tasks_.size();
-            for (int i = N - 1; i >= 0; i--)
+            for (int i = N - 1; i > lastTaskDoNotNeedOptimize; i--)
             {
+                if (((double)rand() / (RAND_MAX)) < SkipRateFindElimination)
+                {
+                    continue;
+                }
                 tasksCurr.tasks_[i].executionTime += eliminateTolIte;
 
                 // we cannot use a more strict criteria in detecting schedulability,
@@ -345,7 +349,7 @@ namespace rt_num_opt
                 tasksCurr.tasks_[i].executionTime -= eliminateTolIte;
             }
             EndTimer(__func__);
-            return -1;
+            return lastTaskDoNotNeedOptimize;
         }
 
         static VectorDynamic UnitOptimization(TaskSetType &tasks,
@@ -379,6 +383,7 @@ namespace rt_num_opt
                 //     params.setVerbosityDL("VERBOSE");
                 params.setDeltaInitial(deltaInitialDogleg);
                 params.setRelativeErrorTol(relativeErrorTolerance);
+                params.setLinearSolverType(linearOptimizerType);
                 gtsam::DoglegOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
@@ -393,6 +398,7 @@ namespace rt_num_opt
                 params.setlambdaUpperBound(upperLambda);
                 params.setMaxIterations(maxIterationsOptimizer);
                 params.setRelativeErrorTol(relativeErrorTolerance);
+                params.setLinearSolverType(linearOptimizerType);
                 gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
@@ -402,6 +408,7 @@ namespace rt_num_opt
                 if (debugMode == 1)
                     params.setVerbosity("DELTA");
                 params.setRelativeErrorTol(relativeErrorTolerance);
+                params.setLinearSolverType(linearOptimizerType);
                 gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
@@ -409,6 +416,7 @@ namespace rt_num_opt
             {
                 gtsam::NonlinearOptimizerParams params;
                 params.setRelativeErrorTol(relativeErrorTolerance);
+                params.setLinearSolverType(linearOptimizerType);
                 if (debugMode == 1)
                     params.setVerbosity("DELTA");
                 gtsam::NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
@@ -463,8 +471,13 @@ namespace rt_num_opt
                 return -2;
 
             VectorDynamic initialExecutionTime = GetParameterVD<int>(taskSetType, "executionTimeOrg");
-            int lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(taskSetType,
+
+            int lastTaskDoNotNeedOptimize = -1;
+            if (SpeedOptimizeOption == 0)
+            {
+                lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(taskSetType,
                                                                       -1, responseTimeInitial, eliminateTol);
+            }
 
             // computationTimeVectorLocalOpt is always stored in tasks
             vectorGlobalOpt = initialExecutionTime;
@@ -524,7 +537,11 @@ namespace rt_num_opt
 
                 // find variables to eliminate
                 int adjustEliminateTolNum = 0;
-                int lastTaskDoNotNeedOptimizeAfterOpt;
+                int lastTaskDoNotNeedOptimizeAfterOpt = -1;
+                if (adjustEliminateMaxIte < 1)
+                {
+                    CoutError("adjustEliminateMaxIte cannot be smaller than 1!");
+                }
 
                 while (adjustEliminateTolNum < adjustEliminateMaxIte)
                 {

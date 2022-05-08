@@ -85,12 +85,17 @@ namespace rt_num_opt
     double granularity_FindUnsustainable = (double)ConfigParameters["granularity_FindUnsustainable"];
     const int taskSetSize_FindUnsustainable = (int)ConfigParameters["taskSetSize_FindUnsustainable"];
 
+    int maxNode_GenerateTaskSet = (int)ConfigParameters["maxNode_GenerateTaskSet"];
+
     int printRTA = (int)ConfigParameters["printRTA"];
     const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
     const double eliminateStep = (double)ConfigParameters["eliminateStep"];
     double frequencyRatio = (double)ConfigParameters["frequencyRatio"];
     double timeScaleFactor = (double)ConfigParameters["timeScaleFactor"];
+    double SkipRateFindElimination = (double)ConfigParameters["SkipRateFindElimination"];
 
+    int SpeedOptimizeOption = (int)ConfigParameters["SpeedOptimizeOption"];
+    int whetherWriteNarsiTaskSet = (int)ConfigParameters["whetherWriteNarsiTaskSet"];
     std::vector<int> PeriodSetAM;
     void ReadVec(std::string str)
     {

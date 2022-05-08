@@ -6,7 +6,7 @@
 #include "io.hpp"
 #include "global/space.hpp"
 // #include "dagSched/tests.h" // to add np_schedulability_analysis
-
+#include "sources/Tools/profilier.h"
 #include "sources/RTA/RTA_BASE.h"
 #include "sources/TaskModel/DAG_Narsi19.h"
 
@@ -39,6 +39,7 @@ namespace rt_num_opt
         }
         VectorDynamic ResponseTimeOfTaskSet()
         {
+            BeginTimer(__func__);
             // prepare input
             std::stringstream tasksInput;
             tasksInput << dagNarsi_.ConvertTasksetToCsv();
@@ -95,6 +96,7 @@ namespace rt_num_opt
                     rta(i) = INT32_MAX;
                 }
             }
+            EndTimer(__func__);
             return rta;
         }
         bool CheckSchedulability(VectorDynamic warmStart,

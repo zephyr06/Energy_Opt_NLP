@@ -9,7 +9,8 @@ using namespace rt_num_opt;
 using namespace std;
 
 // std::vector<int> PeriodSetAM = {1, 2, 5, 10, 20, 50, 100, 200, 1000};
-void deleteDirectoryContents(const std::string &dir_path)
+
+void VerifyDirectoryExist(const std::string &dir_path)
 {
 
     namespace fs = std::filesystem;
@@ -17,9 +18,27 @@ void deleteDirectoryContents(const std::string &dir_path)
     {                                   // Check if dir_path folder exists
         fs::create_directory(dir_path); // create dir_path folder
     }
+}
+void deleteDirectoryContents(const std::string &dir_path)
+{
 
+    namespace fs = std::filesystem;
     for (const auto &entry : std::filesystem::directory_iterator(dir_path))
         std::filesystem::remove_all(entry.path());
+}
+int CountFiles(const std::string &path)
+{
+    int count{};
+
+    std::filesystem::path p1{path};
+
+    for (auto &p : std::filesystem::directory_iterator(p1))
+    {
+        ++count;
+    }
+
+    std::cout << "# of files in " << p1 << ": " << count << '\n';
+    return count;
 }
 int main(int argc, char *argv[])
 {
@@ -62,6 +81,10 @@ int main(int argc, char *argv[])
         .default_value(2)
         .help("schedulabilityCheck in generate task sets? If so, all the task sets are schedulable")
         .scan<'i', int>();
+    program.add_argument("--clearBeforeAdd")
+        .default_value(0)
+        .help("whether clear the directory first")
+        .scan<'i', int>();
     // program.add_argument("--parallelismFactor")
     //     .default_value(1000)
     //     .help("the parallelismFactor DAG")
@@ -82,17 +105,18 @@ int main(int argc, char *argv[])
 
     int N = program.get<int>("--N");
     int DAG_taskSetNumber = program.get<int>("--taskSetNumber");
-    double totalUtilization = program.get<double>("--totalUtilization");
+    double totalUtilization = program.get<double>("--totalUtilization") * rt_num_opt::core_m_dag;
     int numberOfProcessor = program.get<int>("--NumberOfProcessor");
     int periodMin = program.get<int>("--periodMin");
     int periodMax = program.get<int>("--periodMax");
     int deadlineType = program.get<int>("--deadlineType");
     int taskType = program.get<int>("--taskType");
     int schedulabilityCheck = program.get<int>("--schedulabilityCheck");
+    int clearBeforeAdd = program.get<int>("--clearBeforeAdd");
     cout << "Task configuration: " << endl
          << "the number of tasks(--N): " << N << endl
          << "taskSetNumber(--taskSetNumber): " << DAG_taskSetNumber << endl
-         << "totalUtilization(--totalUtilization): " << totalUtilization << endl
+         << "totalUtilization(already multiply core_m_dag)(--totalUtilization): " << totalUtilization << endl
          << "NumberOfProcessor(--NumberOfProcessor): " << numberOfProcessor << endl
          << "periodMin(--periodMin): " << periodMin << endl
          << "periodMax(--periodMax): " << periodMax << endl
@@ -111,9 +135,19 @@ int main(int argc, char *argv[])
         outDirectory = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/";
     }
 
-    deleteDirectoryContents(outDirectory);
+    VerifyDirectoryExist(outDirectory);
+    int filesExist = 0;
+    if (clearBeforeAdd)
+    {
+        deleteDirectoryContents(outDirectory);
+    }
+    else
+    {
+        filesExist = CountFiles(outDirectory);
+        std::cout << "Already have " << filesExist << " files" << std::endl;
+    }
     srand(time(0));
-    for (size_t i = 0; i < DAG_taskSetNumber; i++)
+    for (size_t i = filesExist; i < DAG_taskSetNumber; i++)
     {
         if (taskType == 0)
         {
@@ -183,7 +217,7 @@ int main(int argc, char *argv[])
             {
                 // int periodCurr = (1 + rand() % 9) * pow(10, rand() % 2);
                 int periodCurr = int(PeriodSetAM[rand() % PeriodSetAM.size()] * timeScaleFactor);
-                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, N)), utilVec[i],
+                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[i],
                                                  numberOfProcessor,
                                                  periodCurr,
                                                  periodCurr, deadlineType));
