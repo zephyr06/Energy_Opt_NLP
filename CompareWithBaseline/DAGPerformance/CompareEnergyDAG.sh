@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # ************** Adjust settings there **************
-title="DagPerformance"
+title="DAGPerformance"
 MinTaskNumber=10
 MaxTaskNumber=10
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
@@ -19,7 +19,7 @@ perform_optimization() {
 	# Optimize energy consumption
 	cd $ROOT_PATH/release
 	make -j8
-	./tests/DAGBatch
+	./tests/DAGBatch $1
 	cd $ROOT_PATH/CompareWithBaseline
 	sleep 1
 }
@@ -35,13 +35,13 @@ do
     	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 1000
-	perform_optimization
+	perform_optimization $jobNumber
 	
 	# dog-leg, not eliminated, exact Jacobian
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 0
-	perform_optimization
+	perform_optimization $jobNumber
 	
 done
 
