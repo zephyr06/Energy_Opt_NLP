@@ -12,12 +12,10 @@ include(GtsamTesting)
 
 find_package(yaml-cpp)
 
-add_subdirectory(DAG-scheduling_Verucchi)
-include_directories(${CMAKE_SOURCE_DIR}/DAG-scheduling_Verucchi/include)
-include_directories(${CMAKE_SOURCE_DIR}/DAG-scheduling_Verucchi/np-schedulability-analysis/include )
-# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include matplotlib-cpp 
-#                     ${CMAKE_CURRENT_SOURCE_DIR}/np-schedulability-analysis/include 
-#                     ${Python3_INCLUDE_DIRS})
+# add_subdirectory(DAG-scheduling_Verucchi)
+# include_directories(${CMAKE_SOURCE_DIR}/DAG-scheduling_Verucchi/include)
+include_directories(${CMAKE_SOURCE_DIR}/np-schedulability-analysis/include )
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/np-schedulability-analysis/include )
 include_directories(${CMAKE_SOURCE_DIR})
 
 # for unittest scripts
@@ -42,7 +40,7 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} gtsam)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${CONVENIENCE_LIB_NAME} CppUnitLite)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
-target_link_libraries(${CONVENIENCE_LIB_NAME} dag-sched)
+# target_link_libraries(${CONVENIENCE_LIB_NAME} dag-sched)
 target_link_libraries(${CONVENIENCE_LIB_NAME} yaml-cpp)
 target_link_libraries(${CONVENIENCE_LIB_NAME} tbb)
 
