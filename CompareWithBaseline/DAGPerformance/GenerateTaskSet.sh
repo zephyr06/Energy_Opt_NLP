@@ -6,6 +6,7 @@ MaxTaskNumber=10
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 cd $ROOT_PATH/release
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j8
 
 for (( jobNumber=3; jobNumber<=$MaxTaskNumber; jobNumber++ ))
@@ -14,6 +15,6 @@ do
 	do
 	totalTaskSetNumber=$(echo $util*150 | bc)
 	echo ${totalTaskSetNumber%.*}
-	./tests/GenerateTaskSet --taskSetNumber 2 --taskType 2 --schedulabilityCheck 2 --clearBeforeAdd 0 --deadlineType 0 --totalUtilization $util --N $jobNumber 
+	./tests/GenerateTaskSet --taskSetNumber $totalTaskSetNumber --taskType 2 --schedulabilityCheck 2 --clearBeforeAdd 0 --deadlineType 0 --totalUtilization $util --N $jobNumber 
 	done
 done

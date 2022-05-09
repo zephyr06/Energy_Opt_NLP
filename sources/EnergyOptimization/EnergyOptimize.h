@@ -399,12 +399,12 @@ namespace rt_num_opt
                 // Values result_new = optimizer.values();
                 // result_new.print();
                 // VectorDynamic aaa = FactorGraphType::ExtractResults(result_new, tasks);
-                gtsam::VectorValues delta = optimizer.getDelta(params);
-                if (debugMode == 1)
-                {
-                    delta.print();
-                    std::cout << std::endl;
-                }
+                // gtsam::VectorValues delta = optimizer.getDelta(params);
+                // if (debugMode == 1)
+                // {
+                //     delta.print();
+                //     std::cout << std::endl;
+                // }
                 // double useless = graph.error(MergeValuesInElimination(initialEstimateFG, delta));
                 if (FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal))
                 {
