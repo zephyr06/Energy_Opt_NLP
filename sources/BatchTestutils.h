@@ -36,20 +36,20 @@ namespace rt_num_opt
         {
             while ((en = readdir(dr)) != NULL)
             {
-                files.push_back(en->d_name); //print all directory name
+                files.push_back(en->d_name); // print all directory name
             }
-            closedir(dr); //close all directory
+            closedir(dr); // close all directory
         }
         sort(files.begin(), files.end());
         return files;
     }
 
     /**
- * @brief 
- * 
- * @param path periodic-set-1-syntheticJobs.csv
- * @return std::string "1"
- */
+     * @brief
+     *
+     * @param path periodic-set-1-syntheticJobs.csv
+     * @return std::string "1"
+     */
     int ExtractIndex(std::string path, std::string delimiter = "-")
     {
         int pos = 0;
@@ -65,11 +65,11 @@ namespace rt_num_opt
         return temp;
     }
     /**
- * @brief read Yecheng's result, given path in my format;
- * 
- * @param path like, periodic-set-1-syntheticJobs.csv
- * @return pair<double, double> objective, time
- */
+     * @brief read Yecheng's result, given path in my format;
+     *
+     * @param path like, periodic-set-1-syntheticJobs.csv
+     * @return pair<double, double> objective, time
+     */
     std::pair<double, double> ReadBaselineResult(std::string &pathInPeriodicDataset, int N)
     {
         std::string yechengRepoPath = "/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + std::to_string(N) + "/";
