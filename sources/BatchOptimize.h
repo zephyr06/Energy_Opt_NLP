@@ -37,8 +37,8 @@ namespace rt_num_opt
         std::vector<std::string> errorFiles;
         for (const auto &file : ReadFilesInDirectory(pathDataset))
         {
-            if (debugMode)
-                std::cout << file << std::endl;
+            // if (debugMode)
+            std::cout << file << std::endl;
             std::string delimiter = "-";
             if (file.substr(0, file.find(delimiter)) == "periodic")
             {

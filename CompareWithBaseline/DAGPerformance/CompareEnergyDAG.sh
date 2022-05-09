@@ -2,7 +2,8 @@
 
 # ************** Adjust settings there **************
 title="DagPerformance"
-MaxTaskNumber=5
+MinTaskNumber=10
+MaxTaskNumber=10
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
@@ -24,7 +25,7 @@ perform_optimization() {
 }
 
 
-for (( jobNumber=3; jobNumber<=$MaxTaskNumber; jobNumber++ ))
+for (( jobNumber=$MinTaskNumber; jobNumber<=$MaxTaskNumber; jobNumber++ ))
 do
 	# generate task set
 	
@@ -48,5 +49,5 @@ done
 
 # visualize the result
 cd $ROOT_PATH/CompareWithBaseline/$title
-python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio"
-python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
+python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio"
+python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"

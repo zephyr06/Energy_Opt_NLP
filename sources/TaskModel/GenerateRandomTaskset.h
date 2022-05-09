@@ -12,7 +12,7 @@ namespace rt_num_opt
 
     namespace po = boost::program_options;
 
-    std::vector<double> Uunifast(int N, double utilAll)
+    std::vector<double> Uunifast(int N, double utilAll, bool boundU = false)
     {
         double sumU = utilAll;
         std::vector<double> utilVec(N, 0);
@@ -22,6 +22,10 @@ namespace rt_num_opt
         {
 
             nextU = sumU * pow(double(rand()) / RAND_MAX, 1.0 / (N - 1));
+            if (boundU)
+            {
+                nextU = std::min(1.0, nextU);
+            }
             utilVec[i - 1] = sumU - nextU;
             sumU = nextU;
         }
@@ -33,7 +37,7 @@ namespace rt_num_opt
                             int numberOfProcessor, int periodMin,
                             int periodMax, int deadlineType = 0)
     {
-        std::vector<double> utilVec = Uunifast(N, totalUtilization);
+        std::vector<double> utilVec = Uunifast(N, totalUtilization, true);
         TaskSet tasks;
         // int periodMaxRatio = periodMax / periodMin;
 

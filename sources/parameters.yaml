@@ -2,7 +2,7 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_n5_v3
+testDataSetName: test_n10_v4
 optimizerType: 2
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
@@ -36,7 +36,7 @@ punishmentInBarrier: 1e8
 
 noiseModelSigma: 1e0
 relativeErrorToleranceInit: 1e-5
-relativeErrorTolerance: 1e-5
+relativeErrorTolerance: 1e-4
 relativeErrorToleranceMin: 1e-5
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
@@ -81,10 +81,10 @@ LLCompareWithGeneralizedElimination: 0
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0
 
-maxNode_GenerateTaskSet: 10
+maxNode_GenerateTaskSet: 20
 parallelFactor: 0.2
 PeriodSetAM: [1,2,5,10,20,50,200,1000]
 timeScaleFactor: 1e4
 whetherWriteNarsiTaskSet: 1
-SpeedOptimizeOption: 0
+SpeedOptimizeOption: 1
 SkipRateFindElimination: 0.5

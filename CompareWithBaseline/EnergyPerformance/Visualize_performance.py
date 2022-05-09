@@ -20,6 +20,13 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
             ave += float(lines[i])
         data.append(ave/1000)
 
+        # NLP, with elimination, exact Jacobian
+        ave=0
+        for i in range(1000):
+            ave += float(lines[i])
+        data.append(ave/1000)
+
+
         # NLP, without elimination
         ave = 0
         for i in range(1000,2000):
@@ -53,6 +60,9 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         data=[]
 
         # NLP, with elimination
+        data.append(float(lines[0]))
+
+        # NLP, with elimination, exact Jacobian
         data.append(float(lines[0]))
 
         # NLP, without elimination
@@ -100,11 +110,11 @@ if __name__ == "__main__":
         data_2d = read_data_2d_time(minTaskNumber, maxTaskNumber)
     data_2d=np.array(data_2d).transpose()
     dataset_pd = pd.DataFrame()
-    optimizer_name=["NLP_Elimination", "NLP_Raw",  "Zhao20", "MILP"]
-    marker_list = ["o", "v", "s", "D"] #
-    color_list = ["#0084DB", "limegreen", "r", "gold"] #
+    optimizer_name=["NLP_Elim_approx","NLP_Elim_exact", "NLP_Raw",  "Zhao20", "MILP"]
+    marker_list = ["o", "v", "x", "s", "D"] #
+    color_list = ["#0084DB","cyan", "limegreen", "r", "gold"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
-    for i in {0,1,2}:
+    for i in {0,1,2,3}:
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
 

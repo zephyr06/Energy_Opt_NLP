@@ -211,7 +211,11 @@ int main(int argc, char *argv[])
         else if (taskType == 2)
         {
             std::vector<DAG_Model> dagTaskSet;
-            vector<double> utilVec = Uunifast(N, totalUtilization);
+            if (totalUtilization <= 0)
+            {
+                totalUtilization = RandRange(0.1, 0.8);
+            }
+            vector<double> utilVec = Uunifast(N, totalUtilization, true);
             vector<double> weightVec;
             for (int i = 0; i < N; i++)
             {
