@@ -5,11 +5,18 @@ set (CMAKE_CXX_STANDARD 17)
 
 # Find GTSAM components
 find_package(GTSAM REQUIRED) # Uses installed package
-
 find_package(GTSAMCMakeTools)
 include(GtsamMakeConfigFile)
 include(GtsamBuildTypes)
 include(GtsamTesting)
+
+find_package(yaml-cpp)
+
+# add_subdirectory(DAG-scheduling_Verucchi)
+# include_directories(${CMAKE_SOURCE_DIR}/DAG-scheduling_Verucchi/include)
+include_directories(${CMAKE_SOURCE_DIR}/np-schedulability-analysis/include )
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/np-schedulability-analysis/include )
+include_directories(${CMAKE_SOURCE_DIR})
 
 # for unittest scripts
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${GTSAM_DIR}/../GTSAMCMakeTools")
@@ -33,6 +40,11 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} gtsam)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${CONVENIENCE_LIB_NAME} CppUnitLite)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
+# target_link_libraries(${CONVENIENCE_LIB_NAME} dag-sched)
+target_link_libraries(${CONVENIENCE_LIB_NAME} yaml-cpp)
+target_link_libraries(${CONVENIENCE_LIB_NAME} tbb)
+
+
 
 add_subdirectory(sources)
 add_subdirectory(tests)

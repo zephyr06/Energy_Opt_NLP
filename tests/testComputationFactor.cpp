@@ -1,6 +1,10 @@
 #include <CppUnitLite/TestHarness.h>
-#include "../sources/Optimize.h"
-#include "../sources/testMy.h"
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/Tools/testMy.h"
+
+using namespace rt_num_opt;
+using namespace gtsam;
+using namespace std;
 TEST(evaluateError, v1)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v23.csv";
@@ -11,7 +15,7 @@ TEST(evaluateError, v1)
     int lastTaskDoNotNeedOptimize = -1;
     RTA_LL r(tasks);
     VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
-    Symbol key('a', 0);
+    gtsam::Symbol key('a', 0);
 
     auto model = noiseModel::Isotropic::Sigma((N - lastTaskDoNotNeedOptimize - 1), noiseModelSigma);
     Energy_Opt<TaskSetNormal, RTA_LL>::ComputationFactor factor(key, tasksN, -1, responseTimeInitial, model);

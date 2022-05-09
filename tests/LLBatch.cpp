@@ -1,7 +1,8 @@
-#include "../sources/BatchOptimize.h"
-
+#include "sources/BatchOptimize.h"
+using namespace rt_num_opt;
 int main(int argc, char *argv[])
 {
+    runMode == "normal";
     if (argc == 1)
         BatchOptimize<TaskSetNormal, RTA_LL>();
     else if (argc == 2)
@@ -9,7 +10,7 @@ int main(int argc, char *argv[])
         char *pEnd;
         int N = strtol(argv[1], &pEnd, 10);
         if (debugMode == 1)
-            cout << "Task sets under analyzation is N" + to_string(N) << endl;
+            std::cout << "Task sets under analyzation is N" + std::to_string(N) << std::endl;
         if (N >= 0)
             BatchOptimize<TaskSetNormal, RTA_LL>(N);
         else

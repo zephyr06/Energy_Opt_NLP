@@ -2,12 +2,13 @@
 
 #include <CppUnitLite/TestHarness.h>
 
-#include "../sources/Tasks.h"
-#include "../sources/RTA_LL.h"
-#include "../sources/Parameters.h"
-#include "../sources/DAG_Task.h"
-#include "../sources/BatchTestutils.h"
-
+#include "sources/TaskModel/Tasks.h"
+#include "sources/RTA/RTA_LL.h"
+#include "sources/RTA/RTA_Melani.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/BatchTestutils.h"
+using namespace rt_num_opt;
+using namespace std;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 TEST(ReadTaskSet, p1)
 {
@@ -81,7 +82,7 @@ TEST(dag, v5)
 }
 TEST(ReadFrequencyModeRatio, v1)
 {
-    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v29.csv";
+    std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v29.csv";
 
     auto dagTasks = ReadTaskSet(path, "orig");
     AssertEqualScalar(0.296547, frequencyRatio);

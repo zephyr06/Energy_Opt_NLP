@@ -38,7 +38,8 @@ if __name__=="__main__":
     args = parser.parse_args()
     n = args.n
     path1="../TaskData/test_n5_v"+str(n)+".csv"
+    path2="../TaskData/task_number/dag-set-000-syntheticJobs.csv"
     # path_destination="currGraph.gv"
     # write_csv_to_graphviz(path1,path_destination)
-    show_graphviz(path1)
+    show_graphviz(path2)
 

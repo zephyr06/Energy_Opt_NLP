@@ -1,9 +1,15 @@
 #include <chrono>
 
 #include <CppUnitLite/TestHarness.h>
-#include "../sources/Parameters.h"
-#include "../sources/Optimize.h"
+#include "sources/Utils/Parameters.h"
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
+#include "sources/Utils/FactorGraphUtils.h"
 using namespace std::chrono;
+using namespace rt_num_opt;
+using namespace std;
+
+using namespace gtsam;
 using Opt_LL = Energy_Opt<TaskSetNormal, RTA_LL>;
 
 // There are two types of tests, strict deadline test, or period & 2xExecution test
@@ -75,7 +81,7 @@ TEST(NumericalDerivativeDynamic, A1)
     // f: R2 -> R4
     enableMaxComputationTimeRestrict = 0;
     MaxComputationTimeRestrict = 100;
-    boost::function<Matrix(const VectorDynamic &)> f =
+    boost::function<gtsam::Matrix(const VectorDynamic &)> f =
         [this](const VectorDynamic &input)
     {
         int variablesNumber = 2;
@@ -149,6 +155,7 @@ TEST(unitOptimization, a1)
     InitializeGlobalVector(taskSet1.size());
     optimizerType = 1;
     EnergyMode = 1;
+    executionTimeModel = 1;
     int lastTaskDoNotNeedOptimize = 1;
 
     VectorDynamic initialEstimate;
@@ -159,11 +166,7 @@ TEST(unitOptimization, a1)
     VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
     vectorGlobalOpt.resize(N, 1);
     VectorDynamic res1 = Opt_LL::UnitOptimization(taskSetNormal, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
-    cout << endl;
-    cout << endl;
-    cout << endl;
-    cout << endl;
-    cout << endl;
+
     // 204 corresponds to RT of 319, which should be the best we can get because of the clamp function
     if (not(abs(204 - res1(0, 0)) < 5))
         CoutWarning("One test case failed in performance!");
@@ -249,9 +252,7 @@ TEST(ClampComputationTime, a1)
     vectorGlobalOpt.resize(N, 1);
     TaskSetNormal taskSetNormal(taskSet1);
     VectorDynamic res1 = Opt_LL::UnitOptimization(taskSetNormal, lastTaskDoNotNeedOptimize, initialEstimate, responseTimeInitial);
-    cout << endl;
-    cout << endl;
-    cout << endl;
+
     // 204 corresponds to RT of 319, which should be the best we can get because of the clamp function
     // if (not(abs(205 - res1(0, 0)) < 1))
     //     CoutWarning("One test case failed in performance!");
@@ -337,6 +338,137 @@ TEST(UnitOptimizationIPM, a1)
     VectorDynamic res = Opt_LL::UnitOptimization(taskSetNormal, 1, initial, initialExecution);
     // cout << "In unit test UnitOptimizationIPM, the res is " << res << endl;
     AssertEqualScalar(230, res(0, 0), 1.1, __LINE__);
+}
+// TEST(ReadYecheng_result, v1)
+// {
+//     string pathInPeriodicDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/periodic-set-0-syntheticJobs.csv";
+//     int N = 20;
+//     string yechengRepoPath = "/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep/N" + to_string(N) + "/";
+
+//     int index = 0;
+//     string targetFilePathGP = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_GPResult.txt";
+//     string targetFilePathBF = yechengRepoPath + "Case" + to_string(index) + ".txt" + "_RM_BFSResult.txt";
+//     if (debugMode == 1)
+//         cout << "targetFilePathBF " << targetFilePathBF << endl;
+//     string fileName;
+//     if (baselineLLCompare == 1)
+//         fileName = targetFilePathBF;
+//     else if (baselineLLCompare == 2)
+//         fileName = targetFilePathGP;
+//     else
+//     {
+//         CoutError("Unrecognized baselineLLCompare! Current value is " + to_string(baselineLLCompare));
+//     }
+
+//     ifstream cResultFile(fileName.data());
+//     try
+//     {
+//         assert(cResultFile.is_open());
+//     }
+//     catch (...)
+//     {
+//         cout << "Error in reading "
+//              << batchOptimizeFolder
+//              << "'s result files" << fileName << endl;
+//     }
+
+//     double runTime = 0, obj = 0;
+//     cResultFile >> runTime >> obj;
+//     double nd = 0;
+//     cResultFile >> nd;
+//     int n = round(nd);
+//     vector<int> values(n, 0);
+//     for (int i = 0; i < n; i++)
+//     {
+//         double val = 0;
+//         cResultFile >> val;
+//         values[i] = abs(round(val));
+//     }
+
+//     // check schedulability
+//     auto taskSet1 = ReadTaskSet(pathInPeriodicDataset, "orig");
+//     // TaskSet tasksInit = taskSet1;
+//     UpdateTaskSetExecutionTime(taskSet1, Vector2Eigen(values));
+//     taskSet1 = Reorder(taskSet1, "RM");
+//     RTA_LL r(taskSet1);
+//     // EXPECT(r.CheckSchedulability(
+//     //     debugMode == 1));
+// }
+TEST(EnergyFactor, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+    executionTimeModel = 1;
+    EnergyMode = 1;
+    VectorDynamic comp;
+    comp.resize(3, 1);
+    comp << 17, 12, 253;
+    UpdateTaskSetExecutionTime(tasks, comp);
+
+    VectorDynamic energy1;
+    weightEnergy = 1e8;
+    auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+    FactorGraphEnergyLL::EnergyFactor f0(GenerateControlKey(0, "executionTime"), tasks[0], 0, model);
+    FactorGraphEnergyLL::EnergyFactor f1(GenerateControlKey(1, "executionTime"), tasks[1], 1, model);
+    MatrixDynamic h1 = GenerateMatrixDynamic(1, 1);
+    MatrixDynamic h1Expect = GenerateVectorDynamic1D(-2 / tasks[0].period * weightEnergy);
+    MatrixDynamic h2 = GenerateMatrixDynamic(1, 1);
+    MatrixDynamic h2Expect = GenerateVectorDynamic1D(-2 / tasks[1].period * weightEnergy);
+    AssertEqualScalar(3777777.7778, f0.evaluateError(GenerateVectorDynamic1D(tasks[0].executionTime), h1)(0, 0));
+    AssertEqualScalar(2448979.5918, f1.evaluateError(GenerateVectorDynamic1D(tasks[1].executionTime), h2)(0, 0));
+    assert_equal(h1Expect, h1, 1e-3);
+    assert_equal(h2Expect, h2, 1e-3);
+}
+TEST(RTARelatedFactor, v1)
+{
+    exactJacobian = 1;
+
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    eliminationRecordGlobal.Initialize(tasks.size());
+    VectorDynamic rtaBase = RTALLVector(tasks);
+    auto f1 = FactorGraphEnergyLL::GenerateRTARelatedFactor(tasks, 3, rtaBase);
+    auto x = FactorGraphEnergyLL::GenerateInitialFG(tasks);
+    std::vector<MatrixDynamic> Hs, HsExpect;
+    Hs.reserve(5);
+    HsExpect.reserve(5);
+    for (uint i = 0; i < 5; i++)
+    {
+        MatrixDynamic m = GenerateMatrixDynamic(1, 1);
+        Hs.push_back(m);
+        HsExpect.push_back(m);
+    }
+    assert_equal(GenerateVectorDynamic1D(0), f1.unwhitenedError(x, Hs), 1e-3);
+    for (int i = 0; i < 5; i++)
+        assert_equal(HsExpect[i], Hs[i]);
+}
+TEST(GenerateEliminationLLFactor, v1)
+{
+    string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
+    auto tasks = ReadTaskSet(path, "RM");
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    maskForElimination = {0, 0, 0, 1, 0};
+    eliminationRecordGlobal.Initialize(tasks.size());
+    eliminationRecordGlobal.SetEliminated(3, EliminationType::RTA);
+    VectorDynamic rtaBase = RTALLVector(tasks);
+    MultiKeyFactor f1 = FactorGraphEnergyLL::GenerateEliminationLLFactor(tasks, 3, rtaBase(3));
+    int dimension = 4;
+    std::vector<MatrixDynamic> Hs, HsExpect;
+    Hs.reserve(dimension);
+    HsExpect.reserve(dimension);
+    for (int i = 0; i < dimension; i++)
+    {
+        MatrixDynamic m = GenerateMatrixDynamic(1, 1);
+        Hs.push_back(m);
+        m << -1 * ceil(rtaBase(3) / tasks[i].period);
+        HsExpect.push_back(m);
+    }
+    HsExpect[3] << -1;
+    auto x = FactorGraphEnergyLL::GenerateInitialFG(tasks);
+    assert_equal(GenerateVectorDynamic1D(0), f1.unwhitenedError(x, Hs), 1e-3);
+    for (uint i = 0; i < HsExpect.size(); i++)
+        assert_equal(HsExpect[i], Hs[i], 1e-7);
 }
 
 int main()

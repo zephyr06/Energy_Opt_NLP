@@ -31,7 +31,6 @@ do
 
 	make -j4
 	./tests/LLCompare1
-	#./tests/WAPBatchCompare
 	cd ../CompareWithBaseline
 	sleep 1
 done

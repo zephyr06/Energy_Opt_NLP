@@ -1,6 +1,8 @@
-#include "../sources/OptimizeSA.h"
-#include "../sources/Generate_WAP.h"
+#include "sources/OptimizeSA.h"
+using namespace std;
 using namespace std::chrono;
+using namespace rt_num_opt;
+
 TEST(SA, v1)
 {
     TaskSet tasks = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv", "orig");
@@ -12,9 +14,9 @@ TEST(SA, v1)
     // {
     //     CoutWarning("Unschedulable task set in SA test!");
     // }
-    auto start = chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     auto res = OptimizeSchedulingSA<TaskSetNormal, RTA_LL>(tasksN);
-    auto stop = chrono::high_resolution_clock::now();
+    auto stop = std::chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;
     cout << "The error before optimization is " << Color::green << res.initialError << Color::def << endl;

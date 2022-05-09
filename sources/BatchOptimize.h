@@ -1,113 +1,122 @@
 #pragma once
-#include "BatchTestutils.h"
-#include "Optimize.h"
-#include "RTA_DAG.h"
+#include "sources/BatchTestutils.h"
+#include "sources/EnergyOptimization/Optimize.h"
+#include "sources/RTA/RTA_Melani.h"
+#include "sources/RTA/RTA_Narsi19.h"
 
-void AddEntry(string pathRes, int N, double val)
+namespace rt_num_opt
 {
-    ofstream outfileWrite;
-    // string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-    //                  batchOptimizeFolder + "/EnergySaveRatio/N" +
-    //                  to_string(N) + ".txt";
-    outfileWrite.open(pathRes,
-                      std::ios_base::app);
-    outfileWrite << val << endl;
-    outfileWrite.close();
-}
-
-template <class TaskSetType, class Schedul_Analysis>
-void BatchOptimize(int Nn = -1)
-{
-    runMode = "normal";
-    const char *pathDataset;
-    string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" + to_string(Nn) + "/";
-    if (Nn == -1)
-        pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/";
-    else
+    void AddEntry(std::string pathRes, double val)
     {
-        pathDataset = str.c_str();
+        std::ofstream outfileWrite;
+        outfileWrite.open(pathRes,
+                          std::ios_base::app);
+        outfileWrite << val << std::endl;
+        outfileWrite.close();
+    }
+
+    template <class TaskSetType, class Schedul_Analysis>
+    void BatchOptimize(int Nn = -1)
+    {
+        runMode = "normal";
+        const char *pathDataset;
+        std::string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" + std::to_string(Nn) + "/";
+        if (Nn == -1)
+            pathDataset = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/";
+        else
+        {
+            pathDataset = str.c_str();
+            if (debugMode == 1)
+                printf("Directory: %s\n", pathDataset);
+        }
+        std::vector<double> energySaveRatioVec;
+        std::vector<double> runTime;
+        int N;
         if (debugMode == 1)
             printf("Directory: %s\n", pathDataset);
-    }
-    vector<double> energySaveRatioVec;
-    vector<double> runTime;
-    int N;
-    if (debugMode == 1)
-        printf("Directory: %s\n", pathDataset);
-    vector<string> errorFiles;
-    for (const auto &file : ReadFilesInDirectory(pathDataset))
-    {
-        if (debugMode)
-            cout << file << endl;
-        string delimiter = "-";
-        if (file.substr(0, file.find(delimiter)) == "periodic")
+        std::vector<std::string> errorFiles;
+        for (const auto &file : ReadFilesInDirectory(pathDataset))
         {
-            string path = pathDataset + file;
-            TaskSetType tasksN;
-            if (TaskSetType::Type() == "normal")
+            // if (debugMode)
+            std::cout << file << std::endl;
+            std::string delimiter = "-";
+            if (file.substr(0, file.find(delimiter)) == "periodic")
             {
-                auto tasks = ReadTaskSet(path, readTaskMode);
-                tasksN.UpdateTaskSet(tasks);
-                N = tasks.size();
-            }
+                std::string path = pathDataset + file;
+                TaskSetType tasksN;
+                if (TaskSetType::Type() == "normal")
+                {
+                    auto tasks = ReadTaskSet(path, readTaskMode);
+                    tasksN.UpdateTaskSet(tasks);
+                    N = tasks.size();
+                }
+                // else if (TaskSetType::Type() == "dag")
+                // {
+                //     tasksN = ReadDAG_Tasks(path, readTaskMode);
+                //     N = tasksN.tasks_.size();
+                // }
+                else if (TaskSetType::Type() == "Narsi19")
+                {
+                    tasksN = ReadDAGNarsi19_Tasks(path);
+                    N = tasksN.tasks_.size();
+                }
+                else
+                {
+                    CoutError("Unrecognized TaskSetType!");
+                }
 
-            else if (TaskSetType::Type() == "dag")
-            {
-                tasksN = ReadDAG_Tasks(path, readTaskMode);
-                N = tasksN.tasks_.size();
-            }
-            else
-            {
-                CoutError("Unrecognized TaskSetType!");
-            }
-
-            auto start = chrono::high_resolution_clock::now();
-            double res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
-            // cout << "The energy saving ratio is " << res << endl;
-            auto stop = chrono::high_resolution_clock::now();
-            auto duration = duration_cast<microseconds>(stop - start);
-            double timeTaken = double(duration.count()) / 1e6;
-            if (res >= 0 && res <= 1)
-            {
-                energySaveRatioVec.push_back(res);
-                runTime.push_back(timeTaken);
-            }
-            else
-            {
-                errorFiles.push_back(file);
+                auto start = std::chrono::high_resolution_clock::now();
+                double res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
+                // std::cout << "The energy saving ratio is " << res << std::endl;
+                auto stop = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+                double timeTaken = double(duration.count()) / 1e6;
+                if (res >= 0 && res <= 1)
+                {
+                    energySaveRatioVec.push_back(res);
+                    runTime.push_back(timeTaken);
+                }
+                else
+                {
+                    errorFiles.push_back(file);
+                }
             }
         }
-    }
 
-    double avEnergy = -1;
-    double aveTime = -1;
-    int n = runTime.size();
-    if (n != 0)
-    {
-        avEnergy = Average(energySaveRatioVec);
-        aveTime = Average(runTime);
-    }
-    cout << Color::blue << endl;
-    cout << "Average energy saving ratio is " << avEnergy << endl;
-    cout << "Average time consumed is " << aveTime << endl;
-    cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << endl;
+        double avEnergy = -1;
+        double aveTime = -1;
+        int n = runTime.size();
+        if (n != 0)
+        {
+            avEnergy = Average(energySaveRatioVec);
+            aveTime = Average(runTime);
+        }
+        std::cout << Color::blue << std::endl;
+        std::cout << "Average energy saving ratio is " << avEnergy << std::endl;
+        std::cout << "Average time consumed is " << aveTime << std::endl;
+        std::cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << std::endl;
 
-    string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-                     batchOptimizeFolder + "/EnergySaveRatio/N" +
-                     to_string(N) + ".txt";
-    AddEntry(pathRes, N, avEnergy);
-    pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-              batchOptimizeFolder + "/time_task_number.txt";
-    AddEntry(pathRes, N, aveTime);
+        std::string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                              batchOptimizeFolder + "/EnergySaveRatio/N" +
+                              std::to_string(N) + ".txt";
+        AddEntry(pathRes, avEnergy);
+        // old saving path:
+        //  pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+        //       batchOptimizeFolder + "/time_task_number.txt";
+        pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                  batchOptimizeFolder + "/Time/N" +
+                  std::to_string(N) + ".txt";
+        AddEntry(pathRes, aveTime);
 
-    if (printFailureFile)
-    {
-        cout << endl;
-        for (auto &file : errorFiles)
-            cout << file << endl;
+        if (printFailureFile)
+        {
+            std::cout << std::endl;
+            for (auto &file : errorFiles)
+                std::cout << file << std::endl;
+        }
+        // if (debugMode)
+        std::cout << "The total number of optimization failure files is " << errorFiles.size() << std::endl;
+        std::cout << Color::def << std::endl;
+        return;
     }
-    // if (debugMode)
-    cout << "The total number of optimization failure files is " << errorFiles.size() << endl;
-    cout << Color::def << endl;
-    return;
-}
+} // namespace rt_num_opt

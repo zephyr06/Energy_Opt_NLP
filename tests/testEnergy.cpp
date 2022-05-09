@@ -1,7 +1,8 @@
-#include "../sources/Energy.h"
-#include "../sources/Declaration.h"
-#include "../sources/testMy.h"
-
+#include "sources/EnergyOptimization/Energy.h"
+#include "sources/MatirxConvenient.h"
+#include "sources/Tools/testMy.h"
+using namespace rt_num_opt;
+using namespace std;
 TEST(energy, tasks)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N3.csv";
@@ -46,7 +47,7 @@ TEST(GetFrequency, tasks2)
     comp << 17 * 2, 12, 253;
     UpdateTaskSetExecutionTime(tasks, comp);
 
-    AssertEqualScalar(0.9 / 1.9, GetFrequency(tasks[0]));
+    AssertEqualScalar(0.9 / 1.9, GetFrequency(tasks[0]), 1e-6, __LINE__);
 }
 TEST(Jacobian, v1)
 {
