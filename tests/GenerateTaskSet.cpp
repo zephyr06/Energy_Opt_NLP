@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
                                                  periodCurr, deadlineType));
             }
 
-            string fileName = "periodic-dag-Narsi-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".yaml";
+            string fileName = "periodic-dag-Narsi-set-" + to_string(N) + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".yaml";
 
             if (schedulabilityCheck)
             {

@@ -321,7 +321,12 @@ namespace rt_num_opt
                     continue;
                 }
                 tasksCurr.tasks_[i].executionTime += eliminateTolIte;
-
+                if (enableMaxComputationTimeRestrict &&
+                    tasksCurr.tasks_[i].executionTime - eliminateTolIte > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict)
+                {
+                    EndTimer(__func__);
+                    return i;
+                }
                 // we cannot use a more strict criteria in detecting schedulability,
                 //  because it may trigger early detection of termination
 

@@ -35,9 +35,9 @@ clampTypeMiddle: "none"
 punishmentInBarrier: 1e8
 
 noiseModelSigma: 1e0
-relativeErrorToleranceInit: 1e-4
-relativeErrorTolerance: 1e-4
-relativeErrorToleranceMin: 1e-4
+relativeErrorToleranceInit: 1e-3
+relativeErrorTolerance: 1e-3
+relativeErrorToleranceMin: 1e-3
 relErrorTolIPM: 1e-5
 toleranceBarrier: 1e-6
 
@@ -65,7 +65,7 @@ MaxLoopControl: 1e4
 exactJacobian: 0
 utilTol: 1e-3
 debugMode: 0
-verbosityLM: "SILENT"
+verbosityLM: "SUMMARY"
 linearOptimizerType: "MULTIFRONTAL_CHOLESKY"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
@@ -81,10 +81,10 @@ LLCompareWithGeneralizedElimination: 0
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0
 
-maxNode_GenerateTaskSet: 20
+maxNode_GenerateTaskSet: 10
 parallelFactor: 0.2
 PeriodSetAM: [1,2,5,10,20,50,200,1000]
 timeScaleFactor: 1e4
 whetherWriteNarsiTaskSet: 0
 SpeedOptimizeOption: 1
-SkipRateFindElimination: 0.5
+SkipRateFindElimination: 0.0

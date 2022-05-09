@@ -2,8 +2,8 @@
 
 # ************** Adjust settings there **************
 title="DAGPerformance"
-MinTaskNumber=10
-MaxTaskNumber=10
+MinTaskNumber=3
+MaxTaskNumber=4
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
@@ -31,15 +31,15 @@ do
 	
 	echo "$title iteration is: $jobNumber"
 	
-	# dog-leg, eliminated, approximated Jacobian
-    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
+	# LM, eliminated, approximated Jacobian
+    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 1000
 	perform_optimization $jobNumber
 	
-	# dog-leg, not eliminated, exact Jacobian
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
+	# LM, not eliminated, approximated Jacobian
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 0
 	perform_optimization $jobNumber
 	

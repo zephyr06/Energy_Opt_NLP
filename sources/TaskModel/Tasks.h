@@ -34,7 +34,7 @@ namespace rt_num_opt
     double RandRange(double a, double b)
     {
         if (b < a)
-            CoutError("Range Error in RandRange");
+            CoutError("Range Error in RandRange, " + std::to_string(a) + ", " + std::to_string(b));
         return a + (b - a) * double(rand()) / RAND_MAX;
     }
 
