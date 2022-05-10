@@ -29,6 +29,15 @@ namespace rt_num_opt
         outfileWrite << timeTaken << std::endl;
         outfileWrite.close();
     }
+    std::pair<double, double> ReadFromResultFile(const std::string &pathDataset, const std::string &file)
+    {
+        std::string resFile = GetResFileName(pathDataset, file);
+        std::ifstream cResultFile(fileName.data());
+        double timeTaken = 0, res = 0;
+        cResultFile >> res >> timeTaken;
+        cResultFile.close();
+        return std::make_pair(res, timeTaken);
+    }
 
     bool VerifyResFileExist(const std::string &pathDataset, const std::string &file)
     {
@@ -72,40 +81,47 @@ namespace rt_num_opt
             std::string delimiter = "-";
             if (file.substr(0, file.find(delimiter)) == "periodic")
             {
-
+                double res;
+                double timeTaken;
                 if (VerifyResFileExist(pathDataset, file)) // already optimized
                 {
-                    continue;
-                }
-                std::string path = pathDataset + file;
-                TaskSetType tasksN;
-                if (TaskSetType::Type() == "normal")
-                {
-                    auto tasks = ReadTaskSet(path, readTaskMode);
-                    tasksN.UpdateTaskSet(tasks);
-                    N = tasks.size();
-                }
-                // else if (TaskSetType::Type() == "dag")
-                // {
-                //     tasksN = ReadDAG_Tasks(path, readTaskMode);
-                //     N = tasksN.tasks_.size();
-                // }
-                else if (TaskSetType::Type() == "Narsi19")
-                {
-                    tasksN = ReadDAGNarsi19_Tasks(path);
-                    N = Nn;
+                    auto p = ReadFromResultFile(pathDataset, file);
+                    res = p.first;
+                    timeTaken = p.second;
                 }
                 else
                 {
-                    CoutError("Unrecognized TaskSetType!");
+                    std::string path = pathDataset + file;
+                    TaskSetType tasksN;
+                    if (TaskSetType::Type() == "normal")
+                    {
+                        auto tasks = ReadTaskSet(path, readTaskMode);
+                        tasksN.UpdateTaskSet(tasks);
+                        N = tasks.size();
+                    }
+                    // else if (TaskSetType::Type() == "dag")
+                    // {
+                    //     tasksN = ReadDAG_Tasks(path, readTaskMode);
+                    //     N = tasksN.tasks_.size();
+                    // }
+                    else if (TaskSetType::Type() == "Narsi19")
+                    {
+                        tasksN = ReadDAGNarsi19_Tasks(path);
+                        N = Nn;
+                    }
+                    else
+                    {
+                        CoutError("Unrecognized TaskSetType!");
+                    }
+
+                    auto start = std::chrono::high_resolution_clock::now();
+                    double res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
+                    // std::cout << "The energy saving ratio is " << res << std::endl;
+                    auto stop = std::chrono::high_resolution_clock::now();
+                    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+                    double timeTaken = double(duration.count()) / 1e6;
                 }
 
-                auto start = std::chrono::high_resolution_clock::now();
-                double res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
-                // std::cout << "The energy saving ratio is " << res << std::endl;
-                auto stop = std::chrono::high_resolution_clock::now();
-                auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-                double timeTaken = double(duration.count()) / 1e6;
                 WriteToResultFile(pathDataset, file, res, timeTaken);
                 if (res >= 0 && res <= 1)
                 {
