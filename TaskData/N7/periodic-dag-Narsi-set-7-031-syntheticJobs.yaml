@@ -1,0 +1,149 @@
+tasks:
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 95
+      - id: 1
+        executionTime: 1221
+      - id: 2
+        executionTime: 2709
+      - id: 3
+        executionTime: 1092
+      - id: 4
+        executionTime: 1483
+      - id: 5
+        executionTime: 3402
+      - id: 6
+        executionTime: 1357
+      - id: 7
+        executionTime: 1520
+    edges:
+      - from: 1
+        to: 4
+      - from: 1
+        to: 5
+      - from: 1
+        to: 6
+      - from: 3
+        to: 7
+      - from: 4
+        to: 6
+      - from: 6
+        to: 7
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 1853
+      - id: 1
+        executionTime: 1277
+      - id: 2
+        executionTime: 5250
+      - id: 3
+        executionTime: 3176
+      - id: 4
+        executionTime: 707
+      - id: 5
+        executionTime: 5112
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 3
+      - from: 1
+        to: 4
+      - from: 2
+        to: 5
+      - from: 3
+        to: 4
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 153
+      - id: 1
+        executionTime: 1424
+    edges: ~
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 513
+      - id: 1
+        executionTime: 604
+      - id: 2
+        executionTime: 70
+      - id: 3
+        executionTime: 1014
+      - id: 4
+        executionTime: 317
+      - id: 5
+        executionTime: 551
+      - id: 6
+        executionTime: 378
+      - id: 7
+        executionTime: 1941
+    edges:
+      - from: 0
+        to: 4
+      - from: 0
+        to: 5
+      - from: 2
+        to: 3
+      - from: 2
+        to: 4
+      - from: 3
+        to: 4
+      - from: 3
+        to: 5
+      - from: 3
+        to: 7
+  - deadline: 10000
+    period: 10000
+    vertices:
+      - id: 0
+        executionTime: 719
+      - id: 1
+        executionTime: 143
+      - id: 2
+        executionTime: 4
+      - id: 3
+        executionTime: 33
+      - id: 4
+        executionTime: 203
+    edges: ~
+  - deadline: 1000000
+    period: 1000000
+    vertices:
+      - id: 0
+        executionTime: 24532
+      - id: 1
+        executionTime: 137136
+    edges: ~
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 4696
+      - id: 1
+        executionTime: 1833
+      - id: 2
+        executionTime: 3399
+      - id: 3
+        executionTime: 5079
+      - id: 4
+        executionTime: 3306
+      - id: 5
+        executionTime: 2606
+      - id: 6
+        executionTime: 8698
+    edges:
+      - from: 0
+        to: 6
+      - from: 1
+        to: 5
+      - from: 2
+        to: 6
+      - from: 4
+        to: 5

@@ -1,0 +1,105 @@
+tasks:
+  - deadline: 200000
+    period: 200000
+    vertices:
+      - id: 0
+        executionTime: 9191
+      - id: 1
+        executionTime: 1957
+      - id: 2
+        executionTime: 3142
+      - id: 3
+        executionTime: 2480
+      - id: 4
+        executionTime: 22340
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 4
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 11069
+      - id: 1
+        executionTime: 1902
+      - id: 2
+        executionTime: 2000
+    edges:
+      - from: 0
+        to: 2
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 47319
+      - id: 1
+        executionTime: 113
+      - id: 2
+        executionTime: 44065
+      - id: 3
+        executionTime: 30030
+      - id: 4
+        executionTime: 9773
+      - id: 5
+        executionTime: 57859
+      - id: 6
+        executionTime: 285359
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 2
+      - from: 2
+        to: 5
+      - from: 3
+        to: 6
+  - deadline: 1000000
+    period: 1000000
+    vertices:
+      - id: 0
+        executionTime: 75280
+      - id: 1
+        executionTime: 6216
+      - id: 2
+        executionTime: 3118
+      - id: 3
+        executionTime: 8659
+    edges:
+      - from: 0
+        to: 2
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 4450
+      - id: 1
+        executionTime: 1018
+      - id: 2
+        executionTime: 476
+      - id: 3
+        executionTime: 373
+      - id: 4
+        executionTime: 1469
+      - id: 5
+        executionTime: 2499
+    edges:
+      - from: 0
+        to: 3
+      - from: 1
+        to: 4
+      - from: 2
+        to: 5
+  - deadline: 200000
+    period: 200000
+    vertices:
+      - id: 0
+        executionTime: 3014
+      - id: 1
+        executionTime: 49515
+      - id: 2
+        executionTime: 19428
+    edges:
+      - from: 1
+        to: 2

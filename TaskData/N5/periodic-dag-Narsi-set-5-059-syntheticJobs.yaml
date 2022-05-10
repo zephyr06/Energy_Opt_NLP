@@ -1,0 +1,107 @@
+tasks:
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 120
+      - id: 1
+        executionTime: 248
+      - id: 2
+        executionTime: 406
+    edges:
+      - from: 1
+        to: 2
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 469
+      - id: 1
+        executionTime: 276
+      - id: 2
+        executionTime: 2042
+      - id: 3
+        executionTime: 954
+      - id: 4
+        executionTime: 2951
+      - id: 5
+        executionTime: 1665
+      - id: 6
+        executionTime: 18469
+    edges:
+      - from: 0
+        to: 4
+      - from: 1
+        to: 3
+      - from: 2
+        to: 4
+      - from: 2
+        to: 5
+      - from: 2
+        to: 6
+      - from: 3
+        to: 4
+      - from: 3
+        to: 6
+  - deadline: 1000000
+    period: 1000000
+    vertices:
+      - id: 0
+        executionTime: 19805
+      - id: 1
+        executionTime: 30216
+      - id: 2
+        executionTime: 23540
+      - id: 3
+        executionTime: 1894
+      - id: 4
+        executionTime: 5447
+      - id: 5
+        executionTime: 1259
+      - id: 6
+        executionTime: 29055
+      - id: 7
+        executionTime: 306
+      - id: 8
+        executionTime: 7382
+      - id: 9
+        executionTime: 104936
+    edges:
+      - from: 0
+        to: 2
+      - from: 0
+        to: 6
+      - from: 2
+        to: 4
+      - from: 3
+        to: 8
+      - from: 5
+        to: 9
+      - from: 6
+        to: 8
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 359
+      - id: 1
+        executionTime: 85
+      - id: 2
+        executionTime: 350
+    edges:
+      - from: 0
+        to: 1
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 17797
+      - id: 1
+        executionTime: 21060
+      - id: 2
+        executionTime: 6453
+      - id: 3
+        executionTime: 35500
+    edges:
+      - from: 1
+        to: 3

@@ -1,0 +1,111 @@
+tasks:
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 1824
+      - id: 1
+        executionTime: 477
+      - id: 2
+        executionTime: 489
+      - id: 3
+        executionTime: 174
+      - id: 4
+        executionTime: 735
+      - id: 5
+        executionTime: 180
+      - id: 6
+        executionTime: 4999
+    edges:
+      - from: 0
+        to: 2
+      - from: 4
+        to: 5
+      - from: 5
+        to: 6
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 39
+      - id: 1
+        executionTime: 31
+      - id: 2
+        executionTime: 11
+      - id: 3
+        executionTime: 7
+      - id: 4
+        executionTime: 43
+      - id: 5
+        executionTime: 1
+      - id: 6
+        executionTime: 3
+      - id: 7
+        executionTime: 3
+      - id: 8
+        executionTime: 11
+      - id: 9
+        executionTime: 47
+    edges:
+      - from: 0
+        to: 5
+      - from: 1
+        to: 6
+      - from: 1
+        to: 8
+      - from: 3
+        to: 9
+      - from: 4
+        to: 7
+      - from: 5
+        to: 6
+      - from: 5
+        to: 7
+      - from: 6
+        to: 9
+      - from: 7
+        to: 9
+      - from: 8
+        to: 9
+  - deadline: 1000000
+    period: 1000000
+    vertices:
+      - id: 0
+        executionTime: 70297
+      - id: 1
+        executionTime: 38909
+      - id: 2
+        executionTime: 203823
+      - id: 3
+        executionTime: 62473
+    edges:
+      - from: 1
+        to: 2
+  - deadline: 200000
+    period: 200000
+    vertices:
+      - id: 0
+        executionTime: 4261
+      - id: 1
+        executionTime: 17028
+      - id: 2
+        executionTime: 4442
+      - id: 3
+        executionTime: 14160
+      - id: 4
+        executionTime: 4626
+      - id: 5
+        executionTime: 21805
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 3
+      - from: 0
+        to: 4
+      - from: 0
+        to: 5
+      - from: 1
+        to: 2
+      - from: 3
+        to: 5

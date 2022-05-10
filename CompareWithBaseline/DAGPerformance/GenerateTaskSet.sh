@@ -15,6 +15,6 @@ do
 	do
 	totalTaskSetNumber=$(echo $util*150 | bc)
 	echo ${totalTaskSetNumber%.*}
-	./tests/GenerateTaskSet --taskSetNumber $totalTaskSetNumber --taskType 2 --schedulabilityCheck 2 --clearBeforeAdd 0 --deadlineType 0 --totalUtilization $util --N $jobNumber 
+	./tests/GenerateTaskSet --taskSetNumber ${totalTaskSetNumber%.*} --taskType 2 --schedulabilityCheck 2 --clearBeforeAdd 0 --deadlineType 0 --totalUtilization $util --N $jobNumber 
 	done
 done

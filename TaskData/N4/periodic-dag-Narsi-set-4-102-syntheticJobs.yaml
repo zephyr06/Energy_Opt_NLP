@@ -1,0 +1,107 @@
+tasks:
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 63434
+      - id: 1
+        executionTime: 103212
+      - id: 2
+        executionTime: 21
+      - id: 3
+        executionTime: 12462
+      - id: 4
+        executionTime: 9598
+      - id: 5
+        executionTime: 105712
+      - id: 6
+        executionTime: 162712
+    edges:
+      - from: 1
+        to: 3
+      - from: 1
+        to: 6
+      - from: 4
+        to: 5
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 1120
+      - id: 1
+        executionTime: 1036
+      - id: 2
+        executionTime: 3344
+      - id: 3
+        executionTime: 267
+      - id: 4
+        executionTime: 531
+      - id: 5
+        executionTime: 990
+      - id: 6
+        executionTime: 53
+      - id: 7
+        executionTime: 14
+      - id: 8
+        executionTime: 6981
+    edges:
+      - from: 1
+        to: 3
+      - from: 1
+        to: 7
+      - from: 1
+        to: 8
+      - from: 2
+        to: 3
+      - from: 2
+        to: 7
+      - from: 4
+        to: 5
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 15197
+      - id: 1
+        executionTime: 205
+      - id: 2
+        executionTime: 442
+      - id: 3
+        executionTime: 2199
+      - id: 4
+        executionTime: 1745
+      - id: 5
+        executionTime: 1129
+      - id: 6
+        executionTime: 719
+      - id: 7
+        executionTime: 41939
+    edges:
+      - from: 0
+        to: 5
+      - from: 1
+        to: 2
+      - from: 2
+        to: 7
+      - from: 3
+        to: 5
+      - from: 5
+        to: 7
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 30076
+      - id: 1
+        executionTime: 6019
+      - id: 2
+        executionTime: 2767
+      - id: 3
+        executionTime: 53282
+      - id: 4
+        executionTime: 10792
+      - id: 5
+        executionTime: 44232
+    edges:
+      - from: 2
+        to: 3

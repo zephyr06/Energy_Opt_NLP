@@ -1,0 +1,111 @@
+tasks:
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 2946
+      - id: 1
+        executionTime: 3119
+      - id: 2
+        executionTime: 1244
+      - id: 3
+        executionTime: 325
+      - id: 4
+        executionTime: 395
+      - id: 5
+        executionTime: 68
+      - id: 6
+        executionTime: 3771
+    edges:
+      - from: 2
+        to: 5
+      - from: 3
+        to: 4
+      - from: 4
+        to: 6
+  - deadline: 1000000
+    period: 1000000
+    vertices:
+      - id: 0
+        executionTime: 8141
+      - id: 1
+        executionTime: 1660
+      - id: 2
+        executionTime: 1070
+      - id: 3
+        executionTime: 3908
+      - id: 4
+        executionTime: 30081
+    edges:
+      - from: 0
+        to: 2
+      - from: 1
+        to: 2
+      - from: 1
+        to: 3
+      - from: 1
+        to: 4
+      - from: 2
+        to: 4
+  - deadline: 20000
+    period: 20000
+    vertices:
+      - id: 0
+        executionTime: 82
+      - id: 1
+        executionTime: 4
+      - id: 2
+        executionTime: 153
+      - id: 3
+        executionTime: 180
+      - id: 4
+        executionTime: 42
+      - id: 5
+        executionTime: 570
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 2
+      - from: 0
+        to: 4
+      - from: 1
+        to: 3
+      - from: 2
+        to: 3
+      - from: 3
+        to: 5
+      - from: 4
+        to: 5
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 21
+      - id: 1
+        executionTime: 1632
+      - id: 2
+        executionTime: 12
+      - id: 3
+        executionTime: 641
+      - id: 4
+        executionTime: 396
+      - id: 5
+        executionTime: 597
+    edges:
+      - from: 0
+        to: 2
+      - from: 0
+        to: 3
+      - from: 1
+        to: 3
+      - from: 1
+        to: 5
+      - from: 2
+        to: 3
+      - from: 3
+        to: 4
+      - from: 3
+        to: 5
+      - from: 4
+        to: 5

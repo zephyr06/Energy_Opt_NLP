@@ -1,0 +1,119 @@
+tasks:
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 1129
+      - id: 1
+        executionTime: 799
+      - id: 2
+        executionTime: 3007
+      - id: 3
+        executionTime: 265
+      - id: 4
+        executionTime: 757
+      - id: 5
+        executionTime: 751
+      - id: 6
+        executionTime: 3517
+    edges:
+      - from: 1
+        to: 3
+      - from: 1
+        to: 6
+      - from: 2
+        to: 5
+      - from: 3
+        to: 5
+      - from: 3
+        to: 6
+      - from: 4
+        to: 5
+      - from: 5
+        to: 6
+  - deadline: 200000
+    period: 200000
+    vertices:
+      - id: 0
+        executionTime: 16728
+      - id: 1
+        executionTime: 2720
+      - id: 2
+        executionTime: 7694
+      - id: 3
+        executionTime: 1846
+      - id: 4
+        executionTime: 4848
+      - id: 5
+        executionTime: 634
+      - id: 6
+        executionTime: 272
+      - id: 7
+        executionTime: 777
+      - id: 8
+        executionTime: 25117
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 6
+      - from: 0
+        to: 8
+      - from: 1
+        to: 4
+      - from: 2
+        to: 3
+      - from: 3
+        to: 7
+      - from: 4
+        to: 5
+      - from: 4
+        to: 7
+      - from: 5
+        to: 7
+      - from: 5
+        to: 8
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 963
+      - id: 1
+        executionTime: 1438
+      - id: 2
+        executionTime: 343
+      - id: 3
+        executionTime: 3634
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 2
+      - from: 0
+        to: 3
+      - from: 1
+        to: 3
+      - from: 2
+        to: 3
+  - deadline: 10000
+    period: 10000
+    vertices:
+      - id: 0
+        executionTime: 82
+      - id: 1
+        executionTime: 40
+      - id: 2
+        executionTime: 71
+      - id: 3
+        executionTime: 81
+      - id: 4
+        executionTime: 360
+    edges:
+      - from: 0
+        to: 2
+      - from: 0
+        to: 3
+      - from: 1
+        to: 3
+      - from: 2
+        to: 4

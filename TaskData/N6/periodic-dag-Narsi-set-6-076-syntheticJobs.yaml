@@ -1,0 +1,105 @@
+tasks:
+  - deadline: 200000
+    period: 200000
+    vertices:
+      - id: 0
+        executionTime: 11030
+      - id: 1
+        executionTime: 2349
+      - id: 2
+        executionTime: 3771
+      - id: 3
+        executionTime: 2977
+      - id: 4
+        executionTime: 26808
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 4
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 13283
+      - id: 1
+        executionTime: 2282
+      - id: 2
+        executionTime: 2400
+    edges:
+      - from: 0
+        to: 2
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 49860
+      - id: 1
+        executionTime: 119
+      - id: 2
+        executionTime: 46431
+      - id: 3
+        executionTime: 31642
+      - id: 4
+        executionTime: 10298
+      - id: 5
+        executionTime: 60966
+      - id: 6
+        executionTime: 300682
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 2
+      - from: 2
+        to: 5
+      - from: 3
+        to: 6
+  - deadline: 1000000
+    period: 1000000
+    vertices:
+      - id: 0
+        executionTime: 109138
+      - id: 1
+        executionTime: 9011
+      - id: 2
+        executionTime: 4521
+      - id: 3
+        executionTime: 12554
+    edges:
+      - from: 0
+        to: 2
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 6452
+      - id: 1
+        executionTime: 1477
+      - id: 2
+        executionTime: 690
+      - id: 3
+        executionTime: 541
+      - id: 4
+        executionTime: 2130
+      - id: 5
+        executionTime: 3623
+    edges:
+      - from: 0
+        to: 3
+      - from: 1
+        to: 4
+      - from: 2
+        to: 5
+  - deadline: 200000
+    period: 200000
+    vertices:
+      - id: 0
+        executionTime: 4370
+      - id: 1
+        executionTime: 71784
+      - id: 2
+        executionTime: 28167
+    edges:
+      - from: 1
+        to: 2

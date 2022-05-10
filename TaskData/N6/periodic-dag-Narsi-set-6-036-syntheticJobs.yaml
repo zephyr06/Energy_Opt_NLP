@@ -1,0 +1,109 @@
+tasks:
+  - deadline: 20000
+    period: 20000
+    vertices:
+      - id: 0
+        executionTime: 1454
+      - id: 1
+        executionTime: 866
+      - id: 2
+        executionTime: 1061
+      - id: 3
+        executionTime: 2705
+      - id: 4
+        executionTime: 37
+      - id: 5
+        executionTime: 8
+      - id: 6
+        executionTime: 2799
+      - id: 7
+        executionTime: 23
+      - id: 8
+        executionTime: 3507
+    edges:
+      - from: 1
+        to: 2
+      - from: 1
+        to: 5
+      - from: 1
+        to: 6
+      - from: 2
+        to: 3
+      - from: 2
+        to: 7
+      - from: 4
+        to: 6
+      - from: 6
+        to: 8
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 1067
+      - id: 1
+        executionTime: 3220
+    edges: ~
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 6656
+      - id: 1
+        executionTime: 24182
+    edges: ~
+  - deadline: 20000
+    period: 20000
+    vertices:
+      - id: 0
+        executionTime: 5
+      - id: 1
+        executionTime: 25
+      - id: 2
+        executionTime: 3
+      - id: 3
+        executionTime: 32
+      - id: 4
+        executionTime: 8
+      - id: 5
+        executionTime: 126
+    edges:
+      - from: 0
+        to: 3
+      - from: 2
+        to: 3
+      - from: 2
+        to: 5
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 1642
+      - id: 1
+        executionTime: 1351
+      - id: 2
+        executionTime: 4668
+    edges: ~
+  - deadline: 200000
+    period: 200000
+    vertices:
+      - id: 0
+        executionTime: 3119
+      - id: 1
+        executionTime: 13279
+      - id: 2
+        executionTime: 1209
+      - id: 3
+        executionTime: 3099
+      - id: 4
+        executionTime: 900
+      - id: 5
+        executionTime: 40174
+    edges:
+      - from: 0
+        to: 3
+      - from: 2
+        to: 3
+      - from: 2
+        to: 4
+      - from: 3
+        to: 4

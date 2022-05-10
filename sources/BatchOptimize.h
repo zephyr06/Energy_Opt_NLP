@@ -58,7 +58,7 @@ namespace rt_num_opt
                 else if (TaskSetType::Type() == "Narsi19")
                 {
                     tasksN = ReadDAGNarsi19_Tasks(path);
-                    N = tasksN.tasks_.size();
+                    N = Nn;
                 }
                 else
                 {

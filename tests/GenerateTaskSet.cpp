@@ -46,15 +46,15 @@ int main(int argc, char *argv[])
     program.add_argument("-v", "--verbose"); // parameter packing
 
     program.add_argument("--N")
-        .default_value(5)
+        .default_value(3)
         .help("the number of tasks in DAG")
         .scan<'i', int>();
     program.add_argument("--taskSetNumber")
-        .default_value(10)
+        .default_value(30)
         .help("the number DAGs to create")
         .scan<'i', int>();
     program.add_argument("--totalUtilization")
-        .default_value(0.4)
+        .default_value(0.7)
         .help("the total utilization of tasks in each DAG")
         .scan<'f', double>();
     program.add_argument("--NumberOfProcessor")
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         .help("type of deadline, 0 means implicit, 1 means random")
         .scan<'i', int>();
     program.add_argument("--taskType")
-        .default_value(1)
+        .default_value(2)
         .help("type of tasksets, 0 means normal, 1 means DAG")
         .scan<'i', int>();
     program.add_argument("--schedulabilityCheck")

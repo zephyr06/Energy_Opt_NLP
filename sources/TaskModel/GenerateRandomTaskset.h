@@ -24,9 +24,13 @@ namespace rt_num_opt
             nextU = sumU * pow(double(rand()) / RAND_MAX, 1.0 / (N - 1));
             if (boundU)
             {
-                nextU = std::min(1.0, nextU);
+                utilVec[i - 1] = std::min(1.0, sumU - nextU);
+                nextU += std::max(0.0, sumU - nextU - 1.0);
             }
-            utilVec[i - 1] = sumU - nextU;
+            else
+            {
+                utilVec[i - 1] = sumU - nextU;
+            }
             sumU = nextU;
         }
         utilVec[N - 1] = nextU;
@@ -49,7 +53,7 @@ namespace rt_num_opt
             double deadline = periodCurr;
             if (deadlineType == 1)
             {
-                if (ceil(periodCurr * utilVec[i]) < periodCurr)
+                if (ceil(periodCurr * utilVec[i]) <= periodCurr)
                 {
                     deadline = RandRange(ceil(periodCurr * utilVec[i]), periodCurr);
                 }
@@ -62,7 +66,7 @@ namespace rt_num_opt
             double randomRatio = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
             Task task(0, periodCurr,
                       ceil(periodCurr * utilVec[i]) * 0.1 * randomRatio,
-                      ceil(periodCurr * utilVec[i]),
+                      std::max(1.0, floor(periodCurr * utilVec[i])),
                       deadline, i,
                       rand() % numberOfProcessor);
             tasks.push_back(task);

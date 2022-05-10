@@ -1,0 +1,111 @@
+tasks:
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 12701
+      - id: 1
+        executionTime: 8122
+      - id: 2
+        executionTime: 19921
+      - id: 3
+        executionTime: 2025
+      - id: 4
+        executionTime: 2227
+      - id: 5
+        executionTime: 2540
+      - id: 6
+        executionTime: 4372
+      - id: 7
+        executionTime: 25890
+    edges:
+      - from: 0
+        to: 4
+      - from: 1
+        to: 2
+      - from: 1
+        to: 4
+      - from: 3
+        to: 4
+      - from: 3
+        to: 5
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 5645
+      - id: 1
+        executionTime: 7769
+      - id: 2
+        executionTime: 14640
+    edges:
+      - from: 0
+        to: 1
+      - from: 1
+        to: 2
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 958
+      - id: 1
+        executionTime: 90
+      - id: 2
+        executionTime: 168
+      - id: 3
+        executionTime: 539
+      - id: 4
+        executionTime: 2403
+      - id: 5
+        executionTime: 222
+      - id: 6
+        executionTime: 921
+      - id: 7
+        executionTime: 63
+      - id: 8
+        executionTime: 449
+      - id: 9
+        executionTime: 3276
+    edges:
+      - from: 1
+        to: 2
+      - from: 1
+        to: 5
+      - from: 1
+        to: 7
+      - from: 2
+        to: 7
+      - from: 3
+        to: 5
+      - from: 4
+        to: 5
+      - from: 4
+        to: 7
+      - from: 4
+        to: 8
+      - from: 5
+        to: 6
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 2243
+      - id: 1
+        executionTime: 304
+      - id: 2
+        executionTime: 612
+      - id: 3
+        executionTime: 84
+      - id: 4
+        executionTime: 543
+      - id: 5
+        executionTime: 1078
+    edges:
+      - from: 0
+        to: 5
+      - from: 3
+        to: 4
+      - from: 3
+        to: 5
+      - from: 4
+        to: 5
