@@ -15,6 +15,36 @@ namespace rt_num_opt
         outfileWrite.close();
     }
 
+    inline std::string GetResFileName(const std::string &pathDataset, const std::string &file)
+    {
+        return pathDataset + file + "_Res.txt";
+    }
+    void WriteToResultFile(const std::string &pathDataset, const std::string &file, double res, double timeTaken)
+    {
+        std::string resFile = GetResFileName(pathDataset, file);
+        std::ofstream outfileWrite;
+        outfileWrite.open(resFile,
+                          std::ios_base::app);
+        outfileWrite << res << std::endl;
+        outfileWrite << timeTaken << std::endl;
+        outfileWrite.close();
+    }
+
+    bool VerifyResFileExist(const std::string &pathDataset, const std::string &file)
+    {
+        std::string resFile = GetResFileName(pathDataset, file);
+        std::ifstream myfile;
+        myfile.open(resFile);
+        if (myfile)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     template <class TaskSetType, class Schedul_Analysis>
     void BatchOptimize(int Nn = -1)
     {
@@ -42,6 +72,11 @@ namespace rt_num_opt
             std::string delimiter = "-";
             if (file.substr(0, file.find(delimiter)) == "periodic")
             {
+
+                if (VerifyResFileExist(pathDataset, file)) // already optimized
+                {
+                    continue;
+                }
                 std::string path = pathDataset + file;
                 TaskSetType tasksN;
                 if (TaskSetType::Type() == "normal")
@@ -71,6 +106,7 @@ namespace rt_num_opt
                 auto stop = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
                 double timeTaken = double(duration.count()) / 1e6;
+                WriteToResultFile(pathDataset, file, res, timeTaken);
                 if (res >= 0 && res <= 1)
                 {
                     energySaveRatioVec.push_back(res);
