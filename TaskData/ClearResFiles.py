@@ -38,5 +38,5 @@ if __name__ == "__main__":
         taskData=root+pathDataset
         for f in os.listdir(taskData):
             if(f[0]=='N' and (not ("." in f))):
-                clear_dataset(root +pathDataset+f)
+                clear_dataset(root +pathDataset+f+"/")
 

@@ -77,10 +77,10 @@ namespace rt_num_opt
         for (const auto &file : ReadFilesInDirectory(pathDataset))
         {
             // if (debugMode)
-            std::cout << file << std::endl;
             std::string delimiter = "-";
-            if (file.substr(0, file.find(delimiter)) == "periodic")
+            if (file.substr(0, file.find(delimiter)) == "periodic" && file.substr(file.length() - 4, 4) != ".txt")
             {
+                std::cout << file << std::endl;
                 double res;
                 double timeTaken;
                 if (VerifyResFileExist(pathDataset, file)) // already optimized

@@ -3,13 +3,14 @@
 # ************** Adjust settings there **************
 title="DAGPerformance"
 MinTaskNumber=3
-MaxTaskNumber=5
+MaxTaskNumber=3
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 # clear buffer file content
 cd $ROOT_PATH/CompareWithBaseline
+python $ROOT_PATH/TaskData/ClearResFiles.py
 python clear_result_files.py  --folder $title
 
 python edit_yaml.py --entry "batchOptimizeFolder" --value $title
