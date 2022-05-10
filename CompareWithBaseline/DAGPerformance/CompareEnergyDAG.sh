@@ -13,7 +13,7 @@ cd $ROOT_PATH/CompareWithBaseline
 python clear_result_files.py  --folder $title
 
 python edit_yaml.py --entry "batchOptimizeFolder" --value $title
-python edit_yaml.py --entry "core_m_dag" --value 16
+python edit_yaml.py --entry "core_m_dag" --value 4
 
 perform_optimization() {
 	# Optimize energy consumption

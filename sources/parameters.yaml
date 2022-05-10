@@ -16,7 +16,7 @@ printFailureFile: 1
 printRTA: 0
 readTaskMode: RM
 batchOptimizeFolder: DAGPerformance
-core_m_dag: 16
+core_m_dag: 4
 baselineLLCompare: 1
 
 enableMaxComputationTimeRestrict: 1
@@ -65,7 +65,7 @@ MaxLoopControl: 1e4
 exactJacobian: 1
 utilTol: 1e-3
 debugMode: 0
-verbosityLM: "SUMMARY"
+verbosityLM: "SILENT"
 linearOptimizerType: "MULTIFRONTAL_CHOLESKY"
 # all the weight parameters used in control experiment
 weightEnergy: 1e9 # used in first formulation only
@@ -81,10 +81,10 @@ LLCompareWithGeneralizedElimination: 0
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 enableReorder: 0
 
-maxNode_GenerateTaskSet: 10
+maxNode_GenerateTaskSet: 20
 parallelFactor: 0.2
-PeriodSetAM: [1,2,5,10,20,50,200,1000]
+PeriodSetAM: [1,2,5,10,20,50]
 timeScaleFactor: 1e4
 whetherWriteNarsiTaskSet: 0
-SpeedOptimizeOption: 1
+SpeedOptimizeOption: 0
 SkipRateFindElimination: 0.0
