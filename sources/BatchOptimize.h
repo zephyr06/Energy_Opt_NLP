@@ -32,7 +32,7 @@ namespace rt_num_opt
     std::pair<double, double> ReadFromResultFile(const std::string &pathDataset, const std::string &file)
     {
         std::string resFile = GetResFileName(pathDataset, file);
-        std::ifstream cResultFile(fileName.data());
+        std::ifstream cResultFile(resFile.data());
         double timeTaken = 0, res = 0;
         cResultFile >> res >> timeTaken;
         cResultFile.close();
