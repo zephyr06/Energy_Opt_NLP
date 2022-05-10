@@ -2,10 +2,10 @@ import argparse
 import os
 import sys
 
-def clear_dataset(path_dataset):
+def clear_dataset(path_dataset, all):
     files_periodic = []
     for f in os.listdir(path_dataset):
-        if ("_Res.txt" in f):
+        if ("_Res.txt" in f or all>0):
             task_path = os.path.join(path_dataset, f)
             os.remove(task_path)
 
@@ -22,6 +22,9 @@ if __name__ == "__main__":
     parser.add_argument('--root', type=str,
                         default='/home/zephyr/Programming/Energy_Opt_NLP/',
                         help='O')
+    parser.add_argument('--all', type=int,
+                        default='0',
+                        help='whether clear all the files')
     # parser.add_argument('--directoryWriteTo', type=str,
     #                     default='EnergySpeed',
     #                     help='O')
@@ -30,6 +33,7 @@ if __name__ == "__main__":
     root = args.root
     pathDataset=args.pathDataset
     taskSize=args.taskSize
+    all=args.all
 
     if(taskSize>0):
         target_dir = root +pathDataset+ "N/"+str(taskSize)
@@ -38,5 +42,5 @@ if __name__ == "__main__":
         taskData=root+pathDataset
         for f in os.listdir(taskData):
             if(f[0]=='N' and (not ("." in f))):
-                clear_dataset(root +pathDataset+f+"/")
+                clear_dataset(root +pathDataset+f+"/", all)
 

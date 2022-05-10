@@ -17,7 +17,14 @@ namespace rt_num_opt
 
     inline std::string GetResFileName(const std::string &pathDataset, const std::string &file)
     {
-        return pathDataset + file + "_Res.txt";
+        if (elimIte > 0)
+        {
+            return pathDataset + file + "_elim_Res.txt";
+        }
+        else
+        {
+            return pathDataset + file + "_not_elim_Res.txt";
+        }
     }
     void WriteToResultFile(const std::string &pathDataset, const std::string &file, double res, double timeTaken)
     {
@@ -115,11 +122,11 @@ namespace rt_num_opt
                     }
 
                     auto start = std::chrono::high_resolution_clock::now();
-                    double res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
+                    res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
                     // std::cout << "The energy saving ratio is " << res << std::endl;
                     auto stop = std::chrono::high_resolution_clock::now();
                     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-                    double timeTaken = double(duration.count()) / 1e6;
+                    timeTaken = double(duration.count()) / 1e6;
                 }
 
                 WriteToResultFile(pathDataset, file, res, timeTaken);
