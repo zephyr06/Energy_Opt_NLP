@@ -2,21 +2,21 @@
 
 runMode: normal
 # TODO: v6 elimination check failed
-testDataSetName: test_n3_v5
+testDataSetName: test_n3_v4
 optimizerType: 2
 deltaOptimizer: 1e-4
 eliminateJacobianThreshold: 1e30
 
-executionTimeModel: 2 # 1 is normal, 2 is more difficult
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 0
-EnergyMode: 2
+elimIte: 100
+EnergyMode: 1
 
 printFailureFile: 1
 printRTA: 0
 readTaskMode: RM
 batchOptimizeFolder: DAGPerformance
-core_m_dag: 4
+core_m_dag: 2
 baselineLLCompare: 1
 
 enableMaxComputationTimeRestrict: 1

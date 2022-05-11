@@ -12,22 +12,21 @@ namespace rt_num_opt
 {
     const double EstimateEnergyTask(const Task &task)
     /**
- * @brief Estimate energy consumption of a single task;
+    * @brief Estimate energy consumption of a single task;
     all tasks' default frequency is 1, which is also the maximum frequency;
- * @param
+    second frequency model is adopted from Guo19RTSS
+    * @param
     frequency is defined as f = C_0 / C_real
     @return
     scalar, energy consumption of the task if it runs at the given frequency
-*/
+    */
     {
         double frequency = GetFrequency(task);
         double energy;
         if (EnergyMode == 1)
             energy = task.executionTime * (pow(frequency, 3));
         else if (EnergyMode == 2)
-            energy = task.executionTime * (5 * pow(frequency, 3) + 0.09 * pow(frequency, 2) +
-                                           0.44 * pow(frequency, 1) +
-                                           +0.47);
+            energy = task.executionTime * (1.76 * pow(frequency, 3) + 0.5);
         else if (EnergyMode == 3)
             energy = task.period * 1.0;
         // energy = task.executionTime * (pow(frequency, 3) + 0.09 * pow(frequency, 2));
