@@ -235,12 +235,12 @@ namespace rt_num_opt
 
     double Utilization(const TaskSet &tasks)
     {
-        std::vector<int> periodHigh = GetParameter<int>(tasks, "period");
-        std::vector<double> executionTimeHigh = GetParameter<double>(tasks, "executionTime");
-        int N = periodHigh.size();
+        std::vector<int> periods = GetParameter<int>(tasks, "period");
+        std::vector<double> executionTimes = GetParameter<double>(tasks, "executionTime");
+        int N = periods.size();
         double utilization = 0;
         for (int i = 0; i < N; i++)
-            utilization += double(executionTimeHigh[i]) / periodHigh[i];
+            utilization += double(executionTimes[i]) / periods[i];
         return utilization;
     }
 

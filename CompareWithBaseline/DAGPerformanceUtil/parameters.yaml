@@ -9,7 +9,7 @@ eliminateJacobianThreshold: 1e30
 
 executionTimeModel: 2 # 1 is normal, 2 is more difficult
 enableIPM: 0
-elimIte: 0
+elimIte: 100
 EnergyMode: 2
 
 printFailureFile: 1
@@ -62,7 +62,7 @@ maxIterationsOptimizer: 1e3
 gradientModify: 0
 controlPath: "N5/Case0"
 MaxLoopControl: 1e4
-exactJacobian: 1
+exactJacobian: 0
 utilTol: 1e-3
 debugMode: 0
 verbosityLM: "SILENT"

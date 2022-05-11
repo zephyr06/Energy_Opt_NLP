@@ -115,6 +115,11 @@ namespace rt_num_opt
                     {
                         tasksN = ReadDAGNarsi19_Tasks(path);
                         N = Nn;
+                        if (batchOptimizeFolder == "DAGPerformanceUtil")
+                        {
+                            N = round(Utilization(tasksN.tasks_) * 10.0 / core_m_dag);
+                            std::cout << N << std::endl;
+                        }
                     }
                     else
                     {

@@ -74,9 +74,9 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
     return data2d
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--minTaskNumber', type=int, default=3,
+parser.add_argument('--minTaskNumber', type=int, default=1,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=5,
+parser.add_argument('--maxTaskNumber', type=int, default=7,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
@@ -107,9 +107,6 @@ if __name__ == "__main__":
     for i in {0,1}:
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
-
-    # MILP
-    # plt.plot(np.linspace(minTaskNumber, min(15, maxTaskNumber), min(15, maxTaskNumber)-minTaskNumber+1), data_2d[3][:min(15, maxTaskNumber)-minTaskNumber+1], marker=marker_list[3], color=color_list[3], markersize=8)
 
     if(data_source=="EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
