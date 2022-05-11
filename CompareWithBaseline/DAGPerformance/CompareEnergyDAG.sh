@@ -3,7 +3,7 @@
 # ************** Adjust settings there **************
 title="DAGPerformance"
 MinTaskNumber=3
-MaxTaskNumber=3
+MaxTaskNumber=10
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
