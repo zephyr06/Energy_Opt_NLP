@@ -7,7 +7,7 @@ testDataSetName: test_n3_v5
 
 debugMode: 0
 executionTimeModel: 2 # 1 is normal, 2 is more difficult
-elimIte: 100
+elimIte: 1000
 EnergyMode: 2
 batchOptimizeFolder: DAGPerformance
 core_m_dag: 4
@@ -22,14 +22,14 @@ exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
-optimizerType: 1
+optimizerType: 2
 deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50
 verbosityLM: "SILENT"
-relativeErrorTolerance: 1e-7
-whether_ls: 0
+relativeErrorTolerance: 1e-3
+whether_ls: 1
 #*************************************************************
 
 
