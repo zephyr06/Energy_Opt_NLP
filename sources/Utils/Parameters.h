@@ -59,7 +59,6 @@ namespace rt_num_opt
     double disturb_init = (double)ConfigParameters["disturb_init"];
     const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
     int optimizerType = (int)ConfigParameters["optimizerType"];
-    double weightLogBarrier = (double)ConfigParameters["weightLogBarrier"];
     double disturb_step = (double)ConfigParameters["disturb_step"];
     double relativeErrorToleranceOuterLoop = (double)ConfigParameters["relativeErrorToleranceOuterLoop"];
     double disturb_max = (double)ConfigParameters["disturb_max"];
@@ -76,7 +75,6 @@ namespace rt_num_opt
     std::string batchOptimizeFolder = (std::string)ConfigParameters["batchOptimizeFolder"];
     const double parallelFactor = (double)ConfigParameters["parallelFactor"];
     const std::string readTaskMode = (std::string)ConfigParameters["readTaskMode"];
-    const int granularityInBF = (int)ConfigParameters["granularityInBF"];
     const int debugMode = (int)ConfigParameters["debugMode"];
     const int adjustEliminateMaxIte = (int)ConfigParameters["adjustEliminateMaxIte"];
     int core_m_dag = (int)ConfigParameters["core_m_dag"];
@@ -94,6 +92,7 @@ namespace rt_num_opt
     double timeScaleFactor = (double)ConfigParameters["timeScaleFactor"];
     double SkipRateFindElimination = (double)ConfigParameters["SkipRateFindElimination"];
 
+    int whether_ls = (int)ConfigParameters["whether_ls"];
     int SpeedOptimizeOption = (int)ConfigParameters["SpeedOptimizeOption"];
     int whetherWriteNarsiTaskSet = (int)ConfigParameters["whetherWriteNarsiTaskSet"];
     std::vector<int> PeriodSetAM;

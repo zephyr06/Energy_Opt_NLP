@@ -107,12 +107,12 @@ public:
     }
 
     /**
-         * @brief 
-         * 
-         * @param executionTimeVector (numberOfTasksNeedOptimize, 1)
-         * @param H 
-         * @return Vector 
-         */
+     * @brief
+     *
+     * @param executionTimeVector (numberOfTasksNeedOptimize, 1)
+     * @param H
+     * @return Vector
+     */
     Vector evaluateError(const VectorDynamic &executionTimeVector, boost::optional<Matrix &> H = boost::none) const override
     {
         TaskSet taskDurOpt = tasks_;
@@ -170,7 +170,7 @@ public:
             {
                 for (uint j = 0; j < H->cols(); j++)
                 {
-                    if (abs((*H)(i, j)) > eliminateJacobianThreshold)
+                    if (abs((*H)(i, j)) > 1e30)
                     {
                         // clear column
                         for (uint k = 0; k < H->rows(); k++)
@@ -234,7 +234,7 @@ public:
 // }
 double RealObj(TaskSet &tasks, VectorDynamic coeff)
 {
-    double res = 0;
+    // double res = 0;
     gtsam::Symbol key('a', 0);
     auto model = gtsam::noiseModel::Isotropic::Sigma(tasks.size() * 5, 1);
     std::vector<bool> eliminationMask(tasks.size(), false);

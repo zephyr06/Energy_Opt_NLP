@@ -5,6 +5,7 @@ title="DagPerformance"
 MaxTaskNumber=10
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
+cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 cd $ROOT_PATH/release
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j8

@@ -1,0 +1,125 @@
+tasks:
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 21845
+      - id: 1
+        executionTime: 34302
+      - id: 2
+        executionTime: 908
+      - id: 3
+        executionTime: 3319
+      - id: 4
+        executionTime: 14835
+      - id: 5
+        executionTime: 18156
+    edges:
+      - from: 4
+        to: 5
+  - deadline: 1000000
+    period: 1000000
+    vertices:
+      - id: 0
+        executionTime: 20666
+      - id: 1
+        executionTime: 27023
+      - id: 2
+        executionTime: 119294
+      - id: 3
+        executionTime: 10026
+      - id: 4
+        executionTime: 3712
+      - id: 5
+        executionTime: 28940
+      - id: 6
+        executionTime: 12889
+      - id: 7
+        executionTime: 46805
+      - id: 8
+        executionTime: 99694
+      - id: 9
+        executionTime: 4100
+      - id: 10
+        executionTime: 95794
+      - id: 11
+        executionTime: 36799
+      - id: 12
+        executionTime: 494252
+    edges:
+      - from: 0
+        to: 4
+      - from: 1
+        to: 2
+      - from: 1
+        to: 9
+      - from: 1
+        to: 12
+      - from: 2
+        to: 3
+      - from: 2
+        to: 11
+      - from: 3
+        to: 5
+      - from: 3
+        to: 6
+      - from: 4
+        to: 9
+      - from: 5
+        to: 12
+      - from: 9
+        to: 11
+      - from: 9
+        to: 12
+      - from: 10
+        to: 11
+  - deadline: 500000
+    period: 500000
+    vertices:
+      - id: 0
+        executionTime: 2169
+      - id: 1
+        executionTime: 6004
+      - id: 2
+        executionTime: 23281
+      - id: 3
+        executionTime: 26126
+      - id: 4
+        executionTime: 66547
+      - id: 5
+        executionTime: 1651
+      - id: 6
+        executionTime: 206865
+      - id: 7
+        executionTime: 20363
+      - id: 8
+        executionTime: 19804
+      - id: 9
+        executionTime: 233817
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 3
+      - from: 0
+        to: 6
+      - from: 0
+        to: 7
+      - from: 0
+        to: 8
+      - from: 1
+        to: 2
+      - from: 1
+        to: 6
+      - from: 1
+        to: 9
+      - from: 4
+        to: 5
+      - from: 4
+        to: 6
+      - from: 4
+        to: 9
+      - from: 5
+        to: 8
+      - from: 6
+        to: 8

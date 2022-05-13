@@ -2,7 +2,7 @@
 
 # ************** Adjust settings there **************
 title="EnergyPerformance"
-MaxTaskNumber=30
+MaxTaskNumber=10
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
@@ -16,6 +16,7 @@ python edit_yaml.py --entry "batchOptimizeFolder" --value $title
 perform_optimization() {
 	# Optimize energy consumption
 	cd $ROOT_PATH/release
+	cmake -DCMAKE_BUILD_TYPE=Release ..
 	make -j8
 	./tests/LLCompare
 	cd $ROOT_PATH/CompareWithBaseline

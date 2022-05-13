@@ -1,163 +1,129 @@
 tasks:
+  - deadline: 10000
+    period: 10000
+    vertices:
+      - id: 0
+        executionTime: 540
+      - id: 1
+        executionTime: 835
+    edges:
+      - from: 0
+        to: 1
   - deadline: 50000
     period: 50000
     vertices:
       - id: 0
-        executionTime: 633
+        executionTime: 223
       - id: 1
-        executionTime: 1557
+        executionTime: 50
       - id: 2
-        executionTime: 1086
+        executionTime: 1520
       - id: 3
-        executionTime: 211
+        executionTime: 221
       - id: 4
-        executionTime: 334
+        executionTime: 116
       - id: 5
-        executionTime: 3428
+        executionTime: 509
       - id: 6
-        executionTime: 942
+        executionTime: 1271
       - id: 7
-        executionTime: 16
+        executionTime: 497
       - id: 8
-        executionTime: 1470
+        executionTime: 246
       - id: 9
-        executionTime: 47
+        executionTime: 203
       - id: 10
-        executionTime: 56
+        executionTime: 547
       - id: 11
-        executionTime: 115
-      - id: 12
-        executionTime: 2424
+        executionTime: 3132
     edges:
       - from: 0
         to: 1
       - from: 0
-        to: 4
+        to: 6
       - from: 0
-        to: 5
-      - from: 0
-        to: 12
+        to: 8
       - from: 1
-        to: 10
+        to: 7
       - from: 2
-        to: 8
-      - from: 2
-        to: 9
-      - from: 2
+        to: 6
+      - from: 3
         to: 11
-      - from: 3
-        to: 4
-      - from: 3
-        to: 6
       - from: 4
-        to: 7
-      - from: 5
-        to: 6
-      - from: 8
-        to: 9
-      - from: 9
-        to: 10
-      - from: 10
+        to: 8
+      - from: 4
         to: 11
-      - from: 11
-        to: 12
-  - deadline: 500000
-    period: 500000
-    vertices:
-      - id: 0
-        executionTime: 223902
-      - id: 1
-        executionTime: 56361
-      - id: 2
-        executionTime: 219735
-    edges:
-      - from: 0
-        to: 1
-  - deadline: 20000
-    period: 20000
-    vertices:
-      - id: 0
-        executionTime: 8
-      - id: 1
-        executionTime: 38
-      - id: 2
-        executionTime: 1
-      - id: 3
-        executionTime: 3
-      - id: 4
-        executionTime: 4
-      - id: 5
-        executionTime: 2
-      - id: 6
-        executionTime: 1
-      - id: 7
-        executionTime: 2
-      - id: 8
-        executionTime: 33
-    edges:
-      - from: 1
-        to: 5
-      - from: 2
-        to: 3
-      - from: 2
-        to: 6
-      - from: 3
-        to: 6
-      - from: 3
-        to: 7
-      - from: 3
-        to: 8
-      - from: 4
-        to: 6
-      - from: 4
-        to: 8
-      - from: 5
-        to: 7
+      - from: 6
+        to: 10
   - deadline: 200000
     period: 200000
     vertices:
       - id: 0
-        executionTime: 1449
+        executionTime: 1408
       - id: 1
-        executionTime: 49
+        executionTime: 5557
       - id: 2
-        executionTime: 394
+        executionTime: 779
       - id: 3
-        executionTime: 238
+        executionTime: 2962
       - id: 4
-        executionTime: 3914
-    edges: ~
-  - deadline: 100000
-    period: 100000
-    vertices:
-      - id: 0
-        executionTime: 1598
-      - id: 1
-        executionTime: 4479
-      - id: 2
-        executionTime: 6759
-      - id: 3
-        executionTime: 1796
-      - id: 4
-        executionTime: 2726
+        executionTime: 2531
       - id: 5
-        executionTime: 3618
+        executionTime: 722
       - id: 6
-        executionTime: 367
+        executionTime: 2997
       - id: 7
-        executionTime: 443
-      - id: 8
-        executionTime: 10057
+        executionTime: 7953
     edges:
       - from: 0
-        to: 5
+        to: 6
       - from: 1
-        to: 4
+        to: 2
+      - from: 1
+        to: 6
+      - from: 2
+        to: 5
+      - from: 4
+        to: 6
+  - deadline: 10000
+    period: 10000
+    vertices:
+      - id: 0
+        executionTime: 151
+      - id: 1
+        executionTime: 48
+      - id: 2
+        executionTime: 150
+      - id: 3
+        executionTime: 20
+      - id: 4
+        executionTime: 46
+      - id: 5
+        executionTime: 3
+      - id: 6
+        executionTime: 11
+      - id: 7
+        executionTime: 46
+      - id: 8
+        executionTime: 96
+      - id: 9
+        executionTime: 140
+    edges:
+      - from: 0
+        to: 1
+      - from: 1
+        to: 5
       - from: 1
         to: 8
       - from: 2
         to: 3
       - from: 2
+        to: 4
+      - from: 2
+        to: 7
+      - from: 3
+        to: 7
+      - from: 5
         to: 6
       - from: 5
         to: 7
@@ -165,3 +131,81 @@ tasks:
         to: 8
       - from: 7
         to: 8
+  - deadline: 10000
+    period: 10000
+    vertices:
+      - id: 0
+        executionTime: 685
+      - id: 1
+        executionTime: 132
+      - id: 2
+        executionTime: 73
+      - id: 3
+        executionTime: 314
+      - id: 4
+        executionTime: 1382
+      - id: 5
+        executionTime: 46
+      - id: 6
+        executionTime: 17
+      - id: 7
+        executionTime: 280
+      - id: 8
+        executionTime: 611
+      - id: 9
+        executionTime: 367
+      - id: 10
+        executionTime: 49
+      - id: 11
+        executionTime: 511
+      - id: 12
+        executionTime: 1592
+      - id: 13
+        executionTime: 111
+      - id: 14
+        executionTime: 532
+      - id: 15
+        executionTime: 4243
+    edges:
+      - from: 0
+        to: 15
+      - from: 1
+        to: 12
+      - from: 2
+        to: 7
+      - from: 2
+        to: 14
+      - from: 2
+        to: 15
+      - from: 3
+        to: 6
+      - from: 3
+        to: 15
+      - from: 4
+        to: 5
+      - from: 4
+        to: 9
+      - from: 4
+        to: 10
+      - from: 4
+        to: 14
+      - from: 5
+        to: 7
+      - from: 5
+        to: 10
+      - from: 5
+        to: 13
+      - from: 6
+        to: 13
+      - from: 6
+        to: 14
+      - from: 6
+        to: 15
+      - from: 7
+        to: 8
+      - from: 7
+        to: 9
+      - from: 9
+        to: 13
+      - from: 9
+        to: 14

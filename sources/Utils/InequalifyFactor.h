@@ -22,7 +22,7 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/Tools/colormod.h"
 #include "sources/Tools/testMy.h"
-#include "sources/OptimizationUtils/utils.h"
+#include "sources/Utils/utils.h"
 #include "sources/Utils/GlobalVariables.h"
 namespace rt_num_opt
 {
@@ -32,20 +32,20 @@ namespace rt_num_opt
     typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic &)> NormalErrorFunction2D;
 
     /**
- * @brief returns 0 if x>=0
- *
- * @param x
- * @return double
- */
+     * @brief returns 0 if x>=0
+     *
+     * @param x
+     * @return double
+     */
     double HingeLoss(double x)
     {
         return max(0, -1 * x);
     }
 
     /**
- * @brief Constraint of x <= b
- *
- */
+     * @brief Constraint of x <= b
+     *
+     */
     class InequalityFactor1D : public gtsam::NoiseModelFactor1<VectorDynamic>
     {
     public:
@@ -53,9 +53,9 @@ namespace rt_num_opt
         int dimension;
         int index;
         /**
-     * @brief Construct a new Inequality Factor 1 D object,
-     *  mainly used in derived class because f is not defined
-     */
+         * @brief Construct a new Inequality Factor 1 D object,
+         *  mainly used in derived class because f is not defined
+         */
         InequalityFactor1D(gtsam::Key key,
                            gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor1<VectorDynamic>(model, key)
         {
@@ -112,9 +112,9 @@ namespace rt_num_opt
     };
 
     /**
- * @brief Constraint of x <= b
- *
- */
+     * @brief Constraint of x <= b
+     *
+     */
     class SmallerThanFactor1D : public InequalityFactor1D
     {
     public:
@@ -143,9 +143,9 @@ namespace rt_num_opt
     };
 
     /**
- * @brief Constraint of x >= b
- *
- */
+     * @brief Constraint of x >= b
+     *
+     */
     class LargerThanFactor1D : public InequalityFactor1D
     {
     public:
@@ -211,10 +211,10 @@ namespace rt_num_opt
     }
 
     /**
- * @brief Constraint of f(x1, x2) <= 0;
- * x1 and x2 are vectors of size (1,1)
- *
- */
+     * @brief Constraint of f(x1, x2) <= 0;
+     * x1 and x2 are vectors of size (1,1)
+     *
+     */
     class InequalityFactor2D : public gtsam::NoiseModelFactor2<VectorDynamic, VectorDynamic>
     {
     public:

@@ -15,7 +15,7 @@
 #include "sources/TaskModel/Tasks.h"
 #include "sources/RTA/RTA_LL.h"
 #include "sources/EnergyOptimization/Energy.h"
-#include "sources/OptimizationUtils/utils.h"
+#include "sources/Utils/utils.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/Utils/FactorGraphUtils.h"
 #include "sources/Utils/MultiKeyFactor.h"
@@ -225,9 +225,9 @@ namespace rt_num_opt
             Task task_;
 
             /**
-         * @brief Construct a new Inequality Factor 1 D object,
-         *  mainly used in derived class because f is not defined
-         */
+             * @brief Construct a new Inequality Factor 1 D object,
+             *  mainly used in derived class because f is not defined
+             */
             EnergyFactor(gtsam::Key key, Task &task, int index,
                          gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor1<VectorDynamic>(model, key), taskIndex(index),
                                                           task_(task)
@@ -311,13 +311,13 @@ namespace rt_num_opt
             return graph;
         }
         /**
-     * @brief This function and the following function consider the optimization problem:
-     * min  C^T x
-     * s.b. Jx <= 0
-     * 
-     * @param tasks 
-     * @return NonlinearFactorGraph 
-     */
+         * @brief This function and the following function consider the optimization problem:
+         * min  C^T x
+         * s.b. Jx <= 0
+         *
+         * @param tasks
+         * @return NonlinearFactorGraph
+         */
         static gtsam::NonlinearFactorGraph BuildGraphForC(TaskSet &tasks)
         {
             gtsam::NonlinearFactorGraph graph;
@@ -331,11 +331,11 @@ namespace rt_num_opt
             return graph;
         }
         /**
-     * @brief To analyze Jacobian for constraints
-     * 
-     * @param tasks 
-     * @return NonlinearFactorGraph 
-     */
+         * @brief To analyze Jacobian for constraints
+         *
+         * @param tasks
+         * @return NonlinearFactorGraph
+         */
         static gtsam::NonlinearFactorGraph BuildGraphForJ(TaskSet &tasks)
         {
             VectorDynamic rtaBase = RTALLVector(tasks);

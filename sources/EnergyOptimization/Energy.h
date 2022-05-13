@@ -6,7 +6,7 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/MatirxConvenient.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
-#include "sources/OptimizationUtils/utils.h"
+#include "sources/Utils/utils.h"
 
 namespace rt_num_opt
 {

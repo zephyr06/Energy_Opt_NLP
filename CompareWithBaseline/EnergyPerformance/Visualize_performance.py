@@ -7,6 +7,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 def read_data_2d_energy(minTaskNumber, maxTaskNumber):
+    def extract_ave(method_index):
+        ave = 0
+        for i in range(method_index*1000, method_index*1000+1000):
+            ave += float(lines[i])
+        return ave/1000.0
     data2d = []
     for task_number in range(minTaskNumber, maxTaskNumber + 1):
         file_path = "EnergySaveRatio"+"/N" + str(task_number) + ".txt"
@@ -15,23 +20,13 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         data=[]
 
         # NLP, with elimination
-        ave=0
-        for i in range(1000):
-            ave += float(lines[i])
-        data.append(ave/1000)
+        data.append(extract_ave(0))
 
         # NLP, with elimination, exact Jacobian
-        ave=0
-        for i in range(1000):
-            ave += float(lines[i])
-        data.append(ave/1000)
-
+        data.append(extract_ave(1))
 
         # NLP, without elimination
-        ave = 0
-        for i in range(1000,2000):
-            ave += float(lines[i])
-        data.append(ave / 1000)
+        data.append(extract_ave(2))
 
         # MUA
         data.append(1.0)
@@ -40,7 +35,7 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         if(task_number<=15):
             ave=0
             for i in range(1000):
-                ave += float(lines[3000 + i]) / float(lines[2000 + i])
+                ave += float(lines[4000 + i]) / float(lines[3000 + i])
             data.append(ave / 1000)
         else:
             data.append(-1)
@@ -63,17 +58,17 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         data.append(float(lines[0]))
 
         # NLP, with elimination, exact Jacobian
-        data.append(float(lines[0]))
-
-        # NLP, without elimination
         data.append(float(lines[1]))
 
-        # MUA
+        # NLP, without elimination
         data.append(float(lines[2]))
+
+        # MUA
+        data.append(float(lines[3]))
 
         # MILP, maximum number is 15
         if(task_number<=15):
-            data.append(float(lines[3]))
+            data.append(float(lines[4]))
         else:
             data.append(-1)
 
@@ -90,9 +85,9 @@ parser.add_argument('--maxTaskNumber', type=int, default=7,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source',type=str, default="Time",
+parser.add_argument('--data_source',type=str, default="EnergySaveRatio",
                     help='data source folder')
-parser.add_argument('--title', type=str, default="elimination",
+parser.add_argument('--title', type=str, default="EnergyPerformance",
             help='tilte in produced figure')
 
 
@@ -119,11 +114,11 @@ if __name__ == "__main__":
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
 
     # MILP
-    plt.plot(np.linspace(minTaskNumber, min(15, maxTaskNumber), min(15, maxTaskNumber)-minTaskNumber+1), data_2d[3][:min(15, maxTaskNumber)-minTaskNumber+1], marker=marker_list[3], color=color_list[3], markersize=8)
+    plt.plot(np.linspace(minTaskNumber, min(15, maxTaskNumber), min(15, maxTaskNumber)-minTaskNumber+1), data_2d[-1][:min(15, maxTaskNumber)-minTaskNumber+1], marker=marker_list[-1], color=color_list[-1], markersize=8)
 
     if(data_source=="EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
-        splot.set_ylim([0.95, 2.0])
+        # splot.set_ylim([0.95, 2.0])
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
         plt.savefig("Compare_" +title+ ".pdf", format='pdf')

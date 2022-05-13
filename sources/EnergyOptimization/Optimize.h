@@ -16,7 +16,7 @@
 #include "sources/TaskModel/Tasks.h"
 #include "sources/RTA/RTA_LL.h"
 #include "sources/EnergyOptimization/Energy.h"
-#include "sources/OptimizationUtils/utils.h"
+#include "sources/Utils/utils.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/Utils/GlobalVariables.h"
 #include "sources/EnergyOptimization/EnergyOptimize.h"
@@ -109,7 +109,16 @@ namespace rt_num_opt
                 {
                     TaskSetType taskT = tasks_;
                     UpdateTaskSetExecutionTime(taskT.tasks_, executionTimeVector, lastTaskDoNotNeedOptimize);
-                    return EstimateEnergyTaskSet(taskT.tasks_);
+                    VectorDynamic energys = EstimateEnergyTaskSet(taskT.tasks_);
+                    if (!whether_ls)
+                    {
+                        for (uint i = 0; i < taskT.tasks_.size(); i++)
+                        {
+                            energys(i) = pow(energys(i), 0.5);
+                        }
+                    }
+
+                    return energys;
                 };
 
                 boost::function<gtsam::Matrix(const VectorDynamic &)> f =
@@ -120,7 +129,7 @@ namespace rt_num_opt
                     VectorDynamic responseTimeVec = r.ResponseTimeOfTaskSet(responseTimeInitial);
                     VectorDynamic err = f2(executionTimeVector);
 
-                    double currentEnergyConsumption = err.sum();
+                    double currentEnergyConsumption = EstimateEnergyTaskSet(taskDurOpt.tasks_).sum();
                     for (int i = 0; i < N; i++)
                     {
                         // barrier function part
@@ -537,7 +546,7 @@ namespace rt_num_opt
                     std::cout << vectorGlobalOpt << std::endl;
                     VectorDynamic rtaTemp = r.ResponseTimeOfTaskSet();
                     std::cout << "RTA after optimization: " << rtaTemp << std::endl;
-                    int a = 1;
+                    // int a = 1;
                 }
 
                 // find variables to eliminate

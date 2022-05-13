@@ -1,0 +1,153 @@
+tasks:
+  - deadline: 200000
+    period: 200000
+    vertices:
+      - id: 0
+        executionTime: 1630
+      - id: 1
+        executionTime: 224
+      - id: 2
+        executionTime: 1847
+      - id: 3
+        executionTime: 917
+      - id: 4
+        executionTime: 798
+      - id: 5
+        executionTime: 1849
+      - id: 6
+        executionTime: 378
+      - id: 7
+        executionTime: 2748
+      - id: 8
+        executionTime: 6013
+      - id: 9
+        executionTime: 9518
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 4
+      - from: 0
+        to: 7
+      - from: 0
+        to: 8
+      - from: 0
+        to: 9
+      - from: 1
+        to: 3
+      - from: 1
+        to: 4
+      - from: 1
+        to: 5
+      - from: 2
+        to: 3
+      - from: 2
+        to: 4
+      - from: 2
+        to: 6
+      - from: 2
+        to: 7
+      - from: 3
+        to: 4
+      - from: 3
+        to: 9
+      - from: 5
+        to: 7
+      - from: 6
+        to: 7
+      - from: 7
+        to: 9
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 10332
+      - id: 1
+        executionTime: 2721
+      - id: 2
+        executionTime: 3244
+      - id: 3
+        executionTime: 2179
+      - id: 4
+        executionTime: 1463
+      - id: 5
+        executionTime: 1042
+      - id: 6
+        executionTime: 6137
+      - id: 7
+        executionTime: 4585
+      - id: 8
+        executionTime: 23169
+      - id: 9
+        executionTime: 699
+      - id: 10
+        executionTime: 44424
+    edges:
+      - from: 1
+        to: 3
+      - from: 1
+        to: 9
+      - from: 2
+        to: 4
+      - from: 2
+        to: 7
+      - from: 3
+        to: 8
+      - from: 3
+        to: 9
+      - from: 4
+        to: 10
+      - from: 5
+        to: 8
+      - from: 7
+        to: 10
+      - from: 8
+        to: 9
+      - from: 8
+        to: 10
+      - from: 9
+        to: 10
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 3901
+      - id: 1
+        executionTime: 4996
+      - id: 2
+        executionTime: 47492
+      - id: 3
+        executionTime: 11857
+      - id: 4
+        executionTime: 8647
+      - id: 5
+        executionTime: 19233
+      - id: 6
+        executionTime: 7189
+      - id: 7
+        executionTime: 5925
+      - id: 8
+        executionTime: 1036
+      - id: 9
+        executionTime: 16184
+      - id: 10
+        executionTime: 40569
+    edges:
+      - from: 0
+        to: 2
+      - from: 0
+        to: 7
+      - from: 0
+        to: 10
+      - from: 1
+        to: 2
+      - from: 2
+        to: 3
+      - from: 2
+        to: 6
+      - from: 5
+        to: 8
+      - from: 5
+        to: 10
+      - from: 9
+        to: 10

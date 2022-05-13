@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/function.hpp>
+
 #include "sources/Utils/Parameters.h"
 #include "sources/MatirxConvenient.h"
 #include "sources/TaskModel/Tasks.h"
@@ -7,8 +9,8 @@
 namespace rt_num_opt
 {
     /**
- * barrier function for the optimization
- **/
+     * barrier function for the optimization
+     **/
     double Barrier(double x)
     {
         if (x >= 0)
@@ -21,7 +23,7 @@ namespace rt_num_opt
                 std::cout << Color::red << "Please set TASK_NUMBER!" << Color::def << std::endl;
                 throw;
             }
-            return punishmentInBarrier * pow(10, TASK_NUMBER - 3) * pow(-1 * x, 1);
+            return punishmentInBarrier * pow(-1 * x, 1);
         }
     }
 
@@ -91,13 +93,13 @@ namespace rt_num_opt
     }
 
     /**
- * @brief whether tasksCurr's computation time is within given bound of tasksRef
- * 
- * @param tasksRef 
- * @param tasksCurr 
- * @return true 
- * @return false 
- */
+     * @brief whether tasksCurr's computation time is within given bound of tasksRef
+     *
+     * @param tasksRef
+     * @param tasksCurr
+     * @return true
+     * @return false
+     */
     bool WithInBound(const TaskSet &tasks)
     {
         if (not enableMaxComputationTimeRestrict)
@@ -114,8 +116,8 @@ namespace rt_num_opt
     }
 
     /**
- * for minimization problem
- */
+     * for minimization problem
+     */
     bool checkConvergenceInterior(double oldY, VectorDynamic oldX, double newY, VectorDynamic newX,
                                   double relativeErrorTol, double xTol)
     {
