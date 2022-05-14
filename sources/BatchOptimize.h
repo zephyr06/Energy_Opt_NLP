@@ -162,14 +162,14 @@ namespace rt_num_opt
 
         std::string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
                               batchOptimizeFolder + "/EnergySaveRatio/N" +
-                              std::to_string(N) + ".txt";
+                              std::to_string(Nn) + ".txt";
         AddEntry(pathRes, avEnergy);
         // old saving path:
         //  pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
         //       batchOptimizeFolder + "/time_task_number.txt";
         pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
                   batchOptimizeFolder + "/Time/N" +
-                  std::to_string(N) + ".txt";
+                  std::to_string(Nn) + ".txt";
         AddEntry(pathRes, aveTime);
 
         if (printFailureFile)

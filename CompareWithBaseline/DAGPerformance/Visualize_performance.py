@@ -119,7 +119,7 @@ if __name__ == "__main__":
     elif(data_source=="Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
         # splot.set_ylim([0.95, 2.0])
-        splot.set(yscale="log")
+        # splot.set(yscale="log")
         splot.set_ylim(1e-4, 1e3)
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
