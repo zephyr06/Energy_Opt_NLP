@@ -1,4 +1,8 @@
+// Warning!! Somehow, this file may generate un-schedulable file with a low chance
 #include <filesystem>
+#include <stdio.h>
+#include <iostream>
+#include <cstdio>
 #include "sources/argparse.hpp"
 #include "sources/Utils/Parameters.h"
 #include "sources/RTA/RTA_LL.h"
@@ -217,11 +221,11 @@ int main(int argc, char *argv[])
             }
             vector<double> utilVec = Uunifast(N, totalUtilization, true);
             vector<double> weightVec;
-            for (int i = 0; i < N; i++)
+            for (int j = 0; j < N; j++)
             {
                 // int periodCurr = (1 + rand() % 9) * pow(10, rand() % 2);
                 int periodCurr = int(PeriodSetAM[rand() % PeriodSetAM.size()] * timeScaleFactor);
-                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[i],
+                dagTaskSet.push_back(GenerateDAG(ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[j],
                                                  numberOfProcessor,
                                                  periodCurr,
                                                  periodCurr, deadlineType));
@@ -240,6 +244,16 @@ int main(int argc, char *argv[])
                 }
             }
             WriteDAG_NarsiToYaml(dagTaskSet, outDirectory + fileName);
+            // follow-up verification
+            auto tasksN = rt_num_opt::ReadDAGNarsi19_Tasks(outDirectory + fileName);
+            rt_num_opt::RTA_Narsi19 r(tasksN);
+            if (!r.CheckSchedulability())
+            {
+                std::cout << outDirectory + fileName << std::endl;
+                string ppp = outDirectory + fileName;
+                int a = std::filesystem::remove(ppp);
+                i--;
+            }
         }
     }
 
