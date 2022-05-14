@@ -9,15 +9,15 @@ debugMode: 0
 executionTimeModel: 2 # 1 is normal, 2 is more difficult
 elimIte: 0
 EnergyMode: 2
-batchOptimizeFolder: DAGPerformance
+batchOptimizeFolder: DAGPerformanceUtil
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
 eliminateTol: 1e1
 eliminateStep: 10
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
-roundTypeInClamp: "rough"
-clampTypeMiddle: "rough"
+roundTypeInClamp: "none"
+clampTypeMiddle: "none"
 exactJacobian: 1
 #*************************************************************
 
