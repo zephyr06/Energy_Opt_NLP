@@ -1,7 +1,7 @@
 %YAML:1.0
 
 # optimization seettings
-runMode: compare
+runMode: normal
 testDataSetName: test_n3_v5
 
 
@@ -9,7 +9,7 @@ debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 0
 EnergyMode: 1
-batchOptimizeFolder: EnergyPerformance
+batchOptimizeFolder: ControlPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
@@ -76,7 +76,7 @@ punishmentFrequency: 10
 maxIterationsOptimizer: 1e3
 gradientModify: 0
 utilTol: 1e-3
-linearOptimizerType: "MULTIFRONTAL_QR"
+linearOptimizerType: "MULTIFRONTAL_CHOLESKY"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
 enableReorder: 0
