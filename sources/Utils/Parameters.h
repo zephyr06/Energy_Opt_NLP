@@ -91,6 +91,7 @@ namespace rt_num_opt
     double frequencyRatio = (double)ConfigParameters["frequencyRatio"];
     double timeScaleFactor = (double)ConfigParameters["timeScaleFactor"];
     double SkipRateFindElimination = (double)ConfigParameters["SkipRateFindElimination"];
+    double jacobianScale = (double)ConfigParameters["jacobianScale"];
 
     int whether_ls = (int)ConfigParameters["whether_ls"];
     int SpeedOptimizeOption = (int)ConfigParameters["SpeedOptimizeOption"];

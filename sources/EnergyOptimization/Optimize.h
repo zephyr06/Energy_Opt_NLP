@@ -180,6 +180,7 @@ namespace rt_num_opt
                         }
                     }
 
+                    *H = *H * jacobianScale;
                     // *H = NumericalDerivativeDynamic(f2, executionTimeVector, deltaOptimizer, numberOfTasksNeedOptimize);
                     // *H = jacobian;
                     if (debugMode == 1)
