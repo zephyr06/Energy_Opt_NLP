@@ -42,8 +42,8 @@ do
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 1000
 	perform_optimization
 	
-	# dog-leg, not eliminated, exact Jacobian
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
+	# LM, not eliminated, exact Jacobian
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 0
 	perform_optimization
