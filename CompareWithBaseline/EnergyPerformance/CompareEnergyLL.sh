@@ -2,7 +2,7 @@
 
 # ************** Adjust settings there **************
 title="EnergyPerformance"
-MaxTaskNumber=10
+MaxTaskNumber=30
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
@@ -30,14 +30,14 @@ do
 	python $ROOT_PATH/CompareWithBaseline/ConvertYechengDataset.py --convertionNumber $jobNumber
 	echo "$title iteration is: $jobNumber"
 	
-	# dog-leg, eliminated, approximated Jacobian
-    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
+	# LM, eliminated, approximated Jacobian
+    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 1000
 	perform_optimization
 	
-	# dog-leg, eliminated, exact Jacobian
-    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
+	# LM, eliminated, exact Jacobian
+    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 1000
 	perform_optimization
