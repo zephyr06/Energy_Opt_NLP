@@ -15,4 +15,4 @@ args = parser.parse_args()
 folder = args.folder
 clear_dir_result(folder+"/EnergySaveRatio")
 clear_dir_result(folder+"/Time")
-
+clear_dir_result(folder+"/RTACalling")

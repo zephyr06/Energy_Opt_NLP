@@ -2,27 +2,27 @@
 
 # optimization seettings
 runMode: compare
-testDataSetName: test_n3_v5
+testDataSetName: test_n3_v2
 
 
 debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
-elimIte: 0
+elimIte: 100
 EnergyMode: 1
 batchOptimizeFolder: EnergyPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-eliminateTol: 1e0
-eliminateStep: 1.5
+eliminateTol: 1e1
+eliminateStep: 10
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
 roundTypeInClamp: "rough"
 clampTypeMiddle: "rough"
-exactJacobian: 1
+exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
-optimizerType: 2
+optimizerType: 2 # 5 means SA
 deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
@@ -30,7 +30,7 @@ upperLambda: 1e50
 verbosityLM: "SILENT"
 relativeErrorTolerance: 1e-5
 whether_ls: 0
-jacobianScale: 1
+jacobianScale: 16
 #*************************************************************
 
 

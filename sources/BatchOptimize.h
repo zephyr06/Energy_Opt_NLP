@@ -4,12 +4,17 @@
 #include "sources/RTA/RTA_Melani.h"
 #include "sources/RTA/RTA_Narsi19.h"
 
+#include "sources/EnergyOptimization/OptimizeSA.h"
+
 namespace rt_num_opt
 {
 
-
     inline std::string GetResFileName(const std::string &pathDataset, const std::string &file)
     {
+        if (optimizerType == 5)
+        {
+            return pathDataset + file + "_SA_Res.txt";
+        }
         if (elimIte > 0)
         {
             return pathDataset + file + "_elim_Res.txt";
@@ -122,12 +127,21 @@ namespace rt_num_opt
 
                     auto start = std::chrono::high_resolution_clock::now();
                     ResetCallingTimes();
-                    res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
-                    size_t rtaCall = ReadCallingTimes();
-                    rtaCallTime.push_back(rtaCall);
+                    if (optimizerType <= 4)
+                    {
+                        res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
+                    }
+                    else if (optimizerType == 5) // simulateed annealing
+                    {
+                        auto resStruct = OptimizeSchedulingSA<TaskSetType, Schedul_Analysis>(tasksN);
+                        res = resStruct.optimizeError / resStruct.initialError;
+                    }
                     auto stop = std::chrono::high_resolution_clock::now();
                     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
                     timeTaken = double(duration.count()) / 1e6;
+
+                    size_t rtaCall = ReadCallingTimes();
+                    rtaCallTime.push_back(rtaCall);
                 }
 
                 WriteToResultFile(pathDataset, file, res, timeTaken);

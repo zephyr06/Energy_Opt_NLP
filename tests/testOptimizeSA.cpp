@@ -1,21 +1,16 @@
 #include "sources/OptimizeSA.h"
+#include "sources/RTA/RTA_Narsi19.h"
+
 using namespace std;
 using namespace std::chrono;
 using namespace rt_num_opt;
 
 TEST(SA, v1)
 {
-    TaskSet tasks = ReadTaskSet("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv", "orig");
-    TaskSetNormal tasksN(tasks);
-    // auto sth = Generate_WAP(tasks);
-    // bool success;
-    // std::tie(success, A_Global, P_Global) = sth;
-    // if (not success)
-    // {
-    //     CoutWarning("Unschedulable task set in SA test!");
-    // }
+    std::string path = ("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".yaml");
+    rt_num_opt::DAG_Narsi19 tasksN = rt_num_opt::ReadDAGNarsi19_Tasks(path);
     auto start = std::chrono::high_resolution_clock::now();
-    auto res = OptimizeSchedulingSA<TaskSetNormal, RTA_LL>(tasksN);
+    auto res = OptimizeSchedulingSA<rt_num_opt::DAG_Narsi19, rt_num_opt::RTA_Narsi19>(tasksN);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << endl;

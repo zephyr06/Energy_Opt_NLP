@@ -46,6 +46,10 @@ do
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 0
 	perform_optimization $jobNumber
 	
+	# SA
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 5
+	perform_optimization $jobNumber
+	
 done
 
 

@@ -35,7 +35,7 @@ namespace moe
             for (unsigned int i = 0; i < m_iterations; i++)
             {
                 Moe<GenotypeType> candidate;
-                candidate.genotype = NumericAlgorithm<GenotypeType>::getRandomGenotype();
+                candidate.genotype = NumericAlgorithm<GenotypeType>::getRandomGenotype(tasks);
 
                 while (m_temperature > m_absoluteZero)
                 {
