@@ -4,14 +4,7 @@
 namespace rt_num_opt
 {
     using namespace ControlOptimize;
-    void AddEntry(std::string pathRes, double val)
-    {
-        std::ofstream outfileWrite;
-        outfileWrite.open(pathRes,
-                          std::ios_base::app);
-        outfileWrite << val << std::endl;
-        outfileWrite.close();
-    }
+
     void AddEntry(std::string pathRes, double val1, double val2)
     {
         std::ofstream outfileWrite;

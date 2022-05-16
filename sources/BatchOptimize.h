@@ -6,14 +6,7 @@
 
 namespace rt_num_opt
 {
-    void AddEntry(std::string pathRes, double val)
-    {
-        std::ofstream outfileWrite;
-        outfileWrite.open(pathRes,
-                          std::ios_base::app);
-        outfileWrite << val << std::endl;
-        outfileWrite.close();
-    }
+
 
     inline std::string GetResFileName(const std::string &pathDataset, const std::string &file)
     {
@@ -77,6 +70,7 @@ namespace rt_num_opt
         }
         std::vector<double> energySaveRatioVec;
         std::vector<double> runTime;
+        std::vector<size_t> rtaCallTime;
         int N;
         if (debugMode == 1)
             printf("Directory: %s\n", pathDataset);
@@ -127,8 +121,10 @@ namespace rt_num_opt
                     }
 
                     auto start = std::chrono::high_resolution_clock::now();
+                    ResetCallingTimes();
                     res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
-                    // std::cout << "The energy saving ratio is " << res << std::endl;
+                    size_t rtaCall = ReadCallingTimes();
+                    rtaCallTime.push_back(rtaCall);
                     auto stop = std::chrono::high_resolution_clock::now();
                     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
                     timeTaken = double(duration.count()) / 1e6;
@@ -149,28 +145,34 @@ namespace rt_num_opt
 
         double avEnergy = -1;
         double aveTime = -1;
+        double aveRTA = -1;
         int n = runTime.size();
         if (n != 0)
         {
             avEnergy = Average(energySaveRatioVec);
             aveTime = Average(runTime);
+            aveRTA = Average(rtaCallTime);
         }
         std::cout << Color::blue << std::endl;
         std::cout << "Average energy saving ratio is " << avEnergy << std::endl;
         std::cout << "Average time consumed is " << aveTime << std::endl;
+        std::cout << "Average RTA calling time is " << aveRTA << std::endl;
         std::cout << "The number of tasksets under analyzation is " << energySaveRatioVec.size() << std::endl;
 
         std::string pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
                               batchOptimizeFolder + "/EnergySaveRatio/N" +
                               std::to_string(Nn) + ".txt";
         AddEntry(pathRes, avEnergy);
-        // old saving path:
-        //  pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
-        //       batchOptimizeFolder + "/time_task_number.txt";
+
         pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
                   batchOptimizeFolder + "/Time/N" +
                   std::to_string(Nn) + ".txt";
         AddEntry(pathRes, aveTime);
+
+        pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                  batchOptimizeFolder + "/RTACalling/N" +
+                  std::to_string(Nn) + ".txt";
+        AddEntry(pathRes, aveRTA);
 
         if (printFailureFile)
         {

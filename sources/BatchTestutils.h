@@ -10,15 +10,24 @@
 // using namespace std::chrono;
 namespace rt_num_opt
 {
+    void AddEntry(std::string pathRes, double val)
+    {
+        std::ofstream outfileWrite;
+        outfileWrite.open(pathRes,
+                          std::ios_base::app);
+        outfileWrite << val << std::endl;
+        outfileWrite.close();
+    }
 
-    double Average(std::vector<double> &data)
+    template <typename T>
+    double Average(std::vector<T> &data)
     {
         if (data.size())
         {
-            double sum = 0;
+            T sum = 0;
             for (int i = 0; i < int(data.size()); i++)
                 sum += data[i];
-            return sum / data.size();
+            return double(sum) / data.size();
         }
         else
         {

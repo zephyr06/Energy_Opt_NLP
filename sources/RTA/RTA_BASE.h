@@ -6,6 +6,19 @@
 
 namespace rt_num_opt
 {
+    size_t rtaCallingTimes;
+    inline void ResetCallingTimes()
+    {
+        rtaCallingTimes = 0;
+    }
+    inline void IncrementCallingTimes()
+    {
+        rtaCallingTimes++;
+    }
+    inline size_t ReadCallingTimes()
+    {
+        return rtaCallingTimes;
+    }
     /**
      * @brief All customized TaskSetType must inherit from TaskSetNormal in Tasks.h
      *
@@ -44,6 +57,7 @@ namespace rt_num_opt
 
         VectorDynamic ResponseTimeOfTaskSet(const VectorDynamic &warmStart)
         {
+            IncrementCallingTimes();
             int N = tasks.tasks_.size();
             VectorDynamic res = GenerateVectorDynamic(N);
             if (printRTA)
@@ -90,6 +104,7 @@ namespace rt_num_opt
         bool CheckSchedulability(VectorDynamic warmStart,
                                  bool whetherPrint = false, double tol = 0)
         {
+            IncrementCallingTimes();
             int N = tasks.tasks_.size();
             for (int i = 0; i < N; i++)
             {

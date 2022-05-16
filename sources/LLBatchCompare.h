@@ -30,6 +30,7 @@ namespace rt_num_opt
                 TaskSetNormal tasksN(taskSet1);
                 auto start = std::chrono::high_resolution_clock::now();
                 double res;
+                ResetCallingTimes();
                 if (LLCompareWithGeneralizedElimination)
                 {
 
@@ -39,8 +40,7 @@ namespace rt_num_opt
                 {
                     res = Energy_Opt<TaskSetNormal, RTA_LL>::OptimizeTaskSet(tasksN);
                 }
-
-                // cout << "The energy saving ratio is " << res << endl;
+                size_t rtaCall = ReadCallingTimes();
                 auto stop = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
                 double timeTaken = double(duration.count()) / 1e6;
@@ -60,12 +60,18 @@ namespace rt_num_opt
 
                     if (debugMode == 3)
                         std::cout << "One compare: " << res / (baselineResult.second) << std::endl;
-                    std::ofstream outfileWrite;
-                    outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/EnergySaveRatio/N" +
-                                          std::to_string(taskSet1.size()) + ".txt",
-                                      std::ios_base::app);
-                    outfileWrite << energySaveRatioVec.back() << std::endl;
-                    outfileWrite.close();
+                    // std::ofstream outfileWrite;
+                    // outfileWrite.open("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/EnergySaveRatio/N" +
+                    //                       std::to_string(taskSet1.size()) + ".txt",
+                    //                   std::ios_base::app);
+                    // outfileWrite << energySaveRatioVec.back() << std::endl;
+                    // outfileWrite.close();
+                    AddEntry("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/EnergySaveRatio/N" +
+                                 std::to_string(taskSet1.size()) + ".txt",
+                             energySaveRatioVec.back());
+                    AddEntry("/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + batchOptimizeFolder + "/RTACalling/N" +
+                                 std::to_string(taskSet1.size()) + ".txt",
+                             rtaCall);
 
                     N = taskSet1.size();
                 }

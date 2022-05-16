@@ -40,6 +40,7 @@ namespace rt_num_opt
         VectorDynamic ResponseTimeOfTaskSet()
         {
             BeginTimer(__func__);
+            IncrementCallingTimes();
             // prepare input
             std::stringstream tasksInput;
             tasksInput << dagNarsi_.ConvertTasksetToCsv();

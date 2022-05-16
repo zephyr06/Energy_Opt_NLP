@@ -42,10 +42,33 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
 
         data2d.append(data)
         file.close()
-
-        file.close()
     return data2d
 
+def read_data_2d_rta(minTaskNumber, maxTaskNumber):
+    def extract_ave(method_index):
+        ave = 0
+        for i in range(method_index*1000, method_index*1000+1000):
+            ave += float(lines[i])
+        return ave/1000.0
+    data2d = []
+    for task_number in range(minTaskNumber, maxTaskNumber + 1):
+        file_path = "RTACalling"+"/N" + str(task_number) + ".txt"
+        file = open(file_path, "r")
+        lines = file.readlines()
+        data=[]
+
+        # NLP, with elimination
+        data.append(extract_ave(0))
+
+        # NLP, with elimination, exact Jacobian
+        data.append(extract_ave(1))
+
+        # NLP, without elimination
+        data.append(extract_ave(2))
+
+        data2d.append(data)
+        file.close()
+    return data2d
 def read_data_2d_time(minTaskNumber, maxTaskNumber):
     data2d = []
     for task_number in range(minTaskNumber, maxTaskNumber + 1):
@@ -103,18 +126,22 @@ if __name__ == "__main__":
         data_2d = read_data_2d_energy(minTaskNumber, maxTaskNumber)
     elif (data_source == "Time"):
         data_2d = read_data_2d_time(minTaskNumber, maxTaskNumber)
+    elif (data_source == "RTA"):
+        data_2d = read_data_2d_rta(minTaskNumber, maxTaskNumber)
+
     data_2d=np.array(data_2d).transpose()
     dataset_pd = pd.DataFrame()
     optimizer_name=["NLP_Elim_approx","NLP_Elim_exact", "NLP_Raw",  "Zhao20", "MILP"]
     marker_list = ["o", "v", "x", "s", "D"] #
     color_list = ["#0084DB","cyan", "limegreen", "r", "gold"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
-    for i in {0,1,2,3}:
+    for i in range(min(data_2d.shape[0], 4)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
 
     # MILP
-    plt.plot(np.linspace(minTaskNumber, min(15, maxTaskNumber), min(15, maxTaskNumber)-minTaskNumber+1), data_2d[-1][:min(15, maxTaskNumber)-minTaskNumber+1], marker=marker_list[-1], color=color_list[-1], markersize=8)
+    if (data_source == "EnergySaveRatio" or data_source=="Time"):
+        plt.plot(np.linspace(minTaskNumber, min(15, maxTaskNumber), min(15, maxTaskNumber)-minTaskNumber+1), data_2d[-1][:min(15, maxTaskNumber)-minTaskNumber+1], marker=marker_list[-1], color=color_list[-1], markersize=8)
 
     if(data_source=="EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
@@ -132,5 +159,15 @@ if __name__ == "__main__":
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
         plt.savefig("Compare_Time" + title + ".pdf", format='pdf')
+        plt.show(block=False)
+        plt.pause(3)
+    elif(data_source=="RTA"):
+        splot.set(xlabel="Task Number", ylabel="RTA calling times")
+        # splot.set_ylim([0.95, 2.0])
+        # splot.set(yscale="log")
+        # splot.set_ylim(1e-4, 1e3)
+        plt.legend(labels=optimizer_name)
+        plt.grid(linestyle="--")
+        plt.savefig("Compare_Time" + title +"_"+data_source+ ".pdf", format='pdf')
         plt.show(block=False)
         plt.pause(3)
