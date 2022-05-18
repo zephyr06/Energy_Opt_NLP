@@ -34,12 +34,21 @@ do
     	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "MaxLoopControl" --value 1000
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 16
+	perform_optimization $jobNumber
+	
+	# LM,  eliminated, exact Jacobian
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 1
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "MaxLoopControl" --value 1000
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
 	perform_optimization $jobNumber
 	
 	# LM, not eliminated, exact Jacobian
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "MaxLoopControl" --value 1
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
 	perform_optimization $jobNumber
 	
 	# Load both MUA and MILP results

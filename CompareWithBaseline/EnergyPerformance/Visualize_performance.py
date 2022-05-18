@@ -130,8 +130,10 @@ if __name__ == "__main__":
         data_2d = read_data_2d_rta(minTaskNumber, maxTaskNumber)
 
     data_2d=np.array(data_2d).transpose()
+    if (data_source == "EnergySaveRatio"):
+        data_2d = data_2d * 100
     dataset_pd = pd.DataFrame()
-    optimizer_name=["NLP_Elim_approx","NLP_Elim_exact", "NLP_Raw",  "Zhao20", "MILP"]
+    optimizer_name=["NLP_Elim_approx","NLP_Elim_exact", "NLP_Raw",  "Zhao20", "MIGP"]
     marker_list = ["o", "v", "x", "s", "D"] #
     color_list = ["#0084DB","cyan", "limegreen", "r", "gold"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
