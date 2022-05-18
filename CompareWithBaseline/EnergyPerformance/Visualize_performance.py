@@ -104,11 +104,11 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=7,
+parser.add_argument('--maxTaskNumber', type=int, default=30,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source',type=str, default="EnergySaveRatio",
+parser.add_argument('--data_source',type=str, default="Time",
                     help='data source folder')
 parser.add_argument('--title', type=str, default="EnergyPerformance",
             help='tilte in produced figure')
@@ -157,7 +157,7 @@ if __name__ == "__main__":
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
         # splot.set_ylim([0.95, 2.0])
         splot.set(yscale="log")
-        splot.set_ylim(1e-4, 1e3)
+        # splot.set_ylim(1e-4, 1e3)
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
         plt.savefig("Compare_Time" + title + ".pdf", format='pdf')
