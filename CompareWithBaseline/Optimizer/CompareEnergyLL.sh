@@ -47,6 +47,7 @@ do
 	
 	# cGD, eliminated, approximated Jacobian
     	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 4
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
 	perform_optimization
 	
 done

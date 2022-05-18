@@ -29,7 +29,7 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         data.append(extract_ave(2))
 
         # cGD
-        data.append(extract_ave(2))
+        data.append(extract_ave(3))
 
         # Zhao20
         data.append(1.0)
@@ -95,13 +95,13 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=7,
+parser.add_argument('--maxTaskNumber', type=int, default=30,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
 parser.add_argument('--data_source',type=str, default="EnergySaveRatio",
                     help='data source folder')
-parser.add_argument('--title', type=str, default="EnergyPerformance",
+parser.add_argument('--title', type=str, default="Optimizer",
             help='tilte in produced figure')
 
 
@@ -124,11 +124,11 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio"):
         data_2d = data_2d * 100
     dataset_pd = pd.DataFrame()
-    optimizer_name=["LM","Dogleg", "Gauss-Newton",  "cGD"]
-    marker_list = ["o", "v", "x", "s", "D"] #
+    optimizer_name=["LM","Dogleg", "Gauss-Newton",  "cGD", "Zhao20"]
+    marker_list = ["o", "v", "x", "*", "D"] #
     color_list = ["#0084DB","cyan", "limegreen", "r", "gold"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
-    for i in range(min(data_2d.shape[0], 4)):
+    for i in range(data_2d.shape[0]):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
 
