@@ -312,7 +312,7 @@ namespace rt_num_opt
         }
 
         // get get adjusting direction; 1 means increasing, -1 means decreasing
-        int GetDirection(Task &task)
+        static int GetDirection(Task &task)
         {
             double energy0 = EstimateEnergyTask(task);
             task.executionTime += deltaOptimizer;
