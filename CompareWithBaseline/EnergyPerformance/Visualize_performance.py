@@ -1,6 +1,7 @@
 import sys
 sys.path.append("../")
 import argparse
+import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -102,8 +103,12 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
     # N = 40 ~ 80
     for task_number in range(40, 90, 10):
         file_path = "Time"+"/N" + str(task_number) + ".txt"
+        if(not os.path.exists(file_path)):
+            continue
         file = open(file_path, "r")
         lines = file.readlines()
+        if(len(lines)==0):
+            continue
         data=[]
 
         # NLP, with elimination
@@ -128,7 +133,7 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=30,
+parser.add_argument('--maxTaskNumber', type=int, default=10,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
