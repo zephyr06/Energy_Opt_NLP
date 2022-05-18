@@ -6,15 +6,15 @@ testDataSetName: test_n3_v5
 
 
 debugMode: 0
-executionTimeModel: 1 # 1 is normal, 2 is more difficult
-elimIte: 1000
-EnergyMode: 1
-batchOptimizeFolder: Optimizer
+executionTimeModel: 2 # 1 is normal, 2 is more difficult
+elimIte: 0
+EnergyMode: 2
+batchOptimizeFolder: DAGPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-eliminateTol: 1e0
-eliminateStep: 1.5
+eliminateTol: 1e1
+eliminateStep: 10
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
 roundTypeInClamp: "none"
 clampTypeMiddle: "none"
@@ -22,7 +22,7 @@ exactJacobian: 1
 #*************************************************************
 
 # optimizer settings
-optimizerType: 4
+optimizerType: 5
 deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
