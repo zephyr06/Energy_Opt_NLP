@@ -16,9 +16,9 @@ MaxComputationTimeRestrict: 2
 eliminateTol: 1e0
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
-roundTypeInClamp: "none"
-clampTypeMiddle: "none"
-exactJacobian: 1
+roundTypeInClamp: "rough"
+clampTypeMiddle: "rough"
+exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
@@ -28,7 +28,7 @@ initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50
 verbosityLM: "SILENT"
-relativeErrorTolerance: 1e-3
+relativeErrorTolerance: 1e-5
 whether_ls: 0
 jacobianScale: 1
 #*************************************************************
@@ -36,13 +36,13 @@ jacobianScale: 1
 
 # in generating task set
 parallelFactor: 0.2
-PeriodSetAM: [1, 2, 5, 10, 20, 50, 100]
+PeriodSetAM: [1, 2, 5, 10, 20, 50,100]
 timeScaleFactor: 1e4
 maxNode_GenerateTaskSet: 20
 #*************************************************************
 
 # used in control
-relativeErrorToleranceInit: 1e-7
+relativeErrorToleranceInit: 1e-6
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
@@ -80,13 +80,13 @@ linearOptimizerType: "MULTIFRONTAL_QR"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
 enableReorder: 0
-deltaOptimizer: 1e-4
+deltaOptimizer: 1e-5
 readTaskMode: RM
 baselineLLCompare: 1
 printRTA: 0
 printFailureFile: 1
-noiseModelSigma: 1e0
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e8
+noiseModelSigma: 1e0
 #*************************************************************
 
