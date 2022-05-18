@@ -39,7 +39,7 @@ namespace rt_num_opt
 
     TaskSet GenerateTaskSet(int N, double totalUtilization,
                             int numberOfProcessor, int periodMin,
-                            int periodMax, int deadlineType = 0)
+                            int periodMax, int deadlineType = 0, int periodLogUniform = 0)
     {
         std::vector<double> utilVec = Uunifast(N, totalUtilization, true);
         TaskSet tasks;
@@ -50,6 +50,10 @@ namespace rt_num_opt
 
             // int periodCurr = (1 + rand() % periodMaxRatio) * periodMin;
             int periodCurr = RandRange(periodMin, periodMax);
+            if (periodLogUniform == 1)
+            {
+                periodCurr = round(RandRange(1e-4, 1) * pow(10, 2 + rand() % 4));
+            }
             double deadline = periodCurr;
             if (deadlineType == 1)
             {

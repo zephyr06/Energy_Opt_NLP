@@ -146,7 +146,7 @@ if __name__ == "__main__":
         plt.plot(np.linspace(minTaskNumber, min(15, maxTaskNumber), min(15, maxTaskNumber)-minTaskNumber+1), data_2d[-1][:min(15, maxTaskNumber)-minTaskNumber+1], marker=marker_list[-1], color=color_list[-1], markersize=8)
 
     if(data_source=="EnergySaveRatio"):
-        splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
+        splot.set(xlabel="Task Number", ylabel="Relative gap with Zhao20 (%)")
         # splot.set_ylim([0.95, 2.0])
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
