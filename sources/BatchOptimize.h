@@ -17,7 +17,14 @@ namespace rt_num_opt
         }
         if (elimIte > 0)
         {
-            return pathDataset + file + "_elim_Res.txt";
+            if (exactJacobian == 0 && jacobianScale == 16)
+            {
+                return pathDataset + file + "_elim_approx_Res.txt";
+            }
+            else
+            {
+                return pathDataset + file + "_elim_exact_Res.txt";
+            }
         }
         else
         {
