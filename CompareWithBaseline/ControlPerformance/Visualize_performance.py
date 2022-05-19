@@ -79,11 +79,10 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         file.close()
     return data2d
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=6,
+parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
@@ -126,33 +125,13 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Relative gap (%)")
         # splot.set_ylim([0.95, 1.8])
-        plt.legend(labels=optimizer_name)
-        plt.grid(linestyle="--")
-        plt.savefig("Compare_" + title + ".pdf", format='pdf')
-        plt.show(block=False)
-        plt.pause(3)
     elif (data_source == "Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
         # splot.set_ylim([0.95, 2.0])
         splot.set(yscale="log")
         splot.set_ylim(1e-4, 1e3)
-        plt.legend(labels=optimizer_name)
-        plt.grid(linestyle="--")
-        plt.savefig("Compare_Time" + title + ".pdf", format='pdf')
-        plt.show(block=False)
-        plt.pause(3)
-
-    # Draw box plot for control case
-    # if (data_source == "EnergySaveRatio"):
-    #     data_box_plot=read_data_2d_box(minTaskNumber, maxTaskNumbern)
-    #     dataset_pd = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in data_box_plot.items()]))
-    #     ax = sns.boxplot(data=dataset_pd, orient="v", fliersize=1, saturation=0.75, whis=1.5)
-    #     x = np.linspace(-0.5, 15.5, 16)
-    #     y = np.zeros((16))
-    #     ax = sns.lineplot(x=x, y=y, linestyle="dashed", color='darkgray')
-    #
-    #     ax.set(xlabel="Task Number", ylabel="Relative Gap (%)")
-    #     plt.savefig("Compare_control_box" + "Zhao20" + ".pdf", format='pdf')
-    #     plt.savefig("Compare_control_box" +  "Zhao20" + ".png", format='png')
-    #     plt.show(block=False)
-    #     plt.pause(3)
+    plt.legend(labels=optimizer_name)
+    plt.grid(linestyle="--")
+    plt.savefig("Compare_Time" + title+"_"+data_source + ".pdf", format='pdf')
+    # plt.show(block=False)
+    # plt.pause(3)

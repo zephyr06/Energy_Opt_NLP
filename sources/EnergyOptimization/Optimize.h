@@ -311,6 +311,21 @@ namespace rt_num_opt
             return;
         }
 
+        // get get adjusting direction; 1 means increasing, -1 means decreasing
+        static int GetDirection(Task &task)
+        {
+            double energy0 = EstimateEnergyTask(task);
+            task.executionTime += deltaOptimizer;
+            double energy1 = EstimateEnergyTask(task);
+            if (energy1 <= energy0)
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
         /**
          * find the tasks that do not need to optimize;
          * i means i-th task do not need optimization,  while i+1, ..., N need
@@ -330,7 +345,9 @@ namespace rt_num_opt
                 {
                     continue;
                 }
-                tasksCurr.tasks_[i].executionTime += eliminateTolIte;
+                // get adjusting direction; 1 means increasing, -1 means decreasing
+                int direction = GetDirection(tasksCurr.tasks_[i]);
+                tasksCurr.tasks_[i].executionTime += eliminateTolIte * direction;
                 if (enableMaxComputationTimeRestrict &&
                     tasksCurr.tasks_[i].executionTime - eliminateTolIte > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict)
                 {

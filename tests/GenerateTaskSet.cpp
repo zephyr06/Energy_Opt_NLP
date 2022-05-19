@@ -255,6 +255,34 @@ int main(int argc, char *argv[])
                 i--;
             }
         }
+
+        else if (taskType == 4)
+        {
+            totalUtilization = RandRange(0.5, 0.9);
+            int periodLogUniform = 1;
+            TaskSet tasks = GenerateTaskSet(N, totalUtilization,
+                                            numberOfProcessor,
+                                            periodMin,
+                                            periodMax, deadlineType, periodLogUniform);
+            TaskSetNormal tasksN(tasks);
+            if (schedulabilityCheck)
+            {
+                if (schedulabilityCheck == 1)
+                {
+                    RTA_LL r(tasksN);
+                    if (!r.CheckSchedulability())
+                    {
+                        i--;
+                        continue;
+                    }
+                }
+            }
+            string fileName = "periodic-set-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".csv";
+
+            ofstream myfile;
+            myfile.open(outDirectory + fileName);
+            WriteTaskSets(myfile, tasks);
+        }
     }
 
     return 0;

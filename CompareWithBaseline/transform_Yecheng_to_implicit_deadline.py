@@ -17,7 +17,7 @@ if __name__ == "__main__":
                         default='/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep',
                         help='O')
     parser.add_argument('--directoryWriteTo', type=str,
-                        default='/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt2/TestCases/NSweep',
+                        default='/home/zephyr/Programming/others/YechengRepo/Experiment/WCETEnergyOpt/TestCases/NSweep',
                         help='O')
 
     args = parser.parse_args()

@@ -111,6 +111,7 @@ namespace rt_num_opt
                         auto tasks = ReadTaskSet(path, readTaskMode);
                         tasksN.UpdateTaskSet(tasks);
                         N = tasks.size();
+                        Nn = tasks.size();
                     }
                     // else if (TaskSetType::Type() == "dag")
                     // {

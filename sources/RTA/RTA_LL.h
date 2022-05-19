@@ -102,9 +102,10 @@ namespace rt_num_opt
                     responseTimeBefore = responseTime;
                 }
                 loopCount++;
-                if (loopCount > 1000)
+                if (loopCount > 1500)
                 {
-                    CoutError("LoopCount error in RTA_LL");
+                    CoutWarning("LoopCount error in RTA_LL");
+                    return INT32_MAX;
                 }
             }
             std::cout << "RTA analysis stops unexpectedly!\n";
