@@ -6,23 +6,23 @@ testDataSetName: test_n3_v5
 
 
 debugMode: 0
-executionTimeModel: 1 # 1 is normal, 2 is more difficult
+executionTimeModel: 2 # 1 is normal, 2 is more difficult
 elimIte: 0
-EnergyMode: 1
-batchOptimizeFolder: EnergyPerformance
+EnergyMode: 2
+batchOptimizeFolder: DAGPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-eliminateTol: 1e0
-eliminateStep: 1.5
+eliminateTol: 1e1
+eliminateStep: 10
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
-roundTypeInClamp: "rough"
-clampTypeMiddle: "rough"
+roundTypeInClamp: "none"
+clampTypeMiddle: "none"
 exactJacobian: 1
 #*************************************************************
 
 # optimizer settings
-optimizerType: 2
+optimizerType: 5
 deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
@@ -63,7 +63,7 @@ weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 randomInitialize: 0
 coolingRateSA: 0.99
 temperatureSA: 100000
-SA_iteration: 1000000
+SA_iteration: 10000000
 #*************************************************************
 
 # in FindUnsustainable
