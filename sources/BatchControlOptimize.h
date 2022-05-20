@@ -161,6 +161,7 @@ namespace rt_num_opt
         if (debugMode == 1)
             printf("Directory: %s\n", pathDataset);
         std::vector<std::string> errorFiles;
+        std::vector<size_t> rtaCallTime;
         double worstObjRatio = -100;
         std::string worstFile = "";
         for (const auto &file : ReadFilesInDirectory(pathDataset))
@@ -180,9 +181,12 @@ namespace rt_num_opt
                 std::tie(tasks, coeff) = ReadControlCase(path);
                 N = tasks.size();
                 std::vector<bool> maskForElimination(tasks.size(), false); // TODO: try *2 to ?
+                ResetCallingTimes();
                 auto start = std::chrono::high_resolution_clock::now();
                 auto res = OptimizeTaskSetIterative<FactorGraphType>(tasks, coeff, maskForElimination);
                 auto stop = std::chrono::high_resolution_clock::now();
+                size_t rtaCall = ReadCallingTimes();
+                rtaCallTime.push_back(rtaCall);
                 auto duration = duration_cast<microseconds>(stop - start);
                 double timeTaken = double(duration.count()) / 1e6;
                 runTimeAll[0].push_back(timeTaken);
@@ -249,6 +253,14 @@ namespace rt_num_opt
                           std::ios_base::app);
         outfileWrite << Average(runTimeAll[0]) << std::endl;
         outfileWrite.close();
+
+        // record RTA calling times
+        double aveRTA = -1;
+        aveRTA = Average(rtaCallTime);
+        pathRes = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+                  batchOptimizeFolder + "/RTACalling/N" +
+                  std::to_string(Nn) + ".txt";
+        AddEntry(pathRes, aveRTA);
 
         if (printFailureFile)
         {
