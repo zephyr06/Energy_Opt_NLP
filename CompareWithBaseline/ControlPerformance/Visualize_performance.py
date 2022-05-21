@@ -93,8 +93,8 @@ def read_data_2d_rta(minTaskNumber, maxTaskNumber, folderName):
         # NLP, with elimination, exact Jacobian
         data.append(float(lines[1]))
 
-        # # NLP, without elimination
-        # data.append(float(lines[2]))
+        # NLP, without elimination
+        data.append(float(lines[2]))
         #
         # # SA
         # data.append(float(lines[3]))
@@ -114,7 +114,7 @@ parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
 parser.add_argument('--data_source', type=str, default="RTA",
                     help='data source folder')
-parser.add_argument('--title', type=str, default="elimination",
+parser.add_argument('--title', type=str, default="ControlPerformance",
                     help='tilte in produced figure')
 
 args = parser.parse_args()
