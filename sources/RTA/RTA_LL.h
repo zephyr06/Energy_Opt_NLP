@@ -18,6 +18,7 @@ namespace rt_num_opt
 
         double RTA_Common_Warm(double beginTime, int index) override
         {
+            IncrementRTAControl();
             TaskSet tasksHp;
             for (int i = 0; i < index; i++)
             {

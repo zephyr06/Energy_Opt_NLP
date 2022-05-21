@@ -7,9 +7,15 @@
 namespace rt_num_opt
 {
     size_t rtaCallingTimes;
+    size_t rtaControl;
     inline void ResetCallingTimes()
     {
         rtaCallingTimes = 0;
+        rtaControl = 0;
+    }
+    inline void IncrementRTAControl()
+    {
+        rtaControl++;
     }
     inline void IncrementCallingTimes()
     {
@@ -18,6 +24,10 @@ namespace rt_num_opt
     inline size_t ReadCallingTimes()
     {
         return rtaCallingTimes;
+    }
+    inline size_t ReadRTAControl()
+    {
+        return rtaControl;
     }
     /**
      * @brief All customized TaskSetType must inherit from TaskSetNormal in Tasks.h

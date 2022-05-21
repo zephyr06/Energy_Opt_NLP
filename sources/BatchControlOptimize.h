@@ -161,7 +161,7 @@ namespace rt_num_opt
         if (debugMode == 1)
             printf("Directory: %s\n", pathDataset);
         std::vector<std::string> errorFiles;
-        std::vector<size_t> rtaCallTime;
+        std::vector<double> rtaCallTime;
         double worstObjRatio = -100;
         std::string worstFile = "";
         for (const auto &file : ReadFilesInDirectory(pathDataset))
@@ -185,8 +185,8 @@ namespace rt_num_opt
                 auto start = std::chrono::high_resolution_clock::now();
                 auto res = OptimizeTaskSetIterative<FactorGraphType>(tasks, coeff, maskForElimination);
                 auto stop = std::chrono::high_resolution_clock::now();
-                size_t rtaCall = ReadCallingTimes();
-                rtaCallTime.push_back(rtaCall);
+                size_t rtaCall = ReadRTAControl();
+                rtaCallTime.push_back(rtaCall / double(N));
                 auto duration = duration_cast<microseconds>(stop - start);
                 double timeTaken = double(duration.count()) / 1e6;
                 runTimeAll[0].push_back(timeTaken);
@@ -261,7 +261,7 @@ namespace rt_num_opt
                   batchOptimizeFolder + "/RTACalling/N" +
                   std::to_string(Nn) + ".txt";
         AddEntry(pathRes, aveRTA);
-
+        std::cout << "Average rta calling times is " << aveRTA << std::endl;
         if (printFailureFile)
         {
             std::cout << std::endl;
