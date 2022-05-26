@@ -50,15 +50,16 @@ if __name__ == "__main__":
         lines=f.readlines()
         f.close()
     with open(target_file_name_time, "w") as f:
-        for line in lines[:-1]:
+        for line in lines[:3]:
             f.write(line)
         f.close()
 
     target_file_name_energy = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +  application+"Performance" + "/EnergySaveRatio/N" + str(
         taskSize) + ".txt"
-    # with open(target_file_name_energy, "a") as f:
-    #     for i in range(len(energy_bfs)):
-    #         f.write(str(energy_bfs[i])+"\n")
-    #     # if (application == "Energy"):
-    #     for i in range(len(energy_gp)):
-    #         f.write(str(energy_gp[i])+"\n")
+    with open(target_file_name_energy, "r") as f:
+        lines=f.readlines()
+        f.close()
+    with open(target_file_name_energy, "w") as f:
+        for line in lines[:1000*3]:
+            f.write(line)
+        f.close()
