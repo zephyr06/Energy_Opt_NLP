@@ -15,7 +15,7 @@ do
 	# python $ROOT_PATH/CompareWithBaseline/ConvertYechengDataset.py --convertionNumber $jobNumber
 	echo "$title iteration is: $jobNumber"
 	
-	python $ROOT_PATH/CompareWithBaseline/ClearYechengRecordsInMyRepo.py --taskSize $jobNumber --application "control"
+	python $ROOT_PATH/CompareWithBaseline/ClearYechengRecordsInMyRepo.py --taskSize $jobNumber --application "Control"
 	
 	# Load both MUA and MILP results
 	python $ROOT_PATH/CompareWithBaseline/LoadYechengRecordTo.py --application "Control" --taskSize $jobNumber 
