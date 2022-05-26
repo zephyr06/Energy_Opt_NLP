@@ -46,11 +46,11 @@ if __name__ == "__main__":
 
     target_file_name_time = "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" + application+"Performance" + "/Time/N" + str(
         taskSize) + ".txt"
-    with open(target_file_name_time, "a") as f:
+    with open(target_file_name_time, "r") as f:
         lines=f.readlines()
         f.close()
     with open(target_file_name_time, "w") as f:
-        for line in lines:
+        for line in lines[:-1]:
             f.write(line)
         f.close()
 
