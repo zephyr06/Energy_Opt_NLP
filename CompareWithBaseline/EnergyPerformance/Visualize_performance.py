@@ -133,11 +133,11 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=10,
+parser.add_argument('--maxTaskNumber', type=int, default=30,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source',type=str, default="Time",
+parser.add_argument('--data_source',type=str, default="RTA",
                     help='data source folder')
 parser.add_argument('--title', type=str, default="EnergyPerformance",
             help='tilte in produced figure')
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     dataset_pd = pd.DataFrame()
     optimizer_name=["NLP_Elim_approx","NLP_Elim_exact", "NLP_Raw",  "Zhao20", "MIGP"]
     marker_list = ["o", "v", "x", "s", "D"] #
-    color_list = ["#0084DB","cyan", "limegreen", "r", "gold"] #
+    color_list = ["#0084DB",  "r", "gold", "limegreen"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
     for i in range(min(data_2d.shape[0], 3)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
@@ -182,10 +182,10 @@ if __name__ == "__main__":
 
     if(data_source=="EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Relative gap with Zhao20 (%)")
-        # splot.set_ylim([0.95, 2.0])
+        splot.set_ylim([95, 200])
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
-        plt.savefig("Compare_" +title+ ".pdf", format='pdf')
+        plt.savefig("Compare_" + title +"_"+ data_source + ".pdf", format='pdf')
         plt.show(block=False)
         plt.pause(3)
     elif(data_source=="Time"):

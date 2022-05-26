@@ -35,7 +35,7 @@ def read_data_2d_data(minTaskNumber, maxTaskNumber, folderName):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=3,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=3,
+parser.add_argument('--maxTaskNumber', type=int, default=10,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
@@ -55,30 +55,35 @@ data_source=args.data_source
 if __name__ == "__main__":
     if(data_source=="EnergySaveRatio"):
         data_2d = read_data_2d_data(minTaskNumber, maxTaskNumber, "EnergySaveRatio")
+        data_2d = np.array(data_2d)
+        data_2d = data_2d * 100.0
     elif (data_source == "Time"):
         data_2d = read_data_2d_data(minTaskNumber, maxTaskNumber,"Time")
     elif (data_source == "RTA"):
         data_2d = read_data_2d_data(minTaskNumber, maxTaskNumber,"RTACalling")
     data_2d=np.array(data_2d).transpose()
+    if (data_source == "RTA"):
+        data_2d = data_2d[:3,:]
     dataset_pd = pd.DataFrame()
     optimizer_name=["NLP_Elim_approx","NLP_Elim_exact", "NLP_Raw",  "SA"]
     marker_list = ["o", "v", "s", "D"] #
-    color_list = ["#0084DB", "limegreen", "r", "gold"] #
+    color_list = ["#0084DB",  "r", "gold", "limegreen"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
     for i in {0,1,2,3}:
-        dataset_pd.insert(0, optimizer_name[i], data_2d[i])
-        splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
+        if(i<data_2d.shape[0]):
+            dataset_pd.insert(0, optimizer_name[i], data_2d[i])
+            splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
 
     if(data_source=="EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
-        # splot.set_ylim([0.25, 1])
+        splot.set_ylim([55, 90])
     elif(data_source=="Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
         # splot.set_ylim([0.95, 2.0])
         # splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)
     elif(data_source=="RTA"):
-        splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
+        splot.set(xlabel="Task Number", ylabel="Schedulability analysis call times")
         # splot.set_ylim([0.95, 2.0])
         # splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)

@@ -137,7 +137,7 @@ if __name__ == "__main__":
     dataset_pd = pd.DataFrame()
     optimizer_name=["NLP_Elim_approx", "NLP_Elim_exact", "NLP_Raw",  "Zhao20", "MIGP"]
     marker_list = ["o", "v", "x", "s", "D"] #
-    color_list = ["#0084DB","cyan", "limegreen", "r", "gold"] #
+    color_list = ["#0084DB",  "r", "gold", "limegreen"]#
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
     for i in range(min(data_2d.shape[0], 4)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     if (data_source == "EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Relative gap (%)")
-        # splot.set_ylim([0.95, 1.8])
+        # splot.set_ylim([0.55, 0.9])
     elif (data_source == "Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
         # splot.set_ylim([0.95, 2.0])
