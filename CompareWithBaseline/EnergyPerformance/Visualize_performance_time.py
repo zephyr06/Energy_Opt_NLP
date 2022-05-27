@@ -30,7 +30,7 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         data.append(float(lines[3]))
 
         # MILP, maximum number is 15
-        if (task_number <= 15):
+        if (task_number < 12):
             data.append(float(lines[4]))
         else:
             data.append(-1)
@@ -119,7 +119,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=30,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="RTA",
+parser.add_argument('--data_source', type=str, default="Time",
                     help='data source folder')
 parser.add_argument('--title', type=str, default="EnergyPerformance",
                     help='tilte in produced figure')
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     dataset_pd = pd.DataFrame()
     optimizer_name = ["NLP_Elim_approx", "NLP_Elim_exact", "NLP_Raw", "Zhao20", "MIGP"]
     marker_list = ["o", "v", "x", "s", "D"]  #
-    color_list = ["#0084DB",  "r", "gold", "limegreen"] #
+    color_list = ["#0084DB",  "r", "gold", "limegreen", "purple"] #
     # dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
 
     long_index = []
@@ -165,8 +165,8 @@ if __name__ == "__main__":
 
         # MILP
         if (data_source == "EnergySaveRatio" or data_source == "Time"):
-            plt.plot(np.linspace(minTaskNumber, min(15, maxTaskNumber), min(15, maxTaskNumber) - minTaskNumber + 1),
-                     data_2d[-1][:min(15, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1],
+            plt.plot(np.linspace(minTaskNumber, min(11, maxTaskNumber), min(11, maxTaskNumber) - minTaskNumber + 1),
+                     data_2d[-1][:min(11, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1],
                      color=color_list[-1], markersize=8)
 
     if (data_source == "EnergySaveRatio"):

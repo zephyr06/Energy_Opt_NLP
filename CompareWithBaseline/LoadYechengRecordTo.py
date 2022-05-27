@@ -23,9 +23,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # parser.add_argument('--baseline', type=str, default="Zhao20",
     #                     help='0')
-    parser.add_argument('--application', type=str, default="Control",
+    parser.add_argument('--application', type=str, default="Energy",
                         help='0')
-    parser.add_argument('--taskSize', type=int, default=5,
+    parser.add_argument('--taskSize', type=int, default=11,
                         help='N')
     parser.add_argument('--directory', type=str,
                         default='/home/zephyr/Programming/others/YechengRepo/',

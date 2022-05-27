@@ -6,8 +6,6 @@ MaxTaskNumber=30
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
-python edit_yaml.py --entry "batchOptimizeFolder" --value $title
-
 
 for (( jobNumber=5; jobNumber<=$MaxTaskNumber; jobNumber++ ))
 do
