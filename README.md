@@ -26,7 +26,8 @@ make check -j8 # optional, run all the unit tests
 ./tests/testPeriodFactorsOpt2.run # Control performance optimization for a single task set
 ```
 
-To optimize for several task sets collectively, use the scripts provided in `CompareWithBaseline/*/*.sh`. However, these scripts require loading optimization results of [Zhao20](https://ieeexplore.ieee.org/document/9355563). If you want to reproduce experiment figures, please ask the authors for code access; if you only want to run code, then you can remove the loading part and modify the plot script accordingly.
+To optimize for several task sets collectively, use the scripts provided in `CompareWithBaseline/*/*.sh`. However, these scripts require loading optimization results of [Zhao20](https://ieeexplore.ieee.org/document/9355563). If you want to fully reproduce experiment figures, please ask the authors for code access, run their code, and modify the reading path in this project accordingly(When running our this, it will report path not found and where to modify the path); however, the code provided is enough to re-produce experiments related to our paper. 
+
 
 # Other things to notice before running
 - The parameters that influence optimization process can be found in sources/parameters.yaml. If performing optimization doesn't give good result, you can adjust deltaInitialDogleg if using dogleg optimizer, or initialLambda if using LM optimizer. 
