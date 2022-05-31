@@ -179,6 +179,7 @@ if __name__ == "__main__":
         plt.pause(3)
     elif (data_source == "Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
+        splot.set_xlim([0, 85])
         splot.set_ylim([1e-4, 1e3])
         splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)

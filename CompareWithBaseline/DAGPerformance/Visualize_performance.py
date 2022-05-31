@@ -39,7 +39,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=10,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source',type=str, default="EnergySaveRatio",
+parser.add_argument('--data_source',type=str, default="Time",
                     help='data source folder, Time or EnergySaveRatio or RTA')
 parser.add_argument('--title', type=str, default="DAGPerformance",
             help='tilte in produced figure')
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     if(data_source=="EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
-        # splot.set_ylim([55, 90])
+        splot.set_ylim([55, 90])
     elif(data_source=="Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
         # splot.set_ylim([0.95, 2.0])

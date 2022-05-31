@@ -112,7 +112,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="Time",
+parser.add_argument('--data_source', type=str, default="RTA",
                     help='data source folder')
 parser.add_argument('--title', type=str, default="ControlPerformance",
                     help='tilte in produced figure')
@@ -163,6 +163,7 @@ if __name__ == "__main__":
         # splot.set_ylim([0.95, 2.0])
         # splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)
+    splot.set_xlim([4, 21])
     plt.legend(labels=optimizer_name)
     plt.grid(linestyle="--")
     plt.savefig("Compare_" + title+"_"+data_source + ".pdf", format='pdf')
