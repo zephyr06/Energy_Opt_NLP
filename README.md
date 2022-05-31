@@ -1,69 +1,35 @@
-# Energy_Opt_NLP
-This repo implements energy optimization for real-time systems based on nonlinear programming, and explores special structure to achieve efficient optimization.
+# Numerical Optimization for Real-time Systems
+This repo provides implementation for paper 'A General and Scalable Method for Optimizing
+Real-time Systems with Continuous Variables'.
 
-# RoadMap/TODO
+# Dependencies
+- [CMake](https://cmake.org/download/)
+- [Boost](https://www.boost.org/users/download/)
+- [GTSAM](https://github.com/borglab/gtsam)
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp)
+- [cppUnitLite](https://github.com/anonymousUser666666/CppUnitLite)
+- OpenCV
+- [Intel Threaded Building Blocks (TBB)](http://www.threadingbuildingblocks.org/) 
+- Please let me know if some other packages are missing
 
-2. test with scale
-how to limit the boundary, i.e., the computation time can only increase
-LM will probably have a much worse performance than DL?
+# Build and Run
+To build the C++ code:
+```
+cd Energy_Opt_NLP
+mkdir build
+cd build
+cmake ..
+make -j4
+make check -j8 # optional, run all the unit tests
+./tests/testOptSingle.run # Optimize a single task set with DVFS subject to LL RTA model
+./tests/testOptSingleDAG.run # Optimize a single task set with DVFS subject to [Narsi19](https://drops.dagstuhl.de/opus/volltexte/2019/10758/) RTA model
+./tests/testPeriodFactorsOpt2.run # Control performance optimization for a single task set
+```
 
-2. n20-v2
-eliminate during optimization
+To optimize for several task sets collectively, use the scripts provided in `CompareWithBaseline/*/*.sh`. However, these scripts require loading optimization results of [Zhao20](https://ieeexplore.ieee.org/document/9355563). If you want to reproduce experiment figures, please ask the authors for code access; if you only want to run code, then you can remove the loading part and modify the plot script accordingly.
 
-2. incremental optimization
-- only single-side can be achieved
+# Other things to notice before running
+- The parameters that influence optimization process can be found in sources/parameters.yaml. If performing optimization doesn't give good result, you can adjust deltaInitialDogleg if using dogleg optimizer, or initialLambda if using LM optimizer. 
+- A lot of unit tests can be found in `tests` foldeer so that you have a better idea about each functions.
+- This project uses absolute path, so please replace `/home/zephyr/Programming/Energy_Opt_NLP` with `/YOUR/LOCAL/PATH/Energy_Opt_NLP`
 
-3. DAG optimization
-4. what kind of optimality can we guarantee
-
-0. What are the unique features of global result, how can we guide the optimization algorithm to find it by changing some settings
-
-
-
-
-# Research topic
-1. how to round float point to int
-- it should be applied every time after elimination
-2. can we decide priority assignment from energy otpimization part? i.e., we decide priority assignment that make the task set both schedulable, and more energy efficient by fully using the processor resource
-
-# Solved
-order of variables in GTSAM, should the Jacobian be a upper or a lower triangular matrix?
--- COLMAD automatically adjusts it
-
-optimize at 'int' precision; if adjustment is smaller than 1, then not necessary to move further
--- bound relative error tolerance
-
-long long int issue
--- solved
-
-log barrier function may return inf if responseTime equals deadline
--- clamp the minimum value that log can take as input; if it is 0, we'll return log(0 + toleranceBarrier/100);
--- However, the gradient should be very large at this point, to warn the optimizer not to move further
-
-1. warm start on response time during optimization;
-can we bound the incremental response time analysis?
-
-3. test-n3-v11: 
-- optiaml result is just 1, so make sure that whatever happens, the variables will not decrease during optimization
-- the "eliminate" procedure should be able to detect this and freeze variables
-- how to evaluate Jacobian matrix appropriately for this test case?
-
-1. how to optimize when it's close to the scheduling boundary
-- probably a two-phase method; whenever some tasks reach their boundary, we freeze all the hp variables and remove them from the variable set; however, what kind of optimality can we guarantee in that case? how do we know whether the freezed variables already reach their optimal solution? In essence, the previous optimization iterations update variables following a consistent proportion, while the direction is given by GN method;
-- -how to decide when to eliminate these variables? 
-
-4. n3-v20
-should we clamp before eliminate, or eliminate before clamp?
-- if we eliminate first, and then clamp, the variables may become "do not need clamp" because they actually decrease
- if we clamp first, and then eliminate, nothing happens
-
- 2. weight issue, summarize why do we need to control weight
-- be large, otherwise variables may go backwards when they are near the boundary
-- not be too large, otherwise the schedulability constraints lose effects, can be circumvented by increasing punishment coefficient correspondingly
-- be small, because we want the barrier gradient to guide the optimization process towards the global optimal more??
--> adopt traditional interior-point method
-
-3. n20-v3
-weight cannot be too large
-
-scale issue, why does it perform worse with larger task sets?
