@@ -140,46 +140,25 @@ TEST(multiple_small, v1)
               << std::endl;
 
     Values result;
-    // LevenbergMarquardtParams params;
-    // params.setlambdaInitial(1e3);
-    // params.setVerbosityLM("TRYDELTA");
-    // // params.setlambdaLowerBound(lowerLambda);
-    // // params.setlambdaUpperBound(upperLambda);
-    // // params.setRelativeErrorTol(relativeErrorTolerance);
-    // LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
+    LevenbergMarquardtParams params;
+    params.setlambdaInitial(1e3);
+    params.setVerbosityLM("TRYDELTA");
+    params.setDiagonalDamping(false);
+    LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
 
-    gtsam::GaussNewtonParams params;
-    params.setVerbosity("DELTA");
-    gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
-    result = optimizer.optimize();
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "multiple_small:" << duration.count() << endl;
+    std::cout << "Delta from getDelta " << optimizer.getDelta(params).at(GenerateControlKey(0, "period")) << std::endl
+              << std::endl
+              << std::endl;
+    ;
+    // gtsam::GaussNewtonParams params;
+    // params.setVerbosity("DELTA");
+    // gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
+
+    // result = optimizer.optimize();
+    // auto stop = high_resolution_clock::now();
+    // auto duration = duration_cast<microseconds>(stop - start);
+    // cout << "multiple_small:" << duration.count() << endl;
 }
-
-// TEST(single_big, v1)
-// {
-//     auto start = high_resolution_clock::now();
-//     auto model = noiseModel::Isotropic::Sigma(Nvar, noiseModelSigma);
-//     NonlinearFactorGraph graph;
-//     Values initialEstimateFG;
-
-//     graph.emplace_shared<MyTestFactorND>(GenerateControlKey(0, "period"), model);
-//     initialEstimateFG.insert(GenerateControlKey(0, "period"), GenerateVectorDynamic(Nvar));
-
-//     Values result;
-//     LevenbergMarquardtParams params;
-//     params.setlambdaInitial(initialLambda);
-//     params.setVerbosityLM("SUMMARY");
-//     params.setlambdaLowerBound(lowerLambda);
-//     params.setlambdaUpperBound(upperLambda);
-//     params.setRelativeErrorTol(relativeErrorTolerance);
-//     LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
-//     result = optimizer.optimize();
-//     auto stop = high_resolution_clock::now();
-//     auto duration = duration_cast<microseconds>(stop - start);
-//     cout << "single_big:" << duration.count() << endl;
-// }
 int main()
 {
     TestResult tr;
