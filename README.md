@@ -34,3 +34,4 @@ To optimize for several task sets collectively, use the scripts provided in `Com
 - A lot of unit tests can be found in `tests` foldeer so that you have a better idea about each functions.
 - This project uses absolute path, so please replace `/home/zephyr/Programming/Energy_Opt_NLP` with `/YOUR/LOCAL/PATH/Energy_Opt_NLP`
 
+# Please let me know if you have any issues about this project and open a new issue ticket.
