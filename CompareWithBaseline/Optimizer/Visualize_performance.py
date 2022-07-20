@@ -124,7 +124,7 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio"):
         data_2d = data_2d * 100
     dataset_pd = pd.DataFrame()
-    optimizer_name=["LM","Dogleg", "Gauss-Newton",  "cGD", "Zhao20"]
+    optimizer_name=["LM_VE","Dogleg", "Gauss-Newton",  "cGD", "Zhao20"]
     marker_list = ["o", "v", "x", "*", "D"] #
     color_list = ["#0084DB","cyan", "limegreen", "r", "gold"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
