@@ -42,6 +42,7 @@ TEST(coeffFactor, v1)
     // TaskSet tasks;
     // VectorDynamic coeff;
     // std::tie(tasks, coeff) = ReadControlCase(path1);
+    jacobianScale = 1;
     weightSchedulability = 1;
     auto model = noiseModel::Isotropic::Sigma(1, 1);
     VectorDynamic coeff0 = GenerateVectorDynamic(1);

@@ -5,6 +5,7 @@
 
 #include "sources/Tools/testMy.h"
 #include "sources/Tools/profilier.h"
+#include "sources/Utils/Parameters.h"
 namespace rt_num_opt
 {
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixDynamic;
