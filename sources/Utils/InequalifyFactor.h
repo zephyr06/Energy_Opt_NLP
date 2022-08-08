@@ -106,6 +106,7 @@ namespace rt_num_opt
             {
                 // *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
                 *H = GenerateVectorDynamic(dimension);
+                *H = *H * jacobianScale;
             }
             return err;
         }

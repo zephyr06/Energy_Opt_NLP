@@ -12,9 +12,9 @@ namespace rt_num_opt
     typedef long long int LLint;
 
     /**
- * @brief error= coeff_ * x
- * 
- */
+     * @brief error= coeff_ * x
+     *
+     */
     class CoeffFactor : public gtsam::NoiseModelFactor1<VectorDynamic>
     {
     public:
@@ -43,6 +43,7 @@ namespace rt_num_opt
                 {
                     CoutError("Wrong dimension of Jacobian in CoeffFactor!");
                 }
+                *H = *H * jacobianScale;
             }
             VectorDynamic err = coeff_ * (x);
             EndTimer("CoeffFactor");

@@ -89,6 +89,7 @@ namespace rt_num_opt
 
                         else
                             (*H)[i] = GenerateVectorDynamic(2);
+                        (*H)[i] = (*H)[i] * jacobianScale;
                     }
                     if (debugMode == 1)
                     {
@@ -197,7 +198,8 @@ namespace rt_num_opt
                     tasks[i].period -= disturb;
                     RTA_LL r1(tasks);
                     VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);
-                    if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
+                    // if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb)
+                    if (!r1.CheckSchedulabilityDirect(rtaCurr))
                     // TODO: more analytic way
                     {
                         if (!maskForElimination[i])
