@@ -151,7 +151,7 @@ if __name__ == "__main__":
              markersize=8)
 
     if (data_source == "EnergySaveRatio"):
-        splot.set(xlabel="Task Number", ylabel="Relative gap (%)")
+        splot.set(xlabel="Task Number", ylabel="Relative gap (%)", fontsize=10)
         # splot.set_ylim([0.55, 0.9])
     elif (data_source == "Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")

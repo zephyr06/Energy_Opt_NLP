@@ -185,9 +185,9 @@ namespace rt_num_opt
                     // *H = jacobian;
                     if (debugMode == 1)
                     {
-                        std::cout << std::endl;
+                        std::cout << Color::blue << std::endl;
                         std::cout << "The current evaluation point is " << std::endl
-                                  << executionTimeVector << std::endl;
+                                  << executionTimeVector << Color::def << std::endl;
                         std::cout << "The Jacobian is " << std::endl
                                   << *H << std::endl;
                         // std::cout << "The approximated Jacobian is " << std::endl
@@ -525,6 +525,7 @@ namespace rt_num_opt
                 for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
                     initialEstimateDuringOpt(i - lastTaskDoNotNeedOptimize - 1, 0) =
                         taskSetType.tasks_[i].executionTime;
+
                 Schedul_Analysis r2(taskSetType);
                 responseTimeInitial = r2.ResponseTimeOfTaskSet();
                 // perform optimization
@@ -597,6 +598,7 @@ namespace rt_num_opt
                     break;
                 }
             }
+            // std::cout << "Final eliminateTol is " << eliminateTolIte << std::endl;
             ClampComputationTime(taskSetType,
                                  -1,
                                  responseTimeInitial, roundTypeInClamp);

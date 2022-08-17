@@ -176,12 +176,15 @@ if __name__ == "__main__":
     splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i],
                          markersize=6)
 
+    font_size= 15
+    plt.rcParams.update({'font.size': font_size/1.2})
     # MILP
     if (data_source == "EnergySaveRatio" or data_source=="Time"):
         plt.plot(np.linspace(minTaskNumber, min(11, maxTaskNumber), min(11, maxTaskNumber)-minTaskNumber+1), data_2d[-1][:min(11, maxTaskNumber)-minTaskNumber+1], marker=marker_list[-1], color=color_list[-1], markersize=8)
 
+    plt.xlabel("Task Number", fontsize=font_size)
     if(data_source=="EnergySaveRatio"):
-        splot.set(xlabel="Task Number", ylabel="Relative gap with Zhao20 (%)")
+        plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
         splot.set_ylim([95, 200])
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
@@ -189,7 +192,7 @@ if __name__ == "__main__":
         plt.show(block=False)
         plt.pause(3)
     elif(data_source=="Time"):
-        splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
+        plt.ylabel("Running time (seconds)", fontsize=font_size)
         # splot.set_ylim([0.95, 2.0])
         splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)
@@ -199,8 +202,9 @@ if __name__ == "__main__":
         plt.show(block=False)
         plt.pause(3)
     elif(data_source=="RTA"):
-        splot.set(xlabel="Task Number", ylabel="RTA calling times")
+        # splot.set(xlabel="Task Number", ylabel="RTA calling times")
         # splot.set_ylim([0.95, 2.0])
+        plt.ylabel("RTA calling times", fontsize=font_size)
         # splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)
         plt.legend(labels=optimizer_name)

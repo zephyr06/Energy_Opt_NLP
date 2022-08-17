@@ -2,12 +2,12 @@
 
 # optimization seettings
 runMode: compare
-testDataSetName: test_n3_v5
+testDataSetName: test_n5_v40
 
 
 debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
-elimIte: 0
+elimIte: 100
 EnergyMode: 1
 batchOptimizeFolder: Optimizer
 core_m_dag: 4
@@ -18,16 +18,18 @@ eliminateStep: 1.5
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
 roundTypeInClamp: "rough"
 clampTypeMiddle: "rough"
-exactJacobian: 1
+exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
+SpeedOptimizeOption: 0
 optimizerType: 2
 deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50
-verbosityLM: "SILENT"
+# SILENT SUMMARY
+verbosityLM: "SUMMARY" 
 relativeErrorTolerance: 1e-5
 whether_ls: 0
 jacobianScale: 16
@@ -46,7 +48,7 @@ relativeErrorToleranceInit: 1e-6
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
-MaxLoopControl: 1e4
+MaxLoopControl: 1
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
 weightSchedulabilityMax: 1e12
 weightSchedulabilityStep: 1.5
