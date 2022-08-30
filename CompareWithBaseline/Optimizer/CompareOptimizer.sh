@@ -2,7 +2,7 @@
 
 # ************** Adjust settings there **************
 title="Optimizer"
-MaxTaskNumber=7
+MaxTaskNumber=20
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
