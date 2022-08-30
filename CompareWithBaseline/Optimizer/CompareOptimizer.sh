@@ -2,7 +2,7 @@
 
 # ************** Adjust settings there **************
 title="Optimizer"
-MaxTaskNumber=30
+MaxTaskNumber=7
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
@@ -18,7 +18,7 @@ perform_optimization() {
 	cd $ROOT_PATH/release
 	cmake -DCMAKE_BUILD_TYPE=Release ..
 	make -j8
-	./tests/LLCompare
+	./tests/BatchControl $1
 	cd $ROOT_PATH/CompareWithBaseline
 	sleep 1
 }
@@ -26,31 +26,48 @@ perform_optimization() {
 
 for (( jobNumber=5; jobNumber<=$MaxTaskNumber; jobNumber++ ))
 do
-	# generate task set
-	python $ROOT_PATH/CompareWithBaseline/ConvertYechengDataset.py --convertionNumber $jobNumber
+
 	echo "$title iteration is: $jobNumber"
 	
 	# LM, eliminated, approximated Jacobian
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 16
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 1000
-	perform_optimization
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "MaxLoopControl" --value 100
+	perform_optimization $jobNumber
 	
-	# Dogleg, not eliminated, exact Jacobian
-    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
-		python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 1
-		python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
-		python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 0
-	perform_optimization
+	# Dogleg
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
+	perform_optimization $jobNumber
 	
-	# GN, eliminated, exact Jacobian
+	# GN
     	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 3
 	perform_optimization
 	
-	# cGD, eliminated, exact Jacobian
+	# cGD
     	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 4
 	perform_optimization
+	
+	# **********************************************************************************	
+	# LM, no elimination, exact Jacobian
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 1
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "MaxLoopControl" --value 1
+	perform_optimization $jobNumber
+	
+	# Dogleg
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 1
+	perform_optimization $jobNumber
+	
+	# GN
+    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 3
+	perform_optimization
+	
+	# cGD
+    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 4
+	perform_optimization
+	
 	
 done
 
