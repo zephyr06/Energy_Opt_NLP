@@ -2,7 +2,7 @@
 
 # ************** Adjust settings there **************
 title="EnergyPerformance"
-MaxTaskNumber=23
+MaxTaskNumber=30
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
