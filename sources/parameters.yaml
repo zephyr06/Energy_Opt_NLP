@@ -7,9 +7,9 @@ testDataSetName: test_n3_v5
 
 debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
-elimIte: 100
+elimIte: 0
 EnergyMode: 1
-batchOptimizeFolder: Optimizer
+batchOptimizeFolder: EnergyPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
@@ -22,7 +22,7 @@ exactJacobian: 1
 #*************************************************************
 
 # optimizer settings
-optimizerType: 4
+optimizerType: 2
 deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
@@ -46,7 +46,7 @@ relativeErrorToleranceInit: 1e-6
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
-MaxLoopControl: 1
+MaxLoopControl: 1e4
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
 weightSchedulabilityMax: 1e12
 weightSchedulabilityStep: 1.5
@@ -81,7 +81,7 @@ weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
 enableReorder: 0
 deltaOptimizer: 1e-5
-readTaskMode: RM
+readTaskMode: deadline
 baselineLLCompare: 1
 printRTA: 0
 printFailureFile: 1
