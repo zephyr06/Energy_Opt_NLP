@@ -425,6 +425,7 @@ namespace rt_num_opt
                 params.setlambdaInitial(initialLambda);
                 // if (debugMode > 1 && debugMode < 5)
                 params.setVerbosityLM(verbosityLM);
+                params.setDiagonalDamping(setDiagonalDamping);
                 // params.setVerbosityLM("TRYDELTA");
                 params.setlambdaLowerBound(lowerLambda);
                 params.setlambdaUpperBound(upperLambda);

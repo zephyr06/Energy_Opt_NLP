@@ -94,6 +94,8 @@ namespace rt_num_opt
     double jacobianScale = (double)ConfigParameters["jacobianScale"];
 
     int whether_ls = (int)ConfigParameters["whether_ls"];
+
+    int setDiagonalDamping = (int)ConfigParameters["setDiagonalDamping"];
     int SpeedOptimizeOption = (int)ConfigParameters["SpeedOptimizeOption"];
     int whetherWriteNarsiTaskSet = (int)ConfigParameters["whetherWriteNarsiTaskSet"];
     std::vector<int> PeriodSetAM;
