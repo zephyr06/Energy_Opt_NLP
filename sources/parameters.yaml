@@ -1,13 +1,13 @@
 %YAML:1.0
 
 # optimization seettings
-runMode: compare
-testDataSetName: test_n5_v24
+runMode: normal
+testDataSetName: test_n3_v5
 
 
 debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
-elimIte: 0
+elimIte: 100
 EnergyMode: 1
 batchOptimizeFolder: EnergyPerformance
 core_m_dag: 4
@@ -16,20 +16,20 @@ MaxComputationTimeRestrict: 2
 eliminateTol: 1e0
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
-roundTypeInClamp: "fine"
+roundTypeInClamp: "rough"
 clampTypeMiddle: "rough"
 exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
-optimizerType: 2
+optimizerType: 1
 deltaInitialDogleg: 1e13
-initialLambda: 1e1
-lowerLambda: 1e-5
-upperLambda: 1e15
-verbosityLM: "SILENT" # SILENT
+initialLambda: 1e3
+lowerLambda: 1e-10
+upperLambda: 1e50
+verbosityLM: "SILENT"
+setDiagonalDamping: 0
 relativeErrorTolerance: 1e-5
-setDiagonalDamping: 1
 whether_ls: 0
 jacobianScale: 1
 #*************************************************************
