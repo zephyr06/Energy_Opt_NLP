@@ -185,7 +185,7 @@ if __name__ == "__main__":
     plt.xlabel("Task Number", fontsize=font_size)
     if(data_source=="EnergySaveRatio"):
         plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
-        splot.set_ylim([95, 200])
+        splot.set_ylim([95, 160])
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
         plt.savefig("Compare_" + title +"_"+ data_source + ".pdf", format='pdf')
