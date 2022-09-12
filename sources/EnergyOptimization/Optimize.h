@@ -330,7 +330,10 @@ namespace rt_num_opt
          * find the tasks that do not need to optimize;
          * i means i-th task do not need optimization,  while i+1, ..., N need
          * -1 means all tasks need optimization
-         * N-1 means all tasks do not need optimization
+         * N-1 means all tasks do not need optimization;
+         *
+         * Although Narsi's analysis cannot be verified to satisfy ''influence'' theorem or not, we assume it holds
+         * to enable faster optimization; the results are always safe anyway.
          **/
         static int FindTaskDoNotNeedOptimize(const TaskSetType &tasks, int lastTaskDoNotNeedOptimize,
                                              VectorDynamic &computationTimeWarmStart, double eliminateTolIte)
@@ -377,6 +380,7 @@ namespace rt_num_opt
                     EndTimer(__func__);
                     return i;
                 }
+                // TODO: add discrete selection?
                 // recover tasksCurr[i].executionTime
                 tasksCurr.tasks_[i].executionTime -= eliminateTolIte;
             }
