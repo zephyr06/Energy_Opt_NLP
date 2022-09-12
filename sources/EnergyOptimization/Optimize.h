@@ -148,7 +148,6 @@ namespace rt_num_opt
 
                 if (H)
                 {
-
                     if (exactJacobian == 1)
                         *H = NumericalDerivativeDynamicUpper(f, executionTimeVector, deltaOptimizer, N);
                     else if (exactJacobian == 0)

@@ -1,49 +1,49 @@
 %YAML:1.0
 
 # optimization seettings
-runMode: compare
-testDataSetName: test_n3_v5
+runMode: normal
+testDataSetName: test_n3_v12
 
 
-debugMode: 0
+debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 100
 EnergyMode: 1
-batchOptimizeFolder: EnergyPerformance
-core_m_dag: 4
+batchOptimizeFolder: DAGPerformance
+core_m_dag: 3
 enableMaxComputationTimeRestrict: 1
-MaxComputationTimeRestrict: 2
-eliminateTol: 1e0
-eliminateStep: 1.5
+MaxComputationTimeRestrict: 4
+eliminateTol: 1e1
+eliminateStep: 10
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
-roundTypeInClamp: "rough"
-clampTypeMiddle: "rough"
+roundTypeInClamp: "none"
+clampTypeMiddle: "none"
 exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
 optimizerType: 2
 deltaInitialDogleg: 1e13
-initialLambda: 1e0
+initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50
-verbosityLM: "SILENT"
+verbosityLM: "SUMMARY"
 relativeErrorTolerance: 1e-5
+whether_ls: 1
 setDiagonalDamping: 1
-whether_ls: 0
 jacobianScale: 1
 #*************************************************************
 
 
 # in generating task set
 parallelFactor: 0.2
-PeriodSetAM: [1, 2, 5, 10, 20, 50,100]
+PeriodSetAM: [1, 2, 5, 10, 20, 50, 100]
 timeScaleFactor: 1e4
 maxNode_GenerateTaskSet: 20
 #*************************************************************
 
 # used in control
-relativeErrorToleranceInit: 1e-6
+relativeErrorToleranceInit: 1e-7
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
@@ -64,7 +64,7 @@ weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 randomInitialize: 0
 coolingRateSA: 0.99
 temperatureSA: 100000
-SA_iteration: 1000000
+SA_iteration: 10000000
 #*************************************************************
 
 # in FindUnsustainable
@@ -81,12 +81,13 @@ linearOptimizerType: "MULTIFRONTAL_QR"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
 enableReorder: 0
-deltaOptimizer: 1e-5
-readTaskMode: deadline
+deltaOptimizer: 1e-4
+readTaskMode: RM
 baselineLLCompare: 1
 printRTA: 0
 printFailureFile: 1
+noiseModelSigma: 1e0
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e8
-noiseModelSigma: 1e0
 #*************************************************************
+
