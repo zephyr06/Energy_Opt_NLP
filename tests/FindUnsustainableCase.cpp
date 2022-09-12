@@ -1,6 +1,6 @@
 #include <CppUnitLite/TestHarness.h>
 
-#include "sources/RTA/RTA_Narsi19.h"
+#include "sources/RTA/RTA_Nasri19.h"
 #include "sources/BatchTestutils.h"
 #include "sources/Utils/Parameters.h"
 
@@ -35,7 +35,7 @@ TEST(batchfind, v1)
             for (int adjustTaskIndex = 0; adjustTaskIndex < rt_num_opt::taskSetSize_FindUnsustainable; adjustTaskIndex++)
             {
                 auto tasksetVerucchi = rt_num_opt::TransformTaskSetNumOpt2dagSched(dagTasksNumOpt);
-                
+
                 std::vector<double> rtaBase = dagSched::RTA_G_LP_FTP_Nasri2019_C(tasksetVerucchi, rt_num_opt::core_m_dag);
                 if (rtaBase.size() == 0)
                 {

@@ -5,7 +5,7 @@
 
 namespace rt_num_opt
 {
-    std::vector<rt_num_opt::DAG_Model> ReadDAG_NarsiFromYaml(std::string path)
+    std::vector<rt_num_opt::DAG_Model> ReadDAG_NasriFromYaml(std::string path)
     {
         YAML::Node config = YAML::LoadFile(path);
         YAML::Node tasksNode;
@@ -15,7 +15,7 @@ namespace rt_num_opt
         }
         else
         {
-            CoutError("Input file doesn't follow Narsi format: " + path);
+            CoutError("Input file doesn't follow Nasri format: " + path);
         }
 
         // read frequency ratio, if any
@@ -76,7 +76,7 @@ namespace rt_num_opt
         return dags;
     }
 
-    void WriteDAG_NarsiToYaml(std::vector<rt_num_opt::DAG_Model> &dags, std::string path)
+    void WriteDAG_NasriToYaml(std::vector<rt_num_opt::DAG_Model> &dags, std::string path)
     {
 
         YAML::Node nodeTasks;

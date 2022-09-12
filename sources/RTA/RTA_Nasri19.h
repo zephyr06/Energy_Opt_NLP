@@ -8,7 +8,7 @@
 // #include "dagSched/tests.h" // to add np_schedulability_analysis
 #include "sources/Tools/profilier.h"
 #include "sources/RTA/RTA_BASE.h"
-#include "sources/TaskModel/DAG_Narsi19.h"
+#include "sources/TaskModel/DAG_Nasri19.h"
 
 namespace rt_num_opt
 {
@@ -16,20 +16,20 @@ namespace rt_num_opt
      * @brief this class overrides all the methods of RTA_BASE except CheckSchedulabilityDirect
      *
      */
-    class RTA_Narsi19 : public RTA_BASE<DAG_Narsi19>
+    class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19>
     {
     private:
-        DAG_Narsi19 dagNarsi_;
+        DAG_Nasri19 dagNasri_;
 
     public:
-        RTA_Narsi19(DAG_Narsi19 &dagNarsi) : RTA_BASE<DAG_Narsi19>(dagNarsi)
+        RTA_Nasri19(DAG_Nasri19 &dagNasri) : RTA_BASE<DAG_Nasri19>(dagNasri)
         {
-            dagNarsi_ = dagNarsi;
+            dagNasri_ = dagNasri;
         }
 
         double RTA_Common_Warm(double beginTime, int index) override
         {
-            CoutError("This function should not be used: RTA_Common_Warm, RTA_Narsi19!");
+            CoutError("This function should not be used: RTA_Common_Warm, RTA_Nasri19!");
             return -1;
         }
 
@@ -43,9 +43,9 @@ namespace rt_num_opt
             IncrementCallingTimes();
             // prepare input
             std::stringstream tasksInput;
-            tasksInput << dagNarsi_.ConvertTasksetToCsv();
+            tasksInput << dagNasri_.ConvertTasksetToCsv();
             std::stringstream dagInput;
-            dagInput << dagNarsi_.convertDAGsToCsv();
+            dagInput << dagNasri_.convertDAGsToCsv();
             std::stringstream abortsInput;
             tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
 
@@ -67,8 +67,8 @@ namespace rt_num_opt
             auto space = NP::Global::State_space<dtime_t>::explore(problem, opts);
 
             // Extract the analysis results
-            // std::vector<double> rta(dagNarsi_.tasks_.size(), INT32_MAX);
-            VectorDynamic rta = GenerateVectorDynamic(dagNarsi_.tasks_.size());
+            // std::vector<double> rta(dagNasri_.tasks_.size(), INT32_MAX);
+            VectorDynamic rta = GenerateVectorDynamic(dagNasri_.tasks_.size());
 
             if (space.is_schedulable())
             {
@@ -79,9 +79,9 @@ namespace rt_num_opt
                     // std::cout << std::max<long long>(0, (finish.from() - j.earliest_arrival())) << " ";
                     // std::cout << std::endl;
                     int globalJobId = j.get_job_id();
-                    auto idTuple = dagNarsi_.IdsGlobal2Job(globalJobId);
+                    auto idTuple = dagNasri_.IdsGlobal2Job(globalJobId);
                     // obtain WCRT from all the same job instances
-                    size_t indexJobTaskLevel = dagNarsi_.IdJobTaskLevel(idTuple.taskId, idTuple.jobId);
+                    size_t indexJobTaskLevel = dagNasri_.IdJobTaskLevel(idTuple.taskId, idTuple.jobId);
 
                     double jobInstanceRT = (std::max<long long>(0, (finish.from() - j.earliest_arrival())));
                     if (jobInstanceRT > rta(indexJobTaskLevel))

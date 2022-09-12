@@ -201,7 +201,7 @@ namespace rt_num_opt
         }
 
         /**
-         * @brief add a dummy node to graph for the convenience of analysis by Narsi19;
+         * @brief add a dummy node to graph for the convenience of analysis by Nasri19;
          * this should only be applied during RTA analysis
          *
          */

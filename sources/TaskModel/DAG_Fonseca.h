@@ -20,10 +20,10 @@ namespace rt_num_opt
     //         return taskset;
     //     }
 
-    //     dagSched::Taskset TransformTaskSetNumOpt2dagSched(DAG_Narsi19 dagTasksNumOpt)
+    //     dagSched::Taskset TransformTaskSetNumOpt2dagSched(DAG_Nasri19 dagTasksNumOpt)
     //     {
     //         dagTasksNumOpt.SyncTaskSet();
-    //         return TransformTaskSetNumOpt2dagSched(dagTasksNumOpt.tasksVecNarsi_);
+    //         return TransformTaskSetNumOpt2dagSched(dagTasksNumOpt.tasksVecNasri_);
     //     }
     dagSched::DAGTask TransformSingleTaskNumOpt2dagSched(rt_num_opt::DAG_Model dagTasks)
     {

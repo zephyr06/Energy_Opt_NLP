@@ -7,7 +7,7 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/RTA/RTA_LL.h"
 #include "sources/RTA/RTA_Melani.h"
-#include "sources/RTA/RTA_Narsi19.h"
+#include "sources/RTA/RTA_Nasri19.h"
 #include "sources/TaskModel/GenerateRandomTaskset.h"
 using namespace rt_num_opt;
 using namespace std;
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    rt_num_opt::ReadVec("PeriodSetAM"); // read period set for Narsi19
+    rt_num_opt::ReadVec("PeriodSetAM"); // read period set for Nasri19
 
     int N = program.get<int>("--N");
     int DAG_taskSetNumber = program.get<int>("--taskSetNumber");
@@ -231,22 +231,22 @@ int main(int argc, char *argv[])
                                                  periodCurr, deadlineType));
             }
 
-            string fileName = "periodic-dag-Narsi-set-" + to_string(N) + "-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".yaml";
+            string fileName = "periodic-dag-Nasri-set-" + to_string(N) + "-" + string(3 - to_string(i).size(), '0') + to_string(i) + "-syntheticJobs" + ".yaml";
 
             if (schedulabilityCheck)
             {
-                DAG_Narsi19 dagNarsi19(dagTaskSet);
-                RTA_Narsi19 r(dagNarsi19);
+                DAG_Nasri19 dagNasri19(dagTaskSet);
+                RTA_Nasri19 r(dagNasri19);
                 if (!r.CheckSchedulability())
                 {
                     i--;
                     continue;
                 }
             }
-            WriteDAG_NarsiToYaml(dagTaskSet, outDirectory + fileName);
+            WriteDAG_NasriToYaml(dagTaskSet, outDirectory + fileName);
             // follow-up verification
-            auto tasksN = rt_num_opt::ReadDAGNarsi19_Tasks(outDirectory + fileName);
-            rt_num_opt::RTA_Narsi19 r(tasksN);
+            auto tasksN = rt_num_opt::ReadDAGNasri19_Tasks(outDirectory + fileName);
+            rt_num_opt::RTA_Nasri19 r(tasksN);
             if (!r.CheckSchedulability())
             {
                 std::cout << outDirectory + fileName << std::endl;

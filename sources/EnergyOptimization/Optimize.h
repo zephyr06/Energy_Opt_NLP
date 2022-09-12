@@ -332,7 +332,7 @@ namespace rt_num_opt
          * -1 means all tasks need optimization
          * N-1 means all tasks do not need optimization;
          *
-         * Although Narsi's analysis cannot be verified to satisfy ''influence'' theorem or not, we assume it holds
+         * Although Nasri's analysis cannot be verified to satisfy ''influence'' theorem or not, we assume it holds
          * to enable faster optimization; the results are always safe anyway.
          **/
         static int FindTaskDoNotNeedOptimize(const TaskSetType &tasks, int lastTaskDoNotNeedOptimize,

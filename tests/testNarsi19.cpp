@@ -7,8 +7,8 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/TaskModel/DAG_Task.h"
 #include "sources/TaskModel/ReadWriteYaml.h"
-#include "sources/TaskModel/DAG_Narsi19.h"
-#include "sources/RTA/RTA_Narsi19.h"
+#include "sources/TaskModel/DAG_Nasri19.h"
+#include "sources/RTA/RTA_Nasri19.h"
 
 TEST(io, read_vector)
 {
@@ -39,7 +39,7 @@ TEST(IO, v1)
 TEST(io, v2)
 {
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
-    auto dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
+    auto dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
     EXPECT_LONGS_EQUAL(4, dags[0].tasks_[3].executionTimeOrg);
     EXPECT_LONGS_EQUAL(3, dags[0].tasks_[3].id);
     EXPECT_LONGS_EQUAL(30, dags[1].tasks_[0].period);
@@ -50,8 +50,8 @@ TEST(io, v2)
 TEST(io, v3)
 {
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
-    auto dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
-    rt_num_opt::WriteDAG_NarsiToYaml(dags, "testOutput1.yaml");
+    auto dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
+    rt_num_opt::WriteDAG_NasriToYaml(dags, "testOutput1.yaml");
 }
 
 TEST(io, no_edge)
@@ -61,29 +61,29 @@ TEST(io, no_edge)
     std::vector<rt_num_opt::DAG_Model> dags;
     dags.push_back(dag);
     std::string outputPath = "testOutput2.yaml";
-    rt_num_opt::WriteDAG_NarsiToYaml(dags, outputPath);
-    auto dagsRead = rt_num_opt::ReadDAG_NarsiFromYaml(outputPath);
+    rt_num_opt::WriteDAG_NasriToYaml(dags, outputPath);
+    auto dagsRead = rt_num_opt::ReadDAG_NasriFromYaml(outputPath);
     EXPECT_LONGS_EQUAL(200, dagsRead[0].tasks_[0].period);
     EXPECT_LONGS_EQUAL(0, boost::num_edges(dag.graph_));
     EXPECT_LONGS_EQUAL(0, boost::num_edges(dagsRead[0].graph_));
 }
-TEST(io, narsi)
+TEST(io, Nasri)
 {
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
-    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
-    rt_num_opt::DAG_Narsi19 dagNarsi(dags);
-    dagNarsi.tasks_[0].executionTime = 11;
-    auto str = dagNarsi.ConvertTasksetToCsv();
+    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
+    rt_num_opt::DAG_Nasri19 dagNasri(dags);
+    dagNasri.tasks_[0].executionTime = 11;
+    auto str = dagNasri.ConvertTasksetToCsv();
 }
 
-TEST(rta, narsi)
+TEST(rta, Nasri)
 {
     rt_num_opt::core_m_dag = 3;
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
-    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
-    rt_num_opt::DAG_Narsi19 dagNarsi(dags);
-    auto str = dagNarsi.ConvertTasksetToCsv();
-    rt_num_opt::RTA_Narsi19 r(dagNarsi);
+    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
+    rt_num_opt::DAG_Nasri19 dagNasri(dags);
+    auto str = dagNasri.ConvertTasksetToCsv();
+    rt_num_opt::RTA_Nasri19 r(dagNasri);
     rt_num_opt::VectorDynamic rta = r.ResponseTimeOfTaskSet();
 
     std::cout << rta << std::endl;
@@ -93,14 +93,14 @@ TEST(rta, narsi)
     AssertEigenEqualVector(rtaExpect, rta);
 }
 
-TEST(rta, narsi_no_edge)
+TEST(rta, Nasri_no_edge)
 {
     rt_num_opt::core_m_dag = 3;
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test2.yaml";
-    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
-    rt_num_opt::DAG_Narsi19 dagNarsi(dags);
-    auto str = dagNarsi.ConvertTasksetToCsv();
-    rt_num_opt::RTA_Narsi19 r(dagNarsi);
+    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
+    rt_num_opt::DAG_Nasri19 dagNasri(dags);
+    auto str = dagNasri.ConvertTasksetToCsv();
+    rt_num_opt::RTA_Nasri19 r(dagNasri);
     rt_num_opt::VectorDynamic rta = r.ResponseTimeOfTaskSet();
 
     std::cout << rta << std::endl;
@@ -114,15 +114,15 @@ TEST(rta, Sync)
 {
     rt_num_opt::core_m_dag = 3;
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
-    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NarsiFromYaml(path);
-    rt_num_opt::DAG_Narsi19 dagNarsi(dags);
-    rt_num_opt::RTA_Narsi19 r(dagNarsi);
+    std::vector<rt_num_opt::DAG_Model> dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
+    rt_num_opt::DAG_Nasri19 dagNasri(dags);
+    rt_num_opt::RTA_Nasri19 r(dagNasri);
     rt_num_opt::VectorDynamic rta = r.ResponseTimeOfTaskSet();
     std::cout << rta << std::endl
               << std::endl;
 
-    dagNarsi.tasks_[0].executionTime += 2;
-    rt_num_opt::RTA_Narsi19 r2(dagNarsi);
+    dagNasri.tasks_[0].executionTime += 2;
+    rt_num_opt::RTA_Nasri19 r2(dagNasri);
     rta = r2.ResponseTimeOfTaskSet();
     std::cout << rta << std::endl;
 }

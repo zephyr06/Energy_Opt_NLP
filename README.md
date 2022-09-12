@@ -22,7 +22,7 @@ cmake ..
 make -j4
 make check -j8 # optional, run all the unit tests
 ./tests/testOptSingle.run # Optimize a single task set with DVFS subject to LL RTA model
-./tests/testOptSingleDAG.run # Optimize a single task set with DVFS subject to [Narsi19](https://drops.dagstuhl.de/opus/volltexte/2019/10758/) RTA model
+./tests/testOptSingleDAG.run # Optimize a single task set with DVFS subject to [Nasri19](https://drops.dagstuhl.de/opus/volltexte/2019/10758/) RTA model
 ./tests/testPeriodFactorsOpt2.run # Control performance optimization for a single task set
 ```
 

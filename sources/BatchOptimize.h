@@ -2,7 +2,7 @@
 #include "sources/BatchTestutils.h"
 #include "sources/EnergyOptimization/Optimize.h"
 #include "sources/RTA/RTA_Melani.h"
-#include "sources/RTA/RTA_Narsi19.h"
+#include "sources/RTA/RTA_Nasri19.h"
 
 #include "sources/EnergyOptimization/OptimizeSA.h"
 
@@ -118,9 +118,9 @@ namespace rt_num_opt
                     //     tasksN = ReadDAG_Tasks(path, readTaskMode);
                     //     N = tasksN.tasks_.size();
                     // }
-                    else if (TaskSetType::Type() == "Narsi19")
+                    else if (TaskSetType::Type() == "Nasri19")
                     {
-                        tasksN = ReadDAGNarsi19_Tasks(path);
+                        tasksN = ReadDAGNasri19_Tasks(path);
                         N = Nn;
                         if (batchOptimizeFolder == "DAGPerformanceUtil")
                         {

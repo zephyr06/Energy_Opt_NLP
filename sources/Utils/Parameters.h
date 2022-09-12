@@ -97,7 +97,7 @@ namespace rt_num_opt
 
     int setDiagonalDamping = (int)ConfigParameters["setDiagonalDamping"];
     int SpeedOptimizeOption = (int)ConfigParameters["SpeedOptimizeOption"];
-    int whetherWriteNarsiTaskSet = (int)ConfigParameters["whetherWriteNarsiTaskSet"];
+    int whetherWriteNasriTaskSet = (int)ConfigParameters["whetherWriteNasriTaskSet"];
     std::vector<int> PeriodSetAM;
     void ReadVec(std::string str)
     {
