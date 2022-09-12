@@ -62,6 +62,7 @@ namespace rt_num_opt
                 gtsam::LevenbergMarquardtParams params;
                 params.setlambdaInitial(initialLambda);
                 params.setVerbosityLM(verbosityLM);
+                params.setDiagonalDamping(setDiagonalDamping);
                 params.setlambdaLowerBound(lowerLambda);
                 params.setlambdaUpperBound(upperLambda);
                 params.setRelativeErrorTol(relativeErrorTolerance);

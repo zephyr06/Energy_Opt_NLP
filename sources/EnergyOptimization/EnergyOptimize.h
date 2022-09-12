@@ -91,6 +91,7 @@ namespace rt_num_opt
                 gtsam::LevenbergMarquardtParams params;
                 params.setlambdaInitial(initialLambda);
                 params.setVerbosityLM(verbosityLM);
+                params.setDiagonalDamping(setDiagonalDamping);
                 params.setlambdaLowerBound(lowerLambda);
                 params.setlambdaUpperBound(upperLambda);
                 params.setRelativeErrorTol(relativeErrorTolerance);
@@ -232,11 +233,11 @@ namespace rt_num_opt
         }
 
         /**
- * @brief round period into int type, we assume the given task set is schedulable!
- *
- * @param tasks
- * @param coeff
- */
+         * @brief round period into int type, we assume the given task set is schedulable!
+         *
+         * @param tasks
+         * @param coeff
+         */
         void RoundExecutionTime(TaskSet &tasks)
         {
             if (roundTypeInClamp == "none")
