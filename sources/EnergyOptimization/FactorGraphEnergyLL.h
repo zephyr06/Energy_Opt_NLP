@@ -13,7 +13,6 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/MatirxConvenient.h"
 #include "sources/TaskModel/Tasks.h"
-#include "sources/RTA/RTA_LL.h"
 #include "sources/EnergyOptimization/Energy.h"
 #include "sources/Utils/utils.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"

@@ -345,10 +345,6 @@ namespace rt_num_opt
                 {
                     return true;
                 }
-                // if (eliminationRecordPrev[i].type != eliminationRecordGlobal[i].type)
-                // {
-                //     return true;
-                // }
             }
             return false;
         }
@@ -428,8 +424,8 @@ namespace rt_num_opt
             }
         }
         // TODO: limit the number of outer loops
-        template <typename FactorGraphType>
-        std::pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks)
+        template <typename FactorGraphType, class TaskSetType>
+        std::pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSetType &tasks)
         {
             eliminationRecordGlobal.Initialize(tasks.size());
             InitializeGlobalVector(tasks.size());
@@ -441,7 +437,7 @@ namespace rt_num_opt
             int loopCount = 0;
             // double disturbIte = eliminateTol;
             bool whether_new_eliminate = false;
-            while (whether_new_eliminate || (loopCount < MaxLoopControl && errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop))) // &&
+            while (whether_new_eliminate || (loopCount < elimIte && errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop))) // &&
             {
 
                 // store prev result
@@ -454,21 +450,6 @@ namespace rt_num_opt
                 // perform optimization
                 double err;
                 std::tie(executionTimeResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks);
-                // cout << "Optimized execution time vector: " << endl
-                //      << executionTimeResCurr << endl;
-                // see whether the new update is useful
-                TaskSet tasksTry = tasks;
-                UpdateTaskSetExecutionTime(tasksTry, executionTimeResCurr);
-                if (FactorGraphType::RealObj(tasksTry) <= errPrev)
-                {
-                    tasks = tasksTry;
-                }
-                else
-                {
-                    CoutWarning("After one iterate, the error increases!");
-                    UpdateTaskSetExecutionTime(tasks, executionTimeResPrev);
-                    break;
-                }
 
                 // adjust optimization settings
                 loopCount++;

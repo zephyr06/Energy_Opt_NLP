@@ -5,6 +5,8 @@
 
 #include <Eigen/Dense>
 
+#include <gtsam/inference/Key.h>
+#include <gtsam/inference/Symbol.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/NonlinearConjugateGradientOptimizer.h>
@@ -19,7 +21,7 @@
 #include "sources/Utils/utils.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/Utils/GlobalVariables.h"
-#include "sources/EnergyOptimization/EnergyOptimize.h"
+#include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
 namespace rt_num_opt
 {
     // using namespace gtsam;
