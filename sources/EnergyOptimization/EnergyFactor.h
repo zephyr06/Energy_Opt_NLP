@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gtsam/nonlinear/NonlinearFactor.h"
 #include "gtsam/linear/NoiseModel.h"
 
 #include "sources/Utils/Parameters.h"
@@ -32,9 +33,17 @@ namespace rt_num_opt
             {
                 Task taskCurr = task_;
                 taskCurr.executionTime = executionTimeVector(0, 0);
-                VectorDynamic err = GenerateVectorDynamic1D(pow(1.0 / taskCurr.period *
-                                                                    EstimateEnergyTask(taskCurr),
-                                                                1));
+                VectorDynamic err;
+                if (!whether_ls)
+                {
+                    err = GenerateVectorDynamic1D(
+                        pow(1.0 / taskCurr.period * EstimateEnergyTask(taskCurr), 0.5));
+                }
+                else
+                {
+                    err = GenerateVectorDynamic1D(
+                        pow(1.0 / taskCurr.period * EstimateEnergyTask(taskCurr), 1));
+                }
                 return err;
             };
             VectorDynamic err = f(x);

@@ -426,6 +426,10 @@ namespace rt_num_opt
         for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
             taskSet[i].executionTime = executionTimeVec(i - lastTaskDoNotNeedOptimize - 1, 0);
     }
+    void UpdateTaskSetExecutionTime(TaskSetNormal &taskSet, VectorDynamic executionTimeVec, int lastTaskDoNotNeedOptimize = -1)
+    {
+        return UpdateTaskSetExecutionTime(taskSet.tasks_, executionTimeVec, lastTaskDoNotNeedOptimize);
+    }
 
     void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic periodVec, int lastTaskDoNotNeedOptimize = -1)
     {

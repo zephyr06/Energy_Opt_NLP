@@ -26,7 +26,7 @@ namespace rt_num_opt
         VectorDynamic ExtractResults(const gtsam::Values &result, const TaskSet &tasks)
         {
             VectorDynamic executionTimes = GenerateVectorDynamic(result.size());
-            for (uint i = 0; i < result.size(); i++)
+            for (uint i = 0; i < tasks.size(); i++)
             {
                 if (result.exists(GenerateKey(i, "executionTime")))
                 {

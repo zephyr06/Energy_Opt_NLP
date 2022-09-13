@@ -9,8 +9,8 @@
 
 namespace rt_num_opt
 {
-    MultiKeyFactor GenerateLockLLFactor(const TaskSetNormal &tasks,
-                                        int index)
+    MultiKeyFactor GenerateLockFactor(const TaskSetNormal &tasks,
+                                      int index)
     {
         std::vector<gtsam::Symbol> keys;
         keys.push_back(GenerateKey(index, "executionTime"));

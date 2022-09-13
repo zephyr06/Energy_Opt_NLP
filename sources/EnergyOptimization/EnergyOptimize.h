@@ -12,6 +12,10 @@
 #include <string>
 #include <utility>
 #include <numeric>
+
+#include "gtsam/nonlinear/DoglegOptimizer.h"
+#include "gtsam/nonlinear/LevenbergMarquardtOptimizer.h"
+
 #include "sources/EnergyOptimization/EnergyFactor.h"
 #include "sources/EnergyOptimization/LockFactor.h"
 #include "sources/EnergyOptimization/RTARelatedFactor.h"
@@ -72,24 +76,14 @@ namespace rt_num_opt
 
                 graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg * MaxComputationTimeRestrict, modelPunishmentSoft1);
 
-                if (eliminationRecordGlobal[i].type == EliminationType::Not)
+                if (eliminationRecordGlobal[i].type == EliminationType::Bound)
                 {
-                    // RTA factor
-                    graph.add(GenerateRTARelatedFactor(tasks.tasks_, i));
-                }
-                else if (eliminationRecordGlobal[i].type == EliminationType::RTA) // this case is not used in this paper
-                {
-                    // graph.add(GenerateEliminationLLFactor(tasks.tasks_, i));
-                    ;
-                }
-                else if (eliminationRecordGlobal[i].type == EliminationType::Bound)
-                {
-                    graph.add(GenerateLockLLFactor(tasks.tasks_, i));
-                    // RTA factor
-                    graph.add(GenerateRTARelatedFactor(tasks.tasks_, i));
+                    graph.add(GenerateLockFactor(tasks.tasks_, i));
                 }
             }
-            // graph.add(GenerateRTARelatedFactor(tasks, tasks.size() - 1, rtaBase));
+
+            // RTA factor
+            graph.add(GenerateRTARelatedFactor<TaskSetType, Schedul_Analysis>(tasks));
             return graph;
         }
 

@@ -8,16 +8,6 @@
 
 namespace rt_num_opt
 {
-    /**
-     * @brief returns 0 if x>=0
-     *
-     * @param x
-     * @return double
-     */
-    double HingeLoss(double x)
-    {
-        return max(0, -1 * x);
-    }
 
     /**
      * barrier function for the optimization

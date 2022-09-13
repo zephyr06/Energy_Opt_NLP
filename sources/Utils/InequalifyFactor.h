@@ -27,6 +27,16 @@
 namespace rt_num_opt
 {
     // using namespace gtsam;
+    /**
+     * @brief returns 0 if x>=0
+     *
+     * @param x
+     * @return double
+     */
+    double HingeLoss(double x)
+    {
+        return max(0, -1 * x);
+    }
 
     typedef boost::function<VectorDynamic(const VectorDynamic &)> NormalErrorFunction1D;
     typedef boost::function<VectorDynamic(const VectorDynamic &, const VectorDynamic &)> NormalErrorFunction2D;
