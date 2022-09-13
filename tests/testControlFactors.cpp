@@ -19,15 +19,15 @@ using namespace gtsam;
 //     std::vector<bool> maskForElimination(tasks.size() * 2, false);
 //     maskForElimination[1] = true;
 //     Values result;
-//     result.insert(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(1));
-//     result.insert(GenerateControlKey(2, "period"), GenerateVectorDynamic1D(1));
-//     result.insert(GenerateControlKey(3, "period"), GenerateVectorDynamic1D(1));
-//     result.insert(GenerateControlKey(4, "period"), GenerateVectorDynamic1D(1));
-//     result.insert(GenerateControlKey(0, "response"), GenerateVectorDynamic1D(1));
-//     result.insert(GenerateControlKey(1, "response"), GenerateVectorDynamic1D(1));
-//     result.insert(GenerateControlKey(2, "response"), GenerateVectorDynamic1D(1));
-//     result.insert(GenerateControlKey(3, "response"), GenerateVectorDynamic1D(1));
-//     result.insert(GenerateControlKey(4, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(0, "period"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(2, "period"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(3, "period"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(4, "period"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(0, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(1, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(2, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(3, "response"), GenerateVectorDynamic1D(1));
+//     result.insert(GenerateKey(4, "response"), GenerateVectorDynamic1D(1));
 //     VectorDynamic expectT = GenerateVectorDynamic(5);
 //     expectT = expectT.array() + 1;
 //     VectorDynamic expectR = expectT;
@@ -79,17 +79,17 @@ TEST(RTAFactor, v1)
     Values initialEstimateFG;
     for (uint i = 0; i < tasks.size(); i++)
     {
-        initialEstimateFG.insert(GenerateControlKey(i, "period"), GenerateVectorDynamic1D(tasks[i].period));
-        initialEstimateFG.insert(GenerateControlKey(i, "response"), GenerateVectorDynamic1D(rtaBase(i, 0)));
+        initialEstimateFG.insert(GenerateKey(i, "period"), GenerateVectorDynamic1D(tasks[i].period));
+        initialEstimateFG.insert(GenerateKey(i, "response"), GenerateVectorDynamic1D(rtaBase(i, 0)));
     }
     AssertEqualScalar(0, graph.error(initialEstimateFG));
-    initialEstimateFG.update(GenerateControlKey(0, "response"), GenerateVectorDynamic1D(1));
+    initialEstimateFG.update(GenerateKey(0, "response"), GenerateVectorDynamic1D(1));
     AssertEqualScalar(0.5, graph.error(initialEstimateFG));
-    initialEstimateFG.update(GenerateControlKey(4, "response"), GenerateVectorDynamic1D(120));
+    initialEstimateFG.update(GenerateKey(4, "response"), GenerateVectorDynamic1D(120));
     AssertEqualScalar(25, graph.error(initialEstimateFG));
-    initialEstimateFG.update(GenerateControlKey(4, "period"), GenerateVectorDynamic1D(60));
+    initialEstimateFG.update(GenerateKey(4, "period"), GenerateVectorDynamic1D(60));
     AssertEqualScalar(25, graph.error(initialEstimateFG));
-    initialEstimateFG.update(GenerateControlKey(3, "period"), GenerateVectorDynamic1D(60));
+    initialEstimateFG.update(GenerateKey(3, "period"), GenerateVectorDynamic1D(60));
     AssertEqualScalar(1458.5, graph.error(initialEstimateFG));
 }
 
@@ -111,14 +111,14 @@ TEST(BuildGraph, v1)
     gtsam::Values initialEstimateFG;
     for (uint i = 0; i < tasks.size(); i++)
     {
-        initialEstimateFG.insert(GenerateControlKey(i, "period"), GenerateVectorDynamic1D(tasks[i].period));
-        initialEstimateFG.insert(GenerateControlKey(i, "response"), GenerateVectorDynamic1D(rta(i, 0)));
+        initialEstimateFG.insert(GenerateKey(i, "period"), GenerateVectorDynamic1D(tasks[i].period));
+        initialEstimateFG.insert(GenerateKey(i, "response"), GenerateVectorDynamic1D(rta(i, 0)));
     }
     AssertEqualScalar(1026303.5, graph.error(initialEstimateFG), 1e-6, __LINE__);
-    initialEstimateFG.update(GenerateControlKey(0, "response"), GenerateVectorDynamic1D(1));
-    initialEstimateFG.update(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(200));
-    initialEstimateFG.update(GenerateControlKey(1, "response"), GenerateVectorDynamic1D(51));
-    initialEstimateFG.update(GenerateControlKey(2, "response"), GenerateVectorDynamic1D(636));
+    initialEstimateFG.update(GenerateKey(0, "response"), GenerateVectorDynamic1D(1));
+    initialEstimateFG.update(GenerateKey(0, "period"), GenerateVectorDynamic1D(200));
+    initialEstimateFG.update(GenerateKey(1, "response"), GenerateVectorDynamic1D(51));
+    initialEstimateFG.update(GenerateKey(2, "response"), GenerateVectorDynamic1D(636));
     AssertEqualScalar(1176775.5, graph.error(initialEstimateFG), 1e-6, __LINE__);
 }
 TEST(BuildGraph, v2)
@@ -137,7 +137,7 @@ TEST(BuildGraph, v2)
     auto rta = r.ResponseTimeOfTaskSet();
     gtsam::Values initialEstimateFG = FactorGraphForceManifold::GenerateInitialFG(tasks, maskForElimination);
     AssertEqualScalar(436274310542.5, graph.error(initialEstimateFG), 1e-6, __LINE__);
-    // initialEstimateFG.update(GenerateControlKey(1000, "response"), GenerateVectorDynamic1D(1));
+    // initialEstimateFG.update(GenerateKey(1000, "response"), GenerateVectorDynamic1D(1));
     // AssertEqualScalar(25948729015644.5, graph.error(initialEstimateFG), 1e-6, __LINE__);
 }
 
@@ -157,8 +157,8 @@ TEST(RTAFactor, J)
     Values initialEstimateFG;
     for (uint i = 0; i < tasks.size(); i++)
     {
-        initialEstimateFG.insert(GenerateControlKey(i, "period"), GenerateVectorDynamic1D(tasks[i].period));
-        initialEstimateFG.insert(GenerateControlKey(i, "response"), GenerateVectorDynamic1D(rta(i, 0)));
+        initialEstimateFG.insert(GenerateKey(i, "period"), GenerateVectorDynamic1D(tasks[i].period));
+        initialEstimateFG.insert(GenerateKey(i, "response"), GenerateVectorDynamic1D(rta(i, 0)));
     }
     std::vector<MatrixDynamic> Hs, HsExpect;
     Hs.reserve(10);
@@ -220,8 +220,8 @@ TEST(GenerateSchedulabilityFactor, v2)
     auto initial = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial), __LINE__);
 
-    initial.update(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(70));
-    initial.update(GenerateControlKey(3, "period"), GenerateVectorDynamic1D(110));
+    initial.update(GenerateKey(0, "period"), GenerateVectorDynamic1D(70));
+    initial.update(GenerateKey(3, "period"), GenerateVectorDynamic1D(110));
     factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 3, coeff, rtaBase);
     e2Expect << INT32_MAX, INT32_MAX - 110;
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial), __LINE__);
@@ -244,7 +244,7 @@ TEST(GenerateSchedulabilityFactor, v3)
     auto initial = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial), __LINE__);
 
-    initial.update(GenerateControlKey(0, "period"), GenerateVectorDynamic1D(70));
+    initial.update(GenerateKey(0, "period"), GenerateVectorDynamic1D(70));
 
     factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 3, coeff, rtaBase);
     e2Expect << 117, 0;
@@ -259,7 +259,7 @@ TEST(GenerateSchedulabilityFactor, v3)
     AssertEigenEqualMatrix(HsExpect[0], HsActual[0], __LINE__);
     AssertEigenEqualMatrix(HsExpect[1], HsActual[1], __LINE__);
     AssertEigenEqualMatrix(HsExpect[2], HsActual[2], __LINE__);
-    initial.update(GenerateControlKey(3, "period"), GenerateVectorDynamic1D(110));
+    initial.update(GenerateKey(3, "period"), GenerateVectorDynamic1D(110));
     e2Expect << INT32_MAX, INT32_MAX - 110;
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial, HsActual), __LINE__);
     auto matrix1 = GenerateMatrixDynamic(2, 1);

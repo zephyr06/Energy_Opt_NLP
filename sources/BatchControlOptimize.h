@@ -187,7 +187,7 @@ namespace rt_num_opt
                 auto stop = std::chrono::high_resolution_clock::now();
                 size_t rtaCall = ReadRTAControl();
                 rtaCallTime.push_back(rtaCall / double(N));
-                auto duration = duration_cast<microseconds>(stop - start);
+                auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
                 double timeTaken = double(duration.count()) / 1e6;
                 runTimeAll[0].push_back(timeTaken);
                 objVecAll[0].push_back(res.second);

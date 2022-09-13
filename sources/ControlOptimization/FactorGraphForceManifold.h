@@ -19,19 +19,19 @@ namespace rt_num_opt
 {
 
     /**
- * @brief this factor graph uses RTA as an equality constraint rather than eliminating it;
- * a major difference in implementation is maskForElimination, which has length of 2 * n rather than n to include the extra n 'r_i' variables
- * 
- */
+     * @brief this factor graph uses RTA as an equality constraint rather than eliminating it;
+     * a major difference in implementation is maskForElimination, which has length of 2 * n rather than n to include the extra n 'r_i' variables
+     *
+     */
     struct FactorGraphForceManifold
     {
         /**
-     * @brief 
-     * 
-     * @param result 
-     * @param tasks 
-     * @return pair<VectorDynamic, VectorDynamic> periods, rta; rta is raw rta, which could include -1 (eliminated before)
-     */
+         * @brief
+         *
+         * @param result
+         * @param tasks
+         * @return pair<VectorDynamic, VectorDynamic> periods, rta; rta is raw rta, which could include -1 (eliminated before)
+         */
         // Issue in this function! not able to extract rta because of consistency
         static VectorDynamic ExtractResults(const gtsam::Values &result, TaskSet &tasks)
         {
@@ -39,17 +39,17 @@ namespace rt_num_opt
             VectorDynamic rta = GenerateVectorDynamic(tasks.size());
             for (uint i = 0; i < tasks.size(); i++)
             {
-                if (result.exists(GenerateControlKey(i, "period")))
+                if (result.exists(GenerateKey(i, "period")))
                 {
-                    periods(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
+                    periods(i, 0) = result.at<VectorDynamic>(GenerateKey(i, "period"))(0, 0);
                 }
                 else
                 {
                     periods(i, 0) = tasks[i].period;
                 }
-                if (result.exists(GenerateControlKey(i, "response")))
+                if (result.exists(GenerateKey(i, "response")))
                 {
-                    rta(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "response"))(0, 0);
+                    rta(i, 0) = result.at<VectorDynamic>(GenerateKey(i, "response"))(0, 0);
                 }
                 else
                 {
@@ -70,8 +70,8 @@ namespace rt_num_opt
                 return GenerateVectorDynamic1D(HingeLoss((x2 - x1)(0, 0)) * weightHardConstraint);
             };
             // this factor is explained as: r_i <= T_i
-            return InequalityFactor2D(GenerateControlKey(index, "response"),
-                                      GenerateControlKey(index, "period"), DBF2D, modelPunishmentSoft1);
+            return InequalityFactor2D(GenerateKey(index, "response"),
+                                      GenerateKey(index, "period"), DBF2D, modelPunishmentSoft1);
         }
         static gtsam::NonlinearFactorGraph BuildControlGraph(std::vector<bool> maskForElimination, TaskSet tasks, VectorDynamic &coeff)
         {
@@ -88,19 +88,19 @@ namespace rt_num_opt
 
                 if (!maskForElimination[i + 5])
                 {
-                    graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "response"), tasks[i].executionTime, modelPunishmentSoft1);
+                    graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "response"), tasks[i].executionTime, modelPunishmentSoft1);
                     // add CoeffFactor
-                    graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "response"),
+                    graph.emplace_shared<CoeffFactor>(GenerateKey(i, "response"),
                                                       GenerateVectorDynamic1D(coeff(2 * i + 1, 0)), modelNormal);
                 }
                 if (!maskForElimination[i])
                 {
                     // add CoeffFactor
-                    graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
+                    graph.emplace_shared<CoeffFactor>(GenerateKey(i, "period"),
                                                       GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
                     // add period min/max limits
-                    graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), 0, modelPunishmentSoft1);
-                    graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentSoft1);
+                    graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "period"), 0, modelPunishmentSoft1);
+                    graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "period"), periodMax, modelPunishmentSoft1);
                 }
 
                 // schedulability factor
@@ -109,13 +109,13 @@ namespace rt_num_opt
                     if (!maskForElimination[i + 5]) // r_i is an variable
                         graph.add(GenerateSchedulabilityFactor(maskForElimination, tasks, i));
                     else
-                        graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"),
+                        graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "period"),
                                                                  rtaBase(i), modelPunishmentSoft1);
                 }
                 else // T_i is eliminated
                 {
                     if (!maskForElimination[i + 5]) // r_i is an variable
-                        graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "response"),
+                        graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "response"),
                                                                   min(tasks[i].period, tasks[i].deadline), modelPunishmentSoft1);
                 }
             }
@@ -131,12 +131,12 @@ namespace rt_num_opt
             {
                 if (!maskForElimination[i])
                 {
-                    initialEstimateFG.insert(GenerateControlKey(i, "period"),
+                    initialEstimateFG.insert(GenerateKey(i, "period"),
                                              GenerateVectorDynamic1D(tasks[i].period));
                 }
                 if (!maskForElimination[i + 5])
                 {
-                    initialEstimateFG.insert(GenerateControlKey(i, "response"),
+                    initialEstimateFG.insert(GenerateKey(i, "response"),
                                              GenerateVectorDynamic1D(rta(i)));
                 }
             }

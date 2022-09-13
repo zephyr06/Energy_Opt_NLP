@@ -20,7 +20,7 @@ using namespace rt_num_opt;
 //     double res = Energy_Opt<rt_num_opt::DAG_Nasri19, rt_num_opt::RTA_Nasri19>::OptimizeTaskSet(tasksN);
 //     std::cout << blue << "The energy saving ratio is " << res << def << std::endl;
 //     auto stop = std::chrono::high_resolution_clock::now();
-//     auto duration = duration_cast<microseconds>(stop - start);
+//     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 //     std::cout << "The time taken is: " << double(duration.count()) / 1e6 << "seconds" << std::endl;
 //     EndTimer("main");
 //     PrintTimer();

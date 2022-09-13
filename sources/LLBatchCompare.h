@@ -1,7 +1,7 @@
 
 #pragma once
 #include "sources/BatchTestutils.h"
-#include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
+// #include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
 #include "sources/EnergyOptimization/EnergyOptimize.h"
 
 namespace rt_num_opt
@@ -31,15 +31,9 @@ namespace rt_num_opt
                 auto start = std::chrono::high_resolution_clock::now();
                 double res;
                 ResetCallingTimes();
-                if (LLCompareWithGeneralizedElimination)
-                {
+                // next project: consider generalized elimination?
+                res = Energy_Opt<TaskSetNormal, RTA_LL>::OptimizeTaskSet(tasksN);
 
-                    res = EnergyOptimize::OptimizeTaskSetIterative<FactorGraphEnergyLL>(taskSet1).second;
-                }
-                else
-                {
-                    res = Energy_Opt<TaskSetNormal, RTA_LL>::OptimizeTaskSet(tasksN);
-                }
                 size_t rtaCall = ReadCallingTimes();
                 auto stop = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);

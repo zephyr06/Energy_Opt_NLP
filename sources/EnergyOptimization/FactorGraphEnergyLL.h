@@ -29,9 +29,9 @@ namespace rt_num_opt
             VectorDynamic executionTimes = GenerateVectorDynamic(result.size());
             for (uint i = 0; i < result.size(); i++)
             {
-                if (result.exists(GenerateControlKey(i, "executionTime")))
+                if (result.exists(GenerateKey(i, "executionTime")))
                 {
-                    executionTimes(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "executionTime"))(0, 0);
+                    executionTimes(i, 0) = result.at<VectorDynamic>(GenerateKey(i, "executionTime"))(0, 0);
                 }
                 else
                 {
@@ -159,7 +159,7 @@ namespace rt_num_opt
             keys.reserve(index);
             for (int i = 0; i <= index; i++)
             {
-                keys.push_back(GenerateControlKey(i, "executionTime"));
+                keys.push_back(GenerateKey(i, "executionTime"));
             }
 
             VectorDynamic sigma = GenerateVectorDynamic(1);
@@ -175,7 +175,7 @@ namespace rt_num_opt
             std::vector<gtsam::Symbol> keys;
             for (int i = 0; i <= index; i++)
             {
-                keys.push_back(GenerateControlKey(i, "executionTime"));
+                keys.push_back(GenerateKey(i, "executionTime"));
             }
             LambdaMultiKey f = [tasks, index, rtaAtIndex](const gtsam::Values &x)
             {
@@ -202,13 +202,13 @@ namespace rt_num_opt
                                                    int index)
         {
             std::vector<gtsam::Symbol> keys;
-            keys.push_back(GenerateControlKey(index, "executionTime"));
+            keys.push_back(GenerateKey(index, "executionTime"));
 
             LambdaMultiKey f = [tasks, index](const gtsam::Values &x)
             {
                 VectorDynamic error = GenerateVectorDynamic(1);
                 TaskSet tasksCurr = tasks;
-                VectorDynamic executionTimeVecCurr = x.at<VectorDynamic>(GenerateControlKey(index, "executionTime"));
+                VectorDynamic executionTimeVecCurr = x.at<VectorDynamic>(GenerateKey(index, "executionTime"));
                 error(0) = executionTimeVecCurr(0, 0) - tasks[index].executionTime;
 
                 return error;
@@ -244,10 +244,6 @@ namespace rt_num_opt
                     VectorDynamic err = GenerateVectorDynamic1D(pow(1.0 / taskCurr.period *
                                                                         EstimateEnergyTask(taskCurr),
                                                                     1));
-                    // if (debugMode == 1)
-                    // {
-                    //     std::cout << "Task " << task_.id << "'s Energy cost is is " << err << std::endl;
-                    // }
                     return err;
                 };
                 VectorDynamic err = f(x);
@@ -278,16 +274,16 @@ namespace rt_num_opt
             for (uint i = 0; i < tasks.size(); i++)
             {
                 // energy factor
-                graph.emplace_shared<EnergyFactor>(GenerateControlKey(i, "executionTime"), tasks[i], i, modelNormal);
+                graph.emplace_shared<EnergyFactor>(GenerateKey(i, "executionTime"), tasks[i], i, modelNormal);
 
                 // add executionTime min/max limits
-                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, i, modelPunishmentSoft1);
+                graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg, i, modelPunishmentSoft1);
                 double limit = min(tasks[i].deadline, tasks[i].period);
                 if (enableMaxComputationTimeRestrict)
                 {
                     limit = min(limit, tasks[i].executionTimeOrg * MaxComputationTimeRestrict);
                 }
-                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), limit,
+                graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "executionTime"), limit,
                                                           i, modelPunishmentSoft1);
 
                 if (eliminationRecordGlobal[i].type == EliminationType::Not)
@@ -325,7 +321,7 @@ namespace rt_num_opt
             for (uint i = 0; i < tasks.size(); i++)
             {
                 // energy factor
-                graph.emplace_shared<EnergyFactor>(GenerateControlKey(i, "executionTime"), tasks[i], i, modelNormal);
+                graph.emplace_shared<EnergyFactor>(GenerateKey(i, "executionTime"), tasks[i], i, modelNormal);
             }
             return graph;
         }
@@ -345,13 +341,13 @@ namespace rt_num_opt
             for (uint i = 0; i < tasks.size(); i++)
             {
                 // add executionTime min/max limits
-                graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "executionTime"), tasks[i].executionTimeOrg, i, modelPunishmentSoft1);
+                graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg, i, modelPunishmentSoft1);
                 double limit = min(tasks[i].deadline, tasks[i].period);
                 if (enableMaxComputationTimeRestrict)
                 {
                     limit = min(limit, tasks[i].executionTimeOrg * MaxComputationTimeRestrict);
                 }
-                graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "executionTime"), limit,
+                graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "executionTime"), limit,
                                                           i, modelPunishmentSoft1);
 
                 if (eliminationRecordGlobal[i].type == EliminationType::Not)
@@ -380,7 +376,7 @@ namespace rt_num_opt
             gtsam::Values initialEstimateFG;
             for (uint i = 0; i < tasks.size(); i++)
             {
-                initialEstimateFG.insert(GenerateControlKey(i, "executionTime"),
+                initialEstimateFG.insert(GenerateKey(i, "executionTime"),
                                          GenerateVectorDynamic1D(tasks[i].executionTime));
             }
             return initialEstimateFG;

@@ -25,9 +25,9 @@ namespace rt_num_opt
             VectorDynamic periods = GetParameterVD<double>(tasks, "period");
             for (uint i = 0; i < tasks.size(); i++)
             {
-                if (result.exists(GenerateControlKey(i, "period")))
+                if (result.exists(GenerateKey(i, "period")))
                 {
-                    periods(i, 0) = result.at<VectorDynamic>(GenerateControlKey(i, "period"))(0, 0);
+                    periods(i, 0) = result.at<VectorDynamic>(GenerateKey(i, "period"))(0, 0);
                 }
             }
             return periods;
@@ -115,7 +115,7 @@ namespace rt_num_opt
             {
                 if (!maskForElimination[i])
                 {
-                    keys.push_back(GenerateControlKey(i, "period"));
+                    keys.push_back(GenerateKey(i, "period"));
                 }
             }
 
@@ -151,11 +151,11 @@ namespace rt_num_opt
                 if (!maskForElimination[i])
                 {
                     // add CoeffFactor
-                    graph.emplace_shared<CoeffFactor>(GenerateControlKey(i, "period"),
+                    graph.emplace_shared<CoeffFactor>(GenerateKey(i, "period"),
                                                       GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
                     // add period min/max limits
-                    graph.emplace_shared<LargerThanFactor1D>(GenerateControlKey(i, "period"), tasks[i].executionTime, modelPunishmentSoft1);
-                    graph.emplace_shared<SmallerThanFactor1D>(GenerateControlKey(i, "period"), periodMax, modelPunishmentSoft1);
+                    graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "period"), tasks[i].executionTime, modelPunishmentSoft1);
+                    graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "period"), periodMax, modelPunishmentSoft1);
                 }
                 if (HasDependency(i, maskForElimination))
                 {
@@ -174,7 +174,7 @@ namespace rt_num_opt
             {
                 if (!maskForElimination[i])
                 {
-                    initialEstimateFG.insert(GenerateControlKey(i, "period"),
+                    initialEstimateFG.insert(GenerateKey(i, "period"),
                                              GenerateVectorDynamic1D(tasks[i].period));
                 }
             }

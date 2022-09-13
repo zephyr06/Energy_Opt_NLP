@@ -12,46 +12,51 @@
 #include "sources/Utils/InequalifyFactor.h"
 
 #include "sources/Utils/FactorGraphUtils.h"
-#include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
 #include <chrono>
 using namespace std::chrono;
 namespace rt_num_opt
 {
-    gtsam::Values MergeValuesInElimination(gtsam::Values initial, gtsam::VectorValues &delta)
+    template <class TaskSetType, class Schedul_Analysis>
+    class Energy_OptDAG
     {
-        return initial.retract(delta);
-    }
-    MatrixDynamic GetNonzeroRow(MatrixDynamic &m)
-    {
-        std::vector<int> nonZeroRowIndex;
-        for (uint i = 0; i < m.rows(); i++)
+    public:
+        static double RealObj(const TaskSet tasks)
         {
-            for (uint j = 0; j < m.cols(); j++)
+            return EstimateEnergyTaskSet(tasks).sum() / weightEnergy;
+        }
+        gtsam::Values MergeValuesInElimination(gtsam::Values initial, gtsam::VectorValues &delta)
+        {
+            return initial.retract(delta);
+        }
+        MatrixDynamic GetNonzeroRow(MatrixDynamic &m)
+        {
+            std::vector<int> nonZeroRowIndex;
+            for (uint i = 0; i < m.rows(); i++)
             {
-                if (m(i, j) != 0)
+                for (uint j = 0; j < m.cols(); j++)
                 {
-                    nonZeroRowIndex.push_back(i);
-                    break;
+                    if (m(i, j) != 0)
+                    {
+                        nonZeroRowIndex.push_back(i);
+                        break;
+                    }
                 }
             }
+            int rows = nonZeroRowIndex.size();
+            int cols = m.cols();
+            MatrixDynamic res = GenerateMatrixDynamic(rows, cols);
+            for (uint i = 0; i < nonZeroRowIndex.size(); i++)
+            {
+                res.block(i, 0, 1, cols) = m.block(nonZeroRowIndex[i], 0, 1, cols);
+            }
+            return res;
         }
-        int rows = nonZeroRowIndex.size();
-        int cols = m.cols();
-        MatrixDynamic res = GenerateMatrixDynamic(rows, cols);
-        for (uint i = 0; i < nonZeroRowIndex.size(); i++)
-        {
-            res.block(i, 0, 1, cols) = m.block(nonZeroRowIndex[i], 0, 1, cols);
-        }
-        return res;
-    }
-    namespace EnergyOptimize
-    {
-        template <typename FactorGraphType>
-        std::pair<VectorDynamic, double> UnitOptimizationPeriod(TaskSet &tasks)
+
+        std::pair<VectorDynamic, double> UnitOptimization(TaskSetType &tasks)
         {
             BeginTimer(__func__);
 
-            gtsam::NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
+            gtsam::NonlinearFactorGraph graph = BuildControlGraph(tasks);
 
             gtsam::NonlinearFactorGraph graphForC = FactorGraphEnergyLL::BuildGraphForC(tasks);
             gtsam::NonlinearFactorGraph graphForJ = FactorGraphEnergyLL::BuildGraphForJ(tasks);
@@ -61,7 +66,7 @@ namespace rt_num_opt
             }
             // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
             // initialEstimate << 68.000000, 321, 400, 131, 308;
-            gtsam::Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
+            gtsam::Values initialEstimateFG = GenerateInitialFG(tasks);
             if (debugMode == 1)
             {
                 std::cout << Color::green;
@@ -153,7 +158,7 @@ namespace rt_num_opt
             // cout << Color::def << endl;
 
             VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
-            optComp = FactorGraphType::ExtractResults(result, tasks);
+            optComp = ExtractResults(result, tasks);
             UpdateTaskSetExecutionTime(tasks, optComp);
             rtaFromOpt = RTALLVector(tasks);
             if (debugMode == 1)
@@ -170,21 +175,20 @@ namespace rt_num_opt
                 std::cout << Color::blue;
                 VectorDynamic newExecutionTime = FactorGraphEnergyLL::ExtractResults(initialEstimateFG, tasks);
                 UpdateTaskSetExecutionTime(tasks, newExecutionTime);
-                std::cout << "Before optimization, the total error is " << FactorGraphType::RealObj(tasks) << std::endl;
+                std::cout << "Before optimization, the total error is " << RealObj(tasks) << std::endl;
                 UpdateTaskSetExecutionTime(tasks, optComp);
-                std::cout << "After optimization, the total error is " << FactorGraphType::RealObj(tasks) << std::endl;
+                std::cout << "After optimization, the total error is " << RealObj(tasks) << std::endl;
                 std::cout << Color::def;
             }
 
             // UpdateTaskSetExecutionTime(tasks, optComp);
             EndTimer(__func__);
-            return std::make_pair(optComp, FactorGraphType::RealObj(tasks));
+            return std::make_pair(optComp, RealObj(tasks));
         }
 
-        template <typename FactorGraphType>
-        std::pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks)
+        std::pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSetType &tasks)
         {
-            RTA_LL rr(tasks);
+            Schedul_Analysis rr(tasks);
             if (!rr.CheckSchedulability(debugMode == 1))
             {
                 CoutWarning("The task set is not schedulable!");
@@ -192,40 +196,37 @@ namespace rt_num_opt
             }
             VectorDynamic executionTimeRes;
             double err;
-            for (double weight = weightSchedulabilityMin; weight <= weightSchedulabilityMax;
-                 weight *= weightSchedulabilityStep)
+
+            weightSchedulability = weight;
+            std::tie(executionTimeRes, err) = UnitOptimization(tasks);
+            VectorDynamic periodPrev = GetParameterVD<double>(tasks, "executionTime");
+            UpdateTaskSetExecutionTime(tasks, executionTimeRes);
+            Schedul_Analysis r(tasks);
+            if (!r.CheckSchedulability(1 == debugMode))
             {
-                weightSchedulability = weight;
-                std::tie(executionTimeRes, err) = UnitOptimizationPeriod<FactorGraphType>(tasks);
-                VectorDynamic periodPrev = GetParameterVD<double>(tasks, "executionTime");
-                UpdateTaskSetExecutionTime(tasks, executionTimeRes);
-                RTA_LL r(tasks);
-                if (!r.CheckSchedulability(1 == debugMode))
+                UpdateTaskSetExecutionTime(tasks, periodPrev);
+                // if (debugMode == 1)
+                // {
+                std::lock_guard<std::mutex> lock(mtx);
+                std::cout << Color::blue << "After one iterate on updating weight parameter,\
+             the execution time become unschedulable and are"
+                          << std::endl
+                          << executionTimeRes << std::endl;
+                std::cout << Color::def;
+                // }
+
+                return std::make_pair(periodPrev, err);
+            }
+            else
+            {
+                if (debugMode == 1)
                 {
-                    UpdateTaskSetExecutionTime(tasks, periodPrev);
-                    // if (debugMode == 1)
-                    // {
                     std::lock_guard<std::mutex> lock(mtx);
                     std::cout << Color::blue << "After one iterate on updating weight parameter,\
-             the execution time become unschedulable and are"
+             the execution time remain schedulable and are"
                               << std::endl
                               << executionTimeRes << std::endl;
                     std::cout << Color::def;
-                    // }
-
-                    return std::make_pair(periodPrev, err);
-                }
-                else
-                {
-                    if (debugMode == 1)
-                    {
-                        std::lock_guard<std::mutex> lock(mtx);
-                        std::cout << Color::blue << "After one iterate on updating weight parameter,\
-             the execution time remain schedulable and are"
-                                  << std::endl
-                                  << executionTimeRes << std::endl;
-                        std::cout << Color::def;
-                    }
                 }
             }
 
@@ -238,7 +239,7 @@ namespace rt_num_opt
          * @param tasks
          * @param coeff
          */
-        void RoundExecutionTime(TaskSet &tasks)
+        void RoundExecutionTime(TaskSetType &tasks)
         {
             if (roundTypeInClamp == "none")
                 return;
@@ -256,79 +257,6 @@ namespace rt_num_opt
                     }
                 }
             }
-            // else if (roundTypeInClamp == "fine")
-            // {
-            //     int N = tasks.size();
-
-            //     std::vector<int> wait_for_eliminate_index;
-            //     for (uint i = 0; i < tasks.size(); i++)
-            //     {
-            //         if (maskForElimination[i] && tasks[i].period != ceil(tasks[i].period))
-            //             wait_for_eliminate_index.push_back(i);
-            //     }
-            //     if (!wait_for_eliminate_index.empty())
-            //     {
-
-            //         VectorDynamic rtaBase = RTALLVector(tasks);
-
-            //         std::vector<pair<int, double>> objectiveVec;
-            //         objectiveVec.reserve(wait_for_eliminate_index.size());
-            //         for (uint i = 0; i < wait_for_eliminate_index.size(); i++)
-            //         {
-            //             objectiveVec.push_back(std::make_pair(wait_for_eliminate_index[i], coeff(wait_for_eliminate_index[i] * 2) * -1));
-            //         }
-            //         sort(objectiveVec.begin(), objectiveVec.end(), comparePair);
-            //         int iterationNumber = 0;
-
-            //         // int left = 0, right = 0;
-            //         while (objectiveVec.size() > 0)
-            //         {
-            //             int currentIndex = objectiveVec[0].first;
-
-            //             // try to round 'up', if success, keep the loop; otherwise, eliminate it and high priority tasks
-            //             // can be speeded up, if necessary, by binary search
-            //             int left = int(tasks[currentIndex].period);
-            //             // int left = rtaBase(currentIndex);
-            //             int right = ceil(tasks[currentIndex].period);
-            //             if (left > right)
-            //             {
-            //                 CoutError("left > right error in clamp!");
-            //             }
-            //             int rightOrg = right;
-            //             bool schedulale_flag;
-            //             while (left < right)
-            //             {
-            //                 int mid = (left + right) / 2;
-
-            //                 tasks[currentIndex].period = mid;
-            //                 RTA_LL r(tasks);
-            //                 schedulale_flag = r.CheckSchedulability(
-            //                     rtaBase, debugMode == 1);
-            //                 if (not schedulale_flag)
-            //                 {
-            //                     left = mid + 1;
-            //                     tasks[currentIndex].period = rightOrg;
-            //                 }
-            //                 else
-            //                 {
-            //                     tasks[currentIndex].period = mid;
-            //                     right = mid;
-            //                 }
-            //             }
-
-            //             // post processing, left=right is the value we want
-            //             tasks[currentIndex].period = left;
-            //             objectiveVec.erase(objectiveVec.begin() + 0);
-
-            //             iterationNumber++;
-            //             if (iterationNumber > N)
-            //             {
-            //                 CoutWarning("iterationNumber error in Clamp!");
-            //                 break;
-            //             }
-            //         };
-            //     }
-            // }
             else
             {
                 std::cout << "input error in ClampComputationTime: " << roundTypeInClamp << std::endl;
@@ -348,8 +276,8 @@ namespace rt_num_opt
             }
             return false;
         }
-        template <typename FactorGraphType>
-        void FindEliminateVariableFromRecordGlobal(const TaskSet &tasks)
+
+        void FindEliminateVariableFromRecordGlobal(const TaskSetType &tasks)
         {
             EliminationRecord eliminationRecordPrev = eliminationRecordGlobal;
             if (debugMode == 1)
@@ -357,8 +285,8 @@ namespace rt_num_opt
                 eliminationRecordGlobal.Print();
             }
 
-            gtsam::NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(tasks);
-            gtsam::Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks);
+            gtsam::NonlinearFactorGraph graph = BuildControlGraph(tasks);
+            gtsam::Values initialEstimateFG = GenerateInitialFG(tasks);
             gtsam::Values result;
             gtsam::LevenbergMarquardtParams params;
             params.setlambdaInitial(initialLambda);
@@ -395,7 +323,7 @@ namespace rt_num_opt
                 // optimizer.iterate();
                 // Values result_new = optimizer.values();
                 // result_new.print();
-                // VectorDynamic aaa = FactorGraphType::ExtractResults(result_new, tasks);
+                // VectorDynamic aaa = ExtractResults(result_new, tasks);
                 // gtsam::VectorValues delta = optimizer.getDelta(params);
                 // if (debugMode == 1)
                 // {
@@ -424,7 +352,7 @@ namespace rt_num_opt
             }
         }
         // TODO: limit the number of outer loops
-        template <typename FactorGraphType, class TaskSetType>
+
         std::pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSetType &tasks)
         {
             eliminationRecordGlobal.Initialize(tasks.size());
@@ -433,7 +361,7 @@ namespace rt_num_opt
             VectorDynamic executionTimeResCurr, executionTimeResPrev;
             EliminationRecord eliminationRecordPrev = eliminationRecordGlobal;
             double errPrev = 1e30;
-            double errCurr = FactorGraphType::RealObj(tasks);
+            double errCurr = RealObj(tasks);
             int loopCount = 0;
             // double disturbIte = eliminateTol;
             bool whether_new_eliminate = false;
@@ -449,7 +377,7 @@ namespace rt_num_opt
 
                 // perform optimization
                 double err;
-                std::tie(executionTimeResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks);
+                std::tie(executionTimeResCurr, err) = OptimizeTaskSetIterativeWeight(tasks);
 
                 // adjust optimization settings
                 loopCount++;
@@ -458,7 +386,7 @@ namespace rt_num_opt
                 // std::vector<bool> maskForEliminationCopy = maskForElimination;
                 // while (EqualVector(maskForEliminationCopy, maskForElimination) && eliminateIteCount < adjustEliminateMaxIte)
                 // {
-                //     FactorGraphType::FindEliminatedVariables(tasks, maskForEliminationCopy, disturbIte);
+                //     FindEliminatedVariables(tasks, maskForEliminationCopy, disturbIte);
                 //     disturbIte *= eliminateStep;
                 //     eliminateIteCount++;
                 // }
@@ -467,16 +395,16 @@ namespace rt_num_opt
                 // erase changes of eliminationRecord made during inner loops
                 eliminationRecordGlobal = eliminationRecordPrev;
 
-                FindEliminateVariableFromRecordGlobal<FactorGraphType>(tasks);
+                FindEliminateVariableFromRecordGlobal(tasks);
                 whether_new_eliminate = FindEliminationRecordDiff(eliminationRecordPrev, eliminationRecordGlobal);
                 if (!ContainFalse(eliminationRecordGlobal))
                 {
                     break;
                 }
-                // disturbIte = FactorGraphType::FindEliminatedVariables(tasks, whether_new_eliminate, disturbIte);
+                // disturbIte = FindEliminatedVariables(tasks, whether_new_eliminate, disturbIte);
 
                 RoundExecutionTime(tasks);
-                errCurr = FactorGraphType::RealObj(tasks);
+                errCurr = RealObj(tasks);
                 if (!whether_new_eliminate && relativeErrorTolerance > relativeErrorToleranceMin)
                 {
                     relativeErrorTolerance = relativeErrorTolerance / 10;
@@ -498,7 +426,7 @@ namespace rt_num_opt
             //     ; //nothing else to do
             // }
 
-            double postError = FactorGraphType::RealObj(tasks);
+            double postError = RealObj(tasks);
             std::cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << std::endl;
             std::cout << "Best optimal found: " << valueGlobalOpt << std::endl;
             std::cout << "After optimiazation found: " << postError << std::endl;
@@ -508,7 +436,7 @@ namespace rt_num_opt
             }
 
             // verify feasibility
-            RTA_LL xx(tasks);
+            Schedul_Analysis xx(tasks);
             if (xx.CheckSchedulability() == false)
             {
                 CoutError("Unfeasible result found! Infeasible after optimization");
@@ -521,7 +449,7 @@ namespace rt_num_opt
                     break;
                 }
             }
-            return std::make_pair(GetParameterVD<double>(tasks, "executionTime"), FactorGraphType::RealObj(tasks));
+            return std::make_pair(GetParameterVD<double>(tasks, "executionTime"), RealObj(tasks));
         }
-    }
+    };
 } // namespace rt_num_opt

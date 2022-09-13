@@ -21,7 +21,7 @@
 #include "sources/Utils/utils.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/Utils/GlobalVariables.h"
-#include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
+// #include "sources/EnergyOptimization/EnergyOptimize.h"
 namespace rt_num_opt
 {
     // using namespace gtsam;
@@ -627,8 +627,8 @@ namespace rt_num_opt
                 UpdateTaskSetExecutionTime(tasksInit, initialExecutionTime);
                 double initialEnergyCost = EstimateEnergyTaskSet(tasksInit).sum();
                 double afterEnergyCost = EstimateEnergyTaskSet(taskSetType.tasks_).sum();
-                if (debugMode == 1)
-                    std::cout << "Actual objective function is" << FactorGraphEnergyLL::RealObj(taskSetType.tasks_) << std::endl;
+                // if (debugMode == 1)
+                //     std::cout << "Actual objective function is" << Energy_OptDAG::RealObj(taskSetType.tasks_) << std::endl;
                 if (debugMode == 1)
                 {
                     std::cout << "Normalized objective function after optimization is " << afterEnergyCost << std::endl;

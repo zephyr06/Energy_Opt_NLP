@@ -408,8 +408,8 @@ TEST(EnergyFactor, v1)
     VectorDynamic energy1;
     weightEnergy = 1e8;
     auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-    FactorGraphEnergyLL::EnergyFactor f0(GenerateControlKey(0, "executionTime"), tasks[0], 0, model);
-    FactorGraphEnergyLL::EnergyFactor f1(GenerateControlKey(1, "executionTime"), tasks[1], 1, model);
+    FactorGraphEnergyLL::EnergyFactor f0(GenerateKey(0, "executionTime"), tasks[0], 0, model);
+    FactorGraphEnergyLL::EnergyFactor f1(GenerateKey(1, "executionTime"), tasks[1], 1, model);
     MatrixDynamic h1 = GenerateMatrixDynamic(1, 1);
     MatrixDynamic h1Expect = GenerateVectorDynamic1D(-2 / tasks[0].period * weightEnergy);
     MatrixDynamic h2 = GenerateMatrixDynamic(1, 1);

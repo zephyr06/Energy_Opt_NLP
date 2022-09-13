@@ -22,13 +22,13 @@ namespace rt_num_opt
     {
         LambdaMultiKey f = [tasks, index, rtaBase](const gtsam::Values &x)
         {
-            double error = AtWithReplace(x, GenerateControlKey(index, "response"), rtaBase(index, 0)) -
+            double error = AtWithReplace(x, GenerateKey(index, "response"), rtaBase(index, 0)) -
                            tasks[index].executionTime;
 
             for (int i = 0; i < index; i++)
             {
-                error -= ceil(AtWithReplace(x, GenerateControlKey(index, "response"), rtaBase(index)) /
-                              AtWithReplace(x, GenerateControlKey(i, "period"), tasks[i].period)) *
+                error -= ceil(AtWithReplace(x, GenerateKey(index, "response"), rtaBase(index)) /
+                              AtWithReplace(x, GenerateKey(i, "period"), tasks[i].period)) *
                          tasks[i].executionTime;
             }
             return GenerateVectorDynamic1D(error);
@@ -37,9 +37,9 @@ namespace rt_num_opt
         for (uint i = 0; i < tasks.size(); i++)
         {
             if (!maskForElimination[i])
-                keysVec.push_back(GenerateControlKey(i, "period"));
+                keysVec.push_back(GenerateKey(i, "period"));
             if (!maskForElimination[i + 5])
-                keysVec.push_back(GenerateControlKey(i, "response"));
+                keysVec.push_back(GenerateKey(i, "response"));
         }
         auto model = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightSchedulability);
         // auto modelPunishmentHard = noiseModel::Constrained::All(1);

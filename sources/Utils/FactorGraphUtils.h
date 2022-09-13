@@ -23,7 +23,7 @@ namespace rt_num_opt
      * @param type
      * @return gtsam::Symbol
      */
-    gtsam::Symbol GenerateControlKey(int idtask, std::string type)
+    gtsam::Symbol GenerateKey(int idtask, std::string type)
     {
         if (type == "period")
         {
