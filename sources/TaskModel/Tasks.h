@@ -12,7 +12,7 @@
 #include "sources/Tools/colormod.h"
 
 #include "sources/Utils/Parameters.h"
-#include "sources/MatirxConvenient.h"
+#include "sources/MatrixConvenient.h"
 
 namespace rt_num_opt
 {
@@ -146,6 +146,9 @@ namespace rt_num_opt
                 CoutError("Please provide Update parameter for " + parameter);
             }
         }
+        Task operator[](size_t i) { return tasks_[i]; }
+
+        size_t size() { return tasks_.size(); }
     };
     void Print(TaskSet &tasks)
     {

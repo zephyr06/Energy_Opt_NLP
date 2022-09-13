@@ -4,7 +4,7 @@
 
 #include "sources/TaskModel/Tasks.h"
 #include "sources/Utils/Parameters.h"
-#include "sources/MatirxConvenient.h"
+#include "sources/MatrixConvenient.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/Utils/utils.h"
 
@@ -75,5 +75,6 @@ namespace rt_num_opt
         VectorDynamic x = GenerateVectorDynamic(1);
         x << tasks[i].executionTime;
         return NumericalDerivativeDynamic(f, x, deltaOptimizer, 1)(0, 0);
-    };
+    }
+
 } // namespace rt_num_opt

@@ -145,7 +145,7 @@ namespace rt_num_opt
             double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
             auto modelNormal = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma);
             auto modelPunishmentSoft1 = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
-            VectorDynamic rtaBase = RTALLVector(tasks);
+            VectorDynamic rtaBase = RTAVector(tasks);
             for (uint i = 0; i < tasks.size(); i++)
             {
                 if (!maskForElimination[i])

@@ -1,3 +1,14 @@
+/**
+ * @file Optimize.h
+ * @author Sen Wang
+ * @brief This file mainly performs Energy optimization subject to simple RTA model;
+ * it can optimize with Nasri19, though, but the elimination part is not completed.
+ * @version 0.1
+ * @date 2022-09-12
+ *
+ * @copyright Copyright (c) 2022
+ *
+ */
 #pragma once
 
 #include <chrono>
@@ -14,7 +25,7 @@
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 
 #include "sources/Utils/Parameters.h"
-#include "sources/MatirxConvenient.h"
+#include "sources/MatrixConvenient.h"
 #include "sources/TaskModel/Tasks.h"
 #include "sources/RTA/RTA_LL.h"
 #include "sources/EnergyOptimization/Energy.h"

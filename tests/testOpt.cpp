@@ -408,8 +408,8 @@ TEST(EnergyFactor, v1)
     VectorDynamic energy1;
     weightEnergy = 1e8;
     auto model = noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-    FactorGraphEnergyLL::EnergyFactor f0(GenerateKey(0, "executionTime"), tasks[0], 0, model);
-    FactorGraphEnergyLL::EnergyFactor f1(GenerateKey(1, "executionTime"), tasks[1], 1, model);
+    Energy_OptDAG::EnergyFactor f0(GenerateKey(0, "executionTime"), tasks[0], 0, model);
+    Energy_OptDAG::EnergyFactor f1(GenerateKey(1, "executionTime"), tasks[1], 1, model);
     MatrixDynamic h1 = GenerateMatrixDynamic(1, 1);
     MatrixDynamic h1Expect = GenerateVectorDynamic1D(-2 / tasks[0].period * weightEnergy);
     MatrixDynamic h2 = GenerateMatrixDynamic(1, 1);
@@ -427,9 +427,9 @@ TEST(RTARelatedFactor, v1)
     auto tasks = ReadTaskSet(path, "RM");
     std::vector<bool> maskForElimination(tasks.size(), false);
     eliminationRecordGlobal.Initialize(tasks.size());
-    VectorDynamic rtaBase = RTALLVector(tasks);
-    auto f1 = FactorGraphEnergyLL::GenerateRTARelatedFactor(tasks, 3, rtaBase);
-    auto x = FactorGraphEnergyLL::GenerateInitialFG(tasks);
+    VectorDynamic rtaBase = RTAVector(tasks);
+    auto f1 = Energy_OptDAG::GenerateRTARelatedFactor(tasks, 3, rtaBase);
+    auto x = Energy_OptDAG::GenerateInitialFG(tasks);
     std::vector<MatrixDynamic> Hs, HsExpect;
     Hs.reserve(5);
     HsExpect.reserve(5);
@@ -451,8 +451,8 @@ TEST(GenerateEliminationLLFactor, v1)
     maskForElimination = {0, 0, 0, 1, 0};
     eliminationRecordGlobal.Initialize(tasks.size());
     eliminationRecordGlobal.SetEliminated(3, EliminationType::RTA);
-    VectorDynamic rtaBase = RTALLVector(tasks);
-    MultiKeyFactor f1 = FactorGraphEnergyLL::GenerateEliminationLLFactor(tasks, 3, rtaBase(3));
+    VectorDynamic rtaBase = RTAVector(tasks);
+    MultiKeyFactor f1 = Energy_OptDAG::GenerateEliminationLLFactor(tasks, 3, rtaBase(3));
     int dimension = 4;
     std::vector<MatrixDynamic> Hs, HsExpect;
     Hs.reserve(dimension);
@@ -465,7 +465,7 @@ TEST(GenerateEliminationLLFactor, v1)
         HsExpect.push_back(m);
     }
     HsExpect[3] << -1;
-    auto x = FactorGraphEnergyLL::GenerateInitialFG(tasks);
+    auto x = Energy_OptDAG::GenerateInitialFG(tasks);
     assert_equal(GenerateVectorDynamic1D(0), f1.unwhitenedError(x, Hs), 1e-3);
     for (uint i = 0; i < HsExpect.size(); i++)
         assert_equal(HsExpect[i], Hs[i], 1e-7);

@@ -213,7 +213,7 @@ TEST(GenerateSchedulabilityFactor, v2)
     eliminationRecordGlobal.Initialize(tasks.size());
     coeff << 1, 2, 1, 4, 1, 1, 1, 1, 1, 1;
     std::vector<bool> maskForElimination(tasks.size(), false);
-    VectorDynamic rtaBase = RTALLVector(tasks);
+    VectorDynamic rtaBase = RTAVector(tasks);
     auto factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 0, coeff, rtaBase);
     auto e2Expect = GenerateVectorDynamic(2);
     e2Expect << 4, 0;
@@ -236,7 +236,7 @@ TEST(GenerateSchedulabilityFactor, v3)
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
     coeff << 1, 2, 1, 4, 1, 1, 1, 1, 1, 1;
-    VectorDynamic rtaBase = RTALLVector(tasks);
+    VectorDynamic rtaBase = RTAVector(tasks);
     std::vector<bool> maskForElimination(tasks.size(), false);
     auto factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, 0, coeff, rtaBase);
     auto e2Expect = GenerateVectorDynamic(2);

@@ -1,5 +1,5 @@
 #include "sources/EnergyOptimization/Energy.h"
-#include "sources/MatirxConvenient.h"
+#include "sources/MatrixConvenient.h"
 #include "sources/Tools/testMy.h"
 using namespace rt_num_opt;
 using namespace std;

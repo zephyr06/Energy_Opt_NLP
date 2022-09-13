@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sources/TaskModel/Tasks.h"
-#include "sources/MatirxConvenient.h"
+#include "sources/MatrixConvenient.h"
 #include "sources/RTA/RTA_BASE.h"
 namespace rt_num_opt
 {
@@ -135,13 +135,13 @@ namespace rt_num_opt
         }
     };
 
-    VectorDynamic RTALLVector(const TaskSet &tasks)
+    VectorDynamic RTAVector(const TaskSet &tasks)
     {
         BeginTimer(__func__);
         RTA_LL r(tasks);
         auto res = r.ResponseTimeOfTaskSet();
-
         EndTimer(__func__);
         return res;
     }
+
 } // namespace rt_num_opt

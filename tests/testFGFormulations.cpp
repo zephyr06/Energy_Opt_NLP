@@ -37,7 +37,7 @@ inline MatrixDynamic GenerateMatrixDynamic(int m, int n)
     return M;
 }
 
-gtsam::Symbol GenerateKey(int idtask, std::string type)
+gtsam::Symbol GenerateKeyLocal(int idtask, std::string type)
 {
     if (type == "period")
     {
@@ -127,8 +127,8 @@ TEST(multiple_small, v1)
 
     for (int i = 0; i < Nvar; i++)
     {
-        graph.emplace_shared<MyTestFactor1D>(GenerateKey(i, "period"), model);
-        initialEstimateFG.insert(GenerateKey(i, "period"), GenerateVectorDynamic1D(5));
+        graph.emplace_shared<MyTestFactor1D>(GenerateKeyLocal(i, "period"), model);
+        initialEstimateFG.insert(GenerateKeyLocal(i, "period"), GenerateVectorDynamic1D(5));
     }
 
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
@@ -146,7 +146,7 @@ TEST(multiple_small, v1)
     params.setDiagonalDamping(false);
     LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
 
-    std::cout << "Delta from getDelta " << optimizer.getDelta(params).at(GenerateKey(0, "period")) << std::endl
+    std::cout << "Delta from getDelta " << optimizer.getDelta(params).at(GenerateKeyLocal(0, "period")) << std::endl
               << std::endl
               << std::endl;
     ;

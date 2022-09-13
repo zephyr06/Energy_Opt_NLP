@@ -74,7 +74,7 @@ namespace rt_num_opt
             VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
             optComp = FactorGraphType::ExtractResults(result, tasks);
             UpdateTaskSetPeriod(tasks, optComp);
-            rtaFromOpt = RTALLVector(tasks);
+            rtaFromOpt = RTAVector(tasks);
             if (debugMode == 1)
             {
                 using namespace std;
@@ -186,7 +186,7 @@ namespace rt_num_opt
                 if (!wait_for_eliminate_index.empty())
                 {
 
-                    VectorDynamic rtaBase = RTALLVector(tasks);
+                    VectorDynamic rtaBase = RTAVector(tasks);
 
                     std::vector<std::pair<int, double>> objectiveVec;
                     objectiveVec.reserve(wait_for_eliminate_index.size());
@@ -267,8 +267,8 @@ namespace rt_num_opt
         }
         // TODO: limit the number of outer loops
         template <typename FactorGraphType>
-        std::pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic &coeff,
-                                                                  std::vector<bool> &maskForElimination)
+        static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic &coeff,
+                                                                         std::vector<bool> &maskForElimination)
         {
 
             VectorDynamic periodResCurr, periodResPrev;

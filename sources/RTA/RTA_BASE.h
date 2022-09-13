@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sources/TaskModel/Tasks.h"
-#include "sources/MatirxConvenient.h"
+#include "sources/MatrixConvenient.h"
 #include "sources/Tools/profilier.h"
 
 namespace rt_num_opt
@@ -99,6 +99,7 @@ namespace rt_num_opt
             EndTimer("ResponseTimeOfTaskSet");
             return res;
         }
+
         /**
          * @brief
          *
@@ -157,5 +158,13 @@ namespace rt_num_opt
             return true;
         }
     };
+
+    VectorDynamic RTAVector(const TaskSetNormal &tasks)
+    {
+        BeginTimer(__func__);
+        CoutError("You need to re-write this function in corresponding RTA file!");
+        EndTimer(__func__);
+        return GenerateVectorDynamic1D(0);
+    }
 
 } // namespace rt_num_opt

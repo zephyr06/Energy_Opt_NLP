@@ -3,11 +3,22 @@
 #include <boost/function.hpp>
 
 #include "sources/Utils/Parameters.h"
-#include "sources/MatirxConvenient.h"
+#include "sources/MatrixConvenient.h"
 #include "sources/TaskModel/Tasks.h"
 
 namespace rt_num_opt
 {
+    /**
+     * @brief returns 0 if x>=0
+     *
+     * @param x
+     * @return double
+     */
+    double HingeLoss(double x)
+    {
+        return max(0, -1 * x);
+    }
+
     /**
      * barrier function for the optimization
      **/

@@ -2,7 +2,7 @@
 #pragma once
 #include <gtsam/nonlinear/Values.h>
 
-#include "sources/MatirxConvenient.h"
+#include "sources/MatrixConvenient.h"
 #include "sources/Utils/Parameters.h"
 #include "sources/TaskModel/Tasks.h"
 #include "sources/Tools/testMy.h"
@@ -68,10 +68,10 @@ namespace rt_num_opt
             return record[index];
         }
         /**
-     * @brief 
-     * 
-     * @param n  task set's size
-     */
+         * @brief
+         *
+         * @param n  task set's size
+         */
         void Initialize(uint n)
         {
             record.clear();
