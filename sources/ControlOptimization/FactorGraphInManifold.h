@@ -52,6 +52,11 @@ namespace rt_num_opt
                 {
                     BeginTimer("f_without_RTA");
                     VectorDynamic error = GenerateVectorDynamic(2);
+                    if (!x.exists(GenerateKey(index, "period")))
+                    {
+                        return error;
+                    }
+
                     error(0) = c * x.at<VectorDynamic>(GenerateKey(index, "period"))(0, 0);
                     if (!whether_ls)
                     {
@@ -70,7 +75,15 @@ namespace rt_num_opt
                     UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks));
                     RTA_LL r(tasksCurr);
                     double rta = r.RTA_Common_Warm(rtaBase(index), index);
-                    error(0) = rta * coeff[2 * index + 1] + coeff[2 * index] * x.at<VectorDynamic>(GenerateKey(index, "period"))(0, 0);
+                    if (!x.exists(GenerateKey(index, "period")))
+                    {
+                        error(0) = rta * coeff[2 * index + 1];
+                    }
+                    else
+                    {
+                        error(0) = rta * coeff[2 * index + 1] + coeff[2 * index] * x.at<VectorDynamic>(GenerateKey(index, "period"))(0, 0);
+                    }
+
                     if (!whether_ls)
                     {
                         error(0) = pow(error(0), 0.5);
@@ -297,11 +310,11 @@ namespace rt_num_opt
             gtsam::Values initialEstimateFG;
             for (uint i = 0; i < tasks.size(); i++)
             {
-                // if (!maskForElimination[i])
-                // {
-                initialEstimateFG.insert(GenerateKey(i, "period"),
-                                         GenerateVectorDynamic1D(tasks[i].period));
-                // }
+                if (!maskForElimination[i])
+                {
+                    initialEstimateFG.insert(GenerateKey(i, "period"),
+                                             GenerateVectorDynamic1D(tasks[i].period));
+                }
             }
             return initialEstimateFG;
         }

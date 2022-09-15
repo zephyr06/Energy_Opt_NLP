@@ -26,10 +26,10 @@ namespace rt_num_opt
         {
             BeginTimer(__func__);
             gtsam::NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(maskForElimination, tasks, coeff);
-            if (debugMode == 1)
-            {
-                graph.print();
-            }
+            // if (debugMode == 1)
+            // {
+            //     graph.print();
+            // }
             // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
             // initialEstimate << 68.000000, 321, 400, 131, 308;
             gtsam::Values initialEstimateFG = FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
@@ -104,12 +104,12 @@ namespace rt_num_opt
         std::pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(TaskSet &tasks, VectorDynamic &coeff,
                                                                         std::vector<bool> &maskForElimination)
         {
-            RTA_LL rr(tasks);
-            if (!rr.CheckSchedulability(debugMode == 1))
-            {
-                std::cout << "The task set is not schedulable!" << std::endl;
-                return std::make_pair(GetParameterVD<double>(tasks, "period"), 1e30);
-            }
+            // RTA_LL rr(tasks);
+            // if (!rr.CheckSchedulability(debugMode == 1))
+            // {
+            //     std::cout << "The task set is not schedulable!" << std::endl;
+            //     return std::make_pair(GetParameterVD<double>(tasks, "period"), 1e30);
+            // }
             VectorDynamic periodRes;
             double err;
             for (double weight = weightSchedulabilityMin; weight <= weightSchedulabilityMax;
@@ -119,34 +119,35 @@ namespace rt_num_opt
                 std::tie(periodRes, err) = UnitOptimizationPeriod<FactorGraphType>(tasks, coeff, maskForElimination);
                 VectorDynamic periodPrev = GetParameterVD<double>(tasks, "period");
                 UpdateTaskSetPeriod(tasks, periodRes);
-                RTA_LL r(tasks);
-                if (!r.CheckSchedulability())
-                {
-                    UpdateTaskSetPeriod(tasks, periodPrev);
-                    if (debugMode == 1)
-                    {
-                        std::lock_guard<std::mutex> lock(mtx);
-                        std::cout << Color::blue << "After one iterate on updating weight parameter,\
-             the periods become unschedulable and are"
-                                  << std::endl
-                                  << periodRes << std::endl;
-                        std::cout << Color::def;
-                    }
 
-                    return std::make_pair(periodPrev, err);
-                }
-                else
-                {
-                    if (debugMode == 1)
-                    {
-                        std::lock_guard<std::mutex> lock(mtx);
-                        std::cout << Color::blue << "After one iterate on updating weight parameter,\
-             the periods remain schedulable and are"
-                                  << std::endl
-                                  << periodRes << std::endl;
-                        std::cout << Color::def;
-                    }
-                }
+                //     RTA_LL r(tasks);
+                //     if (!r.CheckSchedulability())
+                //     {
+                //         UpdateTaskSetPeriod(tasks, periodPrev);
+                //         if (debugMode == 1)
+                //         {
+                //             std::lock_guard<std::mutex> lock(mtx);
+                //             std::cout << Color::blue << "After one iterate on updating weight parameter,\
+            //  the periods become unschedulable and are"
+                //                       << std::endl
+                //                       << periodRes << std::endl;
+                //             std::cout << Color::def;
+                //         }
+
+                //         return std::make_pair(periodPrev, err);
+                //     }
+                //     else
+                //     {
+                //         if (debugMode == 1)
+                //         {
+                //             std::lock_guard<std::mutex> lock(mtx);
+                //             std::cout << Color::blue << "After one iterate on updating weight parameter,\
+            //  the periods remain schedulable and are"
+                //                       << std::endl
+                //                       << periodRes << std::endl;
+                //             std::cout << Color::def;
+                //         }
+                //     }
             }
 
             return std::make_pair(periodRes, err);
