@@ -48,7 +48,6 @@ namespace rt_num_opt
                 {
                     error(0) = Barrier(-1e9);
                 }
-                // eliminationRecordGlobal.AdjustEliminationError(error(0), index, EliminationType::RTA);
                 EndTimer("f_with_RTA");
                 return error;
             };

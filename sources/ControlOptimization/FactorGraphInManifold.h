@@ -33,6 +33,124 @@ namespace rt_num_opt
             return periods;
         }
 
+        class ControlObjFactor : public gtsam::NoiseModelFactor
+        {
+        public:
+            TaskSet tasks;
+            int index;
+            VectorDynamic coeff;
+            VectorDynamic rtaBase;
+            int dimension;
+            std::vector<gtsam::Symbol> keyVec;
+            LambdaMultiKey f_with_RTA;
+            LambdaMultiKey f_without_RTA;
+
+            ControlObjFactor(std::vector<gtsam::Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic rtaBase, gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor(model, keyVec), tasks(tasks), index(index), coeff(coeff), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
+            {
+                double c = coeff[2 * index];
+                f_without_RTA = [index, c](const gtsam::Values &x)
+                {
+                    BeginTimer("f_without_RTA");
+                    VectorDynamic error = GenerateVectorDynamic(2);
+                    error(0) = c * x.at<VectorDynamic>(GenerateKey(index, "period"))(0, 0);
+                    if (!whether_ls)
+                    {
+                        error(0) = pow(error(0), 0.5);
+                    }
+                    error(1) = 0;
+                    EndTimer("f_without_RTA");
+                    return error;
+                };
+
+                f_with_RTA = [tasks, index, coeff, rtaBase](const gtsam::Values &x)
+                {
+                    BeginTimer("f_with_RTA");
+                    VectorDynamic error = GenerateVectorDynamic(2);
+                    TaskSet tasksCurr = tasks;
+                    UpdateTaskSetPeriod(tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks));
+                    RTA_LL r(tasksCurr);
+                    double rta = r.RTA_Common_Warm(rtaBase(index), index);
+                    error(0) = rta * coeff[2 * index + 1] + coeff[2 * index] * x.at<VectorDynamic>(GenerateKey(index, "period"))(0, 0);
+                    if (!whether_ls)
+                    {
+                        error(0) = pow(error(0), 0.5);
+                    }
+
+                    error(1) = HingeLoss(tasksCurr[index].period - rta);
+                    EndTimer("f_with_RTA");
+                    return error;
+                };
+            }
+
+            gtsam::Vector unwhitenedError(const gtsam::Values &x,
+                                          boost::optional<std::vector<gtsam::Matrix> &> H = boost::none) const override
+            {
+                BeginTimer("RTARelatedFactor_unwhitenedError");
+                if (H)
+                {
+                    for (int i = 0; i < dimension; i++)
+                    {
+                        if (exactJacobian)
+                        {
+                            NormalErrorFunction1D f =
+                                [x, i, this](const VectorDynamic xi)
+                            {
+                                gtsam::Symbol a = keyVec.at(i);
+                                gtsam::Values xx = x;
+                                xx.update(a, xi);
+                                return f_with_RTA(xx);
+                            };
+                            (*H)[i] = NumericalDerivativeDynamic(f, x.at<VectorDynamic>(keyVec[i]), deltaOptimizer);
+                        }
+                        else
+                        {
+                            VectorDynamic jacob = GenerateVectorDynamic(2);
+                            int taskId = AnalyzeKey(keyVec[i]);
+                            if (taskId == index)
+                            {
+                                double val = coeff(2 * index) / x.at<VectorDynamic>(GenerateKey(index, "period"))(0);
+                                jacob(0) = 0.5 * pow(val, 0.5);
+                            }
+                            (*H)[i] = jacob;
+                        }
+                        (*H)[i] = (*H)[i] * jacobianScale;
+                    }
+                    if (debugMode == 1)
+                    {
+                        std::lock_guard<std::mutex> lock(mtx);
+                        std::cout << Color::blue;
+                        // PrintControlValues(x);
+                        // x.print();
+                        std::cout << Color::def;
+                    }
+                }
+                EndTimer("RTARelatedFactor_unwhitenedError");
+                return f_with_RTA(x);
+            }
+        };
+
+        static ControlObjFactor
+        GenerateControlObjFactor(std::vector<bool> maskForElimination, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic &rtaBase)
+        {
+            BeginTimer(__func__);
+            std::vector<gtsam::Symbol> keys;
+            keys.reserve(index);
+            for (int i = 0; i <= index; i++)
+            {
+                if (!maskForElimination[i])
+                {
+                    keys.push_back(GenerateKey(i, "period"));
+                }
+            }
+
+            VectorDynamic sigma = GenerateVectorDynamic(2);
+            sigma << noiseModelSigma, noiseModelSigma / weightSchedulability;
+            auto model = gtsam::noiseModel::Diagonal::Sigmas(sigma);
+            // return MultiKeyFactor(keys, f, model);
+            EndTimer(__func__);
+            return ControlObjFactor(keys, tasks, index, coeff, rtaBase, model);
+        }
+
         class RTARelatedFactor : public gtsam::NoiseModelFactor
         {
         public:
@@ -43,10 +161,12 @@ namespace rt_num_opt
             int dimension;
             std::vector<gtsam::Symbol> keyVec;
             LambdaMultiKey f_with_RTA;
+            LambdaMultiKey f_without_RTA;
 
             RTARelatedFactor(std::vector<gtsam::Symbol> &keyVec, TaskSet &tasks, int index, VectorDynamic &coeff, VectorDynamic rtaBase,
                              gtsam::SharedNoiseModel model) : gtsam::NoiseModelFactor(model, keyVec), tasks(tasks), index(index), coeff(coeff), rtaBase(rtaBase), dimension(keyVec.size()), keyVec(keyVec)
             {
+
                 f_with_RTA = [tasks, index, coeff, rtaBase](const gtsam::Values &x)
                 {
                     BeginTimer("f_with_RTA");
@@ -56,6 +176,10 @@ namespace rt_num_opt
                     RTA_LL r(tasksCurr);
                     double rta = r.RTA_Common_Warm(rtaBase(index), index);
                     error(0) = rta * coeff[2 * index + 1];
+                    if (!whether_ls)
+                    {
+                        error(0) = pow(error(0), 0.5);
+                    }
                     error(1) = HingeLoss(tasksCurr[index].period - rta);
                     EndTimer("f_with_RTA");
                     return error;
@@ -86,10 +210,10 @@ namespace rt_num_opt
                             };
                             (*H)[i] = NumericalDerivativeDynamic(f, x.at<VectorDynamic>(keyVec[i]), deltaOptimizer);
                         }
-
                         else
+                        {
                             (*H)[i] = GenerateVectorDynamic(2);
-                        (*H)[i] = (*H)[i] * jacobianScale;
+                        }
                     }
                     if (debugMode == 1)
                     {
@@ -151,15 +275,16 @@ namespace rt_num_opt
                 if (!maskForElimination[i])
                 {
                     // add CoeffFactor
-                    graph.emplace_shared<CoeffFactor>(GenerateKey(i, "period"),
-                                                      GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
+                    // graph.emplace_shared<CoeffFactor>(GenerateKey(i, "period"),
+                    //                                   GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
                     // add period min/max limits
                     graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "period"), tasks[i].executionTime, modelPunishmentSoft1);
                     graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "period"), periodMax, modelPunishmentSoft1);
                 }
                 if (HasDependency(i, maskForElimination))
                 {
-                    auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff, rtaBase);
+                    // auto factor = GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff, rtaBase);
+                    auto factor = GenerateControlObjFactor(maskForElimination, tasks, i, coeff, rtaBase);
                     graph.add(factor);
                 }
             }
@@ -172,11 +297,11 @@ namespace rt_num_opt
             gtsam::Values initialEstimateFG;
             for (uint i = 0; i < tasks.size(); i++)
             {
-                if (!maskForElimination[i])
-                {
-                    initialEstimateFG.insert(GenerateKey(i, "period"),
-                                             GenerateVectorDynamic1D(tasks[i].period));
-                }
+                // if (!maskForElimination[i])
+                // {
+                initialEstimateFG.insert(GenerateKey(i, "period"),
+                                         GenerateVectorDynamic1D(tasks[i].period));
+                // }
             }
             return initialEstimateFG;
         }

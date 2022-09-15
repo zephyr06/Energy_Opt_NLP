@@ -40,6 +40,9 @@ namespace rt_num_opt
             if (H)
             {
                 *H = coeff_;
+                if (!whether_ls)
+                    (*H)(0) = 0.5 * pow(coeff_(0) / x(0), 0.5);
+
                 if (coeff_.rows() != 1)
                 {
                     CoutError("Wrong dimension of Jacobian in CoeffFactor!");
@@ -47,6 +50,12 @@ namespace rt_num_opt
                 *H = *H * jacobianScale;
             }
             VectorDynamic err = coeff_ * (x);
+
+            if (!whether_ls)
+            {
+                err(0) = pow(err(0), 0.5);
+            }
+
             EndTimer("CoeffFactor");
             return err;
         }

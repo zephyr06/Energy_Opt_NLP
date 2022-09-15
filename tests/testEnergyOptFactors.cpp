@@ -12,10 +12,11 @@ TEST(UnitOpt, v1)
     InitializeGlobalVector(tasksN.tasks_.size());
     AssertBool(true, tasksN.tasks_.size() > 0, __LINE__);
 
+    EliminationRecord eliminationRecordGlobal;
     eliminationRecordGlobal.Initialize(tasksN.size());
     InitializeGlobalVector(tasksN.size());
 
-    auto resPair = Energy_OptDAG<rt_num_opt::DAG_Nasri19, RTA_Nasri19>::UnitOptimization(tasksN);
+    auto resPair = Energy_OptDAG<rt_num_opt::DAG_Nasri19, RTA_Nasri19>::UnitOptimization(tasksN, eliminationRecordGlobal);
     VectorDynamic exec = resPair.first;
     UpdateTaskSetExecutionTime(tasksN, exec);
     RTA_Nasri19 rr(tasksN);

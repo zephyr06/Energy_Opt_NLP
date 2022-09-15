@@ -67,6 +67,16 @@ namespace rt_num_opt
         {
             return record[index];
         }
+
+        bool whetherAllEliminated()
+        {
+            for (size_t i = 0; i < record.size(); i++)
+            {
+                if (record[i].type == EliminationType::Not)
+                    return false;
+            }
+            return true;
+        }
         /**
          * @brief
          *
@@ -152,5 +162,4 @@ namespace rt_num_opt
             std::cout << std::endl;
         }
     };
-    EliminationRecord eliminationRecordGlobal;
 } // namespace rt_num_opt

@@ -86,7 +86,7 @@ namespace rt_num_opt
                 VectorDynamic x = (c.at<VectorDynamic>(this->key()));
                 return f(x)(0, 0) > 0;
             }
-            else // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
+            else
             {
                 return true;
             }
@@ -96,11 +96,6 @@ namespace rt_num_opt
                                     boost::optional<gtsam::Matrix &> H = boost::none) const override
         {
             VectorDynamic err = f(x);
-            if (index >= 0) // this means it is used in Energy part and rely on eliminationRecordGlobal to update elimination results
-            {
-                eliminationRecordGlobal.AdjustEliminationError(err(0), index, EliminationType::Bound);
-            }
-
             if (H)
             {
                 // *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);

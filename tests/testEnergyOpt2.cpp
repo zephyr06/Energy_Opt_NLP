@@ -7,6 +7,7 @@
 using namespace std::chrono;
 using namespace rt_num_opt;
 using namespace std;
+EliminationRecord eliminationRecordGlobal;
 TEST(EliminationRecordUpdate, v1)
 {
     optimizerType = 2;
@@ -78,7 +79,7 @@ TEST(EliminationRecord, v2)
     auto sth = EnergyOptimize::OptimizeTaskSetIterativeWeight<FactorGraphEnergyLL>(tasks);
     UpdateTaskSetExecutionTime(tasks, sth.first);
     eliminationRecordGlobal.Print();
-    EnergyOptimize::FindEliminateVariableFromRecordGlobal<FactorGraphEnergyLL>(tasks);
+    EnergyOptimize::FindEliminateVariable<FactorGraphEnergyLL>(tasks);
     EXPECT(EliminationType::Bound == eliminationRecordGlobal[4].type);
 }
 
@@ -100,7 +101,7 @@ TEST(WithEliminationRecord, overall)
     for (int i : {10})
         eliminationRecordGlobal.SetEliminated(i, EliminationType::Not);
 
-    EnergyOptimize::FindEliminateVariableFromRecordGlobal<FactorGraphEnergyLL>(tasks);
+    EnergyOptimize::FindEliminateVariable<FactorGraphEnergyLL>(tasks);
     EXPECT(EliminationType::Not == eliminationRecordGlobal[10].type);
 }
 // TEST(WithEliminationRecord, overall)
@@ -140,7 +141,7 @@ TEST(WithEliminationRecord, overall)
 //     // eliminationRecordGlobal[18].type = EliminationType::RTA;
 //     // eliminationRecordGlobal[19].type = EliminationType::RTA;
 
-//     // EnergyOptimize::FindEliminateVariableFromRecordGlobal<FactorGraphEnergyLL>(tasks);
+//     // EnergyOptimize::FindEliminateVariable<FactorGraphEnergyLL>(tasks);
 //     auto sth = EnergyOptimize::OptimizeTaskSetIterative<FactorGraphEnergyLL>(tasks);
 // }
 int main()

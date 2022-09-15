@@ -45,6 +45,11 @@ namespace rt_num_opt
         }
     }
 
+    int AnalyzeKey(gtsam::Symbol key)
+    {
+        return key.index();
+    }
+
     /**
      * @brief perform customized quotient operation for two double type numbers
      * return result is min_k |a - k b|, where k is an integer, a & b >0;

@@ -44,6 +44,7 @@ TEST(coeffFactor, v1)
     // std::tie(tasks, coeff) = ReadControlCase(path1);
     jacobianScale = 1;
     weightSchedulability = 1;
+    whether_ls = 1;
     auto model = noiseModel::Isotropic::Sigma(1, 1);
     VectorDynamic coeff0 = GenerateVectorDynamic(1);
     coeff0 << 3;
@@ -149,7 +150,7 @@ TEST(RTAFactor, J)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
-    eliminationRecordGlobal.Initialize(tasks.size());
+    // eliminationRecordGlobal.Initialize(tasks.size());
     std::vector<bool> maskForElimination(tasks.size() * 2, false);
     RTA_LL r(tasks);
     auto rta = r.ResponseTimeOfTaskSet();
@@ -186,7 +187,7 @@ TEST(GenerateSchedulabilityFactor, v1)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
-    eliminationRecordGlobal.Initialize(tasks.size());
+    // eliminationRecordGlobal.Initialize(tasks.size());
     VectorDynamic periodInitial1 = GenerateVectorDynamic(5);
     periodInitial1 << 127.008,
         127.077,
@@ -210,7 +211,7 @@ TEST(GenerateSchedulabilityFactor, v2)
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
-    eliminationRecordGlobal.Initialize(tasks.size());
+    // eliminationRecordGlobal.Initialize(tasks.size());
     coeff << 1, 2, 1, 4, 1, 1, 1, 1, 1, 1;
     std::vector<bool> maskForElimination(tasks.size(), false);
     VectorDynamic rtaBase = RTAVector(tasks);
@@ -299,7 +300,31 @@ TEST(FactorGraphInManifold, inference)
         131.088,
         308.676;
     UpdateTaskSetPeriod(tasks, initial);
-    gtsam::NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    // gtsam::NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    // using namespace FactorGraphInManifold;
+    gtsam::NonlinearFactorGraph graph;
+    double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
+    auto modelNormal = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+    auto modelPunishmentSoft1 = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
+    VectorDynamic rtaBase = RTAVector(tasks);
+    for (uint i = 0; i < tasks.size(); i++)
+    {
+        if (!maskForElimination[i])
+        {
+            // add CoeffFactor
+            graph.emplace_shared<CoeffFactor>(GenerateKey(i, "period"),
+                                              GenerateVectorDynamic1D(coeff(2 * i, 0)), modelNormal);
+            // add period min/max limits
+            graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "period"), tasks[i].executionTime, modelPunishmentSoft1);
+            graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "period"), periodMax, modelPunishmentSoft1);
+        }
+        if (FactorGraphInManifold::HasDependency(i, maskForElimination))
+        {
+            auto factor = FactorGraphInManifold::GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff, rtaBase);
+            graph.add(factor);
+        }
+    }
+
     auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
     MatrixDynamic jacobianCurr = sth.first;
@@ -650,6 +675,46 @@ TEST(assumption, bigJacobian)
     }
     cout << result.at<VectorDynamic>(key);
     EXPECT_LONGS_EQUAL(-3e-6, result.at<VectorDynamic>(key)(2));
+}
+
+TEST(ControlObjFactor, jacobian)
+{
+    whether_ls = 0;
+    noiseModelSigma = 1;
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case857.txt";
+    TaskSet tasks;
+    VectorDynamic coeff;
+    std::tie(tasks, coeff) = ReadControlCase(path1);
+    std::vector<bool> maskForElimination(tasks.size(), false);
+    // maskForElimination[0] = 1;
+    VectorDynamic initial = GenerateVectorDynamic(5);
+    initial << 1000, 1000, 1000, 1000, 1000;
+    UpdateTaskSetPeriod(tasks, initial);
+    // gtsam::NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
+    // using namespace FactorGraphInManifold;
+    gtsam::NonlinearFactorGraph graph;
+    double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
+    auto modelNormal = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma);
+    auto modelPunishmentSoft1 = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightHardConstraint);
+    VectorDynamic rtaBase = RTAVector(tasks);
+    for (uint i = 0; i < tasks.size(); i++)
+    {
+        if (FactorGraphInManifold::HasDependency(i, maskForElimination))
+        {
+            auto factor = FactorGraphInManifold::GenerateControlObjFactor(maskForElimination, tasks, i, coeff, rtaBase);
+            graph.add(factor);
+        }
+    }
+
+    auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
+    auto sth = graph.linearize(initialEstimateFG)->jacobian();
+    MatrixDynamic jacobianCurr = sth.first;
+    std::cout << "The following should be a diagonal matrix" << std::endl;
+    std::cout << "Current Jacobian matrix:" << endl;
+    std::cout << jacobianCurr << endl;
+    std::cout << "Current b vector: " << endl;
+    std::cout << sth.second << endl;
+    EXPECT_DOUBLES_EQUAL(0, jacobianCurr(2, 0), 1e-5);
 }
 int main()
 {

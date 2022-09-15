@@ -419,6 +419,8 @@ TEST(EnergyFactor, v1)
     assert_equal(h1Expect, h1, 1e-3);
     assert_equal(h2Expect, h2, 1e-3);
 }
+
+EliminationRecord eliminationRecordGlobal;
 TEST(RTARelatedFactor, v1)
 {
     exactJacobian = 1;

@@ -175,7 +175,6 @@ namespace rt_num_opt
             case 0: // perform optimization
             {
                 std::cout << file << std::endl;
-                relativeErrorTolerance = relativeErrorToleranceInit;
                 TaskSet tasks;
                 VectorDynamic coeff;
                 std::tie(tasks, coeff) = ReadControlCase(path);
