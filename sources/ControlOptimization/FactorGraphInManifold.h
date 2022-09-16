@@ -91,6 +91,8 @@ namespace rt_num_opt
 
                     error(1) = HingeLoss(tasksCurr[index].period - rta);
                     EndTimer("f_with_RTA");
+                    // std::cout << std::setprecision(12) << x.at<VectorDynamic>(GenerateKey(index, "period"))(0, 0) << ", " << error(0)
+                    //           << std::setprecision(5) << std::endl;
                     return error;
                 };
             }
@@ -99,6 +101,7 @@ namespace rt_num_opt
                                           boost::optional<std::vector<gtsam::Matrix> &> H = boost::none) const override
             {
                 BeginTimer("RTARelatedFactor_unwhitenedError");
+                gtsam::Vector result = f_with_RTA(x);
                 if (H)
                 {
                     for (int i = 0; i < dimension; i++)
@@ -121,11 +124,13 @@ namespace rt_num_opt
                             int taskId = AnalyzeKey(keyVec[i]);
                             if (taskId == index)
                             {
-                                double val = coeff(2 * index) / x.at<VectorDynamic>(GenerateKey(index, "period"))(0);
-                                jacob(0) = 0.5 * pow(val, 0.5);
+                                jacob(0) = 0.5 * coeff(2 * index) / result(0);
                             }
                             (*H)[i] = jacob;
                         }
+
+                        // std::cout << "*************:" << std::endl
+                        //           << (*H)[i] << std::endl;
                         (*H)[i] = (*H)[i] * jacobianScale;
                     }
                     if (debugMode == 1)
@@ -138,7 +143,7 @@ namespace rt_num_opt
                     }
                 }
                 EndTimer("RTARelatedFactor_unwhitenedError");
-                return f_with_RTA(x);
+                return result;
             }
         };
 

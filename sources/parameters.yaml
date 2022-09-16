@@ -27,9 +27,9 @@ deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50 
-verbosityLM: "SILENT" # SUMMARY  TRYDELTA SILENT
+verbosityLM: "SUMMARY" # SUMMARY  TRYDELTA SILENT
 relativeErrorTolerance: 1e-5
-setDiagonalDamping: 0
+setDiagonalDamping: 1
 whether_ls: 0
 jacobianScale: 1
 #*************************************************************
@@ -46,7 +46,7 @@ readTaskMode: deadline
 # used in control
 relativeErrorToleranceMin: 1e-6
 relErrorTolIPM: 1e-5
-controlPath: "N5/Case998"
+controlPath: "N20/Case238"
 MaxLoopControl: 30
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
 weightSchedulabilityMax: 1e12
@@ -81,7 +81,7 @@ linearOptimizerType: "MULTIFRONTAL_QR"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
 enableReorder: 0
-deltaOptimizer: 1e-5
+deltaOptimizer: 1e-9
 baselineLLCompare: 1
 printRTA: 0
 printFailureFile: 1

@@ -301,7 +301,7 @@ namespace rt_num_opt
                 // perform optimization
                 double err;
                 // std::tie(periodResCurr, err) = OptimizeTaskSetIterativeWeight<FactorGraphType>(tasks, coeff, maskForElimination);
-                std::tie(periodRes, err) = UnitOptimizationPeriod<FactorGraphType>(tasks, coeff, maskForElimination);
+                std::tie(periodResCurr, err) = UnitOptimizationPeriod<FactorGraphType>(tasks, coeff, maskForElimination);
                 UpdateTaskSetPeriod(tasks, periodResCurr);
 
                 // adjust tasks' priority based on RM
