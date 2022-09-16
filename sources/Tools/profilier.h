@@ -45,7 +45,7 @@ void BeginTimer(std::string funcName)
     }
 }
 
-void EndTimer(std::string funcName)
+void EndTimer(std::string funcName, bool print = false)
 {
     std::lock_guard<std::mutex> lock(mtx_profiler);
     auto itr = profilerMap.find(funcName);
@@ -54,7 +54,12 @@ void EndTimer(std::string funcName)
         CoutError("Timer cannot find entry!");
     }
     profilerMap[funcName].end = CurrentTimeInProfiler;
+
     profilerMap[funcName].UpdateAccum();
+    if (print)
+    {
+        std::cout << Color::green << "Total time spent is: " << profilerMap[funcName].accum << " seconds" << Color::def << std::endl;
+    }
 }
 
 struct TimerDataProfiler

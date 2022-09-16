@@ -59,7 +59,7 @@ namespace rt_num_opt
                 jacobian(j, i) = (resPlus(j, 0) - resMinus(j, 0)) / 2 / deltaOptimizer;
             }
         }
-        EndTimer(__func__);
+        EndTimer(__func__, true);
         return jacobian;
     }
 
