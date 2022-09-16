@@ -19,11 +19,6 @@ namespace rt_num_opt
             return 0;
         else //(x < 0)
         {
-            if (TASK_NUMBER == 0)
-            {
-                std::cout << Color::red << "Please set TASK_NUMBER!" << Color::def << std::endl;
-                throw;
-            }
             return punishmentInBarrier * pow(-1 * x, 1);
         }
     }
@@ -59,7 +54,7 @@ namespace rt_num_opt
                 jacobian(j, i) = (resPlus(j, 0) - resMinus(j, 0)) / 2 / deltaOptimizer;
             }
         }
-        EndTimer(__func__, true);
+        EndTimer(__func__);
         return jacobian;
     }
 

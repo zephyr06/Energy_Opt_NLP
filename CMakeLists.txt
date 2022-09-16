@@ -45,7 +45,6 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} yaml-cpp)
 target_link_libraries(${CONVENIENCE_LIB_NAME} tbb)
 
 
-
 add_subdirectory(sources)
 add_subdirectory(tests)
 

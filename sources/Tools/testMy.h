@@ -23,10 +23,10 @@ void CoutError(std::string message)
 
 /**
  * @brief This function always trigger throw, it just prints information
- * 
- * @tparam T 
- * @param expect 
- * @param actual 
+ *
+ * @tparam T
+ * @param expect
+ * @param actual
  */
 template <typename T>
 void AssertUnEqual(T expect, T actual, int lineNumber = 0)
@@ -144,7 +144,7 @@ void AssertEigenEqualMatrix(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic
     {
         for (int j = 0; j < n; j++)
         {
-            AssertEqualScalar(expected(i, j), actual(i, j), 1e-6, lineNumber);
+            AssertEqualScalar(expected(i, j), actual(i, j), 1e-5, lineNumber);
         }
     }
 }

@@ -84,7 +84,10 @@ namespace rt_num_opt
             {
                 // note: still active at equality to avoid zigzagging?
                 VectorDynamic x = (c.at<VectorDynamic>(this->key()));
-                return f(x)(0, 0) > 0;
+                if (exactJacobian)
+                    return f(x)(0, 0) >= 0;
+                else
+                    return f(x)(0, 0) > 0;
             }
             else
             {
@@ -98,8 +101,15 @@ namespace rt_num_opt
             VectorDynamic err = f(x);
             if (H)
             {
-                // *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
-                *H = GenerateVectorDynamic(dimension);
+                if (exactJacobian)
+                {
+                    *H = NumericalDerivativeDynamic(f, x, deltaOptimizer, dimension);
+                }
+                else
+                {
+                    *H = GenerateVectorDynamic(dimension);
+                }
+
                 *H = *H * jacobianScale;
             }
             return err;
@@ -120,7 +130,7 @@ namespace rt_num_opt
             f = [b](const VectorDynamic &x)
             {
                 VectorDynamic res = x;
-                res << HingeLoss(b - x(0, 0));
+                res << Barrier(b - x(0, 0));
                 return res;
             };
         }
@@ -131,7 +141,7 @@ namespace rt_num_opt
             f = [b](const VectorDynamic &x)
             {
                 VectorDynamic res = x;
-                res << HingeLoss(b - x(0, 0));
+                res << Barrier(b - x(0, 0));
                 return res;
             };
         }
@@ -151,7 +161,7 @@ namespace rt_num_opt
             f = [b](const VectorDynamic &x)
             {
                 VectorDynamic res = x;
-                res << HingeLoss(x(0, 0) - b);
+                res << Barrier(x(0, 0) - b);
                 return res;
             };
         }
@@ -162,11 +172,7 @@ namespace rt_num_opt
             f = [b](const VectorDynamic &x)
             {
                 VectorDynamic res = x;
-                res << HingeLoss(x(0, 0) - b);
-                // if (res(0, 0) != 0)
-                // {
-                //     int a = 1;
-                // }
+                res << Barrier(x(0, 0) - b);
                 return res;
             };
         }
