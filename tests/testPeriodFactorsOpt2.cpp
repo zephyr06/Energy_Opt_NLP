@@ -28,6 +28,7 @@ TEST(case1, v1)
     cout << "Actual objective function is" << FactorGraphInManifold::RealObj(tasks, coeff) << endl;
     EndTimer("main");
     PrintTimer();
+    std::cout << count1 << ", " << count2 << std::endl;
 }
 
 int main()

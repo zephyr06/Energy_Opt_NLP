@@ -101,6 +101,7 @@ namespace rt_num_opt
                                           boost::optional<std::vector<gtsam::Matrix> &> H = boost::none) const override
             {
                 BeginTimer("RTARelatedFactor_unwhitenedError");
+                count1++;
                 gtsam::Vector result = f_with_RTA(x);
                 if (H)
                 {

@@ -7,11 +7,14 @@
 #include <opencv2/core/core.hpp>
 namespace rt_num_opt
 {
+
     cv::FileStorage ConfigParameters("/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml", cv::FileStorage::READ);
 
     // const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
     // int TASK_NUMBER_DYNAMIC = 10;
     int TASK_NUMBER = 0;
+    int count1 = 0;
+    int count2 = 0;
     double weightEnergy = (double)ConfigParameters["weightEnergy"];
     double punishmentInBarrier = weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
     double eliminateTol = (double)ConfigParameters["eliminateTol"];
