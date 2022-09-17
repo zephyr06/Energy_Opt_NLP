@@ -14,9 +14,15 @@ namespace rt_num_opt
      **/
     double Barrier(double x)
     {
+
         if (x >= 0)
-            // return pow(x, 2);
-            return 0;
+        {
+            if (whether_IPM)
+                return std::log(x);
+            else
+                return 0;
+        }
+
         else //(x < 0)
         {
             return punishmentInBarrier * pow(-1 * x, 1);

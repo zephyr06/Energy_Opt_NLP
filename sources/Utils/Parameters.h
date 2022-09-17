@@ -31,6 +31,7 @@ namespace rt_num_opt
     double gradientModify = (double)ConfigParameters["gradientModify"];
 
     int maxIterationsOptimizer = (int)ConfigParameters["maxIterationsOptimizer"];
+    int whether_IPM = (int)ConfigParameters["whether_IPM"];
 
     int LLCompareWithGeneralizedElimination = (int)ConfigParameters["LLCompareWithGeneralizedElimination"];
     int printFailureFile = (int)ConfigParameters["printFailureFile"];

@@ -5,7 +5,7 @@ runMode: compare
 testDataSetName: test_n3_v5
 
 
-debugMode: 1
+debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 1000
 EnergyMode: 1
@@ -18,7 +18,7 @@ eliminateStep: 1.5
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
 roundTypeInClamp: "rough"
 clampTypeMiddle: "rough"
-exactJacobian: 1
+exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
@@ -32,6 +32,7 @@ relativeErrorTolerance: 1e-5
 setDiagonalDamping: 1
 whether_ls: 0
 jacobianScale: 1
+whether_IPM: 0
 #*************************************************************
 
 
