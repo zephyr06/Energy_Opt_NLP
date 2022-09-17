@@ -229,9 +229,9 @@ namespace rt_num_opt
         {
             TaskSetType tasksCurr = tasks;
             bool whetherEliminate = false;
-            for (double disturb = eliminateTol; whetherEliminate == false; disturb *= eliminateStep)
+            for (double disturb = eliminateTol; whetherEliminate == false && disturb < disturb_max; disturb *= eliminateStep)
             {
-                for (uint i = 0; i < tasks.N; i++)
+                for (int i = 0; i < tasks.N; i++)
                 {
                     if (eliminationRecord[i].type != EliminationType::Not)
                         continue;
