@@ -69,7 +69,8 @@ namespace rt_num_opt
             for (uint i = 0; i < tasks.size(); i++)
             {
                 // energy factor
-                graph.emplace_shared<EnergyFactor>(GenerateKey(i, "executionTime"), tasks[i], i, modelNormal);
+                if (eliminationRecord[i].type == EliminationType::Not)
+                    graph.emplace_shared<EnergyFactor>(GenerateKey(i, "executionTime"), tasks[i], i, modelNormal);
 
                 // add executionTime min/max limits
                 graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
@@ -117,7 +118,7 @@ namespace rt_num_opt
         {
             BeginTimer(__func__);
             gtsam::NonlinearFactorGraph graph = BuildEnergyGraph(tasks, eliminationRecord);
-            gtsam::NonlinearFactorGraph graphForC = BuildGraphForC(tasks);
+            // gtsam::NonlinearFactorGraph graphForC = BuildGraphForC(tasks);
             // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
             // initialEstimate << 68.000000, 321, 400, 131, 308;
             gtsam::Values initialEstimateFG = EnergyOptUtils::GenerateInitialFG(tasks);
@@ -166,11 +167,11 @@ namespace rt_num_opt
                 }
             }
 
-            std::cout << "Analyze descent direction:--------------------------" << std::endl;
-            MatrixDynamic cDDMatrix = graphForC.linearize(result)->jacobian().first;
-            VectorDynamic cDD = cDDMatrix.diagonal();
-            std::cout << cDD << std::endl;
-            std::cout << std::endl;
+            // std::cout << "Analyze descent direction:--------------------------" << std::endl;
+            // MatrixDynamic cDDMatrix = graphForC.linearize(result)->jacobian().first;
+            // VectorDynamic cDD = cDDMatrix.diagonal();
+            // std::cout << cDD << std::endl;
+            // std::cout << std::endl;
             // int a = 1;
 
             // auto start = high_resolution_clock::now();
@@ -229,7 +230,8 @@ namespace rt_num_opt
         {
             TaskSetType tasksCurr = tasks;
             bool whetherEliminate = false;
-            for (double disturb = eliminateTol; whetherEliminate == false && disturb < disturb_max; disturb *= eliminateStep)
+            double disturb = eliminateTol;
+            for (; whetherEliminate == false && disturb < disturb_max; disturb *= eliminateStep)
             {
                 for (int i = 0; i < tasks.N; i++)
                 {
@@ -238,7 +240,7 @@ namespace rt_num_opt
                     else
                     {
                         double direction = JacobianInEnergyItem(tasksCurr.tasks_, i);
-                        tasksCurr.tasks_[i].executionTime += direction / std::abs(direction) * disturb;
+                        tasksCurr.tasks_[i].executionTime -= direction / std::abs(direction) * disturb;
                         Schedul_Analysis r(tasksCurr);
                         if (enableMaxComputationTimeRestrict && tasksCurr.tasks_[i].executionTime >=
                                                                     MaxComputationTimeRestrict * tasksCurr.tasks_[i].executionTimeOrg)
@@ -251,13 +253,19 @@ namespace rt_num_opt
                             eliminationRecord.SetEliminated(i, EliminationType::RTA);
                             whetherEliminate = true;
                         }
-                        tasksCurr.tasks_[i].executionTime -= direction / std::abs(direction) * disturb;
+                        tasksCurr.tasks_[i].executionTime += direction / std::abs(direction) * disturb;
                     }
                 }
                 int a = 1;
                 if (eliminationRecord.whetherAllEliminated())
                     break;
             }
+            if (debugMode == 1)
+            {
+                eliminationRecord.Print();
+                std::cout << "disturb to trigger elimination: " << disturb << std::endl;
+            }
+
             return std::make_pair(whetherEliminate, eliminationRecord);
         }
 
@@ -272,7 +280,7 @@ namespace rt_num_opt
             int loopCount = 0;
             // double disturbIte = eliminateTol;
             bool whether_new_eliminate = false;
-            while (whether_new_eliminate || (loopCount < elimIte && errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop)))
+            while (whether_new_eliminate || (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop)))
             {
                 // store prev result
                 errPrev = errCurr;
@@ -283,6 +291,8 @@ namespace rt_num_opt
                 std::tie(whether_new_eliminate, eliminationRecord) = FindEliminateVariable(tasks, eliminationRecord);
 
                 loopCount++;
+                if (loopCount > elimIte)
+                    break;
             }
 
             double postError = EnergyOptUtils::RealObj(tasks.tasks_);

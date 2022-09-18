@@ -5,14 +5,14 @@ runMode: compare
 testDataSetName: test_n3_v5
 
 
-debugMode: 0
+debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
-elimIte: 1000
+elimIte: 100 # 0 means no elimination
 EnergyMode: 1
 batchOptimizeFolder: EnergyPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
-MaxComputationTimeRestrict: 2
+MaxComputationTimeRestrict: 3
 eliminateTol: 1e0
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
@@ -27,7 +27,7 @@ deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50 
-verbosityLM: "SILENT" # SUMMARY  TRYDELTA SILENT
+verbosityLM: "SUMMARY" # SUMMARY  TRYDELTA SILENT
 relativeErrorTolerance: 1e-5
 setDiagonalDamping: 1
 whether_ls: 0
@@ -55,8 +55,8 @@ weightSchedulabilityStep: 1.5
 weightSchedulabilityMin: 1e12
 disturb_init: 1e0
 disturb_step: 1.5
-disturb_max: 1e2
-relativeErrorToleranceOuterLoop: 1e-7
+disturb_max: 1e5
+relativeErrorToleranceOuterLoop: 1e-5
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 #*************************************************************
 
