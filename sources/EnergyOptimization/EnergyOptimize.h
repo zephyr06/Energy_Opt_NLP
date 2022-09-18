@@ -70,31 +70,30 @@ namespace rt_num_opt
             {
                 // energy factor
                 if (eliminationRecord[i].type == EliminationType::Not)
-                    graph.emplace_shared<EnergyFactor>(GenerateKey(i, "executionTime"), tasks[i], i, modelNormal);
-                else
                 {
+                    graph.emplace_shared<EnergyFactor>(GenerateKey(i, "executionTime"), tasks[i], i, modelNormal);
                     // add executionTime min/max limits
                     graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
 
                     graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg * MaxComputationTimeRestrict, modelPunishmentSoft1);
                 }
 
-                if (eliminationRecord[i].type == EliminationType::Bound)
-                {
-                    graph.add(GenerateLockFactor(tasks.tasks_, i));
-                }
+                // if (eliminationRecord[i].type == EliminationType::Bound)
+                // {
+                //     graph.add(GenerateLockFactor(tasks.tasks_, i));
+                // }
             }
 
             // RTA factor
-            graph.add(GenerateRTARelatedFactor<TaskSetType, Schedul_Analysis>(tasks));
+            graph.add(GenerateRTARelatedFactor<TaskSetType, Schedul_Analysis>(tasks, eliminationRecord));
             return graph;
         }
 
-        static std::pair<VectorDynamic, double> UnitOptimization(TaskSetType &tasks, EliminationRecord eliminationRecord)
+        static std::pair<VectorDynamic, double> UnitOptimization(TaskSetType &tasks, EliminationRecord &eliminationRecord)
         {
             BeginTimer(__func__);
             gtsam::NonlinearFactorGraph graph = BuildEnergyGraph(tasks, eliminationRecord);
-            gtsam::Values initialEstimateFG = EnergyOptUtils::GenerateInitialFG(tasks);
+            gtsam::Values initialEstimateFG = EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecord);
             if (debugMode == 1)
             {
                 std::cout << Color::green;
@@ -171,7 +170,7 @@ namespace rt_num_opt
             return std::make_pair(optComp, EnergyOptUtils::RealObj(tasks.tasks_));
         }
 
-        static std::pair<bool, EliminationRecord> FindEliminateVariable(const TaskSetType &tasks, EliminationRecord eliminationRecord)
+        static std::pair<bool, EliminationRecord> FindEliminateVariable(const TaskSetType &tasks, EliminationRecord &eliminationRecord)
         {
             TaskSetType tasksCurr = tasks;
             bool whetherEliminate = false;

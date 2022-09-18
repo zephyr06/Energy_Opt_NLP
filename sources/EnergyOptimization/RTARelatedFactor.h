@@ -17,6 +17,8 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/Utils/utils.h"
 
+#include "sources/Utils/GlobalVariables.h" // EliminationRecord
+
 namespace rt_num_opt
 {
 
@@ -59,7 +61,7 @@ namespace rt_num_opt
             BeginTimer("RTARelatedFactor_unwhitenedError");
             if (H)
             {
-                for (int i = 0; i < tasks.N; i++)
+                for (uint i = 0; i < keyVec.size(); i++)
                 {
                     if (exactJacobian)
                     {
@@ -83,14 +85,15 @@ namespace rt_num_opt
         }
     };
     template <class TaskSetType, class Schedul_Analysis>
-    RTARelatedFactor<TaskSetType, Schedul_Analysis> GenerateRTARelatedFactor(TaskSetType &tasks)
+    RTARelatedFactor<TaskSetType, Schedul_Analysis> GenerateRTARelatedFactor(TaskSetType &tasks, EliminationRecord &eliminationRecord)
     {
 
         std::vector<gtsam::Symbol> keys;
         keys.reserve(tasks.N);
         for (int i = 0; i < tasks.N; i++)
         {
-            keys.push_back(GenerateKey(i, "executionTime"));
+            if (eliminationRecord[i].type == EliminationType::Not)
+                keys.push_back(GenerateKey(i, "executionTime"));
         }
         auto model = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma / weightSchedulability);
         return RTARelatedFactor<TaskSetType, Schedul_Analysis>(keys, tasks, model);
