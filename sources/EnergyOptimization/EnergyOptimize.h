@@ -71,11 +71,13 @@ namespace rt_num_opt
                 // energy factor
                 if (eliminationRecord[i].type == EliminationType::Not)
                     graph.emplace_shared<EnergyFactor>(GenerateKey(i, "executionTime"), tasks[i], i, modelNormal);
+                else
+                {
+                    // add executionTime min/max limits
+                    graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
 
-                // add executionTime min/max limits
-                graph.emplace_shared<LargerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg, modelPunishmentSoft1);
-
-                graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg * MaxComputationTimeRestrict, modelPunishmentSoft1);
+                    graph.emplace_shared<SmallerThanFactor1D>(GenerateKey(i, "executionTime"), tasks[i].executionTimeOrg * MaxComputationTimeRestrict, modelPunishmentSoft1);
+                }
 
                 if (eliminationRecord[i].type == EliminationType::Bound)
                 {
@@ -88,39 +90,10 @@ namespace rt_num_opt
             return graph;
         }
 
-        /**
-         * @brief This function and the following function consider the optimization problem:
-         * min  C^T x
-         * s.b. Jx <= 0
-         *
-         * @param tasks
-         * @return NonlinearFactorGraph
-         */
-        static gtsam::NonlinearFactorGraph BuildGraphForC(TaskSetNormal &tasks)
-        {
-            gtsam::NonlinearFactorGraph graph;
-            auto modelNormal = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma);
-
-            for (uint i = 0; i < tasks.size(); i++)
-            {
-                // energy factor
-                graph.emplace_shared<EnergyFactor>(GenerateKey(i, "executionTime"), tasks[i], i, modelNormal);
-            }
-            return graph;
-        }
-
-        static gtsam::Values MergeValuesInElimination(gtsam::Values initial, gtsam::VectorValues &delta)
-        {
-            return initial.retract(delta);
-        }
-
         static std::pair<VectorDynamic, double> UnitOptimization(TaskSetType &tasks, EliminationRecord eliminationRecord)
         {
             BeginTimer(__func__);
             gtsam::NonlinearFactorGraph graph = BuildEnergyGraph(tasks, eliminationRecord);
-            // gtsam::NonlinearFactorGraph graphForC = BuildGraphForC(tasks);
-            // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() + tasks[0].period;
-            // initialEstimate << 68.000000, 321, 400, 131, 308;
             gtsam::Values initialEstimateFG = EnergyOptUtils::GenerateInitialFG(tasks);
             if (debugMode == 1)
             {
@@ -166,34 +139,6 @@ namespace rt_num_opt
                     std::cout << "lambda " << optimizer.lambda() << std::endl;
                 }
             }
-
-            // std::cout << "Analyze descent direction:--------------------------" << std::endl;
-            // MatrixDynamic cDDMatrix = graphForC.linearize(result)->jacobian().first;
-            // VectorDynamic cDD = cDDMatrix.diagonal();
-            // std::cout << cDD << std::endl;
-            // std::cout << std::endl;
-            // int a = 1;
-
-            // auto start = high_resolution_clock::now();
-            // auto sth = graph.error(initialEstimateFG);
-            // auto stop = high_resolution_clock::now();
-            // auto duration = duration_cast<microseconds>(stop - start);
-            // cout << "Evaluate error:" << duration.count() << endl;
-            // start = high_resolution_clock::now();
-            // auto sth2 = graph.linearize(initialEstimateFG);
-            // stop = high_resolution_clock::now();
-            // duration = duration_cast<microseconds>(stop - start);
-            // cout << "linearize:" << duration.count() << endl;
-
-            // cout << Color::green;
-            // // std::lock_guard<std::mutex> lock(mtx);
-            // auto sth3 = graph.linearize(initialEstimateFG)->jacobian();
-            // MatrixDynamic jacobianCurr = sth3.first;
-            // std::cout << "Current Jacobian matrix:" << endl;
-            // std::cout << jacobianCurr << endl;
-            // std::cout << "Current b vector: " << endl;
-            // std::cout << sth3.second << endl;
-            // cout << Color::def << endl;
 
             VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
             optComp = EnergyOptUtils::ExtractResults(result, tasks);
@@ -292,7 +237,7 @@ namespace rt_num_opt
                 std::tie(whether_new_eliminate, eliminationRecord) = FindEliminateVariable(tasks, eliminationRecord);
 
                 loopCount++;
-                if (loopCount > elimIte)
+                if (loopCount > elimIte || eliminationRecord.whetherAllEliminated())
                     break;
             }
 
