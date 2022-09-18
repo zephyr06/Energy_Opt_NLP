@@ -12,8 +12,8 @@ EnergyMode: 1
 batchOptimizeFolder: EnergyPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
-MaxComputationTimeRestrict: 3
-eliminateTol: 1e0
+MaxComputationTimeRestrict: 2
+eliminateTol: 1e2
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
 roundTypeInClamp: "rough"
@@ -28,7 +28,7 @@ initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50 
 verbosityLM: "SILENT" # SUMMARY  TRYDELTA SILENT
-relativeErrorTolerance: 1e-5
+relativeErrorTolerance: 1e-4
 setDiagonalDamping: 1
 whether_ls: 0
 jacobianScale: 1
