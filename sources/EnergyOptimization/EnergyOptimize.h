@@ -277,6 +277,7 @@ namespace rt_num_opt
             VectorDynamic executionTimeResCurr, executionTimeResPrev;
             double errPrev = 1e30;
             double errCurr = EnergyOptUtils::RealObj(tasks.tasks_);
+            double initialError = errCurr;
             int loopCount = 0;
             // double disturbIte = eliminateTol;
             bool whether_new_eliminate = false;
@@ -318,7 +319,7 @@ namespace rt_num_opt
                     break;
                 }
             }
-            return std::make_pair(GetParameterVD<double>(tasks, "executionTime"), EnergyOptUtils::RealObj(tasks.tasks_));
+            return std::make_pair(GetParameterVD<double>(tasks, "executionTime"), EnergyOptUtils::RealObj(tasks.tasks_) / initialError);
         }
     };
 } // namespace rt_num_opt

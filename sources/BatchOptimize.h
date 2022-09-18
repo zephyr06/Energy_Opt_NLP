@@ -5,6 +5,7 @@
 #include "sources/RTA/RTA_Nasri19.h"
 
 #include "sources/EnergyOptimization/OptimizeSA.h"
+#include "sources/EnergyOptimization/EnergyOptimize.h"
 
 namespace rt_num_opt
 {
@@ -137,7 +138,10 @@ namespace rt_num_opt
                     ResetCallingTimes();
                     if (optimizerType <= 4)
                     {
-                        res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
+                        if (TaskSetType::Type() == "normal")
+                            res = Energy_Opt<TaskSetType, Schedul_Analysis>::OptimizeTaskSet(tasksN);
+                        else if (TaskSetType::Type() == "Nasri19")
+                            res = Energy_OptDAG<TaskSetType, Schedul_Analysis>::OptimizeTaskSetIterative(tasksN).second;
                     }
                     else if (optimizerType == 5) // simulateed annealing
                     {
