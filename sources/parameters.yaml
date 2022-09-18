@@ -5,7 +5,7 @@ runMode: compare
 testDataSetName: test_n3_v5
 
 
-debugMode: 1
+debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 100 # 0 means no elimination
 EnergyMode: 1
@@ -27,7 +27,7 @@ deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50 
-verbosityLM: "SUMMARY" # SUMMARY  TRYDELTA SILENT
+verbosityLM: "SILENT" # SUMMARY  TRYDELTA SILENT
 relativeErrorTolerance: 1e-5
 setDiagonalDamping: 1
 whether_ls: 0
