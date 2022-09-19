@@ -14,14 +14,21 @@ namespace rt_num_opt
 
     class ExVariablesEnergy : public ifopt::VariableSet
     {
+    private:
+        VectorDynamic var_;
+        TaskSet tasks_;
+        VectorDynamic lowerBound_;
+
     public:
         // Every variable set has a name, here "var_set1". this allows the constraints
         // and costs to define values and Jacobians specifically w.r.t this variable set.
-        ExVariablesEnergy() : ExVariablesEnergy("var_set1"){};
-        ExVariablesEnergy(const std::string &name) : VariableSet(globalInfoIfopt.tasks.N, name)
+        ExVariablesEnergy(TaskSet &tasks) : ExVariablesEnergy(tasks, "var_set1"){};
+        ExVariablesEnergy(TaskSet &tasks, const std::string &name) : VariableSet(tasks.size(), name)
         {
             // the initial values where the NLP starts iterating from
-            var_ = globalInfoIfopt.variableGlobalIfoptInitial;
+            tasks_ = tasks;
+            lowerBound_ = GetParameterVD<double>(tasks_, "executionTimeOrg");
+            var_ = lowerBound_;
         }
 
         // Here is where you can transform the Eigen::Vector into whatever
@@ -43,36 +50,33 @@ namespace rt_num_opt
         VecBound GetBounds() const override
         {
             VecBound bounds(GetRows());
-            // bounds.at(0) = ifopt::Bounds(-1.0, 1.0);
-            // bounds.at(1) = ifopt::NoBound;
 
             for (int i = 0; i < var_.rows(); i++)
             {
                 if (enableMaxComputationTimeRestrict)
-                    bounds.at(i) = ifopt::Bounds(globalInfoIfopt.variableGlobalIfoptInitial(i), globalInfoIfopt.variableGlobalIfoptInitial(i) * MaxComputationTimeRestrict);
+                    bounds.at(i) = ifopt::Bounds(lowerBound_(i), lowerBound_(i) * MaxComputationTimeRestrict);
                 else
-                    bounds.at(i) = ifopt::Bounds(globalInfoIfopt.variableGlobalIfoptInitial(i), globalInfoIfopt.variableGlobalIfoptInitial(i) * 10000);
+                    bounds.at(i) = ifopt::Bounds(lowerBound_(i), lowerBound_(i) * 10000);
             }
             return bounds;
         }
-
-    private:
-        // double x0_, x1_;
-        VectorDynamic var_;
     };
     class ExCostEnergy : public ifopt::CostTerm
     {
+    private:
+        VectorDynamic var_;
+        TaskSet tasks_;
+
     public:
-        ExCostEnergy() : ExCostEnergy("cost_term1") {}
-        ExCostEnergy(const std::string &name) : CostTerm(name) {}
+        ExCostEnergy(TaskSet &tasks) : ExCostEnergy(tasks, "cost_term1") {}
+        ExCostEnergy(TaskSet &tasks, const std::string &name) : CostTerm(name), tasks_(tasks) {}
 
         boost::function<gtsam::Matrix(const VectorDynamic &)> f =
             [this](const VectorDynamic &executionTimeVector)
         {
-            TaskSet taskT = globalInfoIfopt.tasks.tasks_;
+            TaskSet taskT = tasks_;
             UpdateTaskSetExecutionTime(taskT, executionTimeVector);
             double energy = EstimateEnergyTaskSet(taskT).sum();
-            // std::cout << energy << std::endl;
             return GenerateVectorDynamic1D(energy);
         };
 
@@ -100,33 +104,6 @@ namespace rt_num_opt
         }
     };
 
-    template <class ExVariablesEnergy, class ExConstraint, class ExCostEnergy>
-    Eigen::VectorXd OptimizeIfopt()
-    {
-        // 1. define the problem
-        ifopt::Problem nlp;
-        nlp.AddVariableSet(std::make_shared<ExVariablesEnergy>());
-        nlp.AddConstraintSet(std::make_shared<ExConstraint>());
-        nlp.AddCostSet(std::make_shared<ExCostEnergy>());
-        if (debugMode == 1)
-            nlp.PrintCurrent();
-
-        // 2. choose solver and options
-        ifopt::IpoptSolver ipopt;
-        ipopt.SetOption("linear_solver", "mumps");
-        ipopt.SetOption("jacobian_approximation", "exact");
-
-        // 3 . solve
-        ipopt.Solve(nlp);
-        Eigen::VectorXd x = nlp.GetOptVariables()->GetValues();
-        // double xArray[2] = {3, 1};
-        double y[x.rows()];
-        Eigen2Array(x, y);
-        std::cout << "Obj: " << nlp.EvaluateCostFunction(y) << std::endl;
-        std::cout << "Optimal variable found: " << x << std::endl;
-        return x;
-    }
-
     template <class TaskSetType, class Schedul_Analysis>
     VectorDynamic ClampResultBasedOnFeasibility(TaskSetType &tasks, VectorDynamic &x)
     {
@@ -144,12 +121,12 @@ namespace rt_num_opt
     template <class TaskSetType, class Schedul_Analysis>
     double OptimizeEnergyIfopt(TaskSetType &tasksN)
     {
-        InitializeGlobalInfoIfopt(tasksN);
-        VectorDynamic x = OptimizeIfopt<ExVariablesEnergy, ExConstraint<TaskSetType, Schedul_Analysis>, ExCostEnergy>();
+        VectorDynamic x = OptimizeIfopt<TaskSetType, ExVariablesEnergy, ExConstraint<TaskSetType, Schedul_Analysis>, ExCostEnergy>(tasksN);
         VectorDynamic correctedX = ClampResultBasedOnFeasibility<TaskSetType, Schedul_Analysis>(tasksN, x);
 
         UpdateTaskSetExecutionTime(tasksN, correctedX);
         double energyAfterOpt = EstimateEnergyTaskSet(tasksN.tasks_).sum();
+
         if (runMode == "compare")
             return energyAfterOpt / weightEnergy;
         else if (runMode == "normal")

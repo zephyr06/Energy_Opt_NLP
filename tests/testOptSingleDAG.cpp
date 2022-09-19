@@ -8,6 +8,7 @@
 #include "sources/RTA/RTA_Melani.h"
 #include "sources/RTA/RTA_Nasri19.h"
 #include "sources/Tools/profilier.h"
+#include "sources/EnergyOptimization/EnergyIftopSpec.h"
 using namespace rt_num_opt;
 // TEST(OptimizeTaskSet, RTA_LL_V1)
 // {
@@ -36,7 +37,16 @@ TEST(OptimizeTaskSet, RTA_DAG_V1)
     AssertBool(true, tasksN.tasks_.size() > 0, __LINE__);
     auto start = std::chrono::high_resolution_clock::now();
     // double res = Energy_Opt<rt_num_opt::DAG_Nasri19, rt_num_opt::RTA_Nasri19>::OptimizeTaskSet(tasksN);
-    double res = Energy_OptDAG<rt_num_opt::DAG_Nasri19, rt_num_opt::RTA_Nasri19>::OptimizeTaskSetIterative(tasksN).second;
+    double res;
+    if (optimizerType <= 4)
+    {
+        res = Energy_OptDAG<rt_num_opt::DAG_Nasri19, rt_num_opt::RTA_Nasri19>::OptimizeTaskSetIterative(tasksN).second;
+    }
+    else if (optimizerType == 6) // IPM-Ifopt
+    {
+        res = OptimizeEnergyIfopt<rt_num_opt::DAG_Nasri19, rt_num_opt::RTA_Nasri19>(tasksN);
+    }
+
     std::cout << blue << "The energy saving ratio is " << res << def << std::endl;
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);

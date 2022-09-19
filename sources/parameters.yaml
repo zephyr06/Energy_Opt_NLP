@@ -2,10 +2,10 @@
 
 # optimization seettings
 runMode: compare
-testDataSetName: test_n3_v22
+testDataSetName: test_n3_v3
 
 
-debugMode: 1
+debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 100 # 0 means no elimination
 EnergyMode: 1
@@ -22,7 +22,7 @@ exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
-optimizerType: 2
+optimizerType: 2 # 6 means IPM
 deltaInitialDogleg: 1e13
 initialLambda: 1e3
 lowerLambda: 1e-10

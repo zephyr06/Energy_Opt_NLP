@@ -6,6 +6,7 @@
 
 #include "sources/EnergyOptimization/OptimizeSA.h"
 #include "sources/EnergyOptimization/EnergyOptimize.h"
+#include "sources/EnergyOptimization/EnergyIftopSpec.h"
 
 namespace rt_num_opt
 {
@@ -15,6 +16,10 @@ namespace rt_num_opt
         if (optimizerType == 5)
         {
             return pathDataset + file + "_SA_Res.txt";
+        }
+        else if (optimizerType == 6)
+        {
+            return pathDataset + file + "_IPM_Res.txt";
         }
         if (elimIte > 0)
         {
@@ -147,6 +152,10 @@ namespace rt_num_opt
                     {
                         auto resStruct = OptimizeSchedulingSA<TaskSetType, Schedul_Analysis>(tasksN);
                         res = resStruct.optimizeError / resStruct.initialError;
+                    }
+                    else if (optimizerType == 6) // IPM-Ifopt
+                    {
+                        res = OptimizeEnergyIfopt<TaskSetType, Schedul_Analysis>(tasksN);
                     }
                     auto stop = std::chrono::high_resolution_clock::now();
                     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);

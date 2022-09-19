@@ -4,6 +4,8 @@
 // #include "sources/EnergyOptimization/FactorGraphEnergyLL.h"
 #include "sources/EnergyOptimization/EnergyOptimize.h"
 
+#include "sources/EnergyOptimization/EnergyIftopSpec.h"
+
 namespace rt_num_opt
 {
 
@@ -32,7 +34,14 @@ namespace rt_num_opt
                 double res;
                 ResetCallingTimes();
                 // next project: consider generalized elimination?
-                res = Energy_Opt<TaskSetNormal, RTA_LL>::OptimizeTaskSet(tasksN);
+                if (optimizerType == 6) // IPM-Ifopt
+                {
+                    res = OptimizeEnergyIfopt<TaskSetNormal, RTA_LL>(tasksN);
+                }
+                else if (optimizerType <= 4)
+                    res = Energy_Opt<TaskSetNormal, RTA_LL>::OptimizeTaskSet(tasksN);
+                else
+                    CoutError("Unrecognized optimizer type!");
 
                 size_t rtaCall = ReadCallingTimes();
                 auto stop = std::chrono::high_resolution_clock::now();

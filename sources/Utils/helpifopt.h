@@ -39,33 +39,23 @@ namespace rt_num_opt
         for (int i = 0; i < x.rows(); i++)
             res[i] = x(i);
     }
-    struct GlobalInfoIfopt
-    {
-        TaskSetNormal tasks;
-        VectorDynamic variableGlobalIfoptInitial;
-    };
-    GlobalInfoIfopt globalInfoIfopt;
 
-    void InitializeGlobalInfoIfopt(TaskSetNormal &tasks)
-    {
-        globalInfoIfopt.tasks = tasks;
-        globalInfoIfopt.variableGlobalIfoptInitial = GetParameterVD<double>(tasks.tasks_, "executionTime");
-    }
-
-      template <class TaskSetType, class Schedul_Analysis>
+    template <class TaskSetType, class Schedul_Analysis>
     class ExConstraint : public ifopt::ConstraintSet
     {
     public:
-        ExConstraint() : ExConstraint("constraint1") {}
+        TaskSetType taskGeneral_;
+
+        ExConstraint(TaskSetType &tasks) : ExConstraint(tasks, "constraint1") {}
 
         // This constraint set just contains 1 constraint, however generally
         // each set can contain multiple related constraints.
-        ExConstraint(const std::string &name) : ConstraintSet(1, name) {}
+        ExConstraint(TaskSetType &tasks, const std::string &name) : ConstraintSet(1, name), taskGeneral_(tasks) {}
 
         boost::function<gtsam::Matrix(const VectorDynamic &)> f =
             [this](const VectorDynamic &executionTimeVector)
         {
-            TaskSetType taskT = globalInfoIfopt.tasks;
+            TaskSetType taskT = taskGeneral_;
             UpdateTaskSetExecutionTime(taskT.tasks_, executionTimeVector);
             Schedul_Analysis r(taskT);
             if (r.CheckSchedulability())
@@ -103,17 +93,9 @@ namespace rt_num_opt
         // Attention: see the parent class function for important information on sparsity pattern.
         void FillJacobianBlock(std::string var_set, Jacobian &jac_block) const override
         {
-            // must fill only that submatrix of the overall Jacobian that relates
-            // to this constraint and "var_set1". even if more constraints or variables
-            // classes are added, this submatrix will always start at row 0 and column 0,
-            // thereby being independent from the overall problem.
             if (var_set == "var_set1")
             {
                 VectorDynamic x = GetVariables()->GetComponent("var_set1")->GetValues();
-
-                // jac_block.coeffRef(0, 0) = 2.0 * x(0); // derivative of first constraint w.r.t x0
-                // jac_block.coeffRef(0, 1) = 1.0;        // derivative of first constraint w.r.t x1
-
                 MatrixDynamic jj = NumericalDerivativeDynamic(f, x, deltaOptimizer);
 
                 for (uint i = 0; i < x.rows(); i++)
@@ -121,5 +103,36 @@ namespace rt_num_opt
             }
         }
     };
+
+    template <class TaskSetType, class ExVariablesEnergyT, class ExConstraintT, class ExCostEnergyT>
+    Eigen::VectorXd OptimizeIfopt(TaskSetType &tasks)
+    {
+        // 1. define the problem
+        ifopt::Problem nlp;
+        nlp.AddVariableSet(std::make_shared<ExVariablesEnergyT>(tasks.tasks_));
+        nlp.AddConstraintSet(std::make_shared<ExConstraintT>(tasks));
+        nlp.AddCostSet(std::make_shared<ExCostEnergyT>(tasks.tasks_));
+        if (debugMode == 1)
+            nlp.PrintCurrent();
+
+        // 2. choose solver and options
+        ifopt::IpoptSolver ipopt;
+        ipopt.SetOption("linear_solver", "mumps");
+        ipopt.SetOption("jacobian_approximation", "exact");
+        ipopt.SetOption("max_cpu_time", 600); // time-out after 600 seconds
+
+        // 3 . solve
+        ipopt.Solve(nlp);
+        Eigen::VectorXd x = nlp.GetOptVariables()->GetValues();
+
+        double y[x.rows()];
+        Eigen2Array(x, y);
+        if (debugMode == 1)
+        {
+            std::cout << "Obj: " << nlp.EvaluateCostFunction(y) << std::endl;
+            std::cout << "Optimal variable found: " << x << std::endl;
+        }
+        return x;
+    }
 
 }

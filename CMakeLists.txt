@@ -28,6 +28,8 @@ find_package( OpenCV REQUIRED )
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(includeMoe)
 
+find_package(ifopt)
+
 # file(GLOB sources "*.cpp" "*.h")
 file(GLOB sources "sources/*.cpp" "sources/*.h")
 set(CONVENIENCE_LIB_NAME ${PROJECT_NAME})
@@ -43,6 +45,7 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
 # target_link_libraries(${CONVENIENCE_LIB_NAME} dag-sched)
 target_link_libraries(${CONVENIENCE_LIB_NAME} yaml-cpp)
 target_link_libraries(${CONVENIENCE_LIB_NAME} tbb)
+target_link_libraries(${CONVENIENCE_LIB_NAME} ifopt::ifopt_ipopt) 
 
 
 add_subdirectory(sources)
