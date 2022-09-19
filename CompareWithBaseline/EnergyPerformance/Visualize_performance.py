@@ -24,10 +24,10 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         data.append(extract_ave(0))
 
         # NLP, with elimination, exact Jacobian
-        # data.append(extract_ave(1))
+        data.append(extract_ave(1))
 
         # NLP, without elimination
-        data.append(extract_ave(1))
+        data.append(extract_ave(2))
 
         # MUA
         data.append(1.0)
@@ -36,7 +36,7 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         if(task_number<12):
             ave=0
             for i in range(1000):
-                ave += float(lines[3000 + i]) / float(lines[2000 + i])
+                ave += float(lines[4000 + i]) / float(lines[3000 + i])
             data.append(ave / 1000)
         else:
             data.append(-1)
@@ -111,13 +111,13 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
             continue
         data=[]
 
-        # NLP, with elimination
+        # NORTH
         data.append(float(lines[0]))
 
-        # NLP, with elimination, exact Jacobian
+        # NMBO
         data.append(float(lines[1]))
 
-        # NLP, without elimination
+        # IPM
         data.append(float(lines[2]))
 
         # MUA
@@ -133,10 +133,8 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=30,
+parser.add_argument('--maxTaskNumber', type=int, default=10,
                     help='Nmax')
-parser.add_argument('--methodsNum', type=int, default=4,
-                    help='number of optimizers to compare')
 parser.add_argument('--data_source',type=str, default="EnergySaveRatio", # cannot plot Time/RTA
                     help='data source folder')
 parser.add_argument('--title', type=str, default="EnergyPerformance",
@@ -146,7 +144,6 @@ parser.add_argument('--title', type=str, default="EnergyPerformance",
 args = parser.parse_args()
 minTaskNumber = args.minTaskNumber
 maxTaskNumber = args.maxTaskNumber
-methodsNum = args.methodsNum
 title=args.title
 data_source=args.data_source
 
@@ -162,16 +159,16 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio"):
         data_2d = data_2d * 100
     dataset_pd = pd.DataFrame()
-    optimizer_name=["NORTH", "NLP_Raw",  "Zhao20", "MIGP"] # "NLP_Elim_exact",
-    marker_list = ["o", "v", "x", "s", "D"] #
-    color_list = ["#0084DB",  "r", "gold", "limegreen", "purple"] #
+    optimizer_name=["NORTH", "NMBO", "IPM",  "Zhao20", "MIGP"]
+    marker_list = ["o", "v", "^", "s", "D"] #
+    color_list = ["#0084DB",  "r", "y", "limegreen", "purple"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
-    for i in range(min(data_2d.shape[0], 2)):
+    for i in range(min(data_2d.shape[0], 3)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
 
     # Zhao20
-    i=2
+    i=3
     dataset_pd.insert(0, optimizer_name[i], data_2d[i])
     splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i],
                          markersize=6)
@@ -185,7 +182,7 @@ if __name__ == "__main__":
     plt.xlabel("Task Number", fontsize=font_size)
     if(data_source=="EnergySaveRatio"):
         plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
-        splot.set_ylim([95, 160])
+        splot.set_ylim([95, 200])
         plt.legend(labels=optimizer_name)
         plt.grid(linestyle="--")
         plt.savefig("Compare_" + title +"_"+ data_source + ".pdf", format='pdf')
