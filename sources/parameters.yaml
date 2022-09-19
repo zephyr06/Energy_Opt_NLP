@@ -2,10 +2,10 @@
 
 # optimization seettings
 runMode: compare
-testDataSetName: test_n3_v5
+testDataSetName: test_n3_v22
 
 
-debugMode: 0
+debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 100 # 0 means no elimination
 EnergyMode: 1
@@ -13,7 +13,7 @@ batchOptimizeFolder: EnergyPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-eliminateTol: 1e2
+eliminateTol: 1e-1
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
 roundTypeInClamp: "rough"

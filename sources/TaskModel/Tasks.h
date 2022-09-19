@@ -170,6 +170,8 @@ namespace rt_num_opt
                 parameterList.push_back((T)(taskset[i].period));
             else if (parameterType == "executionTime")
                 parameterList.push_back((T)(taskset[i].executionTime));
+            else if (parameterType == "executionTimeOrg")
+                parameterList.push_back((T)(taskset[i].executionTimeOrg));
             else if (parameterType == "overhead")
                 parameterList.push_back((T)(taskset[i].overhead));
             else if (parameterType == "deadline")

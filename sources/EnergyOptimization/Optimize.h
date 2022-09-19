@@ -372,22 +372,12 @@ namespace rt_num_opt
                 // we cannot use a more strict criteria in detecting schedulability,
                 //  because it may trigger early detection of termination
 
-                // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-                double tolerance = 0.0;
+                           double tolerance = 0.0;
                 Schedul_Analysis r(tasksCurr);
-                bool schedulable = r.CheckSchedulability(
-                    computationTimeWarmStart,
-                    false, tolerance);
-                // bool schedulable = Schedul_Analysis::CheckSchedulability(tasksCurr,
-                //                                                          computationTimeWarmStart,
-                //                                                          debugMode == 1, tolerance);
-                if ((!schedulable) ||
-                    (enableMaxComputationTimeRestrict &&
-                     tasksCurr.tasks_[i].executionTime - eliminateTolIte > tasks.tasks_[i].executionTimeOrg * MaxComputationTimeRestrict))
+                bool schedulable = r.CheckSchedulability(computationTimeWarmStart,
+                                                         false, tolerance);
 
-                // double rt = Schedul_Analysis::RTA_Common_Warm(computationTimeWarmStart(i, 0), tasksCurr, i);
-                // if (abs(rt - tasks[i].deadline) <= tolerance || rt > tasks[i].deadline ||
-                //     tasksCurr[i].executionTime - eliminateTolIte + tolerance > tasks[i].executionTimeOrg * MaxComputationTimeRestrict)
+                if (!schedulable)
                 {
                     EndTimer(__func__);
                     return i;
@@ -522,11 +512,9 @@ namespace rt_num_opt
             VectorDynamic initialExecutionTime = GetParameterVD<int>(taskSetType, "executionTimeOrg");
 
             int lastTaskDoNotNeedOptimize = -1;
-            if (SpeedOptimizeOption == 0)
-            {
-                lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(taskSetType,
-                                                                      -1, responseTimeInitial, eliminateTol);
-            }
+
+            lastTaskDoNotNeedOptimize = FindTaskDoNotNeedOptimize(taskSetType,
+                                                                  -1, responseTimeInitial, eliminateTol);
 
             // computationTimeVectorLocalOpt is always stored in tasks
             vectorGlobalOpt = initialExecutionTime;
