@@ -17,13 +17,13 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         lines = file.readlines()
         data = []
 
-        # NLP, with elimination
+        # NORTH
         data.append(float(lines[0]))
 
-        # NLP, with elimination, exact Jacobian
+        # NMBO
         data.append(float(lines[1]))
 
-        # NLP, without elimination
+        # IPM
         data.append(float(lines[2]))
 
         # MUA
@@ -45,13 +45,13 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         lines = file.readlines()
         data = []
 
-        # NLP, with elimination
+        # NORTH
         data.append(float(lines[0]))
 
-        # NLP, with elimination, exact Jacobian
+        # NMBO
         data.append(float(lines[1]))
 
-        # NLP, without elimination
+        # IPM
         data.append(float(lines[2]))
 
         # MUA
@@ -79,13 +79,13 @@ def read_data_2d_rta(minTaskNumber, maxTaskNumber):
         lines = file.readlines()
         data = []
 
-        # NLP, with elimination
+        # NORTH
         data.append(extract_ave(0))
 
-        # NLP, with elimination, exact Jacobian
+        # NMBO
         data.append(extract_ave(1))
 
-        # NLP, without elimination
+        # IPM
         data.append(extract_ave(2))
 
         data2d.append(data)
@@ -98,13 +98,13 @@ def read_data_2d_rta(minTaskNumber, maxTaskNumber):
         lines = file.readlines()
         data = []
 
-        # NLP, with elimination
+        # NORTH
         data.append(float(lines[0]))
 
-        # NLP, with elimination, exact Jacobian
+        # NMBO
         data.append(float(lines[1]))
 
-        # NLP, without elimination
+        # IPM
         data.append(float(lines[2]))
 
         data2d.append(data)

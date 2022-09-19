@@ -45,98 +45,11 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         file.close()
     return data2d
 
-def read_data_2d_rta(minTaskNumber, maxTaskNumber):
-    def extract_ave(method_index):
-        ave = 0
-        for i in range(method_index*1000, method_index*1000+1000):
-            ave += float(lines[i])
-        return ave/1000.0
-    data2d = []
-    for task_number in range(minTaskNumber, maxTaskNumber + 1):
-        file_path = "RTACalling"+"/N" + str(task_number) + ".txt"
-        file = open(file_path, "r")
-        lines = file.readlines()
-        data=[]
-
-        # NLP, with elimination
-        data.append(extract_ave(0))
-
-        # NLP, with elimination, exact Jacobian
-        data.append(extract_ave(1))
-
-        # NLP, without elimination
-        data.append(extract_ave(2))
-
-        data2d.append(data)
-        file.close()
-    return data2d
-def read_data_2d_time(minTaskNumber, maxTaskNumber):
-    data2d = []
-
-    for task_number in range(minTaskNumber, maxTaskNumber + 1):
-        file_path = "Time"+"/N" + str(task_number) + ".txt"
-        file = open(file_path, "r")
-        lines = file.readlines()
-        data=[]
-
-        # NLP, with elimination
-        data.append(float(lines[0]))
-
-        # NLP, with elimination, exact Jacobian
-        data.append(float(lines[1]))
-
-        # NLP, without elimination
-        data.append(float(lines[2]))
-
-        # MUA
-        data.append(float(lines[3]))
-
-        # MILP, maximum number is 15
-        if(task_number<12):
-            data.append(float(lines[4]))
-        else:
-            data.append(-1)
-
-        data2d.append(data)
-        file.close()
-
-    # N = 40 ~ 80
-    for task_number in range(40, 90, 10):
-        file_path = "Time"+"/N" + str(task_number) + ".txt"
-        if(not os.path.exists(file_path)):
-            continue
-        file = open(file_path, "r")
-        lines = file.readlines()
-        if(len(lines)==0):
-            continue
-        data=[]
-
-        # NORTH
-        data.append(float(lines[0]))
-
-        # NMBO
-        data.append(float(lines[1]))
-
-        # IPM
-        data.append(float(lines[2]))
-
-        # MUA
-        data.append(-1)
-
-        # MILP, maximum number is 15
-        data.append(-1)
-
-        data2d.append(data)
-        file.close()
-    return data2d
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=10,
+parser.add_argument('--maxTaskNumber', type=int, default=5,
                     help='Nmax')
-parser.add_argument('--data_source',type=str, default="EnergySaveRatio", # cannot plot Time/RTA
-                    help='data source folder')
 parser.add_argument('--title', type=str, default="EnergyPerformance",
             help='tilte in produced figure')
 
@@ -145,19 +58,12 @@ args = parser.parse_args()
 minTaskNumber = args.minTaskNumber
 maxTaskNumber = args.maxTaskNumber
 title=args.title
-data_source=args.data_source
 
 if __name__ == "__main__":
-    if(data_source=="EnergySaveRatio"):
-        data_2d = read_data_2d_energy(minTaskNumber, maxTaskNumber)
-    elif (data_source == "Time"):
-        data_2d = read_data_2d_time(minTaskNumber, maxTaskNumber)
-    elif (data_source == "RTA"):
-        data_2d = read_data_2d_rta(minTaskNumber, maxTaskNumber)
-
+    data_2d = read_data_2d_energy(minTaskNumber, maxTaskNumber)
     data_2d=np.array(data_2d).transpose()
-    if (data_source == "EnergySaveRatio"):
-        data_2d = data_2d * 100
+    data_2d = data_2d * 100
+
     dataset_pd = pd.DataFrame()
     optimizer_name=["NORTH", "NMBO", "IPM",  "Zhao20", "MIGP"]
     marker_list = ["o", "v", "^", "s", "D"] #
@@ -176,36 +82,13 @@ if __name__ == "__main__":
     font_size= 15
     plt.rcParams.update({'font.size': font_size/1.2})
     # MILP
-    if (data_source == "EnergySaveRatio" or data_source=="Time"):
-        plt.plot(np.linspace(minTaskNumber, min(11, maxTaskNumber), min(11, maxTaskNumber)-minTaskNumber+1), data_2d[-1][:min(11, maxTaskNumber)-minTaskNumber+1], marker=marker_list[-1], color=color_list[-1], markersize=8)
+    plt.plot(np.linspace(minTaskNumber, min(11, maxTaskNumber), min(11, maxTaskNumber)-minTaskNumber+1), data_2d[-1][:min(11, maxTaskNumber)-minTaskNumber+1], marker=marker_list[-1], color=color_list[-1], markersize=8)
 
     plt.xlabel("Task Number", fontsize=font_size)
-    if(data_source=="EnergySaveRatio"):
-        plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
-        splot.set_ylim([95, 200])
-        plt.legend(labels=optimizer_name)
-        plt.grid(linestyle="--")
-        plt.savefig("Compare_" + title +"_"+ data_source + ".pdf", format='pdf')
-        plt.show(block=False)
-        plt.pause(3)
-    elif(data_source=="Time"):
-        plt.ylabel("Running time (seconds)", fontsize=font_size)
-        # splot.set_ylim([0.95, 2.0])
-        splot.set(yscale="log")
-        # splot.set_ylim(1e-4, 1e3)
-        plt.legend(labels=optimizer_name)
-        plt.grid(linestyle="--")
-        plt.savefig("Compare_Time" + title + ".pdf", format='pdf')
-        plt.show(block=False)
-        plt.pause(3)
-    elif(data_source=="RTA"):
-        # splot.set(xlabel="Task Number", ylabel="RTA calling times")
-        # splot.set_ylim([0.95, 2.0])
-        plt.ylabel("RTA calling times", fontsize=font_size)
-        # splot.set(yscale="log")
-        # splot.set_ylim(1e-4, 1e3)
-        plt.legend(labels=optimizer_name)
-        plt.grid(linestyle="--")
-        plt.savefig("Compare_Time" + title +"_"+data_source+ ".pdf", format='pdf')
-        plt.show(block=False)
-        plt.pause(3)
+    plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
+    splot.set_ylim([95, 200])
+    plt.legend(labels=optimizer_name)
+    plt.grid(linestyle="--")
+    plt.savefig("Compare_" + title +"_"+ "EnergySaveRatio" + ".pdf", format='pdf')
+    plt.show(block=False)
+    plt.pause(3)
