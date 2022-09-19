@@ -33,7 +33,6 @@ namespace rt_num_opt
                                              VectorDynamic x, double deltaOptimizer, int mOfJacobian = -1)
     {
         BeginTimer(__func__);
-        count2++;
         int n = x.rows();
         MatrixDynamic jacobian;
         if (mOfJacobian == -1)

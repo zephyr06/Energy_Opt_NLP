@@ -36,7 +36,6 @@ namespace rt_num_opt
         double ResponseTimeAnalysisWarm_util_nece(double beginTime, const Task &taskCurr,
                                                   const TaskSet &tasksHighPriority)
         {
-            count1++;
             const std::vector<int> periodHigh = GetParameter<int>(tasksHighPriority, "period");
             const std::vector<double> executionTimeHigh = GetParameter<double>(tasksHighPriority, "executionTime");
             int N = periodHigh.size();
