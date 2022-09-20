@@ -178,12 +178,12 @@ namespace rt_num_opt
     }
 
     template <class TaskSetType, class Schedul_Analysis>
-    double OptimizeControlIfopt(TaskSetType &tasksN, VectorDynamic &coeff)
+    std::pair<VectorDynamic, double> OptimizeControlIfopt(TaskSetType &tasksN, VectorDynamic &coeff)
     {
         VectorDynamic x = OptimizeIfopt<TaskSetType, ExVariablesControl, ExConstraintControl<TaskSetType, Schedul_Analysis>, ExCostControl>(tasksN, coeff);
 
         VectorDynamic correctedX = ClampControlResultBasedOnFeasibility<TaskSetType, Schedul_Analysis>(tasksN, x);
 
-        return ControlObj(tasksN.tasks_, coeff, correctedX);
+        return std::make_pair(correctedX, ControlObj(tasksN.tasks_, coeff, correctedX));
     }
 } // namespace rt_num_opt

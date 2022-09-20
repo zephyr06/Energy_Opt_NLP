@@ -23,20 +23,20 @@ TEST(opt, energy)
     std::cout << "***************************************************" << std::endl;
 }
 
-// Uncomment contorl constraint's lower bound to perform a real test
+// Uncomment contorl constraint's lower bound to perform a real test, whose result would be 1095974
 TEST(opt, control)
 {
     rt_num_opt::runMode = "normal";
-    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/" + rt_num_opt::controlPath + ".txt";
+    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N0/Case0.txt";
     rt_num_opt::TaskSet tasks;
     rt_num_opt::VectorDynamic coeff;
     std::tie(tasks, coeff) = rt_num_opt::ReadControlCase(path1);
     rt_num_opt::TaskSetNormal tasksN(tasks);
 
-    double res = rt_num_opt::OptimizeControlIfopt<rt_num_opt::TaskSetNormal, rt_num_opt::RTA_LL>(tasksN, coeff);
+    double res = rt_num_opt::OptimizeControlIfopt<rt_num_opt::TaskSetNormal, rt_num_opt::RTA_LL>(tasksN, coeff).second;
 
     std::cout << "The energy saving ratio is " << res << std::endl;
-    EXPECT_DOUBLES_EQUAL(1095974, res, 1e0);
+    EXPECT_DOUBLES_EQUAL(900410, res, 1e2); // 900410 is optimal, 1209674 is initial objective function
 }
 
 // TEST(run, single)

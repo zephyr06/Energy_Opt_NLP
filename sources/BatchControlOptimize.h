@@ -1,6 +1,7 @@
 #pragma once
 #include "sources/BatchTestutils.h"
 #include "sources/ControlOptimization/ControlOptimize.h"
+#include "sources/ControlOptimization/ControlIfoptSpec.h"
 namespace rt_num_opt
 {
     using namespace ControlOptimize;
@@ -182,7 +183,14 @@ namespace rt_num_opt
                 std::vector<bool> maskForElimination(tasks.size(), false); // TODO: try *2 to ?
                 ResetCallingTimes();
                 auto start = std::chrono::high_resolution_clock::now();
-                auto res = OptimizeTaskSetIterative<FactorGraphType>(tasks, coeff, maskForElimination);
+                std::pair<VectorDynamic, double> res;
+                if (optimizerType <= 4)
+                    res = OptimizeTaskSetIterative<FactorGraphType>(tasks, coeff, maskForElimination);
+                else if (optimizerType == 6)
+                {
+                    TaskSetNormal tasksN(tasks);
+                    res = OptimizeControlIfopt<TaskSetNormal, RTA_LL>(tasksN, coeff);
+                }
                 auto stop = std::chrono::high_resolution_clock::now();
                 size_t rtaCall = ReadRTAControl();
                 rtaCallTime.push_back(rtaCall / double(N));
