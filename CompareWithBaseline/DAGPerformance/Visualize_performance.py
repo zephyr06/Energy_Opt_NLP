@@ -17,10 +17,10 @@ def read_data_2d_data(minTaskNumber, maxTaskNumber, folderName):
         # NLP, with elimination, approximated Jacobian
         data.append(float(lines[0]))
 
-        # NLP, with elimination, exact Jacobian
-        # data.append(float(lines[1]))
-
         # NLP, without elimination
+        data.append(float(lines[1]))
+
+        # IPM
         data.append(float(lines[2]))
 
         # SA
@@ -65,18 +65,18 @@ if __name__ == "__main__":
     if (data_source == "RTA"):
         data_2d = data_2d[:3,:]
     dataset_pd = pd.DataFrame()
-    optimizer_name=["NLP_Elim_approx", "NLP_Raw",  "SA"] # "NLP_Elim_exact",
+    optimizer_name=["NORTH", "NMBO", "IPM",  "SA"] # "NLP_Elim_exact",
     marker_list = ["o", "v", "s", "D"] #
     color_list = ["#0084DB",  "r", "gold", "limegreen"] #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
-    for i in {0,1,2}:
+    for i in {0,1,2,3}:
         if(i<data_2d.shape[0]):
             dataset_pd.insert(0, optimizer_name[i], data_2d[i])
             splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i], markersize=8)
 
     if(data_source=="EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
-        splot.set_ylim([55, 90])
+        # splot.set_ylim([55, 90])
     elif(data_source=="Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
         # splot.set_ylim([0.95, 2.0])

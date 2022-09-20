@@ -158,36 +158,6 @@ namespace rt_num_opt
     }
 
     template <typename T>
-    std::vector<T> GetParameter(const TaskSet &taskset, std::string parameterType)
-    {
-        uint N = taskset.size();
-        std::vector<T> parameterList;
-        parameterList.reserve(N);
-
-        for (uint i = 0; i < N; i++)
-        {
-            if (parameterType == "period")
-                parameterList.push_back((T)(taskset[i].period));
-            else if (parameterType == "executionTime")
-                parameterList.push_back((T)(taskset[i].executionTime));
-            else if (parameterType == "executionTimeOrg")
-                parameterList.push_back((T)(taskset[i].executionTimeOrg));
-            else if (parameterType == "overhead")
-                parameterList.push_back((T)(taskset[i].overhead));
-            else if (parameterType == "deadline")
-                parameterList.push_back((T)(taskset[i].deadline));
-            else if (parameterType == "offset")
-                parameterList.push_back((T)(taskset[i].offset));
-            else
-            {
-                std::cout << Color::red << "parameterType in GetParameter is not recognized!\n"
-                          << Color::def << std::endl;
-                throw;
-            }
-        }
-        return parameterList;
-    }
-    template <typename T>
     VectorDynamic GetParameterVD(const TaskSet &taskset, std::string parameterType)
     {
         uint N = taskset.size();
@@ -199,6 +169,8 @@ namespace rt_num_opt
         {
             if (parameterType == "period")
                 parameterList(i, 0) = ((T)(taskset[i].period));
+            else if (parameterType == "periodOrg")
+                parameterList(i, 0) = ((T)(taskset[i].periodOrg));
             else if (parameterType == "executionTime")
                 parameterList(i, 0) = ((T)(taskset[i].executionTime));
             else if (parameterType == "executionTimeOrg")
@@ -217,6 +189,14 @@ namespace rt_num_opt
             }
         }
         return parameterList;
+    }
+
+    template <typename T>
+    std::vector<T> GetParameter(const TaskSet &taskset, std::string parameterType)
+    {
+
+        VectorDynamic resEigen = GetParameterVD<T>(taskset, parameterType);
+        return Eigen2Vector<T>(resEigen);
     }
 
     template <typename T>
@@ -433,12 +413,17 @@ namespace rt_num_opt
         return UpdateTaskSetExecutionTime(taskSet.tasks_, executionTimeVec, lastTaskDoNotNeedOptimize);
     }
 
-    void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic periodVec, int lastTaskDoNotNeedOptimize = -1)
+    void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic periodVec)
     {
         int N = taskSet.size();
 
-        for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
-            taskSet[i].period = periodVec(i - lastTaskDoNotNeedOptimize - 1, 0);
+        for (int i = 0; i < N; i++)
+            taskSet[i].period = periodVec(i, 0);
+    }
+
+    void UpdateTaskSetPeriod(TaskSetNormal &taskSet, VectorDynamic periodVec)
+    {
+        return UpdateTaskSetPeriod(taskSet.tasks_, periodVec);
     }
     ProcessorTaskSet ExtractProcessorTaskSet(TaskSet &tasks)
     {

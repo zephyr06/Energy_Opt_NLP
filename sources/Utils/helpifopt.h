@@ -1,31 +1,10 @@
-
-/**
- *  @file test_vars_constr_cost.h
- *
- *  @brief Example to generate a solver-independent formulation for the problem, taken
- *  from the IPOPT cpp_example.
- *
- *  The example problem to be solved is given as:
- *
- *      min_x f(x) = -(x1-2)^2
- *      s.t.
- *           0 = x0^2 + x1 - 1
- *           -1 <= x0 <= 1
- *
- * In this simple example we only use one set of variables, constraints and
- * cost. However, most real world problems have multiple different constraints
- * and also different variable sets representing different quantities. This
- * framework allows to define each set of variables or constraints absolutely
- * independently from another and correctly stitches them together to form the
- * final optimization problem.
- *
- * For a helpful graphical overview, see:
- * http://docs.ros.org/api/ifopt/html/group__ProblemFormulation.html
- */
-
+#pragma once
 #include <ifopt/variable_set.h>
 #include <ifopt/constraint_set.h>
 #include <ifopt/cost_term.h>
+
+#include <boost/optional/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 
 #include "sources/MatrixConvenient.h"
 #include "sources/Utils/Parameters.h"
@@ -104,14 +83,17 @@ namespace rt_num_opt
         }
     };
 
-    template <class TaskSetType, class ExVariablesEnergyT, class ExConstraintT, class ExCostEnergyT>
-    Eigen::VectorXd OptimizeIfopt(TaskSetType &tasks)
+    template <class TaskSetType, class ExVariablesT, class ExConstraintT, class ExCostT>
+    Eigen::VectorXd OptimizeIfopt(TaskSetType &tasks, boost::optional<VectorDynamic> otherParameters = boost::none)
     {
         // 1. define the problem
         ifopt::Problem nlp;
-        nlp.AddVariableSet(std::make_shared<ExVariablesEnergyT>(tasks.tasks_));
+        nlp.AddVariableSet(std::make_shared<ExVariablesT>(tasks.tasks_));
         nlp.AddConstraintSet(std::make_shared<ExConstraintT>(tasks));
-        nlp.AddCostSet(std::make_shared<ExCostEnergyT>(tasks.tasks_));
+        if (otherParameters != boost::none) // this 'if' statement distinguishes control and energy cases
+            nlp.AddCostSet(std::make_shared<ExCostT>(tasks.tasks_, otherParameters.get()));
+        else
+            nlp.AddCostSet(std::make_shared<ExCostT>(tasks.tasks_));
         if (debugMode == 1)
             nlp.PrintCurrent();
 

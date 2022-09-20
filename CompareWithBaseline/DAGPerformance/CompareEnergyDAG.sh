@@ -32,16 +32,16 @@ do
 	
 	echo "$title iteration is: $jobNumber"
 	
-	# LM, eliminated, approximated Jacobian
+	# NORTH
     	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 1000
 	perform_optimization $jobNumber
 	
-	# LM, not eliminated, exact Jacobian
+	# NMBO
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 1
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 0
 	perform_optimization $jobNumber
@@ -55,8 +55,6 @@ do
 	perform_optimization $jobNumber
 	
 done
-
-
 
 # visualize the result
 cd $ROOT_PATH/CompareWithBaseline/$title

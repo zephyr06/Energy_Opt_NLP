@@ -13,35 +13,28 @@
 namespace rt_num_opt
 {
 
-    class ExVariablesEnergy : public ifopt::VariableSet
+    class ExVariablesControl : public ifopt::VariableSet
     {
     private:
         VectorDynamic var_;
         TaskSet tasks_;
-        VectorDynamic lowerBound_;
+        VectorDynamic upperBound_;
 
     public:
-        // Every variable set has a name, here "var_set1". this allows the constraints
-        // and costs to define values and Jacobians specifically w.r.t this variable set.
-        ExVariablesEnergy(TaskSet &tasks) : ExVariablesEnergy(tasks, "var_set1"){};
-        ExVariablesEnergy(TaskSet &tasks, const std::string &name) : VariableSet(tasks.size(), name)
+        ExVariablesControl(TaskSet &tasks) : ExVariablesControl(tasks, "var_set1"){};
+        ExVariablesControl(TaskSet &tasks, const std::string &name) : VariableSet(tasks.size(), name)
         {
             // the initial values where the NLP starts iterating from
             tasks_ = tasks;
-            lowerBound_ = GetParameterVD<double>(tasks_, "executionTimeOrg");
-            var_ = lowerBound_;
+            upperBound_ = GetParameterVD<double>(tasks_, "period");
+            var_ = upperBound_;
         }
 
-        // Here is where you can transform the Eigen::Vector into whatever
-        // internal representation of your variables you have (here two doubles, but
-        // can also be complex classes such as splines, etc..
         void SetVariables(const VectorDynamic &x) override
         {
             var_ = x;
         };
 
-        // Here is the reverse transformation from the internal representation to
-        // to the Eigen::Vector
         VectorDynamic GetValues() const override
         {
             return var_;
@@ -54,31 +47,38 @@ namespace rt_num_opt
 
             for (int i = 0; i < var_.rows(); i++)
             {
-                if (enableMaxComputationTimeRestrict)
-                    bounds.at(i) = ifopt::Bounds(lowerBound_(i), lowerBound_(i) * MaxComputationTimeRestrict);
-                else
-                    bounds.at(i) = ifopt::Bounds(lowerBound_(i), lowerBound_(i) * 10000);
+                bounds.at(i) = ifopt::Bounds(tasks_[i].executionTime, upperBound_(i));
             }
             return bounds;
         }
     };
-    class ExCostEnergy : public ifopt::CostTerm
+    class ExCostControl : public ifopt::CostTerm
     {
     private:
         VectorDynamic var_;
         TaskSet tasks_;
+        VectorDynamic coeff_;
 
     public:
-        // otherParameters is actually never used, just for convenience of template
-        ExCostEnergy(TaskSet &tasks, boost::optional<VectorDynamic> otherParameters = boost::none) : CostTerm("cost_term1"), tasks_(tasks) {}
+        ExCostControl(TaskSet &tasks) : CostTerm("cost_term1"), tasks_(tasks)
+        {
+            CoutError("Never call this constructor without providing coeff vector!");
+        }
+
+        ExCostControl(TaskSet &tasks, VectorDynamic coeff) : CostTerm("cost_term1"), tasks_(tasks), coeff_(coeff) {}
 
         boost::function<gtsam::Matrix(const VectorDynamic &)> f =
-            [this](const VectorDynamic &executionTimeVector)
+            [this](const VectorDynamic &periodVector)
         {
             TaskSet taskT = tasks_;
-            UpdateTaskSetExecutionTime(taskT, executionTimeVector);
-            double energy = EstimateEnergyTaskSet(taskT).sum();
-            return GenerateVectorDynamic1D(energy);
+            UpdateTaskSetPeriod(taskT, periodVector);
+            VectorDynamic rtaCurr = RTAVector(taskT);
+            double err = 0;
+            for (uint i = 0; i < tasks_.size(); i++)
+            {
+                err += coeff_(2 * i) * periodVector(i) + coeff_(2 * i + 1) * rtaCurr(i);
+            }
+            return GenerateVectorDynamic1D(err);
         };
 
         double GetCost() const override
@@ -106,33 +106,33 @@ namespace rt_num_opt
     };
 
     template <class TaskSetType, class Schedul_Analysis>
-    VectorDynamic ClampEnergyResultBasedOnFeasibility(TaskSetType &tasks, VectorDynamic &x)
+    VectorDynamic ClampControlResultBasedOnFeasibility(TaskSetType &tasks, VectorDynamic &x)
     {
-
-        UpdateTaskSetExecutionTime(tasks, x);
+        UpdateTaskSetPeriod(tasks, x);
         Schedul_Analysis r(tasks);
         if (!r.CheckSchedulability())
         {
-            return GetParameterVD<double>(tasks, "executionTimeOrg");
+            return GetParameterVD<double>(tasks, "periodOrg");
         }
         else
             return x;
     }
 
     template <class TaskSetType, class Schedul_Analysis>
-    double OptimizeEnergyIfopt(TaskSetType &tasksN)
+    double OptimizeControlIfopt(TaskSetType &tasksN, VectorDynamic &coeff)
     {
-        VectorDynamic x = OptimizeIfopt<TaskSetType, ExVariablesEnergy, ExConstraint<TaskSetType, Schedul_Analysis>, ExCostEnergy>(tasksN);
-        VectorDynamic correctedX = ClampEnergyResultBasedOnFeasibility<TaskSetType, Schedul_Analysis>(tasksN, x);
+        VectorDynamic x = OptimizeIfopt<TaskSetType, ExVariablesControl, ExConstraint<TaskSetType, Schedul_Analysis>, ExCostControl>(tasksN, coeff);
 
-        UpdateTaskSetExecutionTime(tasksN, correctedX);
+        VectorDynamic correctedX = ClampControlResultBasedOnFeasibility<TaskSetType, Schedul_Analysis>(tasksN, x);
+
+        UpdateTaskSetPeriod(tasksN, correctedX);
         double energyAfterOpt = EstimateEnergyTaskSet(tasksN.tasks_).sum();
 
         if (runMode == "compare")
             return energyAfterOpt / weightEnergy;
         else if (runMode == "normal")
         {
-            UpdateTaskSetExecutionTime(tasksN, GetParameterVD<double>(tasksN, "executionTimeOrg"));
+            UpdateTaskSetPeriod(tasksN, GetParameterVD<double>(tasksN, "executionTimeOrg"));
             double initialEnergyCost = EstimateEnergyTaskSet(tasksN.tasks_).sum();
             return energyAfterOpt / initialEnergyCost;
         }
