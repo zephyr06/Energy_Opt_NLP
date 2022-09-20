@@ -1,7 +1,7 @@
 %YAML:1.0
 
 # optimization seettings
-runMode: compare
+runMode: normal
 testDataSetName: test_n3_v5
 
 
@@ -9,7 +9,7 @@ debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 0
 EnergyMode: 1
-batchOptimizeFolder: EnergyPerformance
+batchOptimizeFolder: ControlPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
@@ -24,7 +24,7 @@ exactJacobian: 0
 # optimizer settings
 optimizerType: 6
 deltaInitialDogleg: 1e13
-initialLambda: 1e0
+initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50
 verbosityLM: "SILENT" # SUMMARY  TRYDELTA SILENT
@@ -48,7 +48,7 @@ relativeErrorToleranceInit: 1e-6
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
-MaxLoopControl: 1e4
+MaxLoopControl: 1
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
 weightSchedulabilityMax: 1e12
 weightSchedulabilityStep: 1.5
@@ -65,7 +65,7 @@ weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 randomInitialize: 0
 coolingRateSA: 0.99
 temperatureSA: 100000
-SA_iteration: 1000000
+SA_iteration: 10000000
 #*************************************************************
 
 # in FindUnsustainable
@@ -78,12 +78,12 @@ punishmentFrequency: 10
 maxIterationsOptimizer: 1e3
 gradientModify: 0
 utilTol: 1e-3
-linearOptimizerType: "MULTIFRONTAL_QR"
+linearOptimizerType: "MULTIFRONTAL_CHOLESKY"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
 enableReorder: 0
 deltaOptimizer: 1e-5
-readTaskMode: deadline
+readTaskMode: RM
 baselineLLCompare: 1
 printRTA: 0
 printFailureFile: 1
@@ -91,4 +91,5 @@ printFailureFile: 1
 punishmentInBarrier: 1e8
 noiseModelSigma: 1e0
 #*************************************************************
+
 
