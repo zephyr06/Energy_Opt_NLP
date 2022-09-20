@@ -16,8 +16,8 @@ MaxComputationTimeRestrict: 2
 eliminateTol: 1e-1
 eliminateStep: 10
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
-roundTypeInClamp: "none"
-clampTypeMiddle: "none"
+roundTypeInClamp: "rough"
+clampTypeMiddle: "rough"
 exactJacobian: 0
 #*************************************************************
 
@@ -31,19 +31,21 @@ verbosityLM: "SILENT"
 relativeErrorTolerance: 1e-5
 whether_ls: 0
 setDiagonalDamping: 1
+whether_ls: 0
 jacobianScale: 1
+whether_IPM: 0
 #*************************************************************
 
 
 # in generating task set
 parallelFactor: 0.2
-PeriodSetAM: [1, 2, 5, 10, 20, 50, 100]
+PeriodSetAM: [1, 2, 5, 10, 20, 50,100]
 timeScaleFactor: 1e4
 maxNode_GenerateTaskSet: 20
 #*************************************************************
 
 # used in control
-relativeErrorToleranceInit: 1e-7
+relativeErrorToleranceInit: 1e-6
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
@@ -64,7 +66,7 @@ weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 randomInitialize: 0
 coolingRateSA: 0.99
 temperatureSA: 100000
-SA_iteration: 10000000
+SA_iteration: 1000000
 #*************************************************************
 
 # in FindUnsustainable
@@ -81,13 +83,13 @@ linearOptimizerType: "MULTIFRONTAL_QR"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
 enableReorder: 0
-deltaOptimizer: 1e-4
-readTaskMode: RM
+deltaOptimizer: 1e-5
+readTaskMode: deadline
 baselineLLCompare: 1
 printRTA: 0
 printFailureFile: 1
-noiseModelSigma: 1e0
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e8
+noiseModelSigma: 1e0
 #*************************************************************
 
