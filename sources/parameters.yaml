@@ -2,18 +2,18 @@
 
 # optimization seettings
 runMode: compare
-testDataSetName: test_n3_v5
+testDataSetName: test_n5_v26
 
 
-debugMode: 0
-executionTimeModel: 2 # 1 is normal, 2 is more difficult
-elimIte: 0
-EnergyMode: 2
+debugMode: 1
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
+elimIte: 100
+EnergyMode: 1
 batchOptimizeFolder: DAGPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-eliminateTol: 1e1
+eliminateTol: 1e-1
 eliminateStep: 10
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
 roundTypeInClamp: "none"
@@ -24,11 +24,11 @@ exactJacobian: 0
 # optimizer settings
 optimizerType: 6
 deltaInitialDogleg: 1e13
-initialLambda: 1e0
+initialLambda: 1e3
 lowerLambda: 1e-10
 upperLambda: 1e50
 verbosityLM: "SILENT"
-relativeErrorTolerance: 1e-3
+relativeErrorTolerance: 1e-5
 whether_ls: 0
 setDiagonalDamping: 1
 jacobianScale: 1

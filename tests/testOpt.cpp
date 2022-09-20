@@ -400,6 +400,7 @@ TEST(EnergyFactor, v1)
     auto tasks = ReadTaskSet(path, "RM");
     executionTimeModel = 1;
     EnergyMode = 1;
+    whether_ls = 1;
     VectorDynamic comp;
     comp.resize(3, 1);
     comp << 17, 12, 253;
@@ -430,8 +431,13 @@ TEST(RTARelatedFactor, v1)
     std::vector<bool> maskForElimination(tasks.size(), false);
     eliminationRecordGlobal.Initialize(tasks.size());
     VectorDynamic rtaBase = RTAVector(tasks);
-    auto f1 = GenerateRTARelatedFactor<TaskSetNormal, RTA_LL>(tasks, 3, rtaBase);
-    auto x = EnergyOptUtils::GenerateInitialFG(tasks);
+
+    EliminationRecord eliminationRecord;
+    eliminationRecord.Initialize(tasks.size());
+
+    TaskSetNormal tasksN(tasks);
+    auto f1 = GenerateRTARelatedFactor<TaskSetNormal, RTA_LL>(tasksN, eliminationRecord);
+    auto x = EnergyOptUtils::GenerateInitialFG(tasksN, eliminationRecord);
     std::vector<MatrixDynamic> Hs, HsExpect;
     Hs.reserve(5);
     HsExpect.reserve(5);
@@ -449,8 +455,12 @@ TEST(GenerateEliminationLLFactor, v1)
 {
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
     auto tasks = ReadTaskSet(path, "RM");
+    TaskSetNormal tasksN(tasks);
     std::vector<bool> maskForElimination(tasks.size(), false);
     maskForElimination = {0, 0, 0, 1, 0};
+    EliminationRecord eliminationRecord;
+    eliminationRecord.Initialize(tasks.size());
+
     eliminationRecordGlobal.Initialize(tasks.size());
     eliminationRecordGlobal.SetEliminated(3, EliminationType::RTA);
     VectorDynamic rtaBase = RTAVector(tasks);
@@ -467,7 +477,7 @@ TEST(GenerateEliminationLLFactor, v1)
         HsExpect.push_back(m);
     }
     HsExpect[3] << -1;
-    auto x = EnergyOptUtils::GenerateInitialFG(tasks);
+    auto x = EnergyOptUtils::GenerateInitialFG(tasksN, eliminationRecord);
     assert_equal(GenerateVectorDynamic1D(0), f1.unwhitenedError(x, Hs), 1e-3);
     for (uint i = 0; i < HsExpect.size(); i++)
         assert_equal(HsExpect[i], Hs[i], 1e-7);

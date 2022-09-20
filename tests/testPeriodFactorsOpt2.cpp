@@ -7,6 +7,8 @@ TEST(case1, v1)
 {
     BeginTimer("main");
     noiseModelSigma = 1;
+    if (optimizerType >= 5)
+        optimizerType = 2;
     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/" + controlPath + ".txt";
     TaskSet tasks;
     VectorDynamic coeff;

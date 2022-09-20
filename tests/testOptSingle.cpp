@@ -17,12 +17,10 @@ using Opt_LL = Energy_Opt<Task, RTA_LL>;
 TEST(OptimizeTaskSet, RTA_LL_V1)
 {
     BeginTimer("main");
+    if (optimizerType >= 5)
+        optimizerType = 2;
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
     string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_data_N5_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n10_v2.csv";
-    // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n20_v1.csv";
-
     TaskSet taskSet1 = ReadTaskSet(path, readTaskMode);
     TaskSetNormal tasksN(taskSet1);
     InitializeGlobalVector(taskSet1.size());

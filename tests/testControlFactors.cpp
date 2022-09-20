@@ -45,6 +45,8 @@ TEST(coeffFactor, v1)
     jacobianScale = 1;
     weightSchedulability = 1;
     whether_ls = 1;
+    if (optimizerType >= 5)
+        optimizerType = 2;
     auto model = noiseModel::Isotropic::Sigma(1, 1);
     VectorDynamic coeff0 = GenerateVectorDynamic(1);
     coeff0 << 3;

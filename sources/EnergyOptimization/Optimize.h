@@ -35,7 +35,6 @@
 // #include "sources/EnergyOptimization/EnergyOptimize.h"
 namespace rt_num_opt
 {
-    // using namespace gtsam;
 
 #define numberOfTasksNeedOptimize (N - lastTaskDoNotNeedOptimize - 1)
 
@@ -534,23 +533,9 @@ namespace rt_num_opt
                 Schedul_Analysis r2(taskSetType);
                 responseTimeInitial = r2.ResponseTimeOfTaskSet();
                 // perform optimization
-                if (exactJacobian)
-                {
-                    try
-                    {
-                        auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
-                                                        initialEstimateDuringOpt, responseTimeInitial);
-                    }
-                    catch (...)
-                    {
-                        ;
-                    }
-                }
-                else
-                {
-                    auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
-                                                    initialEstimateDuringOpt, responseTimeInitial);
-                }
+
+                auto variNew = UnitOptimization(taskSetType, lastTaskDoNotNeedOptimize,
+                                                initialEstimateDuringOpt, responseTimeInitial);
 
                 // formulate new computationTime
                 UpdateTaskSetExecutionTime(taskSetType.tasks_, vectorGlobalOpt);

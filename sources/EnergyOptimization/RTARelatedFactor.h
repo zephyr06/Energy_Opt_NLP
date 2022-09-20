@@ -84,6 +84,7 @@ namespace rt_num_opt
             return f_with_RTA(x);
         }
     };
+
     template <class TaskSetType, class Schedul_Analysis>
     RTARelatedFactor<TaskSetType, Schedul_Analysis> GenerateRTARelatedFactor(TaskSetType &tasks, EliminationRecord &eliminationRecord)
     {

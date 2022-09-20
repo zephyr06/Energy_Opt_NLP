@@ -7,7 +7,8 @@ using namespace rt_num_opt;
 TEST(UnitOpt, v1)
 {
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" + testDataSetName + ".yaml";
-
+    if (optimizerType >= 5)
+        optimizerType = 2;
     rt_num_opt::DAG_Nasri19 tasksN = rt_num_opt::ReadDAGNasri19_Tasks(path);
     InitializeGlobalVector(tasksN.tasks_.size());
     AssertBool(true, tasksN.tasks_.size() > 0, __LINE__);
