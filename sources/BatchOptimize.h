@@ -21,16 +21,9 @@ namespace rt_num_opt
         {
             return pathDataset + file + "_IPM_Res.txt";
         }
-        if (elimIte > 0)
+        else if (elimIte > 0)
         {
-            if (exactJacobian == 0 && jacobianScale == 16)
-            {
-                return pathDataset + file + "_elim_approx_Res.txt";
-            }
-            else
-            {
-                return pathDataset + file + "_elim_exact_Res.txt";
-            }
+            return pathDataset + file + "_elim_approx_Res.txt";
         }
         else
         {
