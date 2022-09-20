@@ -48,7 +48,7 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=5,
+parser.add_argument('--maxTaskNumber', type=int, default=30,
                     help='Nmax')
 parser.add_argument('--title', type=str, default="EnergyPerformance",
             help='tilte in produced figure')
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     plt.xlabel("Task Number", fontsize=font_size)
     plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
-    splot.set_ylim([95, 200])
+    splot.set_ylim([95, 230])
     plt.legend(labels=optimizer_name)
     plt.grid(linestyle="--")
     plt.savefig("Compare_" + title +"_"+ "EnergySaveRatio" + ".pdf", format='pdf')

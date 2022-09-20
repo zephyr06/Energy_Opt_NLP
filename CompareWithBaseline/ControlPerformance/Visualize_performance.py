@@ -112,8 +112,8 @@ parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="RTA",
-                    help='data source folder')
+parser.add_argument('--data_source', type=str, default="Time",
+                    help='data source folder, EnergySaveRatio/RTA/Time')
 parser.add_argument('--title', type=str, default="ControlPerformance",
                     help='tilte in produced figure')
 
@@ -135,9 +135,9 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio"):
         data_2d = data_2d * 100
     dataset_pd = pd.DataFrame()
-    optimizer_name=["NLP_Elim_approx", "NLP_Elim_exact", "NLP_Raw",  "Zhao20", "MIGP"]
-    marker_list = ["o", "v", "x", "s", "D"] #
-    color_list = ["#0084DB",  "r", "gold", "limegreen", "purple"]#
+    optimizer_name=["NORTH", "NMBO", "IPM",  "Zhao20", "MIGP"]
+    marker_list = ["o", "v", "^", "s", "D"] #
+    color_list = ["#0084DB",  "r", "y", "limegreen", "purple"]#
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
     for i in range(min(data_2d.shape[0], 4)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
@@ -151,7 +151,7 @@ if __name__ == "__main__":
              markersize=8)
 
     if (data_source == "EnergySaveRatio"):
-        splot.set(xlabel="Task Number", ylabel="Relative gap (%)", fontsize=10)
+        splot.set(xlabel="Task Number", ylabel="Relative gap (%)")
         # splot.set_ylim([0.55, 0.9])
     elif (data_source == "Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
