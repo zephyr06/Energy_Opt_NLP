@@ -27,6 +27,8 @@ namespace rt_num_opt
             // the initial values where the NLP starts iterating from
             tasks_ = tasks;
             upperBound_ = GetParameterVD<double>(tasks_, "period");
+            if (debugMode == 1)
+                std::cout << "UB: " << upperBound_ << std::endl;
             var_ = upperBound_;
         }
 
@@ -48,10 +50,12 @@ namespace rt_num_opt
             for (int i = 0; i < var_.rows(); i++)
             {
                 bounds.at(i) = ifopt::Bounds(tasks_[i].executionTime, upperBound_(i));
+                // bounds.at(i) = ifopt::Bounds(upperBound_(i) - 100, upperBound_(i));
             }
             return bounds;
         }
     };
+
     class ExCostControl : public ifopt::CostTerm
     {
     private:
@@ -78,13 +82,17 @@ namespace rt_num_opt
             {
                 err += coeff_(2 * i) * periodVector(i) + coeff_(2 * i + 1) * rtaCurr(i);
             }
+            if (debugMode == 1)
+            {
+                std::cout << "Periods: " << periodVector << std::endl;
+                std::cout << "Err: " << err << std::endl;
+            }
             return GenerateVectorDynamic1D(err);
         };
 
         double GetCost() const override
         {
             VectorDynamic x = GetVariables()->GetComponent("var_set1")->GetValues();
-
             return f(x)(0);
         };
 
@@ -101,6 +109,63 @@ namespace rt_num_opt
                 {
                     jac.coeffRef(0, i) = jj.coeff(0, i); //
                 }
+                if (debugMode == 1)
+                    std::cout << "Jacobian matrix: " << jac << std::endl;
+            }
+        }
+    };
+
+    template <class TaskSetType, class Schedul_Analysis>
+    class ExConstraintControl : public ifopt::ConstraintSet
+    {
+    public:
+        TaskSetType taskGeneral_;
+
+        ExConstraintControl(TaskSetType &tasks) : ExConstraintControl(tasks, "constraint1") {}
+
+        ExConstraintControl(TaskSetType &tasks, const std::string &name) : ConstraintSet(1, name), taskGeneral_(tasks) {}
+
+        boost::function<gtsam::Matrix(const VectorDynamic &)> f =
+            [this](const VectorDynamic &periodVector)
+        {
+            TaskSetType taskT = taskGeneral_;
+            UpdateTaskSetPeriod(taskT.tasks_, periodVector);
+            Schedul_Analysis r(taskT);
+            if (r.CheckSchedulability())
+            {
+                return GenerateVectorDynamic1D(0);
+            }
+            else
+            {
+                if (debugMode == 1)
+                    std::cout << "Infeasible!" << std::endl;
+                return GenerateVectorDynamic1D(1);
+            }
+        };
+
+        VectorDynamic GetValues() const override
+        {
+            VectorDynamic g(GetRows());
+            VectorDynamic x = GetVariables()->GetComponent("var_set1")->GetValues();
+            return f(x);
+        };
+
+        VecBound GetBounds() const override
+        {
+            VecBound b(GetRows());
+            b.at(0) = ifopt::Bounds(0, 0);
+            return b;
+        }
+
+        void FillJacobianBlock(std::string var_set, Jacobian &jac_block) const override
+        {
+            if (var_set == "var_set1")
+            {
+                VectorDynamic x = GetVariables()->GetComponent("var_set1")->GetValues();
+                MatrixDynamic jj = NumericalDerivativeDynamic(f, x, deltaOptimizer);
+
+                for (uint i = 0; i < x.rows(); i++)
+                    jac_block.coeffRef(0, i) = jj.coeff(0, i);
             }
         }
     };
@@ -121,7 +186,7 @@ namespace rt_num_opt
     template <class TaskSetType, class Schedul_Analysis>
     double OptimizeControlIfopt(TaskSetType &tasksN, VectorDynamic &coeff)
     {
-        VectorDynamic x = OptimizeIfopt<TaskSetType, ExVariablesControl, ExConstraint<TaskSetType, Schedul_Analysis>, ExCostControl>(tasksN, coeff);
+        VectorDynamic x = OptimizeIfopt<TaskSetType, ExVariablesControl, ExConstraintControl<TaskSetType, Schedul_Analysis>, ExCostControl>(tasksN, coeff);
 
         VectorDynamic correctedX = ClampControlResultBasedOnFeasibility<TaskSetType, Schedul_Analysis>(tasksN, x);
 
