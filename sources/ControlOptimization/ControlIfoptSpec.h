@@ -7,8 +7,8 @@
 #include "sources/Utils/helpifopt.h"
 
 #include "sources/Utils/Parameters.h"
-#include "sources/EnergyOptimization/Optimize.h"
 #include "sources/RTA/RTA_LL.h"
+#include "sources/ControlOptimization/FactorGraphInManifold.h"
 
 namespace rt_num_opt
 {
@@ -56,6 +56,12 @@ namespace rt_num_opt
         }
     };
 
+    double ControlObj(TaskSet &tasks, VectorDynamic &coeff, VectorDynamic periodVector)
+    {
+        UpdateTaskSetPeriod(tasks, periodVector);
+        return FactorGraphInManifold::RealObj(tasks, coeff);
+    }
+
     class ExCostControl : public ifopt::CostTerm
     {
     private:
@@ -74,19 +80,7 @@ namespace rt_num_opt
         boost::function<gtsam::Matrix(const VectorDynamic &)> f =
             [this](const VectorDynamic &periodVector)
         {
-            TaskSet taskT = tasks_;
-            UpdateTaskSetPeriod(taskT, periodVector);
-            VectorDynamic rtaCurr = RTAVector(taskT);
-            double err = 0;
-            for (uint i = 0; i < tasks_.size(); i++)
-            {
-                err += coeff_(2 * i) * periodVector(i) + coeff_(2 * i + 1) * rtaCurr(i);
-            }
-            if (debugMode == 1)
-            {
-                std::cout << "Periods: " << periodVector << std::endl;
-                std::cout << "Err: " << err << std::endl;
-            }
+            double err = ControlObj(tasks_, coeff_, periodVector);
             return GenerateVectorDynamic1D(err);
         };
 
@@ -190,21 +184,6 @@ namespace rt_num_opt
 
         VectorDynamic correctedX = ClampControlResultBasedOnFeasibility<TaskSetType, Schedul_Analysis>(tasksN, x);
 
-        UpdateTaskSetPeriod(tasksN, correctedX);
-        double energyAfterOpt = EstimateEnergyTaskSet(tasksN.tasks_).sum();
-
-        if (runMode == "compare")
-            return energyAfterOpt / weightEnergy;
-        else if (runMode == "normal")
-        {
-            UpdateTaskSetPeriod(tasksN, GetParameterVD<double>(tasksN, "executionTimeOrg"));
-            double initialEnergyCost = EstimateEnergyTaskSet(tasksN.tasks_).sum();
-            return energyAfterOpt / initialEnergyCost;
-        }
-        else
-        {
-            CoutError("Unrecognized runMode!!");
-            return 0;
-        }
+        return ControlObj(tasksN.tasks_, coeff, correctedX);
     }
 } // namespace rt_num_opt

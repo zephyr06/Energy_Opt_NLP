@@ -23,6 +23,7 @@ TEST(opt, energy)
     std::cout << "***************************************************" << std::endl;
 }
 
+// Uncomment contorl constraint's lower bound to perform a real test
 TEST(opt, control)
 {
     rt_num_opt::runMode = "normal";
@@ -35,7 +36,7 @@ TEST(opt, control)
     double res = rt_num_opt::OptimizeControlIfopt<rt_num_opt::TaskSetNormal, rt_num_opt::RTA_LL>(tasksN, coeff);
 
     std::cout << "The energy saving ratio is " << res << std::endl;
-    EXPECT_DOUBLES_EQUAL(0.25, res, 1e-2);
+    EXPECT_DOUBLES_EQUAL(1095974, res, 1e0);
 }
 
 // TEST(run, single)

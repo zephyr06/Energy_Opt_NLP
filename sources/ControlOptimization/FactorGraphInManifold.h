@@ -365,7 +365,7 @@ namespace rt_num_opt
             EndTimer(__func__);
         }
 
-        static double RealObj(TaskSet &tasks, VectorDynamic coeff)
+        static double RealObj(const TaskSet &tasks, const VectorDynamic &coeff)
         {
             BeginTimer(__func__);
             double res = 0;
@@ -373,8 +373,8 @@ namespace rt_num_opt
             VectorDynamic rta = r.ResponseTimeOfTaskSet();
             for (uint i = 0; i < tasks.size(); i++)
             {
-                res += coeff(i * 2, 0) * tasks[i].period;
-                res += coeff(i * 2 + 1, 0) * rta(i, 0);
+                res += coeff.coeffRef(i * 2, 0) * tasks[i].period;
+                res += coeff.coeffRef(i * 2 + 1, 0) * rta(i, 0);
             }
             EndTimer(__func__);
             return res;
