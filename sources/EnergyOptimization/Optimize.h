@@ -372,7 +372,7 @@ namespace rt_num_opt
                 // we cannot use a more strict criteria in detecting schedulability,
                 //  because it may trigger early detection of termination
 
-                           double tolerance = 0.0;
+                double tolerance = 0.0;
                 Schedul_Analysis r(tasksCurr);
                 bool schedulable = r.CheckSchedulability(computationTimeWarmStart,
                                                          false, tolerance);
@@ -627,7 +627,7 @@ namespace rt_num_opt
                 double initialEnergyCost = EstimateEnergyTaskSet(tasksInit).sum();
                 double afterEnergyCost = EstimateEnergyTaskSet(taskSetType.tasks_).sum();
                 // if (debugMode == 1)
-                //     std::cout << "Actual objective function is" << Energy_OptDAG::RealObj(taskSetType.tasks_) << std::endl;
+                //     std::cout << "Actual objective function is" << Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::RealObj(taskSetType.tasks_) << std::endl;
                 if (debugMode == 1)
                 {
                     std::cout << "Normalized objective function after optimization is " << afterEnergyCost << std::endl;

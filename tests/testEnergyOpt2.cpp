@@ -18,8 +18,8 @@ TEST(EliminationRecordUpdate, v1)
     execCurr << 6, 46, 50, 138, 8;
     UpdateTaskSetExecutionTime(tasks, execCurr);
     eliminationRecordGlobal.Initialize(tasks.size());
-    gtsam::NonlinearFactorGraph graph = Energy_OptDAG::BuildControlGraph(tasks);
-    gtsam::Values initialEstimateFG = Energy_OptDAG::GenerateInitialFG(tasks);
+    gtsam::NonlinearFactorGraph graph = Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::BuildControlGraph(tasks);
+    gtsam::Values initialEstimateFG = Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::GenerateInitialFG(tasks);
     auto sth = graph.error(initialEstimateFG);
     eliminationRecordGlobal.Print();
     EXPECT(EliminationType::Not == eliminationRecordGlobal[0].type);
@@ -31,8 +31,8 @@ TEST(EliminationRecordUpdate, v1)
     execCurr << 6, 46, 50, 138, 8.1;
     UpdateTaskSetExecutionTime(tasks, execCurr);
     eliminationRecordGlobal.Initialize(tasks.size());
-    graph = Energy_OptDAG::BuildControlGraph(tasks);
-    initialEstimateFG = Energy_OptDAG::GenerateInitialFG(tasks);
+    graph = Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::BuildControlGraph(tasks);
+    initialEstimateFG = Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::GenerateInitialFG(tasks);
     sth = graph.error(initialEstimateFG);
     eliminationRecordGlobal.Print();
     EXPECT(EliminationType::Not == eliminationRecordGlobal[0].type);
@@ -44,8 +44,8 @@ TEST(EliminationRecordUpdate, v1)
     execCurr << 6, 45.9, 24, 138, 8.1;
     UpdateTaskSetExecutionTime(tasks, execCurr);
     eliminationRecordGlobal.Initialize(tasks.size());
-    graph = Energy_OptDAG::BuildControlGraph(tasks);
-    initialEstimateFG = Energy_OptDAG::GenerateInitialFG(tasks);
+    graph = Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::BuildControlGraph(tasks);
+    initialEstimateFG = Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::GenerateInitialFG(tasks);
     sth = graph.error(initialEstimateFG);
     eliminationRecordGlobal.Print();
     EXPECT(EliminationType::Not == eliminationRecordGlobal[0].type);
@@ -57,8 +57,8 @@ TEST(EliminationRecordUpdate, v1)
     execCurr << 6, 45.9, 50.1, 500, 6;
     UpdateTaskSetExecutionTime(tasks, execCurr);
     eliminationRecordGlobal.Initialize(tasks.size());
-    graph = Energy_OptDAG::BuildControlGraph(tasks);
-    initialEstimateFG = Energy_OptDAG::GenerateInitialFG(tasks);
+    graph = Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::BuildControlGraph(tasks);
+    initialEstimateFG = Energy_OptDAG<DAG_Nasri19, RTA_Nasri19>::GenerateInitialFG(tasks);
     sth = graph.error(initialEstimateFG);
     eliminationRecordGlobal.Print();
     EXPECT(EliminationType::Not == eliminationRecordGlobal[0].type);

@@ -1,5 +1,6 @@
 #include "sources/ControlOptimization/ControlOptimize.h"
 #include "sources/BatchControlOptimize.h"
+#include "sources/Utils/Parameters.h"
 using namespace std;
 using namespace std::chrono;
 
@@ -9,9 +10,10 @@ using namespace ControlOptimize;
 using namespace std;
 
 using namespace gtsam;
-whether_ls = 1;
+
 TEST(error, v1)
 {
+    whether_ls = 1;
     noiseModelSigma = 1;
     std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
     TaskSet tasks;

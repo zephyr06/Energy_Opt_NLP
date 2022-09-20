@@ -14,17 +14,19 @@
 #include "sources/MatrixConvenient.h"
 #include "sources/TaskModel/Tasks.h"
 #include "sources/EnergyOptimization/Energy.h"
-#include "sources/Utils/utils.h"
+#include "sources/EnergyOptimization/EnergyOptimize.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
+#include "sources/Utils/utils.h"
 #include "sources/Utils/FactorGraphUtils.h"
 #include "sources/Utils/MultiKeyFactor.h"
 #include "sources/Utils/InequalifyFactor.h"
 #include "sources/Utils/GlobalVariables.h"
+#include "sources/RTA/RTA_Nasri19.h"
 namespace rt_num_opt
 {
     struct FactorGraphEnergyLL
     {
-
+        // not actually used in this project
         static MultiKeyFactor GenerateEliminationLLFactor(TaskSet tasks,
                                                           int index, double rtaAtIndex)
         {
@@ -37,7 +39,7 @@ namespace rt_num_opt
             {
                 VectorDynamic error = GenerateVectorDynamic(1);
                 TaskSet tasksCurr = tasks;
-                VectorDynamic executionTimeVecCurr = Energy_OptDAG::ExtractResults(x, tasks).block(0, 0, index + 1, 1);
+                VectorDynamic executionTimeVecCurr = EnergyOptUtils::ExtractResults(x, tasks).block(0, 0, index + 1, 1);
 
                 MatrixDynamic coeff = executionTimeVecCurr.transpose();
 
