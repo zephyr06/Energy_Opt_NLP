@@ -67,7 +67,7 @@ if __name__ == "__main__":
     dataset_pd = pd.DataFrame()
     optimizer_name=["NORTH", "NMBO", "IPM",  "Zhao20", "MIGP"]
     marker_list = ["o", "v", "^", "s", "D"] #
-    color_list = ["#0084DB",  "r", "y", "limegreen", "purple"] #
+    color_list = ["#0084DB",  "r", "y", "limegreen", "purple"]
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
     for i in range(min(data_2d.shape[0], 3)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
