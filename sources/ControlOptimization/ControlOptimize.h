@@ -79,6 +79,14 @@ namespace rt_num_opt
                 params.setLinearSolverType(linearOptimizerType);
                 gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
+                try
+                {
+                    result = optimizer.optimize();
+                }
+                catch (...)
+                {
+                    result = initialEstimateFG;
+                }
             }
             else if (optimizerType == 4)
             {
@@ -90,6 +98,14 @@ namespace rt_num_opt
                 params.setMaxIterations(maxIterationsOptimizer);
                 gtsam::NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
+                try
+                {
+                    result = optimizer.optimize();
+                }
+                catch (...)
+                {
+                    result = initialEstimateFG;
+                }
             }
 
             VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
@@ -343,7 +359,7 @@ namespace rt_num_opt
                 ; // nothing else to do
             }
 
-            std::cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << std::endl;
+            // std::cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << std::endl;
             RTA_LL r(tasks);
             if (r.CheckSchedulability())
             {

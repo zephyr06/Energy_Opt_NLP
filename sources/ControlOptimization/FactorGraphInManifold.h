@@ -125,6 +125,13 @@ namespace rt_num_opt
                             if (taskId == index)
                             {
                                 jacob(0) = 0.5 * coeff(2 * index) / result(0);
+                                if (optimizerType != 2) // avoid numerically indetermined system
+                                {
+                                    if (jacob(0) / result(0) < 1e-5)
+                                    {
+                                        jacob(0) = result(0) * 1e-5;
+                                    }
+                                }
                             }
                             (*H)[i] = jacob;
                         }
