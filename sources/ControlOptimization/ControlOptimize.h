@@ -70,6 +70,27 @@ namespace rt_num_opt
                 gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG, params);
                 result = optimizer.optimize();
             }
+            else if (optimizerType == 3)
+            {
+                gtsam::GaussNewtonParams params;
+                if (debugMode == 1)
+                    params.setVerbosity("DELTA");
+                params.setRelativeErrorTol(relativeErrorTolerance);
+                params.setLinearSolverType(linearOptimizerType);
+                gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
+                result = optimizer.optimize();
+            }
+            else if (optimizerType == 4)
+            {
+                gtsam::NonlinearOptimizerParams params;
+                params.setRelativeErrorTol(relativeErrorTolerance);
+                params.setLinearSolverType(linearOptimizerType);
+                if (debugMode == 1)
+                    params.setVerbosity("DELTA");
+                params.setMaxIterations(maxIterationsOptimizer);
+                gtsam::NonlinearConjugateGradientOptimizer optimizer(graph, initialEstimateFG, params);
+                result = optimizer.optimize();
+            }
 
             VectorDynamic optComp, rtaFromOpt; // rtaFromOpt can only be used for 'cout'
             optComp = FactorGraphType::ExtractResults(result, tasks);
@@ -323,7 +344,17 @@ namespace rt_num_opt
             }
 
             std::cout << "The number of outside loops in OptimizeTaskSetIterative is " << loopCount << std::endl;
-            return std::make_pair(GetParameterVD<double>(tasks, "period"), FactorGraphType::RealObj(tasks, coeff));
+            RTA_LL r(tasks);
+            if (r.CheckSchedulability())
+            {
+                return std::make_pair(GetParameterVD<double>(tasks, "period"), FactorGraphType::RealObj(tasks, coeff));
+            }
+            else
+            {
+                VectorDynamic periodVecOrg = GetParameterVD<double>(tasks, "periodOrg");
+                UpdateTaskSetPeriod(tasks, periodVecOrg);
+                return std::make_pair(periodVecOrg, FactorGraphType::RealObj(tasks, coeff));
+            }
         }
     }
 } // namespace rt_num_opt

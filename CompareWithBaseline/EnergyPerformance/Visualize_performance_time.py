@@ -139,9 +139,9 @@ if __name__ == "__main__":
 
     data_2d = np.array(data_2d).transpose()
     dataset_pd = pd.DataFrame()
-    optimizer_name = ["NLP_Elim_approx", "NLP_Elim_exact", "NLP_Raw", "Zhao20", "MIGP"]
-    marker_list = ["o", "v", "x", "s", "D"]  #
-    color_list = ["#0084DB",  "r", "gold", "limegreen", "purple"] #
+    optimizer_name = ["NORTH", "NMBO", "IPM", "Zhao20", "MIGP"]
+    marker_list = ["o", "v", "^", "s", "D"]  #
+    color_list = ["#0084DB", "r", "y", "limegreen", "purple"]
     # dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
 
     long_index = []

@@ -48,7 +48,7 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=5,
+parser.add_argument('--maxTaskNumber', type=int, default=30,
                     help='Nmax')
 parser.add_argument('--title', type=str, default="EnergyPerformance",
             help='tilte in produced figure')
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     dataset_pd = pd.DataFrame()
     optimizer_name=["NORTH", "NMBO", "IPM",  "Zhao20", "MIGP"]
     marker_list = ["o", "v", "^", "s", "D"] #
-    color_list = ["#0084DB",  "r", "y", "limegreen", "purple"] #
+    color_list = ["#0084DB",  "r", "y", "limegreen", "purple"]
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber-minTaskNumber+1))
     for i in range(min(data_2d.shape[0], 3)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     plt.xlabel("Task Number", fontsize=font_size)
     plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
-    splot.set_ylim([95, 200])
+    splot.set_ylim([95, 230])
     plt.legend(labels=optimizer_name)
     plt.grid(linestyle="--")
     plt.savefig("Compare_" + title +"_"+ "EnergySaveRatio" + ".pdf", format='pdf')

@@ -11,9 +11,10 @@ import matplotlib.pyplot as plt
 def read_data_2d_energy(minTaskNumber, maxTaskNumber):
     def extract_ave(method_index):
         ave = 0
-        for i in range(method_index*1000, method_index*1000+1000):
+        for i in range(method_index * 1000, method_index * 1000 + 1000):
             ave += float(lines[i])
-        return ave/1000.0
+        return ave / 1000.0
+
     data2d = []
     for task_number in range(minTaskNumber, maxTaskNumber + 1):
         file_path = "EnergySaveRatio" + "/N" + str(task_number) + ".txt"
@@ -34,8 +35,8 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         data.append(1.0)
 
         # MILP, maximum number is 15
-        if(task_number<15):
-            ave=0
+        if (task_number < 15):
+            ave = 0
             for i in range(1000):
                 ave += float(lines[4000 + i]) / float(lines[3000 + i])
             data.append(ave / 1000)
@@ -70,7 +71,7 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         data.append(float(lines[3]))
 
         # MILP, maximum number is 14
-        if(task_number<=14):
+        if (task_number <= 14):
             data.append(float(lines[4]))
         else:
             data.append(-1)
@@ -79,13 +80,14 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         file.close()
     return data2d
 
+
 def read_data_2d_rta(minTaskNumber, maxTaskNumber, folderName):
     data2d = []
     for task_number in range(minTaskNumber, maxTaskNumber + 1):
-        file_path = folderName +"/N" + str(task_number) + ".txt"
+        file_path = folderName + "/N" + str(task_number) + ".txt"
         file = open(file_path, "r")
         lines = file.readlines()
-        data=[]
+        data = []
 
         # NLP, with elimination, approximated Jacobian
         data.append(float(lines[0]))
@@ -105,6 +107,7 @@ def read_data_2d_rta(minTaskNumber, maxTaskNumber, folderName):
         file.close()
     return data2d
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
@@ -113,7 +116,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=20,
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
 parser.add_argument('--data_source', type=str, default="RTA",
-                    help='data source folder')
+                    help='data source folder, EnergySaveRatio/RTA/Time')
 parser.add_argument('--title', type=str, default="ControlPerformance",
                     help='tilte in produced figure')
 
@@ -130,14 +133,14 @@ if __name__ == "__main__":
     elif (data_source == "Time"):
         data_2d = read_data_2d_time(minTaskNumber, maxTaskNumber)
     elif (data_source == "RTA"):
-        data_2d = read_data_2d_rta(minTaskNumber, maxTaskNumber,"RTACalling")
+        data_2d = read_data_2d_rta(minTaskNumber, maxTaskNumber, "RTACalling")
     data_2d = np.array(data_2d).transpose()
     if (data_source == "EnergySaveRatio"):
         data_2d = data_2d * 100
     dataset_pd = pd.DataFrame()
-    optimizer_name=["NLP_Elim_approx", "NLP_Elim_exact", "NLP_Raw",  "Zhao20", "MIGP"]
-    marker_list = ["o", "v", "x", "s", "D"] #
-    color_list = ["#0084DB",  "r", "gold", "limegreen", "purple"]#
+    optimizer_name = ["NORTH", "NMBO", "IPM", "Zhao20", "MIGP"]
+    marker_list = ["o", "v", "^", "s", "D"]  #
+    color_list = ["#0084DB", "r", "y", "limegreen", "purple"]  #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
     for i in range(min(data_2d.shape[0], 4)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
@@ -147,11 +150,11 @@ if __name__ == "__main__":
     # MILP
     if (data_source == "EnergySaveRatio" or data_source == "Time"):
         plt.plot(np.linspace(minTaskNumber, min(14, maxTaskNumber), min(14, maxTaskNumber) - minTaskNumber + 1),
-             data_2d[-1][:min(14, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
-             markersize=8)
+                 data_2d[-1][:min(14, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
+                 markersize=8)
 
     if (data_source == "EnergySaveRatio"):
-        splot.set(xlabel="Task Number", ylabel="Relative gap (%)", fontsize=10)
+        splot.set(xlabel="Task Number", ylabel="Relative gap (%)")
         # splot.set_ylim([0.55, 0.9])
     elif (data_source == "Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
@@ -166,6 +169,6 @@ if __name__ == "__main__":
     splot.set_xlim([4, 21])
     plt.legend(labels=optimizer_name)
     plt.grid(linestyle="--")
-    plt.savefig("Compare_" + title+"_"+data_source + ".pdf", format='pdf')
+    plt.savefig("Compare_" + title + "_" + data_source + ".pdf", format='pdf')
     plt.show(block=False)
     plt.pause(3)
