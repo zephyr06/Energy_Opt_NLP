@@ -156,9 +156,10 @@ namespace rt_num_opt
 
                     size_t rtaCall = ReadCallingTimes();
                     rtaCallTime.push_back(rtaCall);
+
+                    WriteToResultFile(pathDataset, file, res, timeTaken);
                 }
 
-                WriteToResultFile(pathDataset, file, res, timeTaken);
                 if (res >= 0 && res <= 1)
                 {
                     energySaveRatioVec.push_back(res);
