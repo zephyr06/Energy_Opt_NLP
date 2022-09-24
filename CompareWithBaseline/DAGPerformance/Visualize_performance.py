@@ -52,8 +52,8 @@ parser.add_argument('--maxTaskNumber', type=int, default=10,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="Time",
-                    help='data source folder, Time or EnergySaveRatio or RTA')
+parser.add_argument('--data_source', type=str, default="EnergySaveRatio",
+                    help='data source folder, Time or EnergySaveRatio')
 parser.add_argument('--title', type=str, default="DAGPerformance",
                     help='tilte in produced figure')
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     dataset_pd = pd.DataFrame()
     optimizer_name = ["NORTH", "NMBO", "IPM", "SA"]  # "NLP_Elim_exact",
     marker_list = ["o", "v", "s", "D"]  #
-    color_list = ["#0084DB", "r", "gold", "limegreen"]  #
+    color_list = ["#0084DB", "r", "y", "limegreen"]  #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
     for i in {0, 1, 2, 3}:
         if (i < data_2d.shape[0]):

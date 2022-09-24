@@ -115,7 +115,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="RTA",
+parser.add_argument('--data_source', type=str, default="Time",
                     help='data source folder, EnergySaveRatio/RTA/Time')
 parser.add_argument('--title', type=str, default="ControlPerformance",
                     help='tilte in produced figure')
@@ -154,7 +154,7 @@ if __name__ == "__main__":
                  markersize=8)
 
     if (data_source == "EnergySaveRatio"):
-        splot.set(xlabel="Task Number", ylabel="Relative gap (%)")
+        splot.set(xlabel="Task Number", ylabel="Relative gap with Zhao20 (%)")
         # splot.set_ylim([0.55, 0.9])
     elif (data_source == "Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
