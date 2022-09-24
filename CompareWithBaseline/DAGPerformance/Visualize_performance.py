@@ -1,3 +1,4 @@
+import copy
 import sys
 
 sys.path.append("../")
@@ -35,6 +36,15 @@ def read_data_2d_data(minTaskNumber, maxTaskNumber, folderName):
     return data2d
 
 
+def convert_to_relative_performance(data_2d):
+    data_modify = copy.deepcopy(data_2d)
+
+    for i in range(data_2d.shape[0]):
+        for j in range(data_2d.shape[1]):
+            data_modify[i, j] = (data_2d[i, j] - data_2d[i, 0]) / data_2d[i, 0]
+    return data_modify
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=3,
                     help='Nmin')
@@ -42,7 +52,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=10,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="EnergySaveRatio",
+parser.add_argument('--data_source', type=str, default="Time",
                     help='data source folder, Time or EnergySaveRatio or RTA')
 parser.add_argument('--title', type=str, default="DAGPerformance",
                     help='tilte in produced figure')
@@ -58,6 +68,8 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio"):
         data_2d = read_data_2d_data(minTaskNumber, maxTaskNumber, "EnergySaveRatio")
         data_2d = np.array(data_2d)
+        # convert to relative performance with respect to NORTH
+        data_2d = convert_to_relative_performance(data_2d)
         data_2d = data_2d * 100.0
     elif (data_source == "Time"):
         data_2d = read_data_2d_data(minTaskNumber, maxTaskNumber, "Time")
@@ -78,13 +90,13 @@ if __name__ == "__main__":
                                  color=color_list[i], markersize=8)
 
     if (data_source == "EnergySaveRatio"):
-        splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
+        splot.set(xlabel="Task Number", ylabel="Relative gap with NORTH (%)")
         # splot.set_ylim([55, 90])
     elif (data_source == "Time"):
         splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
         # splot.set_ylim([0.95, 2.0])
-        # splot.set(yscale="log")
-        # splot.set_ylim(1e-4, 1e3)
+        splot.set(yscale="log")
+        splot.set_ylim(1e-1, 1e3)
     elif (data_source == "RTA"):
         splot.set(xlabel="Task Number", ylabel="Schedulability analysis call times")
         # splot.set_ylim([0.95, 2.0])

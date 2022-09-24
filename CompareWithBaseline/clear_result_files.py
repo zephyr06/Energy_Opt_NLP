@@ -5,7 +5,7 @@ import argparse
 def clear_dir_result(directory, Nmin, Nmax):
     for filename in os.listdir(directory):
         if filename[0] == "N" and filename[-4:] == ".txt" and Nmin <= int(filename[1:-4]) and int(
-                filename[1:-4]) < Nmax:
+                filename[1:-4]) <= Nmax:
             file = open(directory + "/" + filename, "w")
             file.truncate()
             file.close()
