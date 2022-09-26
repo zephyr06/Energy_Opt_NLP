@@ -94,10 +94,8 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=6,
+parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
-parser.add_argument('--methodsNum', type=int, default=4,
-                    help='number of optimizers to compare')
 parser.add_argument('--data_source', type=str, default="EnergySaveRatio",
                     help='data source folder')
 parser.add_argument('--title', type=str, default="Optimizer",
@@ -106,7 +104,6 @@ parser.add_argument('--title', type=str, default="Optimizer",
 args = parser.parse_args()
 minTaskNumber = args.minTaskNumber
 maxTaskNumber = args.maxTaskNumber
-methodsNum = args.methodsNum
 title = args.title
 data_source = args.data_source
 
@@ -144,7 +141,7 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")
         # splot.set_ylim([0.95, 2.0])
-        plt.legend(labels=optimizer_name, bbox_to_anchor=(0.9, 0.25))
+        plt.legend(labels=optimizer_name, bbox_to_anchor=(0.66, 0.9), mode="expand", borderaxespad=0.2)  #
         plt.grid(linestyle="--")
         plt.savefig("Compare_" + title + ".pdf", format='pdf')
         plt.show(block=False)

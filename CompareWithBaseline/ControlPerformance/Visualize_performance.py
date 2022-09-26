@@ -115,7 +115,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="Time",
+parser.add_argument('--data_source', type=str, default="EnergySaveRatio",
                     help='data source folder, EnergySaveRatio/RTA/Time')
 parser.add_argument('--title', type=str, default="ControlPerformance",
                     help='tilte in produced figure')
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         data_2d = read_data_2d_rta(minTaskNumber, maxTaskNumber, "RTACalling")
     data_2d = np.array(data_2d).transpose()
     if (data_source == "EnergySaveRatio"):
-        data_2d = data_2d * 100
+        data_2d = (data_2d - 1) * 100
     dataset_pd = pd.DataFrame()
     optimizer_name = ["NORTH", "NMBO", "IPM", "Zhao20", "MIGP"]
     marker_list = ["o", "v", "^", "s", "D"]  #
