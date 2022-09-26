@@ -21,7 +21,6 @@ perform_optimization() {
 	make -j8
 	./tests/BatchControl $1
 	cd $ROOT_PATH/CompareWithBaseline/Optimizer/EnergySaveRatio
-	wc -l N11.txt 
 	cd $ROOT_PATH/CompareWithBaseline
 	sleep 1
 }
