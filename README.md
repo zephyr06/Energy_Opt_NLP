@@ -9,7 +9,8 @@ Real-time Systems with Continuous Variables'.
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 - [cppUnitLite](https://github.com/anonymousUser666666/CppUnitLite)
 - OpenCV
-- [Intel Threaded Building Blocks (TBB)](http://www.threadingbuildingblocks.org/) 
+- [Intel Threaded Building Blocks (TBB)](https://github.com/wjakob/tbb) The latest official TBB release removed some legacy code, so if possible, try to install this old version.
+- [ifopt](https://github.com/ethz-adrl/ifopt)
 - Please let me know if some other packages are missing
 
 # Build and Run
