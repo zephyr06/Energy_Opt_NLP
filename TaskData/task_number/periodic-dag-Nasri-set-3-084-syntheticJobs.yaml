@@ -6,24 +6,20 @@ tasks:
         executionTime: 1
       - id: 1
         executionTime: 1
-    edges:
-      - from: 0
-        to: 1
-  - deadline: 5
-    period: 5
-    vertices:
-      - id: 0
-        executionTime: 1
-      - id: 1
-        executionTime: 1
     edges: ~
-  - deadline: 50
-    period: 50
+  - deadline: 100
+    period: 100
     vertices:
       - id: 0
-        executionTime: 39
+        executionTime: 30
       - id: 1
+        executionTime: 28
+    edges: ~
+  - deadline: 20
+    period: 20
+    vertices:
+      - id: 0
         executionTime: 2
-    edges:
-      - from: 0
-        to: 1
+      - id: 1
+        executionTime: 29
+    edges: ~

@@ -1,12 +1,4 @@
 tasks:
-  - deadline: 1
-    period: 1
-    vertices:
-      - id: 0
-        executionTime: 1
-      - id: 1
-        executionTime: 1
-    edges: ~
   - deadline: 5
     period: 5
     vertices:
@@ -14,12 +6,24 @@ tasks:
         executionTime: 1
       - id: 1
         executionTime: 1
-    edges: ~
-  - deadline: 50
-    period: 50
+    edges:
+      - from: 0
+        to: 1
+  - deadline: 1
+    period: 1
     vertices:
       - id: 0
-        executionTime: 38
+        executionTime: 1
       - id: 1
-        executionTime: 12
+        executionTime: 1
+    edges:
+      - from: 0
+        to: 1
+  - deadline: 2
+    period: 2
+    vertices:
+      - id: 0
+        executionTime: 1
+      - id: 1
+        executionTime: 3
     edges: ~

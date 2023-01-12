@@ -8,22 +8,30 @@ using namespace rt_num_opt;
 bool SchedulabilityInSolutionSpace(DAG_Nasri19& tasksN) {
     TaskSet& tasks = tasksN.tasks_;
     for (int c0 = tasks[0].executionTimeOrg;
-         c0 <= tasks[0].executionTimeOrg * 2; c0++) {
+         c0 <= tasks[0].executionTimeOrg * 2 && c0 < tasks[0].deadline; c0++) {
         tasks[0].executionTime = c0;
         for (int c1 = tasks[1].executionTimeOrg;
-             c1 <= tasks[1].executionTimeOrg * 2; c1++) {
+             c1 <= tasks[1].executionTimeOrg * 2 && c1 < tasks[1].deadline;
+             c1++) {
             tasks[1].executionTime = c1;
             for (int c2 = tasks[2].executionTimeOrg;
-                 c2 <= tasks[2].executionTimeOrg * 2; c2++) {
+                 c2 <= tasks[2].executionTimeOrg * 2 && c2 < tasks[2].deadline;
+                 c2++) {
                 tasks[2].executionTime = c2;
                 for (int c3 = tasks[3].executionTimeOrg;
-                     c3 <= tasks[3].executionTimeOrg * 2; c3++) {
+                     c3 <= tasks[3].executionTimeOrg * 2 &&
+                     c3 < tasks[3].deadline;
+                     c3++) {
                     tasks[3].executionTime = c3;
                     for (int c4 = tasks[4].executionTimeOrg;
-                         c4 <= tasks[4].executionTimeOrg * 2; c4++) {
+                         c4 <= tasks[4].executionTimeOrg * 2 &&
+                         c4 < tasks[4].deadline;
+                         c4++) {
                         tasks[4].executionTime = c4;
                         for (int c5 = tasks[5].executionTimeOrg;
-                             c5 <= tasks[5].executionTimeOrg * 2; c5++) {
+                             c5 <= tasks[5].executionTimeOrg * 2 &&
+                             c5 < tasks[5].deadline;
+                             c5++) {
                             tasks[5].executionTime = c5;
 
                             RTA_Nasri19 rCurr(tasksN);
