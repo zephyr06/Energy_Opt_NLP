@@ -1,4 +1,4 @@
-gtsamAddTestsGlob(EnergyOptNLP "test*.cpp" "testBF*" "${CONVENIENCE_LIB_NAME}")
+gtsamAddTestsGlob(EnergyOptNLP "test*.cpp" "" "${CONVENIENCE_LIB_NAME}")
 # ADD_EXECUTABLE(testTask testTasks.cpp)
 # TARGET_LINK_LIBRARIES(testTask ${CONVENIENCE_LIB_NAME})
 # ADD_EXECUTABLE(testRTA testResponseTimeAnalysis.cpp)
