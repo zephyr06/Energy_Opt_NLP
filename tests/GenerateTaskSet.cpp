@@ -214,9 +214,13 @@ int main(int argc, char *argv[]) {
                 // int periodCurr = (1 + rand() % 9) * pow(10, rand() % 2);
                 int periodCurr = int(PeriodSetAM[rand() % PeriodSetAM.size()] *
                                      timeScaleFactor);
-                dagTaskSet.push_back(GenerateDAG(
-                    ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[j],
-                    numberOfProcessor, periodCurr, periodCurr, deadlineType));
+                // NOTE: each DAG has the same number of nodes as the maximum
+                // node now!!!
+                dagTaskSet.push_back(
+                    GenerateDAG(ceil(RandRange(maxNode_GenerateTaskSet,
+                                               maxNode_GenerateTaskSet)),
+                                utilVec[j], numberOfProcessor, periodCurr,
+                                periodCurr, deadlineType));
             }
 
             string fileName = "periodic-dag-Nasri-set-" + to_string(N) + "-" +
