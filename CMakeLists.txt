@@ -11,12 +11,15 @@ include(GtsamBuildTypes)
 include(GtsamTesting)
 
 find_package(yaml-cpp)
+# find_package(tbb)
 
 # add_subdirectory(DAG-scheduling_Verucchi)
 # include_directories(${CMAKE_SOURCE_DIR}/DAG-scheduling_Verucchi/include)
 include_directories(${CMAKE_SOURCE_DIR}/np-schedulability-analysis/include )
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/np-schedulability-analysis/include )
 include_directories(${CMAKE_SOURCE_DIR})
+# include_directories("/usr/lib")
+include_directories("/usr/local/lib")
 
 # for unittest scripts
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${GTSAM_DIR}/../GTSAMCMakeTools")
@@ -44,6 +47,7 @@ target_link_libraries(${CONVENIENCE_LIB_NAME} CppUnitLite)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ${OpenCV_LIBS} )
 target_link_libraries(${CONVENIENCE_LIB_NAME} yaml-cpp)
 target_link_libraries(${CONVENIENCE_LIB_NAME} tbb)
+target_link_libraries(${CONVENIENCE_LIB_NAME} tbbmalloc)
 target_link_libraries(${CONVENIENCE_LIB_NAME} ifopt::ifopt_ipopt) 
 
 
