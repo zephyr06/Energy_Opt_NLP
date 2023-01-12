@@ -8,7 +8,7 @@ TEST(batchfind, v1) {
     const char *pathDataset;
     pathDataset =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"
-        "test_Dag_feasible_ratio/";
+        "task_number/";
 
     std::vector<double> energySaveRatioVec;
     std::vector<double> runTime;
@@ -21,6 +21,7 @@ TEST(batchfind, v1) {
         if (rt_num_opt::debugMode) std::cout << file << std::endl;
 
         if (file.find("yaml") != std::string::npos) {
+            std::cout << file << "\n";
             std::string path = pathDataset + file;
             pathTaskSet.push_back(path);
             totalFiles++;
