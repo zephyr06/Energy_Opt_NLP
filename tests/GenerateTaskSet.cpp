@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
         .help("the total utilization of tasks in each DAG")
         .scan<'f', double>();
     program.add_argument("--NumberOfProcessor")
-        .default_value(2)
+        .default_value(rt_num_opt::core_m_dag)
         .help("the NumberOfProcessor of tasks in DAG")
         .scan<'i', int>();
     program.add_argument("--periodMin")
@@ -216,11 +216,9 @@ int main(int argc, char *argv[]) {
                                      timeScaleFactor);
                 // NOTE: each DAG has the same number of nodes as the maximum
                 // node now!!!
-                dagTaskSet.push_back(
-                    GenerateDAG(ceil(RandRange(maxNode_GenerateTaskSet,
-                                               maxNode_GenerateTaskSet)),
-                                utilVec[j], numberOfProcessor, periodCurr,
-                                periodCurr, deadlineType));
+                dagTaskSet.push_back(GenerateDAG(
+                    ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[j],
+                    numberOfProcessor, periodCurr, periodCurr, deadlineType));
             }
 
             string fileName = "periodic-dag-Nasri-set-" + to_string(N) + "-" +

@@ -6,6 +6,7 @@
 using namespace rt_num_opt;
 
 bool SchedulabilityInSolutionSpace(DAG_Nasri19& tasksN) {
+    auto start_time = std::chrono::high_resolution_clock::now();
     TaskSet& tasks = tasksN.tasks_;
     for (int c0 = tasks[0].executionTimeOrg;
          c0 <= tasks[0].executionTimeOrg * 2 && c0 < tasks[0].deadline; c0++) {
@@ -33,7 +34,13 @@ bool SchedulabilityInSolutionSpace(DAG_Nasri19& tasksN) {
                              c5 < tasks[5].deadline;
                              c5++) {
                             tasks[5].executionTime = c5;
-
+                            auto curr_time = std::chrono::system_clock::now();
+                            if (std::chrono::duration_cast<
+                                    std::chrono::seconds>(curr_time -
+                                                          start_time)
+                                    .count() >= timeLimits) {
+                                return false;
+                            }
                             RTA_Nasri19 rCurr(tasksN);
                             if (rCurr.CheckSchedulability()) {
                                 return true;
@@ -75,7 +82,6 @@ TEST(batchfind, v1) {
                 passOneTime++;
                 continue;
             } else {
-                bool foundInfeasible2feasibleCase = false;
                 if (SchedulabilityInSolutionSpace(tasksN)) {
                     infeasibleInitial++;
                 }
