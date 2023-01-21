@@ -11,7 +11,7 @@ cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 # clear buffer file content
 cd $ROOT_PATH/CompareWithBaseline
 # python $ROOT_PATH/TaskData/ClearResFiles.py
-python clear_result_files.py  --folder $title --Nmin 3 --Nmax 10
+# python clear_result_files.py  --folder $title --Nmin 3 --Nmax 10
 
 python edit_yaml.py --entry "batchOptimizeFolder" --value $title
 python edit_yaml.py --entry "core_m_dag" --value 4
@@ -58,6 +58,6 @@ done
 
 # visualize the result
 cd $ROOT_PATH/CompareWithBaseline/$title
-python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio"
-python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
-python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "RTA"
+python3 $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio"
+python3 $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
+python3 $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "RTA"
