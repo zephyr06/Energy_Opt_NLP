@@ -14,6 +14,10 @@ Warning!!: the source code in this repo still needs some serious cleaning work, 
 - [ifopt](https://github.com/ethz-adrl/ifopt)
 - Please let me know if some other packages are missing
 
+- [Pandas](https://pandas.pydata.org/getting_started.html)(pip install pandas)
+- [Seaborn](https://seaborn.pydata.org/installing.html) (pip install seaborn)
+
+
 # Build and Run
 To build the C++ code:
 ```
