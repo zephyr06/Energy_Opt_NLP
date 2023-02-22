@@ -127,16 +127,16 @@ if __name__ == "__main__":
     for i in range(5):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
-                             color=color_list[i], markersize=8)
+                             color=color_list[i], markersize=8, label = optimizer_name[i])
     for i in range(5):
         dataset_pd.insert(0, optimizer_name[i + 5], data_2d[i + 5])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i + 5], marker=marker_list[i],
-                             color=color_list[i], markersize=8, linestyle='--')
+                             color=color_list[i], markersize=8, linestyle='--', label = optimizer_name[i])
 
     # Zhao20
     dataset_pd.insert(0, optimizer_name[10], data_2d[10])
     splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[10], marker=marker_list[-1], color=color_list[-1],
-                         markersize=8)
+                         markersize=8, label = optimizer_name[-1])
 
     if (data_source == "EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Energy Saving ratio (%)")

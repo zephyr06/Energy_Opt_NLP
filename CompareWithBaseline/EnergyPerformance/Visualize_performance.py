@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # MILP
     plt.plot(np.linspace(minTaskNumber, min(11, maxTaskNumber), min(11, maxTaskNumber) - minTaskNumber + 1),
              data_2d[-1][:min(11, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
-             markersize=8)
+             markersize=8, label = optimizer_name[-1])
 
     plt.xlabel("Task Number", fontsize=font_size)
     plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)

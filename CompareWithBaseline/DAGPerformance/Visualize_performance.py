@@ -102,7 +102,7 @@ if __name__ == "__main__":
         # splot.set_ylim([0.95, 2.0])
         # splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)
-    # plt.legend(labels=optimizer_name)
+    plt.legend(labels=optimizer_name)
     plt.grid(linestyle="--")
     plt.savefig("Compare_" + title + "_" + data_source + ".pdf", format='pdf')
     plt.show(block=False)

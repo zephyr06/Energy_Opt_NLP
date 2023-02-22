@@ -151,7 +151,7 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio" or data_source == "Time"):
         plt.plot(np.linspace(minTaskNumber, min(14, maxTaskNumber), min(14, maxTaskNumber) - minTaskNumber + 1),
                  data_2d[-1][:min(14, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
-                 markersize=8)
+                 markersize=8, label = optimizer_name[-1])
 
     if (data_source == "EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Relative gap with Zhao20 (%)")
@@ -166,6 +166,7 @@ if __name__ == "__main__":
         # splot.set_ylim([0.95, 2.0])
         # splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)
+    plt.legend()
     splot.set_xlim([4, 21])
     plt.grid(linestyle="--")
     plt.savefig("Compare_" + title + "_" + data_source + ".pdf", format='pdf')

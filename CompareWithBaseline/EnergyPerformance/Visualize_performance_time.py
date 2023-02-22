@@ -161,13 +161,13 @@ if __name__ == "__main__":
         i = 3
         plt.plot(np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1),
                  data_2d[i][:maxTaskNumber - minTaskNumber + 1], marker=marker_list[i], color=color_list[i],
-                 markersize=8)
+                 markersize=8, label = optimizer_name[i])
 
         # MILP
         if (data_source == "EnergySaveRatio" or data_source == "Time"):
             plt.plot(np.linspace(minTaskNumber, min(11, maxTaskNumber), min(11, maxTaskNumber) - minTaskNumber + 1),
                      data_2d[-1][:min(11, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1],
-                     color=color_list[-1], markersize=8)
+                     color=color_list[-1], markersize=8, label = optimizer_name[-1])
 
     if (data_source == "EnergySaveRatio"):
         plt.set(xlabel="Task Number", ylabel="Relative gap with Zhao20 (%)")

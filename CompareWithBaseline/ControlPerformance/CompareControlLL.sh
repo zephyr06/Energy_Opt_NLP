@@ -9,7 +9,6 @@ ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 # clear buffer file content
 cd $ROOT_PATH/CompareWithBaseline
-python clear_result_files.py  --folder $title
 
 python edit_yaml.py --entry "batchOptimizeFolder" --value $title
 
@@ -22,7 +21,6 @@ perform_optimization() {
 	cd $ROOT_PATH/CompareWithBaseline
 	sleep 1
 }
-
 
 for (( jobNumber=5; jobNumber<=$MaxTaskNumber; jobNumber++ ))
 do
@@ -60,6 +58,5 @@ python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTask
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "RTA"
 python $ROOT_PATH/CompareWithBaseline/$title/draw_box_plot.py
-python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
-python draw_box_plot.py
-python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "RTA"
+# python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
+# python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "RTA"
