@@ -6,10 +6,10 @@ Warning!!: the source code in this repo still needs some serious cleaning work, 
 # Dependencies
 - [CMake](https://cmake.org/download/)
 - [Boost](https://www.boost.org/users/download/)
-- [GTSAM](https://github.com/borglab/gtsam)
+- [GTSAM](https://github.com/borglab/gtsam) (Add "set (GTSAM_USE_SYSTEM_EIGEN TRUE)" to CMakeLists.txt)
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 - [cppUnitLite](https://github.com/anonymousUser666666/CppUnitLite)
-- OpenCV
+- [OpenCV](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)
 - [Intel Threaded Building Blocks (TBB)](https://github.com/wjakob/tbb) The latest official TBB release removed some legacy code, so if possible, try to install this old version.
 - [ifopt](https://github.com/ethz-adrl/ifopt)
 - Please let me know if some other packages are missing
