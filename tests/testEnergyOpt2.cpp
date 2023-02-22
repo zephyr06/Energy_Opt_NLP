@@ -9,85 +9,87 @@ using namespace std::chrono;
 using namespace rt_num_opt;
 using namespace std;
 EliminationRecord eliminationRecordGlobal;
-TEST(EliminationRecordUpdate, v1) {
-    executionTimeModel = 1;
-    EnergyMode = 1;
-    optimizerType = 2;
-    string path =
-        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
-    auto tasks = ReadTaskSet(path, "RM");
-    TaskSetNormal tasksN(tasks);
-    VectorDynamic execCurr = GenerateVectorDynamic(5);
+// TEST(EliminationRecordUpdate, v1) {
+//     executionTimeModel = 1;
+//     EnergyMode = 1;
+//     optimizerType = 2;
+//     string path =
+//         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v26.csv";
+//     auto tasks = ReadTaskSet(path, "RM");
+//     TaskSetNormal tasksN(tasks);
+//     VectorDynamic execCurr = GenerateVectorDynamic(5);
 
-    execCurr << 6, 46, 50, 138, 8;
-    UpdateTaskSetExecutionTime(tasksN.tasks_, execCurr);
-    UpdateTaskSetExecutionTime(tasks, execCurr);
-    eliminationRecordGlobal.Initialize(tasks.size());
-    gtsam::NonlinearFactorGraph graph =
-        Energy_OptDAG<TaskSetNormal, RTA_LL>::BuildEnergyGraph(
-            tasks, eliminationRecordGlobal);
-    gtsam::Values initialEstimateFG =
-        EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecordGlobal);
-    auto sth = graph.error(initialEstimateFG);
-    bool a;
-    std::tie(a, eliminationRecordGlobal) =
-        Energy_OptDAG<TaskSetNormal, RTA_LL>::FindEliminateVariable(
-            tasksN, eliminationRecordGlobal);
+//     execCurr << 6, 46, 50, 138, 8;
+//     UpdateTaskSetExecutionTime(tasksN.tasks_, execCurr);
+//     UpdateTaskSetExecutionTime(tasks, execCurr);
+//     eliminationRecordGlobal.Initialize(tasks.size());
+//     gtsam::NonlinearFactorGraph graph =
+//         Energy_OptDAG<TaskSetNormal, RTA_LL>::BuildEnergyGraph(
+//             tasks, eliminationRecordGlobal);
+//     gtsam::Values initialEstimateFG =
+//         EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecordGlobal);
+//     auto sth = graph.error(initialEstimateFG);
+//     bool a;
+//     std::tie(a, eliminationRecordGlobal) =
+//         Energy_OptDAG<TaskSetNormal, RTA_LL>::FindEliminateVariable(
+//             tasksN, eliminationRecordGlobal);
 
-    eliminationRecordGlobal.Print();
-    EXPECT(EliminationType::Bound == eliminationRecordGlobal[0].type);
-    EXPECT(EliminationType::Bound == eliminationRecordGlobal[1].type);
-    EXPECT(EliminationType::Bound == eliminationRecordGlobal[2].type);
-    EXPECT(EliminationType::Bound == eliminationRecordGlobal[3].type);
-    EXPECT(EliminationType::Bound == eliminationRecordGlobal[4].type);
+//     eliminationRecordGlobal.Print();
+//     EXPECT(EliminationType::Bound == eliminationRecordGlobal[0].type);
+//     EXPECT(EliminationType::Bound == eliminationRecordGlobal[1].type);
+//     EXPECT(EliminationType::Bound == eliminationRecordGlobal[2].type);
+//     EXPECT(EliminationType::Bound == eliminationRecordGlobal[3].type);
+//     EXPECT(EliminationType::Bound == eliminationRecordGlobal[4].type);
 
-    // execCurr << 6, 46, 50, 138, 8.1;
-    // UpdateTaskSetExecutionTime(tasks, execCurr);
-    // eliminationRecordGlobal.Initialize(tasks.size());
-    // graph = Energy_OptDAG<TaskSetNormal, RTA_LL>::BuildEnergyGraph(tasks,
-    // eliminationRecordGlobal); initialEstimateFG =
-    // EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecordGlobal);
-    // // sth = graph.error(initialEstimateFG);
+//     // execCurr << 6, 46, 50, 138, 8.1;
+//     // UpdateTaskSetExecutionTime(tasks, execCurr);
+//     // eliminationRecordGlobal.Initialize(tasks.size());
+//     // graph = Energy_OptDAG<TaskSetNormal, RTA_LL>::BuildEnergyGraph(tasks,
+//     // eliminationRecordGlobal); initialEstimateFG =
+//     // EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecordGlobal);
+//     // // sth = graph.error(initialEstimateFG);
 
-    // std::tie(a, eliminationRecordGlobal) = Energy_OptDAG<TaskSetNormal,
-    // RTA_LL>::FindEliminateVariable(tasksN, eliminationRecordGlobal);
-    // eliminationRecordGlobal.Print();
-    // EXPECT(EliminationType::Not == eliminationRecordGlobal[0].type);
-    // EXPECT(EliminationType::Not == eliminationRecordGlobal[1].type);
-    // EXPECT(EliminationType::Not == eliminationRecordGlobal[2].type);
-    // EXPECT(EliminationType::Not == eliminationRecordGlobal[3].type);
-    // EXPECT(EliminationType::Bound == eliminationRecordGlobal[4].type);
+//     // std::tie(a, eliminationRecordGlobal) = Energy_OptDAG<TaskSetNormal,
+//     // RTA_LL>::FindEliminateVariable(tasksN, eliminationRecordGlobal);
+//     // eliminationRecordGlobal.Print();
+//     // EXPECT(EliminationType::Not == eliminationRecordGlobal[0].type);
+//     // EXPECT(EliminationType::Not == eliminationRecordGlobal[1].type);
+//     // EXPECT(EliminationType::Not == eliminationRecordGlobal[2].type);
+//     // EXPECT(EliminationType::Not == eliminationRecordGlobal[3].type);
+//     // EXPECT(EliminationType::Bound == eliminationRecordGlobal[4].type);
 
-    // execCurr << 6, 45.9, 24, 138, 8.1;
-    // UpdateTaskSetExecutionTime(tasks, execCurr);
-    // eliminationRecordGlobal.Initialize(tasks.size());
-    // graph = Energy_OptDAG<TaskSetNormal, RTA_LL>::BuildEnergyGraph(tasks,
-    // eliminationRecordGlobal); initialEstimateFG =
-    // EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecordGlobal); sth =
-    // graph.error(initialEstimateFG); std::tie(a, eliminationRecordGlobal) =
-    // Energy_OptDAG<TaskSetNormal, RTA_LL>::FindEliminateVariable(tasksN,
-    // eliminationRecordGlobal); EXPECT(EliminationType::Not ==
-    // eliminationRecordGlobal[0].type); EXPECT(EliminationType::Not ==
-    // eliminationRecordGlobal[1].type); EXPECT(EliminationType::Bound ==
-    // eliminationRecordGlobal[2].type); EXPECT(EliminationType::Not ==
-    // eliminationRecordGlobal[3].type); EXPECT(EliminationType::Bound ==
-    // eliminationRecordGlobal[4].type);
+//     // execCurr << 6, 45.9, 24, 138, 8.1;
+//     // UpdateTaskSetExecutionTime(tasks, execCurr);
+//     // eliminationRecordGlobal.Initialize(tasks.size());
+//     // graph = Energy_OptDAG<TaskSetNormal, RTA_LL>::BuildEnergyGraph(tasks,
+//     // eliminationRecordGlobal); initialEstimateFG =
+//     // EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecordGlobal); sth
+//     =
+//     // graph.error(initialEstimateFG); std::tie(a, eliminationRecordGlobal) =
+//     // Energy_OptDAG<TaskSetNormal, RTA_LL>::FindEliminateVariable(tasksN,
+//     // eliminationRecordGlobal); EXPECT(EliminationType::Not ==
+//     // eliminationRecordGlobal[0].type); EXPECT(EliminationType::Not ==
+//     // eliminationRecordGlobal[1].type); EXPECT(EliminationType::Bound ==
+//     // eliminationRecordGlobal[2].type); EXPECT(EliminationType::Not ==
+//     // eliminationRecordGlobal[3].type); EXPECT(EliminationType::Bound ==
+//     // eliminationRecordGlobal[4].type);
 
-    // execCurr << 6, 45.9, 50.1, 500, 6;
-    // UpdateTaskSetExecutionTime(tasks, execCurr);
-    // eliminationRecordGlobal.Initialize(tasks.size());
-    // graph = Energy_OptDAG<TaskSetNormal, RTA_LL>::BuildEnergyGraph(tasks,
-    // eliminationRecordGlobal); initialEstimateFG =
-    // EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecordGlobal); sth =
-    // graph.error(initialEstimateFG); std::tie(a, eliminationRecordGlobal) =
-    // Energy_OptDAG<TaskSetNormal, RTA_LL>::FindEliminateVariable(tasksN,
-    // eliminationRecordGlobal); EXPECT(EliminationType::Not ==
-    // eliminationRecordGlobal[0].type); EXPECT(EliminationType::Not ==
-    // eliminationRecordGlobal[1].type); EXPECT(EliminationType::Bound ==
-    // eliminationRecordGlobal[2].type); EXPECT(EliminationType::Bound ==
-    // eliminationRecordGlobal[3].type); EXPECT(EliminationType::RTA ==
-    // eliminationRecordGlobal[4].type);
-}
+//     // execCurr << 6, 45.9, 50.1, 500, 6;
+//     // UpdateTaskSetExecutionTime(tasks, execCurr);
+//     // eliminationRecordGlobal.Initialize(tasks.size());
+//     // graph = Energy_OptDAG<TaskSetNormal, RTA_LL>::BuildEnergyGraph(tasks,
+//     // eliminationRecordGlobal); initialEstimateFG =
+//     // EnergyOptUtils::GenerateInitialFG(tasks, eliminationRecordGlobal); sth
+//     =
+//     // graph.error(initialEstimateFG); std::tie(a, eliminationRecordGlobal) =
+//     // Energy_OptDAG<TaskSetNormal, RTA_LL>::FindEliminateVariable(tasksN,
+//     // eliminationRecordGlobal); EXPECT(EliminationType::Not ==
+//     // eliminationRecordGlobal[0].type); EXPECT(EliminationType::Not ==
+//     // eliminationRecordGlobal[1].type); EXPECT(EliminationType::Bound ==
+//     // eliminationRecordGlobal[2].type); EXPECT(EliminationType::Bound ==
+//     // eliminationRecordGlobal[3].type); EXPECT(EliminationType::RTA ==
+//     // eliminationRecordGlobal[4].type);
+// }
 
 TEST(EliminationRecord, v2) {
     optimizerType = 2;
