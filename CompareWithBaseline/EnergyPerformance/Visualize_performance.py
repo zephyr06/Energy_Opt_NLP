@@ -93,7 +93,7 @@ if __name__ == "__main__":
     plt.xlabel("Task Number", fontsize=font_size)
     plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
     splot.set_ylim([-5, 130])
-    plt.legend(labels=optimizer_name)
+    plt.legend()
     plt.grid(linestyle="--")
     plt.savefig("Compare_" + title + "_" + "EnergySaveRatio" + ".pdf", format='pdf')
     plt.show(block=False)
