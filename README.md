@@ -6,16 +6,19 @@ Warning!!: the source code in this repo still needs some serious cleaning work, 
 # Dependencies
 - [CMake](https://cmake.org/download/)
 - [Boost](https://www.boost.org/users/download/)
-- [GTSAM](https://github.com/borglab/gtsam) (Add "set (GTSAM_USE_SYSTEM_EIGEN TRUE)" to CMakeLists.txt)
+- [GTSAM](https://github.com/borglab/gtsam)
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 - [cppUnitLite](https://github.com/anonymousUser666666/CppUnitLite)
 - [OpenCV](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)
 - [Intel Threaded Building Blocks (TBB)](https://github.com/wjakob/tbb) The latest official TBB release removed some legacy code, so if possible, try to install this old version.
 - [ifopt](https://github.com/ethz-adrl/ifopt)
-- Please let me know if some other packages are missing
-
 - [Pandas](https://pandas.pydata.org/getting_started.html)(pip install pandas)
 - [Seaborn](https://seaborn.pydata.org/installing.html) (pip install seaborn)
+- Please let me know if some other packages are missing
+
+- More about installing GTSAM
+-- Sometimes the latest version may not work well, in that case, consider using the commit `7f19e3f43d5d38808b4f30617a187b253eb92b91`
+-- The Eigen library installed in your system may cause some conflictions. In that case, please add `set (GTSAM_USE_SYSTEM_EIGEN TRUE)` to `CMakeLists.txt` 
 
 
 # Build and Run
