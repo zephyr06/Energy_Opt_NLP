@@ -17,8 +17,8 @@ Warning!!: the source code in this repo still needs some serious cleaning work, 
 - Please let me know if some other packages are missing
 
 - More about installing GTSAM
--- Sometimes the latest version may not work well, in that case, consider using the commit `7f19e3f43d5d38808b4f30617a187b253eb92b91`
--- The Eigen library installed in your system may cause some conflictions. In that case, please add `set (GTSAM_USE_SYSTEM_EIGEN TRUE)` to `CMakeLists.txt` 
+    - Sometimes the latest version may not work well, in that case, consider using the commit `7f19e3f43d5d38808b4f30617a187b253eb92b91`
+    - The Eigen library installed in your system may cause some conflictions. In that case, please add `set (GTSAM_USE_SYSTEM_EIGEN TRUE)` to `CMakeLists.txt` 
 
 
 # Build and Run

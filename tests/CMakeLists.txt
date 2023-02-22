@@ -1,3 +1,4 @@
+# *RunSingle* are not test files, but only used to run single test cases
 gtsamAddTestsGlob(EnergyOptNLP "test*.cpp" "" "${CONVENIENCE_LIB_NAME}")
 # ADD_EXECUTABLE(testTask testTasks.cpp)
 # TARGET_LINK_LIBRARIES(testTask ${CONVENIENCE_LIB_NAME})
