@@ -75,7 +75,7 @@ if __name__ == "__main__":
     for i in range(min(data_2d.shape[0], 3)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
-                             color=color_list[i], markersize=8)
+                             color=color_list[i], markersize=8, label = optimizer_name[i])
 
     # Zhao20
     i = 3

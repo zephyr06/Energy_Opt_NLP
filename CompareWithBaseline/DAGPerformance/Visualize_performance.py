@@ -87,7 +87,7 @@ if __name__ == "__main__":
         if (i < data_2d.shape[0]):
             dataset_pd.insert(0, optimizer_name[i], data_2d[i])
             splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
-                                 color=color_list[i], markersize=8)
+                                 color=color_list[i], markersize=8, label = optimizer_name[i])
 
     if (data_source == "EnergySaveRatio"):
         splot.set(xlabel="Task Number", ylabel="Relative gap with NORTH (%)")
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         # splot.set_ylim([0.95, 2.0])
         # splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)
-    plt.legend(labels=optimizer_name)
+    # plt.legend(labels=optimizer_name)
     plt.grid(linestyle="--")
     plt.savefig("Compare_" + title + "_" + data_source + ".pdf", format='pdf')
     plt.show(block=False)

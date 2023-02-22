@@ -115,7 +115,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="EnergySaveRatio",
+parser.add_argument('--data_source', type=str, default="RTA",
                     help='data source folder, EnergySaveRatio/RTA/Time')
 parser.add_argument('--title', type=str, default="ControlPerformance",
                     help='tilte in produced figure')
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     for i in range(min(data_2d.shape[0], 4)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
-                             color=color_list[i], markersize=8)
+                             color=color_list[i], markersize=8, label = optimizer_name[i])
 
     # MILP
     if (data_source == "EnergySaveRatio" or data_source == "Time"):
@@ -167,7 +167,6 @@ if __name__ == "__main__":
         # splot.set(yscale="log")
         # splot.set_ylim(1e-4, 1e3)
     splot.set_xlim([4, 21])
-    plt.legend(labels=optimizer_name)
     plt.grid(linestyle="--")
     plt.savefig("Compare_" + title + "_" + data_source + ".pdf", format='pdf')
     plt.show(block=False)
