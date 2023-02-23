@@ -8,7 +8,7 @@ make testEstimateFeasibleSolutionRatio
 
 > FeasibleRatio.txt
 
-for util in $(seq 0.1 0.1 0.1) # average per-core utilization
+for util in $(seq 0.1 0.1 0.9) # average per-core utilization
 do
 	./tests/testEstimateFeasibleSolutionRatio --U $util
 done
