@@ -5,7 +5,12 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/argparse.hpp"
 
-enum FEASIBLE_STATUS { Initial_feasible, Initial_infeasible, Time_out };
+enum FEASIBLE_STATUS {
+    Initial_feasible,
+    Initial_infeasible,
+    Time_out,
+    Always_infeasible
+};
 
 inline std::string GetResFileName(const std::string &pathDataset,
                                   const std::string &file) {
@@ -93,7 +98,11 @@ int main(int argc, char *argv[]) {
                     case FEASIBLE_STATUS::Time_out:
                         totalFiles--;
                         break;
-                    default:;  // do nothing
+                    case FEASIBLE_STATUS::Always_infeasible:
+                        totalFiles--;
+                        break;
+                    default:
+                        CoutError("Wrong Feasiebl_Status!");  // do nothing
                 }
                 continue;
             }
@@ -117,12 +126,17 @@ int main(int argc, char *argv[]) {
                     infeasibleInitial++;
                     WriteToResultFile(pathDataset, file,
                                       FEASIBLE_STATUS::Initial_infeasible, 0);
-                } else {
+                } else {  // cannot be analyzed to be schedulable
                     if (ifTimeout(start_time, true)) {
-                        totalFiles--;
                         WriteToResultFile(pathDataset, file,
                                           FEASIBLE_STATUS::Time_out, 0);
+                    } else {  // not schedulable
+                        WriteToResultFile(pathDataset, file,
+                                          FEASIBLE_STATUS::Always_infeasible,
+                                          0);
                     }
+
+                    totalFiles--;
                 }
             }
         }
