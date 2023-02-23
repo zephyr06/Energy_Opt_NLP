@@ -1,9 +1,9 @@
 tasks:
-  - deadline: 5
-    period: 5
+  - deadline: 20
+    period: 20
     vertices:
       - id: 0
-        executionTime: 2
+        executionTime: 1
       - id: 1
         executionTime: 1
       - id: 2
@@ -13,10 +13,12 @@ tasks:
       - id: 4
         executionTime: 1
     edges:
-      - from: 1
-        to: 2
-  - deadline: 1
-    period: 1
+      - from: 0
+        to: 1
+      - from: 0
+        to: 4
+  - deadline: 50
+    period: 50
     vertices:
       - id: 0
         executionTime: 1
@@ -42,40 +44,72 @@ tasks:
         executionTime: 1
       - id: 11
         executionTime: 1
+      - id: 12
+        executionTime: 1
+      - id: 13
+        executionTime: 1
+      - id: 14
+        executionTime: 4
     edges:
       - from: 0
-        to: 8
-      - from: 2
-        to: 8
-      - from: 2
-        to: 11
-      - from: 3
+        to: 5
+      - from: 0
         to: 7
-      - from: 3
-        to: 9
+      - from: 0
+        to: 13
+      - from: 0
+        to: 14
+      - from: 1
+        to: 8
+      - from: 2
+        to: 4
+      - from: 2
+        to: 5
+      - from: 4
+        to: 7
       - from: 4
         to: 10
       - from: 6
+        to: 8
+      - from: 6
         to: 9
       - from: 6
-        to: 11
+        to: 13
       - from: 7
-        to: 11
+        to: 9
       - from: 8
-        to: 10
-      - from: 9
-        to: 11
-  - deadline: 2
-    period: 2
+        to: 13
+      - from: 10
+        to: 13
+      - from: 12
+        to: 14
+  - deadline: 50
+    period: 50
     vertices:
       - id: 0
-        executionTime: 1
+        executionTime: 50
       - id: 1
-        executionTime: 1
+        executionTime: 21
       - id: 2
-        executionTime: 1
+        executionTime: 11
       - id: 3
         executionTime: 1
+      - id: 4
+        executionTime: 6
+      - id: 5
+        executionTime: 11
+      - id: 6
+        executionTime: 34
     edges:
       - from: 0
+        to: 2
+      - from: 0
         to: 3
+      - from: 0
+        to: 5
+      - from: 1
+        to: 3
+      - from: 2
+        to: 6
+      - from: 5
+        to: 6
