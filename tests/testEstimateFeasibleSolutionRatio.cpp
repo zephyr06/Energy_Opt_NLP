@@ -5,6 +5,44 @@
 #include "sources/Utils/Parameters.h"
 #include "sources/argparse.hpp"
 
+enum FEASIBLE_STATUS { Initial_feasible, Initial_infeasible, Time_out };
+
+inline std::string GetResFileName(const std::string &pathDataset,
+                                  const std::string &file) {
+    return pathDataset + file + "_Res.txt";
+}
+void WriteToResultFile(const std::string &pathDataset, const std::string &file,
+                       int res, double timeTaken) {
+    std::string resFile = GetResFileName(pathDataset, file);
+    std::ofstream outfileWrite;
+    outfileWrite.open(resFile, std::ios_base::app);
+    outfileWrite << res << std::endl;
+    outfileWrite << timeTaken << std::endl;
+    outfileWrite.close();
+}
+std::pair<int, double> ReadFromResultFile(const std::string &pathDataset,
+                                          const std::string &file) {
+    std::string resFile = GetResFileName(pathDataset, file);
+    std::ifstream cResultFile(resFile.data());
+    double timeTaken = 0;
+    int res = 0;
+    cResultFile >> res >> timeTaken;
+    cResultFile.close();
+    return std::make_pair(res, timeTaken);
+}
+
+bool VerifyResFileExist(const std::string &pathDataset,
+                        const std::string &file) {
+    std::string resFile = GetResFileName(pathDataset, file);
+    std::ifstream myfile;
+    myfile.open(resFile);
+    if (myfile) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 int main(int argc, char *argv[]) {
     argparse::ArgumentParser program("program name");
     program.add_argument("-v", "--verbose");  // parameter packing
@@ -39,14 +77,35 @@ int main(int argc, char *argv[]) {
     for (const auto &file : rt_num_opt::ReadFilesInDirectory(pathDataset)) {
         if (rt_num_opt::debugMode) std::cout << file << std::endl;
 
-        if (file.find("yaml") != std::string::npos) {
+        if (file.find("yaml") != std::string::npos &&
+            file.find("Res") == std::string::npos) {
+            totalFiles++;
+            if (VerifyResFileExist(pathDataset, file)) {
+                auto res = ReadFromResultFile(pathDataset, file);
+                if (res.second >= TIME_LIMIT_FIND_INITIAL - 10) continue;
+                switch (res.first) {
+                    case FEASIBLE_STATUS::Initial_feasible:
+                        initialFeasible++;
+                        break;
+                    case FEASIBLE_STATUS::Initial_infeasible:
+                        infeasibleInitial++;
+                        break;
+                    case FEASIBLE_STATUS::Time_out:
+                        totalFiles--;
+                        break;
+                    default:;  // do nothing
+                }
+                continue;
+            }
+
             std::string path = pathDataset + file;
             pathTaskSet.push_back(path);
-            totalFiles++;
             DAG_Nasri19 tasksN = ReadDAGNasri19_Tasks(path);
             RTA_Nasri19 r(tasksN);
             if (r.CheckSchedulability()) {
                 initialFeasible++;
+                WriteToResultFile(pathDataset, file,
+                                  FEASIBLE_STATUS::Initial_feasible, 0);
                 continue;
             } else {
                 auto start_time = std::chrono::high_resolution_clock::now();
@@ -56,14 +115,20 @@ int main(int argc, char *argv[]) {
                                  "strategy fails;"
                               << std::endl;
                     infeasibleInitial++;
+                    WriteToResultFile(pathDataset, file,
+                                      FEASIBLE_STATUS::Initial_infeasible, 0);
                 } else {
-                    if (ifTimeout(start_time, true)) totalFiles--;
+                    if (ifTimeout(start_time, true)) {
+                        totalFiles--;
+                        WriteToResultFile(pathDataset, file,
+                                          FEASIBLE_STATUS::Time_out, 0);
+                    }
                 }
             }
         }
     }
 
-    std::cout << "Total number of files iterated: " << totalFiles << "\n";
+    std::cout << "\nTotal number of files iterated: " << totalFiles << "\n";
     std::cout << "The number of cases that the given initial solution is "
                  "feasible: "
               << initialFeasible << "\n";
