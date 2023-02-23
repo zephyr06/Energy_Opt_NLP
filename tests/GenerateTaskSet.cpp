@@ -232,16 +232,16 @@ int main(int argc, char *argv[]) {
                 }
             }
             WriteDAG_NasriToYaml(dagTaskSet, outDirectory + fileName);
-            // follow-up verification
-            // auto tasksN = rt_num_opt::ReadDAGNasri19_Tasks(outDirectory +
-            // fileName); rt_num_opt::RTA_Nasri19 r(tasksN); if
-            // (!r.CheckSchedulability())
-            // {
-            //     std::cout << outDirectory + fileName << std::endl;
-            //     string ppp = outDirectory + fileName;
-            //     int a = std::filesystem::remove(ppp);
-            //     i--;
-            // }
+            // follow-up verification on system utilization
+            auto tasksN =
+                rt_num_opt::ReadDAGNasri19_Tasks(outDirectory + fileName);
+            rt_num_opt::RTA_Nasri19 r(tasksN);
+            if (std::abs(Utilization(tasksN.tasks_) - totalUtilization) > 0.1) {
+                std::cout << outDirectory + fileName << std::endl;
+                string ppp = outDirectory + fileName;
+                int a = std::filesystem::remove(ppp);
+                i--;
+            }
         }
 
         else if (taskType == 4) {

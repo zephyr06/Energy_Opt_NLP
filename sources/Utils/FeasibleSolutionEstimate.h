@@ -6,12 +6,14 @@
 
 using namespace rt_num_opt;
 double TIME_LIMIT_FIND_INITIAL = 100;
-bool ifTimeout(ProfilerData::TimerType startTime) {
+bool ifTimeout(ProfilerData::TimerType startTime, bool ifPrint = false) {
     auto curr_time = std::chrono::system_clock::now();
     if (std::chrono::duration_cast<std::chrono::seconds>(curr_time - startTime)
             .count() >= TIME_LIMIT_FIND_INITIAL) {
-        std::cout << "\nTime out when running OptimizeOrder. Maximum time is "
-                  << TIME_LIMIT_FIND_INITIAL << " seconds.\n\n";
+        if (ifPrint)
+            std::cout
+                << "\nTime out when running OptimizeOrder. Maximum time is "
+                << TIME_LIMIT_FIND_INITIAL << " seconds.\n\n";
         return true;
     }
     return false;
@@ -22,6 +24,10 @@ bool IterateSpaceHelper(DAG_Nasri19 &tasksN, int taskIndex,
     if (ifTimeout(startTime)) return false;
     if (taskIndex >= tasksN.N) {
         RTA_Nasri19 r(tasksN);
+        // For debug purpose
+        // std::cout << GetParameterVD<double>(tasksN,
+        // "executionTime").transpose()
+        //           << std::endl;
         return r.CheckSchedulability();
     } else {
         for (int i = tasksN.tasks_[taskIndex].executionTimeOrg;

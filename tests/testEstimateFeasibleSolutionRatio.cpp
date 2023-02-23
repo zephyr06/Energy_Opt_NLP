@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
                               << std::endl;
                     infeasibleInitial++;
                 } else {
-                    if (ifTimeout(start_time)) totalFiles--;
+                    if (ifTimeout(start_time, true)) totalFiles--;
                 }
             }
         }
