@@ -1,15 +1,32 @@
-#include <CppUnitLite/TestHarness.h>
 
 #include "sources/BatchTestutils.h"
 #include "sources/RTA/RTA_Nasri19.h"
 #include "sources/Utils/FeasibleSolutionEstimate.h"
 #include "sources/Utils/Parameters.h"
+#include "sources/argparse.hpp"
 
-TEST(batchfind, v1) {
-    const char *pathDataset;
-    pathDataset =
-        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"
-        "task_number/";
+int main(int argc, char *argv[]) {
+    argparse::ArgumentParser program("program name");
+    program.add_argument("-v", "--verbose");  // parameter packing
+
+    program.add_argument("--U")
+        .default_value(0.0)
+        .help("the utilization folder")
+        .scan<'f', double>();
+    try {
+        program.parse_args(argc, argv);
+    } catch (const std::runtime_error &err) {
+        std::cout << err.what() << std::endl;
+        std::cout << program;
+        exit(0);
+    }
+
+    int N = program.get<double>("--U") * 10;
+    std::string pathDatasetStr =
+        "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/"
+        "FeasibleInitialRatio/U" +
+        std::to_string(N) + "/";
+    const char *pathDataset = pathDatasetStr.c_str();
 
     std::vector<double> energySaveRatioVec;
     std::vector<double> runTime;
@@ -35,7 +52,8 @@ TEST(batchfind, v1) {
                 auto start_time = std::chrono::high_resolution_clock::now();
                 if (WhetherTaskSetSchedulableSimple(tasksN) ||
                     WhetherTaskSetSchedulableInAllSolutionSpace(tasksN)) {
-                    std::cout << "Find a case that the initial strategy fails;"
+                    std::cout << "Find a case that the initial "
+                                 "strategy fails;"
                               << std::endl;
                     infeasibleInitial++;
                 } else {
@@ -55,10 +73,6 @@ TEST(batchfind, v1) {
     std::string pathRes =
         "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/"
         "FeasibleInitialRatio/FeasibleRatio.txt";
-    AddEntry(pathRes, 1.0 - float(infeasibleInitial) / totalFiles);
-}
-
-int main() {
-    TestResult tr;
-    return TestRegistry::runAllTests(tr);
+    AddEntry(pathRes,
+             float(infeasibleInitial) / (initialFeasible + infeasibleInitial));
 }

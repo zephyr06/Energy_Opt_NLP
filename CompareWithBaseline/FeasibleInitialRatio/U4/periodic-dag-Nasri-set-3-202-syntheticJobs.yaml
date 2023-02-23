@@ -1,0 +1,127 @@
+tasks:
+  - deadline: 2
+    period: 2
+    vertices:
+      - id: 0
+        executionTime: 1
+      - id: 1
+        executionTime: 1
+      - id: 2
+        executionTime: 1
+      - id: 3
+        executionTime: 1
+      - id: 4
+        executionTime: 1
+      - id: 5
+        executionTime: 1
+      - id: 6
+        executionTime: 1
+      - id: 7
+        executionTime: 1
+      - id: 8
+        executionTime: 1
+      - id: 9
+        executionTime: 1
+      - id: 10
+        executionTime: 1
+      - id: 11
+        executionTime: 1
+      - id: 12
+        executionTime: 1
+    edges:
+      - from: 0
+        to: 4
+      - from: 0
+        to: 9
+      - from: 1
+        to: 3
+      - from: 2
+        to: 3
+      - from: 2
+        to: 7
+      - from: 3
+        to: 6
+      - from: 4
+        to: 9
+      - from: 4
+        to: 12
+      - from: 5
+        to: 6
+      - from: 5
+        to: 7
+      - from: 5
+        to: 10
+      - from: 5
+        to: 12
+      - from: 6
+        to: 8
+      - from: 9
+        to: 11
+  - deadline: 1
+    period: 1
+    vertices:
+      - id: 0
+        executionTime: 1
+      - id: 1
+        executionTime: 1
+      - id: 2
+        executionTime: 1
+      - id: 3
+        executionTime: 1
+      - id: 4
+        executionTime: 1
+      - id: 5
+        executionTime: 1
+      - id: 6
+        executionTime: 1
+      - id: 7
+        executionTime: 1
+      - id: 8
+        executionTime: 1
+      - id: 9
+        executionTime: 1
+    edges:
+      - from: 0
+        to: 2
+      - from: 0
+        to: 9
+      - from: 1
+        to: 2
+      - from: 1
+        to: 5
+      - from: 1
+        to: 9
+      - from: 2
+        to: 6
+      - from: 4
+        to: 5
+      - from: 5
+        to: 6
+      - from: 5
+        to: 7
+      - from: 5
+        to: 8
+      - from: 6
+        to: 7
+      - from: 6
+        to: 8
+  - deadline: 2
+    period: 2
+    vertices:
+      - id: 0
+        executionTime: 1
+      - id: 1
+        executionTime: 1
+      - id: 2
+        executionTime: 1
+      - id: 3
+        executionTime: 1
+      - id: 4
+        executionTime: 1
+      - id: 5
+        executionTime: 1
+    edges:
+      - from: 0
+        to: 3
+      - from: 1
+        to: 3
