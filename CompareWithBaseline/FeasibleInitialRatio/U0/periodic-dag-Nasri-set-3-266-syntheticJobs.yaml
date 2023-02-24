@@ -1,0 +1,159 @@
+tasks:
+  - deadline: 50
+    period: 50
+    vertices:
+      - id: 0
+        executionTime: 29
+      - id: 1
+        executionTime: 4
+      - id: 2
+        executionTime: 3
+      - id: 3
+        executionTime: 1
+      - id: 4
+        executionTime: 10
+    edges:
+      - from: 0
+        to: 4
+      - from: 3
+        to: 4
+  - deadline: 50
+    period: 50
+    vertices:
+      - id: 0
+        executionTime: 7
+      - id: 1
+        executionTime: 2
+      - id: 2
+        executionTime: 1
+      - id: 3
+        executionTime: 1
+      - id: 4
+        executionTime: 3
+      - id: 5
+        executionTime: 1
+      - id: 6
+        executionTime: 1
+      - id: 7
+        executionTime: 1
+      - id: 8
+        executionTime: 1
+      - id: 9
+        executionTime: 10
+    edges:
+      - from: 0
+        to: 4
+      - from: 0
+        to: 5
+      - from: 0
+        to: 6
+      - from: 1
+        to: 2
+      - from: 1
+        to: 3
+      - from: 1
+        to: 6
+      - from: 1
+        to: 8
+      - from: 3
+        to: 5
+      - from: 4
+        to: 5
+      - from: 5
+        to: 6
+  - deadline: 20
+    period: 20
+    vertices:
+      - id: 0
+        executionTime: 4
+      - id: 1
+        executionTime: 1
+      - id: 2
+        executionTime: 1
+      - id: 3
+        executionTime: 1
+      - id: 4
+        executionTime: 2
+      - id: 5
+        executionTime: 2
+      - id: 6
+        executionTime: 1
+      - id: 7
+        executionTime: 1
+      - id: 8
+        executionTime: 1
+      - id: 9
+        executionTime: 1
+      - id: 10
+        executionTime: 1
+      - id: 11
+        executionTime: 1
+      - id: 12
+        executionTime: 1
+      - id: 13
+        executionTime: 1
+      - id: 14
+        executionTime: 2
+      - id: 15
+        executionTime: 1
+      - id: 16
+        executionTime: 11
+    edges:
+      - from: 0
+        to: 1
+      - from: 0
+        to: 3
+      - from: 0
+        to: 15
+      - from: 1
+        to: 4
+      - from: 1
+        to: 8
+      - from: 1
+        to: 14
+      - from: 2
+        to: 12
+      - from: 2
+        to: 15
+      - from: 3
+        to: 4
+      - from: 3
+        to: 11
+      - from: 3
+        to: 16
+      - from: 4
+        to: 9
+      - from: 4
+        to: 13
+      - from: 4
+        to: 14
+      - from: 5
+        to: 8
+      - from: 5
+        to: 16
+      - from: 6
+        to: 9
+      - from: 6
+        to: 11
+      - from: 6
+        to: 15
+      - from: 7
+        to: 9
+      - from: 7
+        to: 11
+      - from: 7
+        to: 13
+      - from: 9
+        to: 10
+      - from: 9
+        to: 13
+      - from: 9
+        to: 16
+      - from: 10
+        to: 12
+      - from: 12
+        to: 16
+      - from: 13
+        to: 15
+      - from: 15
+        to: 16

@@ -1,18 +1,4 @@
 tasks:
-  - deadline: 50
-    period: 50
-    vertices:
-      - id: 0
-        executionTime: 17
-      - id: 1
-        executionTime: 15
-      - id: 2
-        executionTime: 16
-    edges:
-      - from: 0
-        to: 1
-      - from: 0
-        to: 2
   - deadline: 100
     period: 100
     vertices:
@@ -54,130 +40,128 @@ tasks:
         executionTime: 1
       - id: 18
         executionTime: 1
+      - id: 19
+        executionTime: 7
     edges:
       - from: 0
-        to: 3
-      - from: 1
-        to: 8
-      - from: 1
-        to: 15
-      - from: 2
-        to: 10
-      - from: 2
-        to: 11
-      - from: 2
-        to: 13
-      - from: 2
-        to: 17
-      - from: 3
-        to: 8
-      - from: 3
-        to: 11
-      - from: 3
-        to: 13
-      - from: 3
-        to: 15
-      - from: 4
         to: 7
+      - from: 0
+        to: 8
+      - from: 0
+        to: 9
+      - from: 0
+        to: 12
+      - from: 0
+        to: 17
+      - from: 1
+        to: 2
+      - from: 1
+        to: 4
+      - from: 1
+        to: 5
+      - from: 1
+        to: 10
+      - from: 1
+        to: 12
+      - from: 1
+        to: 17
+      - from: 2
+        to: 8
+      - from: 2
+        to: 10
+      - from: 2
+        to: 13
+      - from: 2
+        to: 14
+      - from: 3
+        to: 4
+      - from: 3
+        to: 5
+      - from: 3
+        to: 12
+      - from: 3
+        to: 14
+      - from: 3
+        to: 15
+      - from: 3
+        to: 17
       - from: 4
         to: 8
       - from: 4
-        to: 16
-      - from: 4
-        to: 17
-      - from: 5
         to: 9
       - from: 5
         to: 12
-      - from: 5
-        to: 18
       - from: 6
-        to: 9
-      - from: 6
-        to: 10
+        to: 7
       - from: 6
         to: 18
       - from: 7
-        to: 9
-      - from: 7
-        to: 12
-      - from: 7
-        to: 13
+        to: 8
       - from: 8
-        to: 13
-      - from: 8
-        to: 14
-      - from: 8
-        to: 15
-      - from: 9
-        to: 13
+        to: 18
       - from: 10
         to: 12
+      - from: 10
+        to: 19
       - from: 11
         to: 14
       - from: 11
         to: 16
-      - from: 11
-        to: 17
-      - from: 13
+      - from: 12
         to: 15
       - from: 13
-        to: 18
-      - from: 15
+        to: 16
+      - from: 14
+        to: 16
+      - from: 14
         to: 18
       - from: 16
+        to: 19
+      - from: 17
         to: 18
-  - deadline: 10
-    period: 10
+      - from: 17
+        to: 19
+  - deadline: 20
+    period: 20
     vertices:
       - id: 0
-        executionTime: 1
+        executionTime: 6
       - id: 1
-        executionTime: 1
+        executionTime: 5
       - id: 2
-        executionTime: 3
+        executionTime: 1
       - id: 3
         executionTime: 1
       - id: 4
-        executionTime: 3
-      - id: 5
-        executionTime: 1
-      - id: 6
-        executionTime: 5
-      - id: 7
-        executionTime: 1
-      - id: 8
-        executionTime: 1
-      - id: 9
-        executionTime: 8
+        executionTime: 2
     edges:
       - from: 0
-        to: 1
+        to: 2
       - from: 0
-        to: 5
-      - from: 0
-        to: 6
-      - from: 0
-        to: 8
+        to: 3
       - from: 1
-        to: 5
+        to: 2
       - from: 1
-        to: 9
+        to: 4
       - from: 2
-        to: 7
+        to: 3
       - from: 2
-        to: 8
-      - from: 4
-        to: 5
-      - from: 4
-        to: 7
-      - from: 4
-        to: 8
-      - from: 4
-        to: 9
-      - from: 5
-        to: 7
-      - from: 5
-        to: 8
-      - from: 7
-        to: 8
+        to: 4
+  - deadline: 100
+    period: 100
+    vertices:
+      - id: 0
+        executionTime: 43
+      - id: 1
+        executionTime: 33
+      - id: 2
+        executionTime: 13
+      - id: 3
+        executionTime: 15
+      - id: 4
+        executionTime: 152
+    edges:
+      - from: 1
+        to: 3
+      - from: 2
+        to: 4
