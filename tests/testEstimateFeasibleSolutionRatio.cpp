@@ -152,6 +152,6 @@ int main(int argc, char *argv[]) {
     std::string pathRes =
         "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/"
         "FeasibleInitialRatio/FeasibleRatio.txt";
-    AddEntry(pathRes,
-             float(infeasibleInitial) / (initialFeasible + infeasibleInitial));
+    AddEntry(pathRes, 1.0 - float(infeasibleInitial) /
+                                (initialFeasible + infeasibleInitial));
 }
