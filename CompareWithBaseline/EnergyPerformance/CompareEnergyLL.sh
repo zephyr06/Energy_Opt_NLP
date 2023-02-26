@@ -11,7 +11,7 @@ cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 cd $ROOT_PATH/CompareWithBaseline
 python clear_result_files.py  --folder $title
 
-python edit_yaml.py --entry "batchOptimizeFolder" --value $title
+# python edit_yaml.py --entry "batchOptimizeFolder" --value $title
 
 perform_optimization() {
 	# Optimize energy consumption

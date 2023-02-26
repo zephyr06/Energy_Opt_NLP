@@ -11,7 +11,7 @@ cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 # clear buffer file content
 cd $ROOT_PATH/CompareWithBaseline
 # python $ROOT_PATH/TaskData/ClearResFiles.py
-# python clear_result_files.py  --folder $title --Nmin 3 --Nmax 10
+# python clear_result_files.py  --folder $title --Nmin 3 --Nmax $MaxTaskNumber
 
 python edit_yaml.py --entry "batchOptimizeFolder" --value $title
 python edit_yaml.py --entry "core_m_dag" --value 4
