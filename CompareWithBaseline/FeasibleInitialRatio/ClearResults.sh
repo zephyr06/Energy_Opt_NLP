@@ -3,7 +3,7 @@
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 
 cd $ROOT_PATH/CompareWithBaseline/FeasibleInitialRatio
-for i in $(seq 1 1 1) 
+for i in $(seq 1 1 9) 
 do
 	cd U$i
 	rm *Res*
