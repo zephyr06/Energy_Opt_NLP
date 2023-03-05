@@ -237,7 +237,7 @@ class Energy_OptDAG {
         std::cout
             << "The number of outside loops in OptimizeTaskSetIterative is "
             << loopCount << std::endl;
-        std::cout << "Best optimal found: " << valueGlobalOpt << std::endl;
+        // std::cout << "Best optimal found: " << valueGlobalOpt << std::endl;
         std::cout << "After optimiazation found: " << postError << std::endl;
         if (valueGlobalOpt < postError) {
             UpdateTaskSetExecutionTime(tasks.tasks_, vectorGlobalOpt);

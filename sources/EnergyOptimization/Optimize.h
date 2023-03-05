@@ -427,10 +427,11 @@ class Energy_Opt {
         }
 
         VectorDynamic optComp = result.at<VectorDynamic>(key);
-        if (debugMode == 1) {
-            std::cout << "After optimization, the computation time vector is "
-                      << optComp << std::endl;
-        }
+        // if (debugMode == 1) {
+        //     std::cout << "After optimization, the computation time vector is
+        //     "
+        //               << optComp << std::endl;
+        // }
 
         EndTimer(__func__);
         return optComp;
@@ -539,12 +540,12 @@ class Energy_Opt {
         if (r2.CheckSchedulability()) {
             if (debugMode == 1) {
                 std::cout << "The task set is schedulable after optimization\n";
-                std::cout << std::endl;
-                std::cout << "The original task set is: " << std::endl;
-                for (int i = 0; i < N; i++) {
-                    std::cout << i << " ";
-                    taskSetType.tasks_[i].print();
-                }
+                // std::cout << std::endl;
+                // std::cout << "The original task set is: " << std::endl;
+                // for (int i = 0; i < N; i++) {
+                //     std::cout << i << " ";
+                //     taskSetType.tasks_[i].print();
+                // }
             }
             TaskSet tasksInit = taskSetType.tasks_;
             UpdateTaskSetExecutionTime(tasksInit, initialExecutionTime);
@@ -581,10 +582,11 @@ class Energy_Opt {
                                     0.03 &&
                                 eliminateTolIte / taskLast.executionTime >
                                     0.015) {
-                                CoutWarning(
-                                    "Elimination failed in final verfication, \
-                            eliminateTolIte used before is " +
-                                    std::to_string(eliminateTolIte));
+                                //     CoutWarning(
+                                //         "Elimination failed in final
+                                //         verfication, \
+                            // eliminateTolIte used before is " +
+                                //         std::to_string(eliminateTolIte));
                             }
                         }
                     }
