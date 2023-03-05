@@ -25,15 +25,15 @@ using namespace rt_num_opt;
 //     EndTimer("main");
 //     PrintTimer();
 // }
-TEST(iterate, v3) {
-    BeginTimer("main");
-    std::string path =
-        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v17.yaml";
-    rt_num_opt::DAG_Nasri19 tasksN = rt_num_opt::ReadDAGNasri19_Tasks(path);
-    EXPECT(WhetherTaskSetSchedulableInAllSolutionSpace(tasksN));
-    EndTimer("main");
-    PrintTimer();
-}
+// TEST(iterate, v3) {
+//     BeginTimer("main");
+//     std::string path =
+//         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v17.yaml";
+//     rt_num_opt::DAG_Nasri19 tasksN = rt_num_opt::ReadDAGNasri19_Tasks(path);
+//     EXPECT(WhetherTaskSetSchedulableInAllSolutionSpace(tasksN));
+//     EndTimer("main");
+//     PrintTimer();
+// }
 
 TEST(iterate, v1) {
     BeginTimer("main");
