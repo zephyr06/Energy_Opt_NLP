@@ -13,10 +13,6 @@ class EnergyFactor : public gtsam::NoiseModelFactor1<VectorDynamic> {
     int taskIndex;
     Task task_;
 
-    /**
-     * @brief Construct a new Inequality Factor 1 D object,
-     *  mainly used in derived class because f is not defined
-     */
     EnergyFactor(gtsam::Key key, Task task, int index,
                  gtsam::SharedNoiseModel model)
         : gtsam::NoiseModelFactor1<VectorDynamic>(model, key),
