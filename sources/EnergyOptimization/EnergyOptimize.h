@@ -18,7 +18,6 @@
 #include "gtsam/nonlinear/LevenbergMarquardtOptimizer.h"
 #include "sources/ControlOptimization/ReadControlCases.h"
 #include "sources/EnergyOptimization/EnergyFactor.h"
-#include "sources/EnergyOptimization/LockFactor.h"
 #include "sources/EnergyOptimization/RTARelatedFactor.h"
 #include "sources/MatrixConvenient.h"
 #include "sources/Utils/FactorGraphUtils.h"
