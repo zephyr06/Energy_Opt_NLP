@@ -245,14 +245,7 @@ namespace rt_num_opt
 
         std::cout << Color::blue << std::endl;
         std::cout << "Average relative performance gap (NO: MUA) is " << RelativeGap(objVecAll[0], objVecAll[2]) << std::endl;
-        // try
-        // {
-        //     std::cout << "Average relative performance gap (NO: MIGP) is " << RelativeGap(objVecAll[0], objVecAll[1]) << std::endl;
-        // }
-        // catch (...)
-        // {
-        //     std::cout << "No MILP information found" << std::endl;
-        // }
+    
         std::cout << "Speed ratio (NO: MUA) is " << SpeedRatio(runTimeAll[0], runTimeAll[2]) << std::endl;
         std::cout << "Average time consumed is " << Average(runTimeAll[0]) << std::endl;
         std::cout << Color::def << std::endl;
