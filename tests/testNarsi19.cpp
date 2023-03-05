@@ -50,7 +50,8 @@ TEST(io, v3) {
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
     auto dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
-    rt_num_opt::WriteDAG_NasriToYaml(dags, "testOutput1.yaml");
+    rt_num_opt::WriteDAG_NasriToYaml(
+        dags, "/home/zephyr/Programming/Energy_Opt_NLP/build/testOutput1.yaml");
 }
 
 TEST(io, no_edge) {
@@ -59,7 +60,8 @@ TEST(io, no_edge) {
     auto dag = rt_num_opt::ReadDAG_Task(path);
     std::vector<rt_num_opt::DAG_Model> dags;
     dags.push_back(dag);
-    std::string outputPath = "testOutput2.yaml";
+    std::string outputPath =
+        "/home/zephyr/Programming/Energy_Opt_NLP/build/testOutput2.yaml";
     rt_num_opt::WriteDAG_NasriToYaml(dags, outputPath);
     auto dagsRead = rt_num_opt::ReadDAG_NasriFromYaml(outputPath);
     EXPECT_LONGS_EQUAL(200, dagsRead[0].tasks_[0].period);

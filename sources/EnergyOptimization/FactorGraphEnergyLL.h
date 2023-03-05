@@ -24,34 +24,6 @@
 #include "sources/Utils/utils.h"
 namespace rt_num_opt {
 struct FactorGraphEnergyLL {
-    // not actually used in this project
-    static MultiKeyFactor GenerateEliminationLLFactor(TaskSet tasks, int index,
-                                                      double rtaAtIndex) {
-        std::vector<gtsam::Symbol> keys;
-        for (int i = 0; i <= index; i++) {
-            keys.push_back(GenerateKey(i, "executionTime"));
-        }
-        LambdaMultiKey f = [tasks, index, rtaAtIndex](const gtsam::Values &x) {
-            VectorDynamic error = GenerateVectorDynamic(1);
-            TaskSet tasksCurr = tasks;
-            VectorDynamic executionTimeVecCurr =
-                EnergyOptUtils::ExtractResults(x, tasks).block(0, 0, index + 1,
-                                                               1);
-
-            MatrixDynamic coeff = executionTimeVecCurr.transpose();
-
-            for (int i = 0; i < index; i++) {
-                coeff(i) = ceil(rtaAtIndex / tasks[i].period);
-            }
-            coeff(index) = 1;
-            error(0) = rtaAtIndex - (coeff * executionTimeVecCurr)(0, 0);
-            // std::cout << "Real error: " << RealObj(tasks) << std::endl;
-            return error;
-        };
-        auto model = gtsam::noiseModel::Constrained::All(1);
-        return MultiKeyFactor(keys, f, gtsam::noiseModel::Constrained::All(1));
-    }
-
     static double FindEliminatedVariables(TaskSet &tasks,
                                           std::vector<bool> &maskForElimination,
                                           bool &whether_new_eliminate,
