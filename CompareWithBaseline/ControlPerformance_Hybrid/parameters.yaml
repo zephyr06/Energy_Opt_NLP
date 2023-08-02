@@ -1,0 +1,95 @@
+%YAML:1.0
+
+# optimization seettings
+runMode: normal
+testDataSetName: test_n3_v5
+
+
+debugMode: 0
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
+elimIte: 0
+EnergyMode: 1
+batchOptimizeFolder: ControlPerformance
+core_m_dag: 4
+enableMaxComputationTimeRestrict: 1
+MaxComputationTimeRestrict: 2
+eliminateTol: 1e0
+eliminateStep: 1.5
+adjustEliminateMaxIte: 100 # does not control whether enabling elimination
+roundTypeInClamp: "rough"
+clampTypeMiddle: "rough"
+exactJacobian: 1
+#*************************************************************
+
+# optimizer settings
+optimizerType: 2
+deltaInitialDogleg: 1e13
+initialLambda: 1e3
+lowerLambda: 1e-10
+upperLambda: 1e50
+verbosityLM: "SILENT" # SUMMARY  TRYDELTA SILENT
+relativeErrorTolerance: 1e-5
+setDiagonalDamping: 1
+whether_ls: 0
+jacobianScale: 1
+whether_IPM: 0
+#*************************************************************
+
+
+# in generating task set
+parallelFactor: 0.2
+PeriodSetAM: [1, 2, 5, 10, 20, 50,100]
+timeScaleFactor: 1e4
+maxNode_GenerateTaskSet: 20
+#*************************************************************
+
+# used in control
+relativeErrorToleranceInit: 1e-6
+relativeErrorToleranceMin: 1e-10
+relErrorTolIPM: 1e-5
+controlPath: "N5/Case0"
+MaxLoopControl: 1e4
+weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
+weightSchedulabilityMax: 1e12
+weightSchedulabilityStep: 1.5
+weightSchedulabilityMin: 1e12
+disturb_init: 1e0
+disturb_step: 1.5
+disturb_max: 1e3
+relativeErrorToleranceOuterLoop: 1e-7
+weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
+#*************************************************************
+
+
+# used in SA
+randomInitialize: 0
+coolingRateSA: 0.99
+temperatureSA: 100000
+SA_iteration: 10000000
+#*************************************************************
+
+# in FindUnsustainable
+granularity_FindUnsustainable: 0.01
+taskSetSize_FindUnsustainable: 3
+#*************************************************************
+
+# no need to adjust
+punishmentFrequency: 10
+maxIterationsOptimizer: 1e3
+gradientModify: 0
+utilTol: 1e-3
+linearOptimizerType: "MULTIFRONTAL_CHOLESKY"
+weightEnergy: 1e9
+LLCompareWithGeneralizedElimination: 0
+enableReorder: 0
+deltaOptimizer: 1e-5
+readTaskMode: RM
+baselineLLCompare: 1
+printRTA: 0
+printFailureFile: 1
+# This is actually a relative parameter compared with weightEnergy
+punishmentInBarrier: 1e8
+noiseModelSigma: 1e0
+#*************************************************************
+
+
