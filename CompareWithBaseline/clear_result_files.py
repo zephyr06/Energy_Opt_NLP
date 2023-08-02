@@ -12,9 +12,9 @@ def clear_dir_result(directory, Nmin, Nmax):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--folder', type=str, default="Optimizer",
+parser.add_argument('--folder', type=str, default="ControlPerformance_Hybrid",
                     help='folder that stores results')
-parser.add_argument('--Nmin', type=int, default="11",
+parser.add_argument('--Nmin', type=int, default="5",
                     help='folder that stores results to clear')
 parser.add_argument('--Nmax', type=int, default="10000",
                     help='folder that stores results to clear')
