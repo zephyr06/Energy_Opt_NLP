@@ -1,7 +1,6 @@
 # Numerical Optimization for Real-time Systems
-This repo provides implementation for paper 'A General and Scalable Method for Optimizing
+This repo provides implementation for RTAS23 paper 'A General and Scalable Method for Optimizing
 Real-time Systems with Continuous Variables'.
-Warning!!: the source code in this repo still needs some serious cleaning work, it is suggested to check it out later.
 
 # Dependencies
 - [CMake](https://cmake.org/download/)
