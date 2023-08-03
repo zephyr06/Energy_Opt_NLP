@@ -24,9 +24,11 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
     }
 
     double RTA_Common_Warm(double beginTime, int index) override {
-        CoutError(
-            "This function should not be used: RTA_Common_Warm, RTA_Nasri19!");
-        return -1;
+        // CoutError(
+        //     "This function should not be used: RTA_Common_Warm,
+        //     RTA_Nasri19!");
+        // return -1;
+        return ResponseTimeOfTaskSet()(index, 0);
     }
 
     VectorDynamic ResponseTimeOfTaskSet(const VectorDynamic &warmStart) {
@@ -89,6 +91,7 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
         EndTimer(__func__);
         return rta;
     }
+
     bool CheckSchedulability(VectorDynamic warmStart, bool whetherPrint = false,
                              double tol = 0) {
         return CheckSchedulability();
