@@ -26,7 +26,8 @@ class ExVariablesControl : public ifopt::VariableSet {
         // the initial values where the NLP starts iterating from
         tasks_ = tasks;
         upperBound_ = GetParameterVD<double>(tasks_, "period");
-        if (debugMode == 1) std::cout << "UB: " << upperBound_ << std::endl;
+        if (debugMode == 1)
+            std::cout << "UB: " << upperBound_ << std::endl;
         var_ = upperBound_;
     }
 
@@ -48,7 +49,7 @@ class ExVariablesControl : public ifopt::VariableSet {
 double ControlObj(TaskSet &tasks, VectorDynamic &coeff,
                   VectorDynamic periodVector) {
     UpdateTaskSetPeriod(tasks, periodVector);
-    return FactorGraphInManifold::RealObj(tasks, coeff);
+    return FactorGraphInManifold<RTA_LL>::RealObj(tasks, coeff);
 }
 
 class ExCostControl : public ifopt::CostTerm {
@@ -111,7 +112,8 @@ class ExConstraintControl : public ifopt::ConstraintSet {
             if (r.CheckSchedulability()) {
                 return GenerateVectorDynamic1D(0);
             } else {
-                if (debugMode == 1) std::cout << "Infeasible!" << std::endl;
+                if (debugMode == 1)
+                    std::cout << "Infeasible!" << std::endl;
                 return GenerateVectorDynamic1D(1);
             }
         };

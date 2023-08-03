@@ -6,7 +6,8 @@ using namespace std;
 TEST(case1, v1) {
     BeginTimer("main");
     noiseModelSigma = 1;
-    if (optimizerType >= 5) optimizerType = 2;
+    if (optimizerType >= 5)
+        optimizerType = 2;
     std::string path1 =
         "/home/zephyr/Programming/others/YechengRepo/Experiment/"
         "ControlPerformance/TestCases/NSweep/" +
@@ -20,9 +21,9 @@ TEST(case1, v1) {
     // 815, 815, 815, 815, 815, 204, 815, 815; periodInitial1 << 68, 300, 300,
     // 300, 300; UpdateTaskSetPeriod(tasks, periodInitial1); Reorder(tasks,
     // coeff, "RM"); maskForElimination[1] = 1; auto sth =
-    // OptimizeTaskSetIterativeWeight<FactorGraphInManifold>(tasks, coeff,
-    // maskForElimination);
-    auto sth2 = OptimizeTaskSetIterative<FactorGraphInManifold>(
+    // OptimizeTaskSetIterativeWeight<FactorGraphInManifold<RTA_LL>>(tasks,
+    // coeff, maskForElimination);
+    auto sth2 = OptimizeTaskSetIterative<FactorGraphInManifold<RTA_LL>, RTA_LL>(
         tasks, coeff, maskForElimination);
 
     // FindEliminatedVariables(tasks, maskForElimination);
@@ -30,7 +31,7 @@ TEST(case1, v1) {
     // maskForElimination);
     UpdateTaskSetPeriod(tasks, sth2.first);
     cout << "Actual objective function is "
-         << FactorGraphInManifold::RealObj(tasks, coeff) << endl;
+         << FactorGraphInManifold<RTA_LL>::RealObj(tasks, coeff) << endl;
     EndTimer("main");
     PrintTimer();
     std::cout << count1 << ", " << count2 << std::endl;

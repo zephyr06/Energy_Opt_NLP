@@ -59,7 +59,8 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         result = optimizer.optimize();
     } else if (optimizerType == 3) {
         gtsam::GaussNewtonParams params;
-        if (debugMode == 1) params.setVerbosity("DELTA");
+        if (debugMode == 1)
+            params.setVerbosity("DELTA");
         params.setRelativeErrorTol(relativeErrorTolerance);
         params.setLinearSolverType(linearOptimizerType);
         gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
@@ -73,7 +74,8 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         gtsam::NonlinearOptimizerParams params;
         params.setRelativeErrorTol(relativeErrorTolerance);
         params.setLinearSolverType(linearOptimizerType);
-        if (debugMode == 1) params.setVerbosity("DELTA");
+        if (debugMode == 1)
+            params.setVerbosity("DELTA");
         params.setMaxIterations(maxIterationsOptimizer);
         gtsam::NonlinearConjugateGradientOptimizer optimizer(
             graph, initialEstimateFG, params);
@@ -232,7 +234,7 @@ bool ContainFalse(std::vector<bool> &eliminationRecord) {
     return false;
 }
 
-template <typename FactorGraphType>
+template <typename FactorGraphType, class Schedul_Analysis>
 static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     TaskSet &tasks, VectorDynamic &coeff,
     std::vector<bool> &maskForElimination) {
@@ -252,7 +254,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             coeff = coeffTry;
         }
     }
-    double disturbIte = eliminateTol;
+    // double disturbIte = eliminateTol;
     while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) &&
            ContainFalse(maskForElimination) && loopCount < MaxLoopControl) {
         // store prev result

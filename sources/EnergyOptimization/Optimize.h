@@ -51,9 +51,11 @@ struct OptimizeResult {
 };
 
 bool CheckExecutionTimeBound(VectorDynamic &exec, TaskSet &tasksOrg) {
-    if (not enableMaxComputationTimeRestrict) return true;
+    if (not enableMaxComputationTimeRestrict)
+        return true;
     for (uint i = 0; i < tasksOrg.size(); i++) {
-        if (exec(i, 0) > tasksOrg[i].executionTime * 2) return false;
+        if (exec(i, 0) > tasksOrg[i].executionTime * 2)
+            return false;
     }
     return true;
 }
@@ -218,7 +220,8 @@ class Energy_Opt {
                                      int lastTaskDoNotNeedOptimize,
                                      VectorDynamic &responseTimeInitial,
                                      std::string roundType) {
-        if (roundType == "none") return;
+        if (roundType == "none")
+            return;
         TaskSet &tasks = tasksSetType.tasks_;
         for (uint i = 0; i < tasks.size(); i++)
             tasks[i].executionTime = int(tasks[i].executionTime);
@@ -410,7 +413,8 @@ class Energy_Opt {
             result = optimizer.optimize();
         } else if (optimizerType == 3) {
             gtsam::GaussNewtonParams params;
-            if (debugMode == 1) params.setVerbosity("DELTA");
+            if (debugMode == 1)
+                params.setVerbosity("DELTA");
             params.setRelativeErrorTol(relativeErrorTolerance);
             params.setLinearSolverType(linearOptimizerType);
             gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG,
@@ -420,7 +424,8 @@ class Energy_Opt {
             gtsam::NonlinearOptimizerParams params;
             params.setRelativeErrorTol(relativeErrorTolerance);
             params.setLinearSolverType(linearOptimizerType);
-            if (debugMode == 1) params.setVerbosity("DELTA");
+            if (debugMode == 1)
+                params.setVerbosity("DELTA");
             gtsam::NonlinearConjugateGradientOptimizer optimizer(
                 graph, initialEstimateFG, params);
             result = optimizer.optimize();
@@ -448,7 +453,8 @@ class Energy_Opt {
         // this function also checks schedulability
         Schedul_Analysis r(taskSetType);
         VectorDynamic responseTimeInitial = r.ResponseTimeOfTaskSet();
-        if (!r.CheckSchedulabilityDirect(responseTimeInitial)) return -2;
+        if (!r.CheckSchedulabilityDirect(responseTimeInitial))
+            return -2;
 
         VectorDynamic initialExecutionTime =
             GetParameterVD<int>(taskSetType, "executionTimeOrg");
@@ -584,8 +590,8 @@ class Energy_Opt {
                                     0.015) {
                                 //     CoutWarning(
                                 //         "Elimination failed in final
-                                //         verfication, \
-                            // eliminateTolIte used before is " +
+                                //         verfication, eliminateTolIte used
+                                //         before is " +
                                 //         std::to_string(eliminateTolIte));
                             }
                         }
@@ -617,7 +623,8 @@ class Energy_Opt {
         double res = OptimizeTaskSetOneIte(taskSetType);
         std::cout << "After optimization: " << res << std::endl;
         // Some variables become 0, which actually means a failure
-        if (isinf(res)) res = 10;
+        if (isinf(res))
+            res = 10;
         eliminateTol = eliminateTolRef;
         return res;
     }

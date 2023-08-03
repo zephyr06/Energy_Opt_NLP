@@ -1,5 +1,5 @@
-#include "sources/ControlOptimization/ControlOptimize.h"
 #include "sources/BatchControlOptimize.h"
+#include "sources/ControlOptimization/ControlOptimize.h"
 #include "sources/Utils/Parameters.h"
 using namespace std;
 using namespace std::chrono;
@@ -11,28 +11,28 @@ using namespace std;
 
 using namespace gtsam;
 
-TEST(error, v1)
-{
+TEST(error, v1) {
     whether_ls = 0;
     exactJacobian = 0;
     noiseModelSigma = 1;
     if (optimizerType >= 5)
         optimizerType = 2;
-    std::string path1 = "/home/zephyr/Programming/others/YechengRepo/Experiment/ControlPerformance/TestCases/NSweep/N5/Case0.txt";
+    std::string path1 =
+        "/home/zephyr/Programming/others/YechengRepo/Experiment/"
+        "ControlPerformance/TestCases/NSweep/N5/Case0.txt";
     TaskSet tasks;
     VectorDynamic coeff;
     std::tie(tasks, coeff) = ReadControlCase(path1);
     std::vector<bool> maskForElimination(tasks.size(), false);
     maskForElimination[0] = 1;
     VectorDynamic initial = GenerateVectorDynamic(5);
-    initial << 130.00,
-        321,
-        400,
-        131,
-        308;
+    initial << 130.00, 321, 400, 131, 308;
     UpdateTaskSetPeriod(tasks, initial);
-    gtsam::NonlinearFactorGraph graph = FactorGraphInManifold::BuildControlGraph(maskForElimination, tasks, coeff);
-    auto initialEstimateFG = FactorGraphInManifold::GenerateInitialFG(tasks, maskForElimination);
+    gtsam::NonlinearFactorGraph graph =
+        FactorGraphInManifold<RTA_LL>::BuildControlGraph(maskForElimination,
+                                                         tasks, coeff);
+    auto initialEstimateFG = FactorGraphInManifold<RTA_LL>::GenerateInitialFG(
+        tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
     MatrixDynamic jacobianCurr = sth.first;
     std::cout << "Current Jacobian matrix:" << endl;
@@ -46,8 +46,7 @@ TEST(error, v1)
     jacobianExpect(6, 3) = 0.38635;
     gtsam::assert_equal(jacobianExpect, jacobianCurr, 1e-3);
 }
-int main()
-{
+int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);
 }

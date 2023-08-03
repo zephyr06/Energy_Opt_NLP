@@ -17,6 +17,7 @@
 #include "sources/Utils/Parameters.h"
 namespace rt_num_opt {
 
+template <class Schedul_Analysis>
 struct FactorGraphInManifold {
     static VectorDynamic ExtractResults(const gtsam::Values &result,
                                         TaskSet tasks) {
@@ -75,8 +76,9 @@ struct FactorGraphInManifold {
                 VectorDynamic error = GenerateVectorDynamic(2);
                 TaskSet tasksCurr = tasks;
                 UpdateTaskSetPeriod(
-                    tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks));
-                RTA_LL r(tasksCurr);
+                    tasksCurr,
+                    ExtractResults(x, tasks));  // FactorGraphInManifold::
+                Schedul_Analysis r(tasksCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 if (!x.exists(GenerateKey(index, "period"))) {
                     error(0) = rta * coeff[2 * index + 1];
@@ -196,8 +198,9 @@ struct FactorGraphInManifold {
                 VectorDynamic error = GenerateVectorDynamic(2);
                 TaskSet tasksCurr = tasks;
                 UpdateTaskSetPeriod(
-                    tasksCurr, FactorGraphInManifold::ExtractResults(x, tasks));
-                RTA_LL r(tasksCurr);
+                    tasksCurr,
+                    ExtractResults(x, tasks));  //  FactorGraphInManifold::
+                Schedul_Analysis r(tasksCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = rta * coeff[2 * index + 1];
                 if (!whether_ls) {
@@ -268,7 +271,8 @@ struct FactorGraphInManifold {
     static bool HasDependency(int index,
                               std::vector<bool> &maskForElimination) {
         for (int i = 0; i <= index; i++) {
-            if (!maskForElimination[i]) return true;
+            if (!maskForElimination[i])
+                return true;
         }
         return false;
     }
@@ -320,24 +324,26 @@ struct FactorGraphInManifold {
                                         std::vector<bool> &maskForElimination,
                                         double disturb = disturb_init) {
         BeginTimer(__func__);
-        RTA_LL r(tasks);
+        Schedul_Analysis r(tasks);
         VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
         bool whether_new_eliminate = false;
         while (!whether_new_eliminate && disturb <= disturb_max) {
             for (uint i = 0; i < tasks.size(); i++) {
                 tasks[i].period -= disturb;
-                RTA_LL r1(tasks);
+                Schedul_Analysis r1(tasks);
                 VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);
                 if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb ||
                     !r1.CheckSchedulabilityDirect(rtaCurr))
 
                 {
-                    if (!maskForElimination[i]) whether_new_eliminate = true;
+                    if (!maskForElimination[i])
+                        whether_new_eliminate = true;
                     maskForElimination[i] = true;
                 }
                 tasks[i].period += disturb;
             }
-            if (!whether_new_eliminate) disturb *= disturb_step;
+            if (!whether_new_eliminate)
+                disturb *= disturb_step;
             if (debugMode == 1) {
                 std::lock_guard<std::mutex> lock(mtx);
                 for (auto a : maskForElimination) std::cout << a << ", ";
@@ -351,7 +357,7 @@ struct FactorGraphInManifold {
     static double RealObj(const TaskSet &tasks, const VectorDynamic &coeff) {
         BeginTimer(__func__);
         double res = 0;
-        RTA_LL r(tasks);
+        Schedul_Analysis r(tasks);
         VectorDynamic rta = r.ResponseTimeOfTaskSet();
         for (uint i = 0; i < tasks.size(); i++) {
             res += coeff.coeffRef(i * 2, 0) * tasks[i].period;
