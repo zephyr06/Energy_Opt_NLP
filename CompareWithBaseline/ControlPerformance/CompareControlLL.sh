@@ -57,4 +57,5 @@ cd $ROOT_PATH/CompareWithBaseline/$title
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio"
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "RTA"
-python $ROOT_PATH/CompareWithBaseline/$title/draw_box_plot.py
+cd $ROOT_PATH/CompareWithBaseline
+python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --exp_folder $title

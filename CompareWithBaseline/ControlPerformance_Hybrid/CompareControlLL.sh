@@ -1,10 +1,9 @@
 #!/usr/bin/bash
 
 # ************** Adjust settings there **************
-title="ControlPerformance_Hybrid"
-title_reuse="ControlPerformance"
-MaxTaskNumber=20
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
+title="ControlPerformance_Hybrid"
+MaxTaskNumber=5
 # ***************************************************
 
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
@@ -43,5 +42,5 @@ done
 
 
 # visualize the result
-cd $ROOT_PATH/CompareWithBaseline/$title
-python $ROOT_PATH/CompareWithBaseline/$title/draw_box_plot.py --maxTaskNumber $MaxTaskNumber
+cd $ROOT_PATH/CompareWithBaseline
+python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --exp_folder $title
