@@ -3,7 +3,7 @@
 # ************** Adjust settings there **************
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 title="ControlPerformance_Hybrid"
-MaxTaskNumber=5
+MaxTaskNumber=10
 # ***************************************************
 
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
@@ -28,12 +28,16 @@ do
 	# python $ROOT_PATH/CompareWithBaseline/ConvertYechengDataset.py --convertionNumber $jobNumber
 	echo "$title iteration is: $jobNumber"
 	
-	# LM, eliminated
+	# LM, with reorder
     	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "MaxLoopControl" --value 1000
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
+	perform_optimization $jobNumber
+
+	# LM, without reorder
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 0
 	perform_optimization $jobNumber
 	
 	
