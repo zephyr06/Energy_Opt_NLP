@@ -11,6 +11,7 @@
 #include "sources/ControlOptimization/RTAFactor.h"
 #include "sources/ControlOptimization/ReadControlCases.h"
 #include "sources/EnergyOptimization/Optimize.h"
+#include "sources/RTA/RTA_Nasri19.h"
 #include "sources/Utils/FactorGraphUtils.h"
 #include "sources/Utils/InequalifyFactor.h"
 #include "sources/Utils/MultiKeyFactor.h"
