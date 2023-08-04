@@ -27,9 +27,13 @@ def Read_txt_file_1d_box(path, func, data_readin_size=1000):
 
 def ChangeDataBaseline(data_1d, func):
     """the input is 2000*1=[a;b], the output is 1000*1=[a/b], for the visualization for ControlPerformance_Hybrid"""
+    data_res=data_1d[:1000].copy()
     for i in range(1000):
-        data_1d[i]=func(data_1d[i]/data_1d[i+1000])
-    return data_1d[:1000]
+        data_res[i]=func(data_1d[i]/data_1d[i+1000])
+        if(data_res[i]>0.1):
+            print(i, data_1d[i],data_1d[i+1000],data_1d[i]/data_1d[i+1000])
+            aa=1
+    return data_res
 
 def read_data_2d_box(minTaskNumber, maxTaskNumber, exp_folder, data_source):
     data_2d = {}
@@ -47,7 +51,7 @@ def read_data_2d_box(minTaskNumber, maxTaskNumber, exp_folder, data_source):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=10,
+parser.add_argument('--maxTaskNumber', type=int, default=5,
                     help='Nmax')
 parser.add_argument('--data_source', type=str, default="EnergySaveRatio",
                     help='data source folder')
