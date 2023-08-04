@@ -123,6 +123,7 @@ double timeScaleFactor = (double)ConfigParameters["timeScaleFactor"];
 double SkipRateFindElimination =
     (double)ConfigParameters["SkipRateFindElimination"];
 double jacobianScale = (double)ConfigParameters["jacobianScale"];
+double control_sort_obj_coeff_weight = (double)ConfigParameters["control_sort_obj_coeff_weight"];
 
 int whether_ls = (int)ConfigParameters["whether_ls"];
 

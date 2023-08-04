@@ -9,7 +9,7 @@ debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 0
 EnergyMode: 1
-batchOptimizeFolder: ControlPerformance
+batchOptimizeFolder: ControlPerformance_Hybrid
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
@@ -44,6 +44,7 @@ maxNode_GenerateTaskSet: 20
 #*************************************************************
 
 # used in control
+control_sort_obj_coeff_weight: -0.01
 relativeErrorToleranceInit: 1e-6
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
@@ -81,7 +82,7 @@ utilTol: 1e-3
 linearOptimizerType: "MULTIFRONTAL_CHOLESKY"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
-enableReorder: 1
+enableReorder: 0
 deltaOptimizer: 1e-5
 readTaskMode: RM
 baselineLLCompare: 1
