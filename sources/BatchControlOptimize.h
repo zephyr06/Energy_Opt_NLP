@@ -192,6 +192,8 @@ void BatchOptimize(int Nn = 5) {
                 double timeTaken = double(duration.count()) / 1e6;
                 runTimeAll[0].push_back(timeTaken);
                 objVecAll[0].push_back(res.second);
+                if (objVecAll[0].size() == 633)
+                    int a = 1;
 
                 // check schedulability
                 UpdateTaskSetPeriod(tasks, res.first);
