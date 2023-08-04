@@ -3,7 +3,7 @@
 # ************** Adjust settings there **************
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 title="ControlPerformance_Hybrid"
-MaxTaskNumber=10
+MaxTaskNumber=5
 # ***************************************************
 
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
@@ -28,23 +28,46 @@ do
 	# python $ROOT_PATH/CompareWithBaseline/ConvertYechengDataset.py --convertionNumber $jobNumber
 	echo "$title iteration is: $jobNumber"
 	
-	# LM, with reorder
-    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
+	# LM, without reorder
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "MaxLoopControl" --value 1000
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
+
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 0
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_exec_weight" --value 0
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_obj_coeff_weight" --value 0
+	perform_optimization $jobNumber
+	
+	# reorder with RM
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_exec_weight" --value 0
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_obj_coeff_weight" --value 0
 	perform_optimization $jobNumber
 
-	# LM, without reorder
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 0
-	perform_optimization $jobNumber
-	
-	
+	# # reorder with RM+exec
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_exec_weight" --value 1
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_obj_coeff_weight" --value 0
+	# perform_optimization $jobNumber
+
+	# reorder with sorting
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_exec_weight" --value 1
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_obj_coeff_weight" --value -0.01
+	perform_optimization $jobNumber	
 done
 
 
 
 # visualize the result
 cd $ROOT_PATH/CompareWithBaseline
-python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --exp_folder $title
+
+# show the comparison between NORTH and NORTH_RM
+python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --exp_folder $title --main_data_index 1
+
+# show the comparison between NORTH and NORTH_Sort
+python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --exp_folder $title --main_data_index 2
+
+cd $ROOT_PATH/CompareWithBaseline/$title
+python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
