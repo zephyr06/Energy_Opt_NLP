@@ -71,7 +71,7 @@ struct TaskAugment {
         : task_(task), coeff_T(coeffT), coeff_R(coeffR) {}
 
     double sort_metric() const {
-        return task_.period + task_.executionTime +
+        return task_.period + control_sort_exec_weight * task_.executionTime +
                control_sort_obj_coeff_weight * (coeff_T + coeff_R);
     }
 
