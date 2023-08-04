@@ -73,7 +73,7 @@ if __name__ == "__main__":
     ax = sns.lineplot(x=x, y=y, linestyle="dashed", color='darkgray')
 
     ax.set(xlabel="Task Number", ylabel="Relative Gap (%)")
-    plt.savefig(exp_folder + "/Compare_control_box" + ".pdf", format='pdf')
+    plt.savefig(exp_folder + "/Compare_control_box_" + exp_folder+".pdf", format='pdf')
     # plt.savefig("Compare_control_box" +  "Zhao20" + ".png", format='png')
     plt.show(block=False)
     plt.pause(3)
