@@ -61,13 +61,12 @@ done
 
 
 # visualize the result
-cd $ROOT_PATH/CompareWithBaseline
+cd $ROOT_PATH/CompareWithBaseline/$title
 
 # show the comparison between NORTH and NORTH_RM
-python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --exp_folder $title --main_data_index 1
+python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --main_data_index 1
 
 # show the comparison between NORTH and NORTH_Sort
-python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --exp_folder $title --main_data_index 2
+python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --main_data_index 2
 
-cd $ROOT_PATH/CompareWithBaseline/$title
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
