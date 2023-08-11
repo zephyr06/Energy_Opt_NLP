@@ -219,7 +219,8 @@ double Utilization(const TaskSet &tasks) {
 
 // Recursive function to return gcd of a and b
 long long gcd(long long int a, long long int b) {
-    if (b == 0) return a;
+    if (b == 0)
+        return a;
     return gcd(b, a % b);
 }
 
@@ -240,7 +241,8 @@ long long int HyperPeriod(const TaskSet &tasks) {
             if (hyper < 0 || hyper > LLONG_MAX) {
                 // cout << Color::red <<  << Color::def << std::endl;
                 // throw;
-                if (debugMode == 1) CoutWarning("The hyper-period over flows!");
+                if (debugMode == 1)
+                    CoutWarning("The hyper-period over flows!");
                 return LLONG_MAX / 2;
             }
         }
@@ -278,11 +280,13 @@ void ReadFrequencyModeRatio(std::string path) {
         while (getline(file, line)) {
             if (line.substr(0, 17) == "Frequency_Ratio: ") {
                 frequencyRatio = std::stod(line.substr(17));
-                if (frequencyRatio == 0) frequencyRatio = 0.5;
+                if (frequencyRatio == 0)
+                    frequencyRatio = 0.5;
                 return;
             }
         }
-        if (frequencyRatio == 0) frequencyRatio = 0.5;
+        if (frequencyRatio == 0)
+            frequencyRatio = 0.5;
     } else {
         CoutError(
             "The path does not exist in ReadFrequencyModeRatio! Given path "
@@ -333,7 +337,8 @@ TaskSet ReadTaskSet(std::string path, std::string priorityType = "RM") {
     if (file.is_open()) {
         string line;
         while (getline(file, line)) {
-            if (!(line[0] >= '0' && line[0] <= '9')) continue;
+            if (!(line[0] >= '0' && line[0] <= '9'))
+                continue;
             vector<double> dataInLine = ReadLine(line);
 
             // dataInLine.erase(dataInLine.begin());
@@ -370,13 +375,14 @@ void UpdateTaskSetExecutionTime(TaskSetNormal &taskSet,
                                       lastTaskDoNotNeedOptimize);
 }
 
-void UpdateTaskSetPeriod(TaskSet &taskSet, VectorDynamic periodVec) {
+void UpdateTaskSetPeriod(TaskSet &taskSet, const VectorDynamic &periodVec) {
     int N = taskSet.size();
 
-    for (int i = 0; i < N; i++) taskSet[i].period = periodVec(i, 0);
+    for (int i = 0; i < N; i++) taskSet[i].period = periodVec.coeff(i, 0);
 }
 
-void UpdateTaskSetPeriod(TaskSetNormal &taskSet, VectorDynamic periodVec) {
+void UpdateTaskSetPeriod(TaskSetNormal &taskSet,
+                         const VectorDynamic &periodVec) {
     return UpdateTaskSetPeriod(taskSet.tasks_, periodVec);
 }
 ProcessorTaskSet ExtractProcessorTaskSet(TaskSet &tasks) {

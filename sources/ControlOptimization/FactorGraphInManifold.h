@@ -34,9 +34,12 @@ struct FactorGraphInManifold {
     }
 
     inline static Schedul_Analysis GenerateSchedul_Analysis(
-        const TaskSetType &taskSetTypeRef, const gtsam::Values &x) {
+        const TaskSetType &taskSetTypeRef, const gtsam::Values &x,
+        const TaskSet &tasks) {
         TaskSetType tasksCurr = taskSetTypeRef;
-        UpdateTaskSetPeriod(tasksCurr, ExtractResults(x, tasksCurr.tasks_));
+        tasksCurr.tasks_ = tasks;
+        UpdateTaskSetPeriod(tasksCurr.tasks_,
+                            ExtractResults(x, tasksCurr.tasks_));
         return Schedul_Analysis(tasksCurr);
     }
 
@@ -94,11 +97,10 @@ struct FactorGraphInManifold {
                 BeginTimer("f_with_RTA");
                 VectorDynamic error = GenerateVectorDynamic(2);
                 // TaskSet tasksCurr = tasks;
-                // UpdateTaskSetPeriod(
-                //     tasksCurr,
-                //     ExtractResults(x, tasks));
+                // UpdateTaskSetPeriod(tasksCurr, ExtractResults(x, tasks));
                 // Schedul_Analysis r(tasksCurr);
-                Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, x);
+                Schedul_Analysis r =
+                    GenerateSchedul_Analysis(taskSetType, x, tasks);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 if (!x.exists(GenerateKey(index, "period"))) {
                     error(0) = rta * coeff[2 * index + 1];
@@ -224,7 +226,8 @@ struct FactorGraphInManifold {
                 // TaskSet tasksCurr = tasks;
                 // UpdateTaskSetPeriod(tasksCurr, ExtractResults(x, tasks));
                 // Schedul_Analysis r(tasksCurr);
-                Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, x);
+                Schedul_Analysis r =
+                    GenerateSchedul_Analysis(taskSetType, x, tasks);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = rta * coeff[2 * index + 1];
                 if (!whether_ls) {
@@ -273,7 +276,8 @@ struct FactorGraphInManifold {
 
     static RTARelatedFactor GenerateRTARelatedFactor(
         std::vector<bool> maskForElimination, TaskSet &tasks, int index,
-        VectorDynamic &coeff, VectorDynamic &rtaBase,const TaskSetType &taskSetType) {
+        VectorDynamic &coeff, VectorDynamic &rtaBase,
+        const TaskSetType &taskSetType) {
         BeginTimer(__func__);
         std::vector<gtsam::Symbol> keys;
         keys.reserve(index);
@@ -288,7 +292,8 @@ struct FactorGraphInManifold {
         auto model = gtsam::noiseModel::Diagonal::Sigmas(sigma);
         // return MultiKeyFactor(keys, f, model);
         EndTimer(__func__);
-        return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model,taskSetType);
+        return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model,
+                                taskSetType);
     }
 
     /* whether task 'index' has free dependent variables*/
@@ -355,9 +360,10 @@ struct FactorGraphInManifold {
         while (!whether_new_eliminate && disturb <= disturb_max) {
             for (uint i = 0; i < tasks.size(); i++) {
                 tasks[i].period -= disturb;
-                // Schedul_Analysis r1(tasks);
+
                 Schedul_Analysis r1 =
                     GenerateSchedul_Analysis(taskSetType, tasks);
+                // RTA_LL r1(tasks);
                 VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);
                 if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb ||
                     !r1.CheckSchedulabilityDirect(rtaCurr))
@@ -386,6 +392,7 @@ struct FactorGraphInManifold {
         BeginTimer(__func__);
         double res = 0;
         Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, tasks);
+        // RTA_LL r(tasks);
         VectorDynamic rta = r.ResponseTimeOfTaskSet();
         for (uint i = 0; i < tasks.size(); i++) {
             res += coeff.coeffRef(i * 2, 0) * tasks[i].period;
