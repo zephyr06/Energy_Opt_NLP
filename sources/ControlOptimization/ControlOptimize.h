@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 
-#include "sources/ControlOptimization/CoeffFactor.h"
+// #include "sources/ControlOptimization/CoeffFactor.h"
 // #include "sources/ControlOptimization/FactorGraphForceManifold.h"
 #include "sources/ControlOptimization/FactorGraphInManifold.h"
 #include "sources/Utils/FactorGraphUtils.h"

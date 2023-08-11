@@ -7,8 +7,8 @@
 #include <string>
 #include <utility>
 
-#include "sources/ControlOptimization/CoeffFactor.h"
-#include "sources/ControlOptimization/RTAFactor.h"
+// #include "sources/ControlOptimization/CoeffFactor.h"
+// #include "sources/ControlOptimization/RTAFactor.h"
 #include "sources/ControlOptimization/ReadControlCases.h"
 #include "sources/EnergyOptimization/Optimize.h"
 #include "sources/RTA/RTA_Nasri19.h"
