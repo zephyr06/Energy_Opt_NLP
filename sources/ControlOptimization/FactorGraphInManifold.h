@@ -18,8 +18,9 @@
 #include "sources/Utils/Parameters.h"
 namespace rt_num_opt {
 
-template <class Schedul_Analysis>
+template <class TaskSetType, class Schedul_Analysis>
 struct FactorGraphInManifold {
+    // TODO: pass by reference
     static VectorDynamic ExtractResults(const gtsam::Values &result,
                                         TaskSet tasks) {
         VectorDynamic periods = GetParameterVD<double>(tasks, "period");
@@ -32,8 +33,22 @@ struct FactorGraphInManifold {
         return periods;
     }
 
+    inline static Schedul_Analysis GenerateSchedul_Analysis(
+        const TaskSetType &taskSetTypeRef, const gtsam::Values &x) {
+        TaskSetType tasksCurr = taskSetTypeRef;
+        UpdateTaskSetPeriod(tasksCurr, ExtractResults(x, tasksCurr.tasks_));
+        return Schedul_Analysis(tasksCurr);
+    }
+
+    inline static Schedul_Analysis GenerateSchedul_Analysis(
+        TaskSetType taskSetTypeRef, const TaskSet &tasks) {
+        taskSetTypeRef.tasks_ = tasks;
+        return Schedul_Analysis(taskSetTypeRef);
+    }
+
     class ControlObjFactor : public gtsam::NoiseModelFactor {
        public:
+        // data members
         TaskSet tasks;
         int index;
         VectorDynamic coeff;
@@ -42,17 +57,20 @@ struct FactorGraphInManifold {
         std::vector<gtsam::Symbol> keyVec;
         LambdaMultiKey f_with_RTA;
         LambdaMultiKey f_without_RTA;
+        TaskSetType taskSetType;
 
         ControlObjFactor(std::vector<gtsam::Symbol> &keyVec, TaskSet &tasks,
                          int index, VectorDynamic &coeff, VectorDynamic rtaBase,
-                         gtsam::SharedNoiseModel model)
+                         gtsam::SharedNoiseModel model,
+                         const TaskSetType &taskSetType)
             : gtsam::NoiseModelFactor(model, keyVec),
               tasks(tasks),
               index(index),
               coeff(coeff),
               rtaBase(rtaBase),
               dimension(keyVec.size()),
-              keyVec(keyVec) {
+              keyVec(keyVec),
+              taskSetType(taskSetType) {
             double c = coeff[2 * index];
             f_without_RTA = [index, c](const gtsam::Values &x) {
                 BeginTimer("f_without_RTA");
@@ -71,15 +89,16 @@ struct FactorGraphInManifold {
                 return error;
             };
 
-            f_with_RTA = [tasks, index, coeff,
+            f_with_RTA = [tasks, index, coeff, taskSetType,
                           rtaBase](const gtsam::Values &x) {
                 BeginTimer("f_with_RTA");
                 VectorDynamic error = GenerateVectorDynamic(2);
-                TaskSet tasksCurr = tasks;
-                UpdateTaskSetPeriod(
-                    tasksCurr,
-                    ExtractResults(x, tasks));  // FactorGraphInManifold::
-                Schedul_Analysis r(tasksCurr);
+                // TaskSet tasksCurr = tasks;
+                // UpdateTaskSetPeriod(
+                //     tasksCurr,
+                //     ExtractResults(x, tasks));
+                // Schedul_Analysis r(tasksCurr);
+                Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, x);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 if (!x.exists(GenerateKey(index, "period"))) {
                     error(0) = rta * coeff[2 * index + 1];
@@ -94,7 +113,7 @@ struct FactorGraphInManifold {
                     error(0) = pow(error(0), 0.5);
                 }
 
-                error(1) = HingeLoss(tasksCurr[index].period - rta);
+                error(1) = HingeLoss(taskSetType.tasks_[index].period - rta);
                 EndTimer("f_with_RTA");
                 // std::cout << std::setprecision(12) <<
                 // x.at<VectorDynamic>(GenerateKey(index, "period"))(0, 0) << ",
@@ -155,7 +174,8 @@ struct FactorGraphInManifold {
 
     static ControlObjFactor GenerateControlObjFactor(
         std::vector<bool> maskForElimination, TaskSet &tasks, int index,
-        VectorDynamic &coeff, VectorDynamic &rtaBase) {
+        VectorDynamic &coeff, VectorDynamic &rtaBase,
+        const TaskSetType &taskSetType) {
         BeginTimer(__func__);
         std::vector<gtsam::Symbol> keys;
         keys.reserve(index);
@@ -169,7 +189,8 @@ struct FactorGraphInManifold {
         sigma << noiseModelSigma, noiseModelSigma / weightSchedulability;
         auto model = gtsam::noiseModel::Diagonal::Sigmas(sigma);
         EndTimer(__func__);
-        return ControlObjFactor(keys, tasks, index, coeff, rtaBase, model);
+        return ControlObjFactor(keys, tasks, index, coeff, rtaBase, model,
+                                taskSetType);
     }
 
     class RTARelatedFactor : public gtsam::NoiseModelFactor {
@@ -182,32 +203,34 @@ struct FactorGraphInManifold {
         std::vector<gtsam::Symbol> keyVec;
         LambdaMultiKey f_with_RTA;
         LambdaMultiKey f_without_RTA;
+        TaskSetType taskSetType;
 
         RTARelatedFactor(std::vector<gtsam::Symbol> &keyVec, TaskSet &tasks,
                          int index, VectorDynamic &coeff, VectorDynamic rtaBase,
-                         gtsam::SharedNoiseModel model)
+                         gtsam::SharedNoiseModel model,
+                         const TaskSetType &taskSetType)
             : gtsam::NoiseModelFactor(model, keyVec),
               tasks(tasks),
               index(index),
               coeff(coeff),
               rtaBase(rtaBase),
               dimension(keyVec.size()),
-              keyVec(keyVec) {
-            f_with_RTA = [tasks, index, coeff,
+              keyVec(keyVec),
+              taskSetType(taskSetType) {
+            f_with_RTA = [tasks, index, coeff, taskSetType,
                           rtaBase](const gtsam::Values &x) {
                 BeginTimer("f_with_RTA");
                 VectorDynamic error = GenerateVectorDynamic(2);
-                TaskSet tasksCurr = tasks;
-                UpdateTaskSetPeriod(
-                    tasksCurr,
-                    ExtractResults(x, tasks));  //  FactorGraphInManifold::
-                Schedul_Analysis r(tasksCurr);
+                // TaskSet tasksCurr = tasks;
+                // UpdateTaskSetPeriod(tasksCurr, ExtractResults(x, tasks));
+                // Schedul_Analysis r(tasksCurr);
+                Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, x);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = rta * coeff[2 * index + 1];
                 if (!whether_ls) {
                     error(0) = pow(error(0), 0.5);
                 }
-                error(1) = HingeLoss(tasksCurr[index].period - rta);
+                error(1) = HingeLoss(taskSetType.tasks_[index].period - rta);
                 EndTimer("f_with_RTA");
                 return error;
             };
@@ -250,7 +273,7 @@ struct FactorGraphInManifold {
 
     static RTARelatedFactor GenerateRTARelatedFactor(
         std::vector<bool> maskForElimination, TaskSet &tasks, int index,
-        VectorDynamic &coeff, VectorDynamic &rtaBase) {
+        VectorDynamic &coeff, VectorDynamic &rtaBase,const TaskSetType &taskSetType) {
         BeginTimer(__func__);
         std::vector<gtsam::Symbol> keys;
         keys.reserve(index);
@@ -265,7 +288,7 @@ struct FactorGraphInManifold {
         auto model = gtsam::noiseModel::Diagonal::Sigmas(sigma);
         // return MultiKeyFactor(keys, f, model);
         EndTimer(__func__);
-        return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model);
+        return RTARelatedFactor(keys, tasks, index, coeff, rtaBase, model,taskSetType);
     }
 
     /* whether task 'index' has free dependent variables*/
@@ -280,7 +303,7 @@ struct FactorGraphInManifold {
 
     static gtsam::NonlinearFactorGraph BuildControlGraph(
         std::vector<bool> maskForElimination, TaskSet tasks,
-        VectorDynamic &coeff) {
+        VectorDynamic &coeff, const TaskSetType &taskSetType) {
         BeginTimer(__func__);
         gtsam::NonlinearFactorGraph graph;
         double periodMax =
@@ -300,7 +323,7 @@ struct FactorGraphInManifold {
             }
             if (HasDependency(i, maskForElimination)) {
                 auto factor = GenerateControlObjFactor(
-                    maskForElimination, tasks, i, coeff, rtaBase);
+                    maskForElimination, tasks, i, coeff, rtaBase, taskSetType);
                 graph.add(factor);
             }
         }
@@ -323,15 +346,18 @@ struct FactorGraphInManifold {
 
     static void FindEliminatedVariables(TaskSet &tasks,
                                         std::vector<bool> &maskForElimination,
+                                        TaskSetType taskSetType,
                                         double disturb = disturb_init) {
         BeginTimer(__func__);
-        Schedul_Analysis r(tasks);
+        Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, tasks);
         VectorDynamic rtaBase = r.ResponseTimeOfTaskSet();
         bool whether_new_eliminate = false;
         while (!whether_new_eliminate && disturb <= disturb_max) {
             for (uint i = 0; i < tasks.size(); i++) {
                 tasks[i].period -= disturb;
-                Schedul_Analysis r1(tasks);
+                // Schedul_Analysis r1(tasks);
+                Schedul_Analysis r1 =
+                    GenerateSchedul_Analysis(taskSetType, tasks);
                 VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet(rtaBase);
                 if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb ||
                     !r1.CheckSchedulabilityDirect(rtaCurr))
@@ -355,10 +381,11 @@ struct FactorGraphInManifold {
         EndTimer(__func__);
     }
 
-    static double RealObj(const TaskSet &tasks, const VectorDynamic &coeff) {
+    static double RealObj(const TaskSet &tasks, const VectorDynamic &coeff,
+                          TaskSetType taskSetType) {
         BeginTimer(__func__);
         double res = 0;
-        Schedul_Analysis r(tasks);
+        Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, tasks);
         VectorDynamic rta = r.ResponseTimeOfTaskSet();
         for (uint i = 0; i < tasks.size(); i++) {
             res += coeff.coeffRef(i * 2, 0) * tasks[i].period;

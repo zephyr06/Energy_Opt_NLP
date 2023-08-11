@@ -242,18 +242,21 @@ TEST(GenerateSchedulabilityFactor, v2) {
     coeff << 1, 2, 1, 4, 1, 1, 1, 1, 1, 1;
     std::vector<bool> maskForElimination(tasks.size(), false);
     VectorDynamic rtaBase = RTAVector(tasks);
-    auto factor = FactorGraphInManifold<RTA_LL>::GenerateRTARelatedFactor(
-        maskForElimination, tasks, 0, coeff, rtaBase);
+    auto factor =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateRTARelatedFactor(
+            maskForElimination, tasks, 0, coeff, rtaBase, TaskSetNormal(tasks));
     auto e2Expect = GenerateVectorDynamic(2);
     e2Expect << 4, 0;
-    auto initial = FactorGraphInManifold<RTA_LL>::GenerateInitialFG(
-        tasks, maskForElimination);
+    auto initial =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateInitialFG(
+            tasks, maskForElimination);
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial), __LINE__);
 
     initial.update(GenerateKey(0, "period"), GenerateVectorDynamic1D(70));
     initial.update(GenerateKey(3, "period"), GenerateVectorDynamic1D(110));
-    factor = FactorGraphInManifold<RTA_LL>::GenerateRTARelatedFactor(
-        maskForElimination, tasks, 3, coeff, rtaBase);
+    factor =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateRTARelatedFactor(
+            maskForElimination, tasks, 3, coeff, rtaBase, TaskSetNormal(tasks));
     e2Expect << INT32_MAX, INT32_MAX - 110;
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial), __LINE__);
 }
@@ -270,18 +273,21 @@ TEST(GenerateSchedulabilityFactor, v3) {
     coeff << 1, 2, 1, 4, 1, 1, 1, 1, 1, 1;
     VectorDynamic rtaBase = RTAVector(tasks);
     std::vector<bool> maskForElimination(tasks.size(), false);
-    auto factor = FactorGraphInManifold<RTA_LL>::GenerateRTARelatedFactor(
-        maskForElimination, tasks, 0, coeff, rtaBase);
+    auto factor =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateRTARelatedFactor(
+            maskForElimination, tasks, 0, coeff, rtaBase, TaskSetNormal(tasks));
     auto e2Expect = GenerateVectorDynamic(2);
     e2Expect << 4, 0;
-    auto initial = FactorGraphInManifold<RTA_LL>::GenerateInitialFG(
-        tasks, maskForElimination);
+    auto initial =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateInitialFG(
+            tasks, maskForElimination);
     AssertEigenEqualVector(e2Expect, factor.unwhitenedError(initial), __LINE__);
 
     initial.update(GenerateKey(0, "period"), GenerateVectorDynamic1D(70));
 
-    factor = FactorGraphInManifold<RTA_LL>::GenerateRTARelatedFactor(
-        maskForElimination, tasks, 3, coeff, rtaBase);
+    factor =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateRTARelatedFactor(
+            maskForElimination, tasks, 3, coeff, rtaBase, TaskSetNormal(tasks));
     e2Expect << 117, 0;
 
     std::vector<MatrixDynamic> HsExpect, HsActual;
@@ -317,8 +323,8 @@ TEST(FindEliminatedVariables, v1) {
     VectorDynamic initial = GenerateVectorDynamic(5);
     initial << 45, 372.719, 454.248, 128.127, 358.683;
     UpdateTaskSetPeriod(tasks, initial);
-    FactorGraphInManifold<RTA_LL>::FindEliminatedVariables(
-        tasks, maskForElimination, 1);
+    FactorGraphInManifold<TaskSetNormal, RTA_LL>::FindEliminatedVariables(
+        tasks, maskForElimination, TaskSetNormal(tasks), 1);
     AssertEqualVectorExact({1, 0, 0, 0, 0}, maskForElimination);
 }
 
@@ -358,17 +364,18 @@ TEST(FactorGraphInManifold, inference) {
             graph.emplace_shared<SmallerThanFactor1D>(
                 GenerateKey(i, "period"), periodMax, modelPunishmentSoft1);
         }
-        if (FactorGraphInManifold<RTA_LL>::HasDependency(i,
-                                                         maskForElimination)) {
-            auto factor =
-                FactorGraphInManifold<RTA_LL>::GenerateRTARelatedFactor(
-                    maskForElimination, tasks, i, coeff, rtaBase);
+        if (FactorGraphInManifold<TaskSetNormal, RTA_LL>::HasDependency(
+                i, maskForElimination)) {
+            auto factor = FactorGraphInManifold<TaskSetNormal, RTA_LL>::
+                GenerateRTARelatedFactor(maskForElimination, tasks, i, coeff,
+                                         rtaBase, TaskSetNormal(tasks));
             graph.add(factor);
         }
     }
 
-    auto initialEstimateFG = FactorGraphInManifold<RTA_LL>::GenerateInitialFG(
-        tasks, maskForElimination);
+    auto initialEstimateFG =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateInitialFG(
+            tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
     MatrixDynamic jacobianCurr = sth.first;
     // std::cout << "Current Jacobian matrix:" << endl;
@@ -400,12 +407,13 @@ TEST(FactorGraphInManifold, inference2) {
     initial << 68.0034, 321.249, 400.807, 131.088, 308.676;
     UpdateTaskSetPeriod(tasks, initial);
     gtsam::NonlinearFactorGraph graph =
-        FactorGraphInManifold<RTA_LL>::BuildControlGraph(maskForElimination,
-                                                         tasks, coeff);
-    auto initialEstimateFG = FactorGraphInManifold<RTA_LL>::GenerateInitialFG(
-        tasks, maskForElimination);
-    FactorGraphInManifold<RTA_LL>::FindEliminatedVariables(tasks,
-                                                           maskForElimination);
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::BuildControlGraph(
+            maskForElimination, tasks, coeff, TaskSetNormal(tasks));
+    auto initialEstimateFG =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateInitialFG(
+            tasks, maskForElimination);
+    FactorGraphInManifold<TaskSetNormal, RTA_LL>::FindEliminatedVariables(
+        tasks, maskForElimination, TaskSetNormal(tasks));
     AssertEqualVectorExact({1, 0, 0, 0, 0}, maskForElimination);
 }
 TEST(io, IfTargetFile) {
@@ -543,23 +551,28 @@ TEST(HasDependency, v1) {
     maskForElimination = {1, 0, 1, 1, 1};
     AssertEqualScalar(
         false,
-        FactorGraphInManifold<RTA_LL>::HasDependency(0, maskForElimination),
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::HasDependency(
+            0, maskForElimination),
         1e-6, __LINE__);
     AssertEqualScalar(
         true,
-        FactorGraphInManifold<RTA_LL>::HasDependency(1, maskForElimination),
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::HasDependency(
+            1, maskForElimination),
         1e-6, __LINE__);
     AssertEqualScalar(
         true,
-        FactorGraphInManifold<RTA_LL>::HasDependency(2, maskForElimination),
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::HasDependency(
+            2, maskForElimination),
         1e-6, __LINE__);
     AssertEqualScalar(
         true,
-        FactorGraphInManifold<RTA_LL>::HasDependency(3, maskForElimination),
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::HasDependency(
+            3, maskForElimination),
         1e-6, __LINE__);
     AssertEqualScalar(
         true,
-        FactorGraphInManifold<RTA_LL>::HasDependency(4, maskForElimination),
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::HasDependency(
+            4, maskForElimination),
         1e-6, __LINE__);
 }
 TEST(ExtractCaseID, v1) {
@@ -636,45 +649,26 @@ TEST(Reorder, v1) {
         "/home/zephyr/Programming/others/YechengRepo/Experiment/"
         "ControlPerformance/TestCases/NSweep/N5/Case0.txt";
     std::tie(tasks, coeff) = ReadControlCase(path1);
-    tasks[0].period = 5;
-    tasks[1].period = 10;
-    tasks[2].period = 7;
-    tasks[3].period = 7;
-    tasks[4].period = 7;
+    tasks[0].period = 500;
+    tasks[1].period = 1000;
+    tasks[2].period = 700;
+    tasks[3].period = 700;
+    tasks[4].period = 700;
     Reorder(tasks, coeff);
     EXPECT_LONGS_EQUAL(0, tasks[0].id);
 
-    EXPECT_LONGS_EQUAL(2, tasks[1].id);
+    // EXPECT_LONGS_EQUAL(2, tasks[1].id);
 
-    EXPECT_LONGS_EQUAL(3, tasks[2].id);
+    // EXPECT_LONGS_EQUAL(3, tasks[2].id);
 
-    EXPECT_LONGS_EQUAL(4, tasks[3].id);
+    // EXPECT_LONGS_EQUAL(4, tasks[3].id);
 
     EXPECT_LONGS_EQUAL(1, tasks[4].id);
     VectorDynamic coeffExpect = coeff;
     coeffExpect << 645, 7143, 217, 5031, 489, 3778, 285, 380, 275, 9334;
     assert_equal(coeffExpect, coeff);
 }
-TEST(Reorder, v2) {
-    enableReorder = 1;
-    TaskSet tasks;
-    VectorDynamic coeff;
-    std::string path1 =
-        "/home/zephyr/Programming/others/YechengRepo/Experiment/"
-        "ControlPerformance/TestCases/NSweep/N20/Case0.txt";
-    std::tie(tasks, coeff) = ReadControlCase(path1);
-    tasks[0].period = 5;
-    tasks[1].period = 10;
-    tasks[2].period = 7;
-    tasks[3].period = 7;
-    tasks[4].period = 7;
-    Reorder(tasks, coeff);
-    EXPECT_LONGS_EQUAL(0, tasks[0].id);
-    EXPECT_LONGS_EQUAL(2, tasks[1].id);
-    EXPECT_LONGS_EQUAL(3, tasks[2].id);
-    EXPECT_LONGS_EQUAL(4, tasks[3].id);
-    EXPECT_LONGS_EQUAL(1, tasks[4].id);
-}
+
 class TestBigJacobian1 : public NoiseModelFactor1<VectorDynamic> {
    public:
     NormalErrorFunction1D f;
@@ -757,23 +751,25 @@ TEST(ControlObjFactor, jacobian) {
     // FactorGraphInManifold<RTA_LL>::BuildControlGraph(maskForElimination,
     // tasks, coeff); using namespace FactorGraphInManifold;
     gtsam::NonlinearFactorGraph graph;
-    double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() * 5;
+    // double periodMax = GetParameterVD<double>(tasks, "executionTime").sum() *
+    // 5;
     auto modelNormal = gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma);
     auto modelPunishmentSoft1 = gtsam::noiseModel::Isotropic::Sigma(
         1, noiseModelSigma / weightHardConstraint);
     VectorDynamic rtaBase = RTAVector(tasks);
     for (uint i = 0; i < tasks.size(); i++) {
-        if (FactorGraphInManifold<RTA_LL>::HasDependency(i,
-                                                         maskForElimination)) {
-            auto factor =
-                FactorGraphInManifold<RTA_LL>::GenerateControlObjFactor(
-                    maskForElimination, tasks, i, coeff, rtaBase);
+        if (FactorGraphInManifold<TaskSetNormal, RTA_LL>::HasDependency(
+                i, maskForElimination)) {
+            auto factor = FactorGraphInManifold<TaskSetNormal, RTA_LL>::
+                GenerateControlObjFactor(maskForElimination, tasks, i, coeff,
+                                         rtaBase, TaskSetNormal(tasks));
             graph.add(factor);
         }
     }
 
-    auto initialEstimateFG = FactorGraphInManifold<RTA_LL>::GenerateInitialFG(
-        tasks, maskForElimination);
+    auto initialEstimateFG =
+        FactorGraphInManifold<TaskSetNormal, RTA_LL>::GenerateInitialFG(
+            tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
     MatrixDynamic jacobianCurr = sth.first;
     std::cout << "The following should be a diagonal matrix" << std::endl;

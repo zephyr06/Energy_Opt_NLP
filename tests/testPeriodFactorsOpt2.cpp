@@ -23,15 +23,19 @@ TEST(case1, v1) {
     // coeff, "RM"); maskForElimination[1] = 1; auto sth =
     // OptimizeTaskSetIterativeWeight<FactorGraphInManifold<RTA_LL>>(tasks,
     // coeff, maskForElimination);
-    auto sth2 = OptimizeTaskSetIterative<FactorGraphInManifold<RTA_LL>, RTA_LL>(
-        tasks, coeff, maskForElimination);
+    auto sth2 =
+        OptimizeTaskSetIterative<FactorGraphInManifold<TaskSetNormal, RTA_LL>,
+                                 TaskSetNormal, RTA_LL>(
+            tasks, coeff, maskForElimination, TaskSetNormal(tasks));
 
     // FindEliminatedVariables(tasks, maskForElimination);
     // AssertEqualVectorExact({true, false, false, false, false},
     // maskForElimination);
     UpdateTaskSetPeriod(tasks, sth2.first);
     cout << "Actual objective function is "
-         << FactorGraphInManifold<RTA_LL>::RealObj(tasks, coeff) << endl;
+         << FactorGraphInManifold<TaskSetNormal, RTA_LL>::RealObj(
+                tasks, coeff, TaskSetNormal(tasks))
+         << endl;
     EndTimer("main");
     PrintTimer();
     std::cout << count1 << ", " << count2 << std::endl;

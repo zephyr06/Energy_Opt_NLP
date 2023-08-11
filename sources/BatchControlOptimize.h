@@ -65,7 +65,8 @@ std::pair<double, double> ReadBaselineZhao20(std::string directory,
             ReadControlCase(directory + "/" + "Case" +
                             std::to_string(ExtractCaseID(path)) + ".txt");
         double initialError =
-            FactorGraphInManifold<RTA_LL>::RealObj(tasks, coeff);
+            FactorGraphInManifold<TaskSetNormal, RTA_LL>::RealObj(
+                tasks, coeff, TaskSetNormal(tasks));
         VectorDynamic periods;
         if (TargetFileType(path) == 1)  // GP
         {
@@ -175,9 +176,11 @@ void BatchOptimize(int Nn = 5) {
                 auto start = std::chrono::high_resolution_clock::now();
                 std::pair<VectorDynamic, double> res;
                 if (optimizerType <= 4)
-                    res = OptimizeTaskSetIterative<FactorGraphType,
-                                                   Schedul_Analysis>(
-                        tasks, coeff, maskForElimination);
+                    res =
+                        OptimizeTaskSetIterative<FactorGraphType, TaskSetNormal,
+                                                 Schedul_Analysis>(
+                            tasks, coeff, maskForElimination,
+                            TaskSetNormal(tasks));
                 else if (optimizerType == 6) {
                     TaskSetNormal tasksN(tasks);
                     res = OptimizeControlIfopt<TaskSetNormal, Schedul_Analysis>(

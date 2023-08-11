@@ -49,7 +49,8 @@ class ExVariablesControl : public ifopt::VariableSet {
 double ControlObj(TaskSet &tasks, VectorDynamic &coeff,
                   VectorDynamic periodVector) {
     UpdateTaskSetPeriod(tasks, periodVector);
-    return FactorGraphInManifold<RTA_LL>::RealObj(tasks, coeff);
+    return FactorGraphInManifold<TaskSetNormal,RTA_LL>::RealObj(
+        tasks, coeff, TaskSetNormal(tasks));
 }
 
 class ExCostControl : public ifopt::CostTerm {

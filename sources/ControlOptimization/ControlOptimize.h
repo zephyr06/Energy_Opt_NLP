@@ -18,13 +18,13 @@
 #include "sources/Utils/Parameters.h"
 namespace rt_num_opt {
 namespace ControlOptimize {
-template <typename FactorGraphType>
+template <typename FactorGraphType, typename TaskSetType>
 std::pair<VectorDynamic, double> UnitOptimizationPeriod(
-    TaskSet &tasks, VectorDynamic &coeff,
-    std::vector<bool> &maskForElimination) {
+    TaskSet &tasks, VectorDynamic &coeff, std::vector<bool> &maskForElimination,
+    const TaskSetType &taskSetType) {
     BeginTimer(__func__);
-    gtsam::NonlinearFactorGraph graph =
-        FactorGraphType::BuildControlGraph(maskForElimination, tasks, coeff);
+    gtsam::NonlinearFactorGraph graph = FactorGraphType::BuildControlGraph(
+        maskForElimination, tasks, coeff, taskSetType);
     gtsam::Values initialEstimateFG =
         FactorGraphType::GenerateInitialFG(tasks, maskForElimination);
     if (debugMode == 1) {
@@ -105,37 +105,38 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         cout << Color::blue;
         UpdateTaskSetPeriod(
             tasks, FactorGraphType::ExtractResults(initialEstimateFG, tasks));
-        cout << "Before optimization, the total error is "
-             << FactorGraphType::RealObj(tasks, coeff) << std::endl;
+        // cout << "Before optimization, the total error is "
+        //      << FactorGraphType::RealObj(tasks, coeff) << std::endl;
         UpdateTaskSetPeriod(tasks, optComp);
-        cout << "The objective function is "
-             << FactorGraphType::RealObj(tasks, coeff) << std::endl;
+        // cout << "The objective function is "
+        //      << FactorGraphType::RealObj(tasks, coeff) << std::endl;
         cout << Color::def;
     }
 
     UpdateTaskSetPeriod(tasks, optComp);
     EndTimer(__func__);
-    return std::make_pair(optComp, FactorGraphType::RealObj(tasks, coeff));
+    return std::make_pair(optComp,
+                          FactorGraphType::RealObj(tasks, coeff, taskSetType));
 }
 
-template <typename FactorGraphType>
-std::pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(
-    TaskSet &tasks, VectorDynamic &coeff,
-    std::vector<bool> &maskForElimination) {
-    VectorDynamic periodRes;
-    double err;
-    for (double weight = weightSchedulabilityMin;
-         weight <= weightSchedulabilityMax;
-         weight *= weightSchedulabilityStep) {
-        weightSchedulability = weight;
-        std::tie(periodRes, err) = UnitOptimizationPeriod<FactorGraphType>(
-            tasks, coeff, maskForElimination);
-        VectorDynamic periodPrev = GetParameterVD<double>(tasks, "period");
-        UpdateTaskSetPeriod(tasks, periodRes);
-    }
+// template <typename FactorGraphType>
+// std::pair<VectorDynamic, double> OptimizeTaskSetIterativeWeight(
+//     TaskSet &tasks, VectorDynamic &coeff,
+//     std::vector<bool> &maskForElimination) {
+//     VectorDynamic periodRes;
+//     double err;
+//     for (double weight = weightSchedulabilityMin;
+//          weight <= weightSchedulabilityMax;
+//          weight *= weightSchedulabilityStep) {
+//         weightSchedulability = weight;
+//         std::tie(periodRes, err) = UnitOptimizationPeriod<FactorGraphType>(
+//             tasks, coeff, maskForElimination);
+//         VectorDynamic periodPrev = GetParameterVD<double>(tasks, "period");
+//         UpdateTaskSetPeriod(tasks, periodRes);
+//     }
 
-    return std::make_pair(periodRes, err);
-}
+//     return std::make_pair(periodRes, err);
+// }
 
 /**
  * @brief round period into int type, we assume the given task set is
@@ -234,21 +235,22 @@ bool ContainFalse(std::vector<bool> &eliminationRecord) {
     return false;
 }
 
-template <typename FactorGraphType, class Schedul_Analysis>
+template <typename FactorGraphType, class TaskSetType, class Schedul_Analysis>
 static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
-    TaskSet &tasks, VectorDynamic &coeff,
-    std::vector<bool> &maskForElimination) {
+    TaskSet &tasks, VectorDynamic &coeff, std::vector<bool> &maskForElimination,
+    const TaskSetType &taskSetType) {
     VectorDynamic periodResCurr, periodResPrev;
     std::vector<bool> maskForEliminationPrev = maskForElimination;
     double errPrev = 1e30;
-    double errCurr = FactorGraphType::RealObj(tasks, coeff);
+    double errCurr = FactorGraphType::RealObj(tasks, coeff, taskSetType);
     int loopCount = 0;
     if (enableReorder > -1) {
-        errCurr = FactorGraphType::RealObj(tasks, coeff);
+        errCurr = FactorGraphType::RealObj(tasks, coeff, taskSetType);
         TaskSet tasksTry = tasks;
         VectorDynamic coeffTry = coeff;
         Reorder(tasksTry, coeffTry);
-        double errCurrTry = FactorGraphType::RealObj(tasksTry, coeffTry);
+        double errCurrTry =
+            FactorGraphType::RealObj(tasksTry, coeffTry, taskSetType);
         if (errCurrTry < errCurr) {
             tasks = tasksTry;
             coeff = coeffTry;
@@ -264,18 +266,20 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
 
         // perform optimization
         double err;
-        std::tie(periodResCurr, err) = UnitOptimizationPeriod<FactorGraphType>(
-            tasks, coeff, maskForElimination);
+        std::tie(periodResCurr, err) =
+            UnitOptimizationPeriod<FactorGraphType, TaskSetType>(
+                tasks, coeff, maskForElimination, taskSetType);
         UpdateTaskSetPeriod(tasks, periodResCurr);
 
         // adjust tasks' priority based on RM
         // bool whether_pa_changed = false;
         if (enableReorder > 0) {
-            errCurr = FactorGraphType::RealObj(tasks, coeff);
+            errCurr = FactorGraphType::RealObj(tasks, coeff, taskSetType);
             TaskSet tasksTry = tasks;
             VectorDynamic coeffTry = coeff;
             Reorder(tasksTry, coeffTry);
-            double errCurrTry = FactorGraphType::RealObj(tasksTry, coeffTry);
+            double errCurrTry =
+                FactorGraphType::RealObj(tasksTry, coeffTry, taskSetType);
             if (errCurrTry < errCurr) {
                 tasks = tasksTry;
                 coeff = coeffTry;
@@ -286,10 +290,11 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         // adjust optimization settings
         loopCount++;
         // if (!whether_pa_changed)
-        FactorGraphType::FindEliminatedVariables(tasks, maskForElimination);
+        FactorGraphType::FindEliminatedVariables(tasks, maskForElimination,
+                                                 TaskSetNormal(tasks));
 
         RoundPeriod(tasks, maskForElimination, coeff);
-        errCurr = FactorGraphType::RealObj(tasks, coeff);
+        errCurr = FactorGraphType::RealObj(tasks, coeff, taskSetType);
         if (Equals(maskForElimination, maskForEliminationPrev) &&
             relativeErrorTolerance > relativeErrorToleranceMin) {
             relativeErrorTolerance = relativeErrorTolerance / 10;
@@ -313,13 +318,14 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
 
     RTA_LL r(tasks);
     if (r.CheckSchedulability()) {
-        return std::make_pair(GetParameterVD<double>(tasks, "period"),
-                              FactorGraphType::RealObj(tasks, coeff));
+        return std::make_pair(
+            GetParameterVD<double>(tasks, "period"),
+            FactorGraphType::RealObj(tasks, coeff, taskSetType));
     } else {
         VectorDynamic periodVecOrg = GetParameterVD<double>(tasks, "periodOrg");
         UpdateTaskSetPeriod(tasks, periodVecOrg);
-        return std::make_pair(periodVecOrg,
-                              FactorGraphType::RealObj(tasks, coeff));
+        return std::make_pair(
+            periodVecOrg, FactorGraphType::RealObj(tasks, coeff, taskSetType));
     }
 }
 }  // namespace ControlOptimize

@@ -298,20 +298,21 @@ pair<VectorDynamic, double> UnitOptimizationPeriod(
     cout << Color::def;
     return std::make_pair(optComp, RealObj(tasks, coeff));
 }
-VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
-                                       std::vector<bool> &eliminationMask,
-                                       VectorDynamic &initialEstimate,
-                                       double initialError) {
-    VectorDynamic periodRes;
-    double err;
-    std::tie(periodRes, err) =
-        UnitOptimizationPeriod(tasks, coeff, eliminationMask, initialEstimate);
-    if (err < initialError) {
-        periodRes = OptimizeTaskSetIterative(tasks, coeff, eliminationMask,
-                                             periodRes, err);
-    }
-    return periodRes;
-}
+// VectorDynamic OptimizeTaskSetIterative(TaskSet &tasks, VectorDynamic coeff,
+//                                        std::vector<bool> &eliminationMask,
+//                                        VectorDynamic &initialEstimate,
+//                                        double initialError) {
+//     VectorDynamic periodRes;
+//     double err;
+//     std::tie(periodRes, err) =
+//         UnitOptimizationPeriod(tasks, coeff, eliminationMask,
+//         initialEstimate);
+//     if (err < initialError) {
+//         periodRes = OptimizeTaskSetIterative(tasks, coeff, eliminationMask,
+//                                              periodRes, err);
+//     }
+//     return periodRes;
+// }
 bool EliminateTask(TaskSet &tasks, std::vector<bool> &eliminationMask,
                    VectorDynamic &currPeriod) {
     TaskSet tasksCurr = tasks;

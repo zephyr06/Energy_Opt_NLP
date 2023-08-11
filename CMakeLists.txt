@@ -11,7 +11,7 @@ include(GtsamBuildTypes)
 include(GtsamTesting)
 
 find_package(yaml-cpp)
-
+add_compile_options("-Wno-deprecated")
 # add_subdirectory(DAG-scheduling_Verucchi)
 # include_directories(${CMAKE_SOURCE_DIR}/DAG-scheduling_Verucchi/include)
 include_directories(${CMAKE_SOURCE_DIR}/np-schedulability-analysis/include )

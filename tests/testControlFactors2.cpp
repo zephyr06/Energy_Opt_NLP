@@ -29,10 +29,11 @@ TEST(error, v1) {
     initial << 130.00, 321, 400, 131, 308;
     UpdateTaskSetPeriod(tasks, initial);
     gtsam::NonlinearFactorGraph graph =
-        FactorGraphInManifold<RTA_LL>::BuildControlGraph(maskForElimination,
-                                                         tasks, coeff);
-    auto initialEstimateFG = FactorGraphInManifold<RTA_LL>::GenerateInitialFG(
-        tasks, maskForElimination);
+        FactorGraphInManifold<TaskSetNormal,RTA_LL>::BuildControlGraph(
+            maskForElimination, tasks, coeff, TaskSetNormal(tasks));
+    auto initialEstimateFG =
+        FactorGraphInManifold<TaskSetNormal,RTA_LL>::GenerateInitialFG(
+            tasks, maskForElimination);
     auto sth = graph.linearize(initialEstimateFG)->jacobian();
     MatrixDynamic jacobianCurr = sth.first;
     std::cout << "Current Jacobian matrix:" << endl;
