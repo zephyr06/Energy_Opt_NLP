@@ -183,7 +183,7 @@ struct FactorGraphInManifold {
     };
 
     static ControlObjFactor GenerateControlObjFactor(
-        std::vector<bool> maskForElimination, TaskSet &tasks, int index,
+        std::vector<bool> maskForElimination, const TaskSet &tasks, int index,
         VectorDynamic &coeff, VectorDynamic &rtaBase,
         const TaskSetType &taskSetType) {
         BeginTimer(__func__);
@@ -321,7 +321,7 @@ struct FactorGraphInManifold {
     }
 
     static gtsam::NonlinearFactorGraph BuildControlGraph(
-        std::vector<bool> maskForElimination, TaskSet tasks,
+        std::vector<bool> maskForElimination, const TaskSet &tasks,
         VectorDynamic &coeff, const TaskSetType &taskSetType) {
         BeginTimer(__func__);
         gtsam::NonlinearFactorGraph graph;
@@ -331,11 +331,13 @@ struct FactorGraphInManifold {
             gtsam::noiseModel::Isotropic::Sigma(1, noiseModelSigma);
         auto modelPunishmentSoft1 = gtsam::noiseModel::Isotropic::Sigma(
             1, noiseModelSigma / weightHardConstraint);
+        // NOTICE: the usage here is valid because only RTA_LL utilizes a valid
+        // warm_start, i.e., rtaBAse
         VectorDynamic rtaBase = RTAVector(tasks);
         for (uint i = 0; i < tasks.size(); i++) {
             if (!maskForElimination[i]) {
                 graph.emplace_shared<LargerThanFactor1D>(
-                    GenerateKey(i, "period"), tasks[i].executionTime,
+                    GenerateKey(i, "period"), tasks.at(i).executionTime,
                     modelPunishmentSoft1);
                 graph.emplace_shared<SmallerThanFactor1D>(
                     GenerateKey(i, "period"), periodMax, modelPunishmentSoft1);
@@ -351,13 +353,13 @@ struct FactorGraphInManifold {
     }
 
     static gtsam::Values GenerateInitialFG(
-        TaskSet tasks, std::vector<bool> &maskForElimination) {
+        const TaskSet &tasks, std::vector<bool> &maskForElimination) {
         gtsam::Values initialEstimateFG;
         for (uint i = 0; i < tasks.size(); i++) {
             if (!maskForElimination[i]) {
                 initialEstimateFG.insert(
                     GenerateKey(i, "period"),
-                    GenerateVectorDynamic1D(tasks[i].period));
+                    GenerateVectorDynamic1D(tasks.at(i).period));
             }
         }
         return initialEstimateFG;
@@ -365,7 +367,7 @@ struct FactorGraphInManifold {
 
     static void FindEliminatedVariables(TaskSet &tasks,
                                         std::vector<bool> &maskForElimination,
-                                        TaskSetType taskSetType,
+                                        const TaskSetType &taskSetType,
                                         double disturb = disturb_init) {
         BeginTimer(__func__);
         Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, tasks);
@@ -402,7 +404,7 @@ struct FactorGraphInManifold {
     }
 
     static double RealObj(const TaskSet &tasks, const VectorDynamic &coeff,
-                          TaskSetType taskSetType) {
+                          const TaskSetType &taskSetType) {
         BeginTimer(__func__);
         double res = 0;
         Schedul_Analysis r = GenerateSchedul_Analysis(taskSetType, tasks);

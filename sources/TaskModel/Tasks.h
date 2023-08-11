@@ -107,7 +107,7 @@ class Task {
         executionTimeOrg = executionTime;
     }
 
-    void print() {
+    void print() const {
         std::cout << "The period is: " << period << " The executionTime is "
                   << executionTime << " The deadline is " << deadline
                   << " The overhead is " << overhead << " The offset is "
@@ -146,7 +146,7 @@ struct TaskSetNormal {
 
     size_t size() { return tasks_.size(); }
 };
-void Print(TaskSet &tasks) {
+void Print(const TaskSet &tasks) {
     std::cout << "The task set is printed as follows" << std::endl;
     for (auto &task : tasks) task.print();
 }
@@ -196,13 +196,13 @@ VectorDynamic GetParameterVD(const TaskSetNormal &taskset,
     return GetParameterVD<T>(taskset.tasks_, parameterType);
 }
 // some helper function for Reorder
-static bool comparePeriod(Task task1, Task task2) {
+static bool comparePeriod(const Task &task1, const Task &task2) {
     return task1.period < task2.period;
 };
-bool compareUtilization(Task task1, Task task2) {
+bool compareUtilization(const Task &task1, const Task &task2) {
     return task1.utilization() < task2.utilization();
 };
-static bool compareDeadline(Task &task1, Task &task2) {
+static bool compareDeadline(const Task &task1, const Task &task2) {
     return task1.deadline < task2.deadline;
 };
 
@@ -360,16 +360,16 @@ TaskSet ReadTaskSet(std::string path, std::string priorityType = "RM") {
 }
 
 void UpdateTaskSetExecutionTime(TaskSet &taskSet,
-                                VectorDynamic executionTimeVec,
+                                const VectorDynamic &executionTimeVec,
                                 int lastTaskDoNotNeedOptimize = -1) {
     int N = taskSet.size();
 
     for (int i = lastTaskDoNotNeedOptimize + 1; i < N; i++)
         taskSet[i].executionTime =
-            executionTimeVec(i - lastTaskDoNotNeedOptimize - 1, 0);
+            executionTimeVec.coeff(i - lastTaskDoNotNeedOptimize - 1, 0);
 }
 void UpdateTaskSetExecutionTime(TaskSetNormal &taskSet,
-                                VectorDynamic executionTimeVec,
+                                const VectorDynamic &executionTimeVec,
                                 int lastTaskDoNotNeedOptimize = -1) {
     return UpdateTaskSetExecutionTime(taskSet.tasks_, executionTimeVec,
                                       lastTaskDoNotNeedOptimize);
@@ -385,15 +385,16 @@ void UpdateTaskSetPeriod(TaskSetNormal &taskSet,
                          const VectorDynamic &periodVec) {
     return UpdateTaskSetPeriod(taskSet.tasks_, periodVec);
 }
-ProcessorTaskSet ExtractProcessorTaskSet(TaskSet &tasks) {
+ProcessorTaskSet ExtractProcessorTaskSet(const TaskSet &tasks) {
     int N = tasks.size();
     ProcessorTaskSet processorTasks;
     for (int i = 0; i < N; i++) {
-        if (processorTasks.find(tasks[i].processorId) == processorTasks.end()) {
-            std::vector<int> ttt{tasks[i].id};
-            processorTasks[tasks[i].processorId] = ttt;
+        if (processorTasks.find(tasks.at(i).processorId) ==
+            processorTasks.end()) {
+            std::vector<int> ttt{tasks.at(i).id};
+            processorTasks[tasks.at(i).processorId] = ttt;
         } else {
-            processorTasks[tasks[i].processorId].push_back(tasks[i].id);
+            processorTasks[tasks.at(i).processorId].push_back(tasks.at(i).id);
         }
     }
     return processorTasks;
