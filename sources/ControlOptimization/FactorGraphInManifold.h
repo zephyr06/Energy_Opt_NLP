@@ -22,7 +22,7 @@ template <class TaskSetType, class Schedul_Analysis>
 struct FactorGraphInManifold {
     // TODO: pass by reference
     static VectorDynamic ExtractResults(const gtsam::Values &result,
-                                        TaskSet tasks) {
+                                        const TaskSet &tasks) {
         VectorDynamic periods = GetParameterVD<double>(tasks, "period");
         for (uint i = 0; i < tasks.size(); i++) {
             if (result.exists(GenerateKey(i, "period"))) {
@@ -62,8 +62,10 @@ struct FactorGraphInManifold {
         LambdaMultiKey f_without_RTA;
         TaskSetType taskSetType;
 
-        ControlObjFactor(std::vector<gtsam::Symbol> &keyVec, TaskSet &tasks,
-                         int index, VectorDynamic &coeff, VectorDynamic rtaBase,
+        ControlObjFactor(std::vector<gtsam::Symbol> &keyVec,
+                         const TaskSet &tasks, int index,
+                         const VectorDynamic &coeff,
+                         const VectorDynamic &rtaBase,
                          gtsam::SharedNoiseModel model,
                          const TaskSetType &taskSetType)
             : gtsam::NoiseModelFactor(model, keyVec),
@@ -99,8 +101,13 @@ struct FactorGraphInManifold {
                 // TaskSet tasksCurr = tasks;
                 // UpdateTaskSetPeriod(tasksCurr, ExtractResults(x, tasks));
                 // Schedul_Analysis r(tasksCurr);
-                Schedul_Analysis r =
-                    GenerateSchedul_Analysis(taskSetType, x, tasks);
+                // Schedul_Analysis r =
+                //     GenerateSchedul_Analysis(taskSetType, x, tasks);
+                TaskSetType taskSetTypeCurr = taskSetType;
+                taskSetTypeCurr.tasks_ = tasks;
+                UpdateTaskSetPeriod(taskSetTypeCurr.tasks_,
+                                    ExtractResults(x, taskSetTypeCurr.tasks_));
+                Schedul_Analysis r(taskSetTypeCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 if (!x.exists(GenerateKey(index, "period"))) {
                     error(0) = rta * coeff[2 * index + 1];
@@ -115,7 +122,8 @@ struct FactorGraphInManifold {
                     error(0) = pow(error(0), 0.5);
                 }
 
-                error(1) = HingeLoss(taskSetType.tasks_[index].period - rta);
+                error(1) =
+                    HingeLoss(taskSetTypeCurr.tasks_[index].period - rta);
                 EndTimer("f_with_RTA");
                 // std::cout << std::setprecision(12) <<
                 // x.at<VectorDynamic>(GenerateKey(index, "period"))(0, 0) << ",
@@ -226,14 +234,20 @@ struct FactorGraphInManifold {
                 // TaskSet tasksCurr = tasks;
                 // UpdateTaskSetPeriod(tasksCurr, ExtractResults(x, tasks));
                 // Schedul_Analysis r(tasksCurr);
-                Schedul_Analysis r =
-                    GenerateSchedul_Analysis(taskSetType, x, tasks);
+                // Schedul_Analysis r =
+                //     GenerateSchedul_Analysis(taskSetType, x, tasks);
+                TaskSetType taskSetTypeCurr = taskSetType;
+                taskSetTypeCurr.tasks_ = tasks;
+                UpdateTaskSetPeriod(taskSetTypeCurr.tasks_,
+                                    ExtractResults(x, taskSetTypeCurr.tasks_));
+                Schedul_Analysis r(taskSetTypeCurr);
                 double rta = r.RTA_Common_Warm(rtaBase(index), index);
                 error(0) = rta * coeff[2 * index + 1];
                 if (!whether_ls) {
                     error(0) = pow(error(0), 0.5);
                 }
-                error(1) = HingeLoss(taskSetType.tasks_[index].period - rta);
+                error(1) =
+                    HingeLoss(taskSetTypeCurr.tasks_[index].period - rta);
                 EndTimer("f_with_RTA");
                 return error;
             };

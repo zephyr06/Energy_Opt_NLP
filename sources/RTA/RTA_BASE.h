@@ -85,8 +85,8 @@ class RTA_BASE {
      * @return true: system is schedulable
      * @return false: system is not schedulable
      */
-    bool CheckSchedulability(VectorDynamic warmStart, bool whetherPrint = false,
-                             double tol = 0) {
+    bool CheckSchedulability(const VectorDynamic &warmStart,
+                             bool whetherPrint = false, double tol = 0) {
         IncrementCallingTimes();
         int N = tasks.tasks_.size();
         for (int i = 0; i < N; i++) {
@@ -109,7 +109,8 @@ class RTA_BASE {
                 return false;
             }
         }
-        if (whetherPrint) std::cout << std::endl;
+        if (whetherPrint)
+            std::cout << std::endl;
         return true;
     }
 
