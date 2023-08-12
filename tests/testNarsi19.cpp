@@ -123,11 +123,15 @@ TEST(rta, Sync) {
     rt_num_opt::DAG_Nasri19 dagNasri(dags);
     rt_num_opt::RTA_Nasri19 r(dagNasri);
     rt_num_opt::VectorDynamic rta = r.ResponseTimeOfTaskSet();
-    std::cout << rta << std::endl << std::endl;
-
+    std::cout << std::endl << rta << std::endl << std::endl;
+    rt_num_opt::VectorDynamic rta_expect = rta;
+    rta_expect << 2, 6, 6, 10, 5, 8, 9, 13, 12, 14, 3, 11, 14;
+    AssertEigenEqualVector(rta_expect, rta);
     dagNasri.tasks_[0].executionTime += 2;
     rt_num_opt::RTA_Nasri19 r2(dagNasri);
     rta = r2.ResponseTimeOfTaskSet();
+    rta_expect << 4, 8, 8, 12, 5, 9, 12, 14, 15, 16, 3, 4, 7;
+    AssertEigenEqualVector(rta_expect, rta);
     std::cout << rta << std::endl;
 }
 
