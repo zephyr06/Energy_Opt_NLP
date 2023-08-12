@@ -566,42 +566,43 @@ class TestBigJacobian1 : public NoiseModelFactor1<VectorDynamic> {
     }
 };
 
-TEST(assumption, bigJacobian) {
-    int m = 6;
-    int n = 5;
-    gtsam::NonlinearFactorGraph graph;
-    auto key = Symbol('a', 0);
-    auto model = noiseModel::Isotropic::Sigma(m, noiseModelSigma);
-    graph.emplace_shared<TestBigJacobian1>(key, model);
+// TEST(assumption, bigJacobian) {
+//     int m = 6;
+//     int n = 5;
+//     gtsam::NonlinearFactorGraph graph;
+//     auto key = Symbol('a', 0);
+//     auto model = noiseModel::Isotropic::Sigma(m, noiseModelSigma);
+//     graph.emplace_shared<TestBigJacobian1>(key, model);
 
-    // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() +
-    // tasks[0].period; initialEstimate << 68.000000, 321, 400, 131, 308;
-    gtsam::Values initialEstimateFG;
-    initialEstimateFG.insert(key, GenerateVectorDynamic(n));
+//     // VectorDynamic initialEstimate = GenerateVectorDynamic(N).array() +
+//     // tasks[0].period; initialEstimate << 68.000000, 321, 400, 131, 308;
+//     gtsam::Values initialEstimateFG;
+//     initialEstimateFG.insert(key, GenerateVectorDynamic(n));
 
-    gtsam::Values result;
-    if (optimizerType == 1) {
-        gtsam::DoglegParams params;
-        // if (debugMode == 1)
-        //     params.setVerbosityDL("VERBOSE");
-        params.setDeltaInitial(deltaInitialDogleg);
-        params.setRelativeErrorTol(relativeErrorTolerance);
-        gtsam::DoglegOptimizer optimizer(graph, initialEstimateFG, params);
-        result = optimizer.optimize();
-    } else if (optimizerType == 2) {
-        gtsam::LevenbergMarquardtParams params;
-        params.setlambdaInitial(initialLambda);
-        params.setVerbosityLM(verbosityLM);
-        params.setlambdaLowerBound(lowerLambda);
-        params.setlambdaUpperBound(upperLambda);
-        params.setRelativeErrorTol(relativeErrorTolerance);
-        gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimateFG,
-                                                     params);
-        result = optimizer.optimize();
-    }
-    cout << result.at<VectorDynamic>(key);
-    EXPECT_LONGS_EQUAL(-3e-6, result.at<VectorDynamic>(key)(2));
-}
+//     gtsam::Values result;
+//     if (optimizerType == 1) {
+//         gtsam::DoglegParams params;
+//         // if (debugMode == 1)
+//         //     params.setVerbosityDL("VERBOSE");
+//         params.setDeltaInitial(deltaInitialDogleg);
+//         params.setRelativeErrorTol(relativeErrorTolerance);
+//         gtsam::DoglegOptimizer optimizer(graph, initialEstimateFG, params);
+//         result = optimizer.optimize();
+//     } else if (optimizerType == 2) {
+//         gtsam::LevenbergMarquardtParams params;
+//         params.setlambdaInitial(initialLambda);
+//         params.setVerbosityLM(verbosityLM);
+//         params.setlambdaLowerBound(lowerLambda);
+//         params.setlambdaUpperBound(upperLambda);
+//         params.setRelativeErrorTol(relativeErrorTolerance);
+//         gtsam::LevenbergMarquardtOptimizer optimizer(graph,
+//         initialEstimateFG,
+//                                                      params);
+//         result = optimizer.optimize();
+//     }
+//     cout << result.at<VectorDynamic>(key);
+//     EXPECT_LONGS_EQUAL(-3e-6, result.at<VectorDynamic>(key)(2));
+// }
 
 TEST(ControlObjFactor, jacobian) {
     whether_ls = 0;

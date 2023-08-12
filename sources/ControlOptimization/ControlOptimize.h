@@ -291,7 +291,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         loopCount++;
         // if (!whether_pa_changed)
         FactorGraphType::FindEliminatedVariables(tasks, maskForElimination,
-                                                 TaskSetNormal(tasks));
+                                                 taskSetType);
 
         RoundPeriod(tasks, maskForElimination, coeff);
         errCurr = FactorGraphType::RealObj(tasks, coeff, taskSetType);
