@@ -100,11 +100,11 @@ class DAG_Model {
     }
     static std::string Type() { return "dag"; }
 
-    inline void RoundPeriodDeadline(double round_quantum = PeriodRoundQuantum) {
+    inline void RoundPeriod(double round_quantum = PeriodRoundQuantum) {
         for (Task &task_curr : tasks_) {
             task_curr.period =
                 round(task_curr.period / round_quantum) * round_quantum;
-            task_curr.deadline = task_curr.period;
+            // task_curr.deadline = task_curr.period;
         }
     }
     /**

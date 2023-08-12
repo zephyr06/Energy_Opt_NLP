@@ -23,7 +23,8 @@ struct DAG_Nasri19 : public TaskSetNormal {
         hyperPeriod = GetHyperPeriodNasri(dagsNum);
 
         tasksVecNasri_ = dagsNum;
-        RoundPeriodDeadline();
+        RoundPeriod();
+
         for (size_t taskId = 0; taskId < tasksVecNasri_.size(); taskId++) {
             for (size_t jobId = 0; jobId < tasksVecNasri_[taskId].tasks_.size();
                  jobId++) {
@@ -49,9 +50,9 @@ struct DAG_Nasri19 : public TaskSetNormal {
     static inline std::string Type() { return "Nasri19"; }
 
     // round for tasksVecNasri_
-    void RoundPeriodDeadline() {
+    void RoundPeriod() {
         for (uint i = 0; i < tasksVecNasri_.size(); i++) {
-            tasksVecNasri_[i].RoundPeriodDeadline();
+            tasksVecNasri_[i].RoundPeriod();
         }
     }
 

@@ -144,6 +144,15 @@ TEST(rta, Sync) {
     std::cout << rta << std::endl;
 }
 
+TEST(read_dag, rounding) {
+    rt_num_opt::PeriodRoundQuantum = 1;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v5.yaml";
+    rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    EXPECT_LONGS_EQUAL(50000, tasks_dag.tasks_[0].period);
+    EXPECT_LONGS_EQUAL(30000, tasks_dag.tasks_[0].deadline);
+}
+
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);
