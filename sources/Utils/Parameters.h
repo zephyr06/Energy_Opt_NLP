@@ -120,6 +120,7 @@ const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
 const double eliminateStep = (double)ConfigParameters["eliminateStep"];
 double frequencyRatio = (double)ConfigParameters["frequencyRatio"];
 double timeScaleFactor = (double)ConfigParameters["timeScaleFactor"];
+double PeriodRoundQuantum= (double)ConfigParameters["PeriodRoundQuantum"];
 double SkipRateFindElimination =
     (double)ConfigParameters["SkipRateFindElimination"];
 double jacobianScale = (double)ConfigParameters["jacobianScale"];

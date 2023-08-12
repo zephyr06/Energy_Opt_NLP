@@ -90,6 +90,7 @@ class DAG_Model {
         longestPath = 0;
         volume = 0;
     }
+
     inline TaskSet GetNormalTaskSet() { return tasks_; }
     inline Graph GetGraph() { return graph_; }
     inline IndexVertexMap GetIndexVertexMap() { return index2Vertex_; }
@@ -99,6 +100,13 @@ class DAG_Model {
     }
     static std::string Type() { return "dag"; }
 
+    inline void RoundPeriodDeadline(double round_quantum = PeriodRoundQuantum) {
+        for (Task &task_curr : tasks_) {
+            task_curr.period =
+                round(task_curr.period / round_quantum) * round_quantum;
+            task_curr.deadline = task_curr.period;
+        }
+    }
     /**
      * @brief weight of edge is the same as child task's execution time
      *
@@ -121,7 +129,8 @@ class DAG_Model {
     TaskSet GetTasks() const { return tasks_; }
 
     double Volume() {
-        if (volume) return volume;
+        if (volume)
+            return volume;
         for (uint i = 0; i < tasks_.size(); i++) {
             volume += tasks_[i].executionTime;
         }
@@ -131,7 +140,8 @@ class DAG_Model {
         int weight;
     };
     double CriticalPath() {
-        if (longestPath) return longestPath;
+        if (longestPath)
+            return longestPath;
         std::vector<Vertex> sources, sinks;
 
         boost::graph_traits<Graph>::in_edge_iterator ei, edge_end_i;
@@ -139,9 +149,11 @@ class DAG_Model {
         boost::graph_traits<Graph>::vertex_iterator vi, viEnd;
         for (boost::tie(vi, viEnd) = vertices(graph_); vi != viEnd; ++vi) {
             boost::tie(ei, edge_end_i) = in_edges(*vi, graph_);
-            if (ei == edge_end_i) sources.push_back(*vi);
+            if (ei == edge_end_i)
+                sources.push_back(*vi);
             boost::tie(eo, edge_end_o) = out_edges(*vi, graph_);
-            if (eo == edge_end_o) sinks.push_back(*vi);
+            if (eo == edge_end_o)
+                sinks.push_back(*vi);
         }
         AddVertexMy(graph_, index2Vertex_, N);
         AddVertexMy(graph_, index2Vertex_, N + 1);
@@ -210,7 +222,8 @@ DAG_Model ReadDAG_Task(std::string path, std::string priorityType = "orig") {
         DAG_Model dagModel(tasks);
         string line;
         while (getline(file, line)) {
-            if (line[0] != '*') continue;
+            if (line[0] != '*')
+                continue;
             line = line.substr(1, int(line.size()) - 1);
             vector<int> dataInLine;
             while ((pos = line.find(delimiter)) != string::npos) {

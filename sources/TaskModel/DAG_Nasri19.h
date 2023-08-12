@@ -19,10 +19,11 @@ struct DAG_Nasri19 : public TaskSetNormal {
      *               ...
      * @param dagsNum
      */
-    DAG_Nasri19(std::vector<rt_num_opt::DAG_Model> &dagsNum) {
+    DAG_Nasri19(const std::vector<rt_num_opt::DAG_Model> &dagsNum) {
         hyperPeriod = GetHyperPeriodNasri(dagsNum);
 
         tasksVecNasri_ = dagsNum;
+        RoundPeriodDeadline();
         for (size_t taskId = 0; taskId < tasksVecNasri_.size(); taskId++) {
             for (size_t jobId = 0; jobId < tasksVecNasri_[taskId].tasks_.size();
                  jobId++) {
@@ -37,15 +38,22 @@ struct DAG_Nasri19 : public TaskSetNormal {
     }
 
     static long long int GetHyperPeriodNasri(
-        std::vector<rt_num_opt::DAG_Model> &dagsNum) {
+        const std::vector<rt_num_opt::DAG_Model> &dagsNum) {
         TaskSet tasks;
         for (size_t taskId = 0; taskId < dagsNum.size(); taskId++) {
-            tasks.push_back(dagsNum[taskId].tasks_[0]);
+            tasks.push_back(dagsNum.at(taskId).tasks_[0]);
         }
         return HyperPeriod(tasks);
     }
 
     static inline std::string Type() { return "Nasri19"; }
+
+    // round for tasksVecNasri_
+    void RoundPeriodDeadline() {
+        for (uint i = 0; i < tasksVecNasri_.size(); i++) {
+            tasksVecNasri_[i].RoundPeriodDeadline();
+        }
+    }
 
     void SyncTaskSet() {
         int index = 0;

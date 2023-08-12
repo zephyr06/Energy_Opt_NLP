@@ -1,54 +1,54 @@
 %YAML:1.0
 
 # optimization seettings
-runMode: normal
+runMode: compare
 testDataSetName: test_n3_v5
 
 
 debugMode: 0
-executionTimeModel: 1 # 1 is normal, 2 is more difficult
+executionTimeModel: 2 # 1 is normal, 2 is more difficult
 elimIte: 0
-EnergyMode: 1
-batchOptimizeFolder: ControlPerformance
+EnergyMode: 2
+batchOptimizeFolder: DAGPerformance
 core_m_dag: 4
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
-eliminateTol: 1e0
-eliminateStep: 1.5
+eliminateTol: 1e1
+eliminateStep: 10
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
-roundTypeInClamp: "rough"
-clampTypeMiddle: "rough"
+roundTypeInClamp: "none"
+clampTypeMiddle: "none"
 exactJacobian: 0
 #*************************************************************
 
 # optimizer settings
-optimizerType: 6
+optimizerType: 5
 deltaInitialDogleg: 1e13
-initialLambda: 1e3
+initialLambda: 1e0
 lowerLambda: 1e-10
 upperLambda: 1e50
-verbosityLM: "SILENT" # SUMMARY  TRYDELTA SILENT
-relativeErrorTolerance: 1e-5
-setDiagonalDamping: 1
+verbosityLM: "SILENT"
+relativeErrorTolerance: 1e-3
 whether_ls: 0
+setDiagonalDamping: 1
 jacobianScale: 1
-whether_IPM: 0
 #*************************************************************
 
 
 # in generating task set
 parallelFactor: 0.2
-PeriodSetAM: [1, 2, 5, 10, 20, 50,100]
+PeriodSetAM: [1, 2, 5, 10, 20, 50, 100]
 timeScaleFactor: 1e4
 maxNode_GenerateTaskSet: 20
 #*************************************************************
 
 # used in control
-relativeErrorToleranceInit: 1e-6
+PeriodRoundQuantum: 1
+relativeErrorToleranceInit: 1e-7
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
-MaxLoopControl: 1
+MaxLoopControl: 1e4
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
 weightSchedulabilityMax: 1e12
 weightSchedulabilityStep: 1.5
@@ -78,18 +78,17 @@ punishmentFrequency: 10
 maxIterationsOptimizer: 1e3
 gradientModify: 0
 utilTol: 1e-3
-linearOptimizerType: "MULTIFRONTAL_CHOLESKY"
+linearOptimizerType: "MULTIFRONTAL_QR"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
 enableReorder: 0
-deltaOptimizer: 1e-5
+deltaOptimizer: 1e-4
 readTaskMode: RM
 baselineLLCompare: 1
 printRTA: 0
 printFailureFile: 1
+noiseModelSigma: 1e0
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e8
-noiseModelSigma: 1e0
 #*************************************************************
-
 

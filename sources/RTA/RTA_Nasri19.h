@@ -34,9 +34,21 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
     VectorDynamic ResponseTimeOfTaskSet(const VectorDynamic &warmStart) {
         return ResponseTimeOfTaskSet();
     }
+    bool IsTasksValid() const {
+        for (uint i = 0; i < dagNasri_.tasks_.size(); i++) {
+            const Task &task_curr = dagNasri_.tasks_[i];
+            if (task_curr.period < task_curr.executionTimeOrg ||
+                task_curr.deadline < task_curr.executionTimeOrg)
+                return false;
+        }
+        return true;
+    }
     VectorDynamic ResponseTimeOfTaskSet() {
         BeginTimer(__func__);
         IncrementCallingTimes();
+
+        if (!IsTasksValid())
+            return GenerateInvalidRTA(dagNasri_.tasks_.size());
         // prepare input
         std::stringstream tasksInput;
         tasksInput << dagNasri_.ConvertTasksetToCsv();
