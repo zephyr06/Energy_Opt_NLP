@@ -172,12 +172,14 @@ struct DAG_Nasri19 : public TaskSetNormal {
                      taskIndex < hyperPeriod / dag.tasks_[0].period;
                      taskIndex++) {
                     int globalId = IdJob2Global(taskId, jobId, taskIndex);
-                    taskSetStr += LineInTaskCsv(
-                        taskId, globalId,
-                        tasks_[0].offset + taskIndex * dag.tasks_[0].period,
-                        dag.tasks_[jobId].executionTime,
-                        tasks_[0].offset + taskIndex * dag.tasks_[0].period +
-                            dag.tasks_[0].deadline);
+                    taskSetStr +=
+                        LineInTaskCsv(taskId, globalId,
+                                      tasks_[jobId].offset +
+                                          taskIndex * dag.tasks_[jobId].period,
+                                      dag.tasks_[jobId].executionTime,
+                                      tasks_[jobId].offset +
+                                          taskIndex * dag.tasks_[jobId].period +
+                                          dag.tasks_[jobId].deadline);
                 }
             }
         }
