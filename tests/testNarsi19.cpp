@@ -11,6 +11,7 @@
 #include "sources/Utils/Parameters.h"
 
 TEST(io, read_vector) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     rt_num_opt::ReadVec("PeriodSetAM");
     for (auto x : rt_num_opt::PeriodSetAM) {
         std::cout << x << " ";
@@ -21,6 +22,7 @@ TEST(io, read_vector) {
 }
 
 TEST(IO, v1) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
     YAML::Node config = YAML::LoadFile(path);
@@ -36,6 +38,7 @@ TEST(IO, v1) {
     // fout.close();
 }
 TEST(io, v2) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
     auto dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
@@ -47,6 +50,7 @@ TEST(io, v2) {
     EXPECT_LONGS_EQUAL(3, dags[2].tasks_[2].executionTime);
 }
 TEST(io, v3) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
     auto dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
@@ -55,6 +59,7 @@ TEST(io, v3) {
 }
 
 TEST(io, no_edge) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n5_v23.csv";
     auto dag = rt_num_opt::ReadDAG_Task(path);
@@ -69,6 +74,7 @@ TEST(io, no_edge) {
     EXPECT_LONGS_EQUAL(0, boost::num_edges(dagsRead[0].graph_));
 }
 TEST(io, Nasri) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
     std::vector<rt_num_opt::DAG_Model> dags =
@@ -80,6 +86,7 @@ TEST(io, Nasri) {
 
 TEST(rta, Nasri) {
     rt_num_opt::core_m_dag = 3;
+    rt_num_opt::PeriodRoundQuantum = 1;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
     std::vector<rt_num_opt::DAG_Model> dags =
@@ -98,6 +105,7 @@ TEST(rta, Nasri) {
 
 TEST(rta, Nasri_no_edge) {
     rt_num_opt::core_m_dag = 3;
+    rt_num_opt::PeriodRoundQuantum = 1;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test2.yaml";
     std::vector<rt_num_opt::DAG_Model> dags =
@@ -115,6 +123,7 @@ TEST(rta, Nasri_no_edge) {
 }
 
 TEST(rta, Sync) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     rt_num_opt::core_m_dag = 3;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";

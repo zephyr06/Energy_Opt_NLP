@@ -36,6 +36,7 @@ using namespace rt_num_opt;
 // }
 
 TEST(iterate, v1) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     BeginTimer("main");
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v14.yaml";
@@ -46,6 +47,7 @@ TEST(iterate, v1) {
 }
 
 TEST(iterate, v2) {
+    rt_num_opt::PeriodRoundQuantum = 1;
     BeginTimer("main");
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v15.yaml";
