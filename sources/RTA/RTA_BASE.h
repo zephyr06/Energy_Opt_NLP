@@ -17,6 +17,12 @@ inline void IncrementCallingTimes() { rtaCallingTimes++; }
 inline size_t ReadCallingTimes() { return rtaCallingTimes; }
 inline size_t ReadRTAControl() { return rtaControl; }
 
+inline VectorDynamic GenerateInvalidRTA(int n) {
+    VectorDynamic rta = GenerateVectorDynamic(n);
+    rta.setOnes();
+    rta = rta * 1e9;
+    return rta;
+}
 /**
  * @brief RTA_BASE encapsulate all the interafaces required
  *  by Energy_optimization.
