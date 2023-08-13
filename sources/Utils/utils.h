@@ -6,6 +6,7 @@
 #include "sources/MatrixConvenient.h"
 #include "sources/TaskModel/Tasks.h"
 
+#include "sources/TaskModel/TaskSetNormal.h"
 namespace rt_num_opt
 {
 

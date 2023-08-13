@@ -1,6 +1,8 @@
 #pragma once
 
 #include "sources/MatrixConvenient.h"
+
+#include "sources/TaskModel/TaskSetNormal.h"
 #include "sources/TaskModel/Tasks.h"
 #include "sources/Tools/profilier.h"
 

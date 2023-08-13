@@ -2,7 +2,7 @@
 
 #include "sources/MatrixConvenient.h"
 #include "sources/RTA/RTA_BASE.h"
-#include "sources/TaskModel/Tasks.h"
+#include "sources/TaskModel/TaskSetNormal.h"
 namespace rt_num_opt {
 class RTA_LL : public RTA_BASE<TaskSetNormal> {
    public:
