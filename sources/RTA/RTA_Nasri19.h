@@ -16,12 +16,14 @@ namespace rt_num_opt {
  */
 class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
    private:
-    DAG_Nasri19 dagNasri_;
+    DAG_Nasri19 dagNasri_;  // TODO: avoid this copy later
 
    public:
-    RTA_Nasri19(DAG_Nasri19 &dagNasri) : RTA_BASE<DAG_Nasri19>(dagNasri) {
+    RTA_Nasri19(const DAG_Nasri19 &dagNasri) : RTA_BASE<DAG_Nasri19>(dagNasri) {
         dagNasri_ = dagNasri;
     }
+
+    static std::string type() { return "Nasri19"; }
 
     double RTA_Common_Warm(double beginTime, int index) override {
         // CoutError(
@@ -34,6 +36,11 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
     VectorDynamic ResponseTimeOfTaskSet(const VectorDynamic &warmStart) {
         return ResponseTimeOfTaskSet();
     }
+
+    VectorDynamic ResponseTimeOfDag(size_t dag_index) {
+        return GenerateVectorDynamic1D(0);
+    }
+
     bool IsTasksValid() const {
         for (uint i = 0; i < dagNasri_.tasks_.size(); i++) {
             const Task &task_curr = dagNasri_.tasks_[i];
@@ -43,6 +50,7 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
         }
         return true;
     }
+
     VectorDynamic ResponseTimeOfTaskSet() {
         BeginTimer(__func__);
         IncrementCallingTimes();
@@ -51,9 +59,9 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
             return GenerateInvalidRTA(dagNasri_.tasks_.size());
         // prepare input
         std::stringstream tasksInput;
-        tasksInput << dagNasri_.ConvertTasksetToCsv();
+        tasksInput << dagNasri_.ConvertTasksetToCsv(debugMode == 1);
         std::stringstream dagInput;
-        dagInput << dagNasri_.convertDAGsToCsv();
+        dagInput << dagNasri_.convertDAGsToCsv(debugMode == 1);
         std::stringstream abortsInput;
         tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
 
@@ -64,8 +72,8 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
 
         // Set common analysis options
         NP::Analysis_options opts;
-        opts.timeout = 0;
-        opts.max_depth = 0;
+        opts.timeout = rt_num_opt::Nasri19Param_timeout;
+        opts.max_depth = rt_num_opt::Nasri19Param_max_depth;
         opts.early_exit = true;
         opts.num_buckets = problem.jobs.size();
         opts.be_naive = 0;
