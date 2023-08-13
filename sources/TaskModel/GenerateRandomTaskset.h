@@ -5,7 +5,7 @@
 
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/TaskModel/DAG_Task.h"
-#include "sources/TaskModel/Tasks.h"
+#include "sources/TaskModel/TaskSetNormal.h"
 #include "sources/Utils/Parameters.h"
 namespace rt_num_opt {
 
