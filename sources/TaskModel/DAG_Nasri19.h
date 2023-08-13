@@ -7,56 +7,80 @@
 
 namespace rt_num_opt {
 struct DAG_Nasri19 : public TaskSetNormal {
-    std::vector<rt_num_opt::DAG_Model>
-        tasksVecNasri_;  // it mainly stores the graphical structure of DAGs
-    // std::vector<int> nodeSizes_;
-    std::string dagCsv;
-    long long int hyperPeriod;
-
     DAG_Nasri19() {}
-    /**
-     * @brief Construct a new dag Nasri19 object
-     *               ...
-     * @param dagsNum
-     */
-    DAG_Nasri19(const std::vector<rt_num_opt::DAG_Model> &dagsNum) {
-        hyperPeriod = GetHyperPeriodNasri(dagsNum);
 
+    DAG_Nasri19(const std::vector<rt_num_opt::DAG_Model> &dagsNum) {
         tasksVecNasri_ = dagsNum;
         RoundPeriod();
 
         for (size_t taskId = 0; taskId < tasksVecNasri_.size(); taskId++) {
-            for (size_t jobId = 0; jobId < tasksVecNasri_[taskId].tasks_.size();
-                 jobId++) {
-                // for (int instanceId = 0; instanceId < hyperPeriod /
-                // tasksVecNasri_[i].tasks_[0].period; instanceId++)
-                // {
-                tasks_.push_back(tasksVecNasri_[taskId].tasks_[jobId]);
+            for (size_t nodeId = 0;
+                 nodeId < tasksVecNasri_[taskId].tasks_.size(); nodeId++) {
+                tasks_.push_back(tasksVecNasri_[taskId].tasks_[nodeId]);
             }
         }
+        hyperPeriod = HyperPeriod(tasks_);
         N = tasks_.size();
         dagCsv = convertDAGsToCsv();
     }
 
-    static long long int GetHyperPeriodNasri(
-        const std::vector<rt_num_opt::DAG_Model> &dagsNum) {
-        TaskSet tasks;
-        for (size_t taskId = 0; taskId < dagsNum.size(); taskId++) {
-            tasks.push_back(dagsNum.at(taskId).tasks_[0]);
-        }
-        return HyperPeriod(tasks);
+    size_t inline SizeDag() const { return tasksVecNasri_.size(); }
+
+    size_t SizeNode() const {
+        size_t size = 0;
+        for (uint i = 0; i < tasksVecNasri_.size(); i++)
+            size += tasksVecNasri_[i].tasks_.size();
+        return size;
+    }
+    inline const DAG_Model &getDag(size_t index) const {
+        return tasksVecNasri_[index];
     }
 
     static inline std::string Type() { return "Nasri19"; }
+
+    void AdjustPeriod(size_t dag_index, double delta) {
+        UpdatePeriod(dag_index, delta + tasksVecNasri_[dag_index].GetPeriod());
+    }
+
+    void UpdatePeriod(size_t dag_index, double period) {
+        // prevent some unrealistic values
+        if (period <= 0)
+            period = 1e7;
+        DAG_Model &dag_curr = tasksVecNasri_[dag_index];
+        for (uint i = 0; i < dag_curr.tasks_.size(); i++) {
+            dag_curr.tasks_[i].period = period;
+            dag_curr.tasks_[i].RoundPeriod();
+        }
+        UpdateTasksFromVecNasri_();
+        hyperPeriod = HyperPeriod(tasks_);
+    }
+
+    void UpdateTasksFromVecNasri_() {
+        uint node_count = 0;
+        for (uint i = 0; i < tasksVecNasri_.size(); i++) {
+            DAG_Model &dag_curr = tasksVecNasri_[i];
+            for (uint j = 0; j < dag_curr.tasks_.size(); j++) {
+                tasks_[node_count++].period = dag_curr.tasks_[j].period;
+            }
+        }
+    }
 
     // round for tasksVecNasri_
     void RoundPeriod() {
         for (uint i = 0; i < tasksVecNasri_.size(); i++) {
             tasksVecNasri_[i].RoundPeriod();
         }
+        for (Task &task_curr : tasks_) task_curr.RoundPeriod();
     }
 
-    void SyncTaskSet() {
+    void UpdateTaskSet(const TaskSet &tasks) {
+        tasks_ = tasks;
+        UpdateTasksVecNasri_();
+        RoundPeriod();
+        hyperPeriod = HyperPeriod(tasks_);
+    }
+
+    void UpdateTasksVecNasri_() {
         int index = 0;
         for (size_t taskId = 0; taskId < tasksVecNasri_.size(); taskId++) {
             for (size_t jobId = 0; jobId < tasksVecNasri_[taskId].tasks_.size();
@@ -65,6 +89,7 @@ struct DAG_Nasri19 : public TaskSetNormal {
             }
         }
     }
+
     /**
      * @brief
      *
@@ -159,7 +184,7 @@ struct DAG_Nasri19 : public TaskSetNormal {
 
     std::string ConvertTasksetToCsv(
         bool saveOnDisk = whetherWriteNasriTaskSet) {
-        SyncTaskSet();
+        UpdateTasksVecNasri_();
 
         std::string taskSetStr =
             "Task ID,     Job ID,          Arrival min,          Arrival max,  "
@@ -167,19 +192,20 @@ struct DAG_Nasri19 : public TaskSetNormal {
             "           Priority\n";
         for (size_t taskId = 0; taskId < tasksVecNasri_.size(); taskId++) {
             DAG_Model &dag = tasksVecNasri_[taskId];
-            for (size_t jobId = 0; jobId < dag.tasks_.size(); jobId++) {
-                for (size_t taskIndex = 0;
-                     taskIndex < hyperPeriod / dag.tasks_[0].period;
-                     taskIndex++) {
-                    int globalId = IdJob2Global(taskId, jobId, taskIndex);
-                    taskSetStr +=
-                        LineInTaskCsv(taskId, globalId,
-                                      tasks_[jobId].offset +
-                                          taskIndex * dag.tasks_[jobId].period,
-                                      dag.tasks_[jobId].executionTime,
-                                      tasks_[jobId].offset +
-                                          taskIndex * dag.tasks_[jobId].period +
-                                          dag.tasks_[jobId].deadline);
+            for (size_t nodeId = 0; nodeId < dag.tasks_.size(); nodeId++) {
+                Task &task_curr = tasksVecNasri_[taskId].tasks_[nodeId];
+                int period = task_curr.period;
+                // int period = tasksVecNasri_[taskId].tasks_[0].period;
+                for (size_t node_job_index = 0;
+                     node_job_index < size_t(hyperPeriod / period);
+                     node_job_index++) {
+                    int globalId = IdJob2Global(taskId, nodeId, node_job_index);
+                    taskSetStr += LineInTaskCsv(
+                        taskId, globalId,
+                        task_curr.offset + node_job_index * period,
+                        task_curr.executionTime,
+                        task_curr.offset + node_job_index * period +
+                            task_curr.deadline);
                 }
             }
         }
@@ -196,6 +222,7 @@ struct DAG_Nasri19 : public TaskSetNormal {
         return std::to_string(predTId) + ", " + std::to_string(predJId) + ", " +
                std::to_string(SuccTId) + ", " + std::to_string(succJId) + "\n";
     }
+
     std::string convertDAGsToCsv(bool saveOnDisk = whetherWriteNasriTaskSet) {
         std::string dependStr =
             "Predecessor TID,	Predecessor JID,	Successor TID, "
@@ -224,9 +251,16 @@ struct DAG_Nasri19 : public TaskSetNormal {
         }
         return dependStr;
     }
+
+    // data members
+    long long int hyperPeriod;
+    std::vector<rt_num_opt::DAG_Model>
+        tasksVecNasri_;  // it mainly stores the graphical structure of DAGs
+    // std::vector<int> nodeSizes_;
+    std::string dagCsv;
 };
 
-DAG_Nasri19 ReadDAGNasri19_Tasks(
+inline DAG_Nasri19 ReadDAGNasri19_Tasks(
     std::string path)  // std::string priorityType = "orig"
 {
     std::vector<rt_num_opt::DAG_Model> dagsNum = ReadDAG_NasriFromYaml(path);
