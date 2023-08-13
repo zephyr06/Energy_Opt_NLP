@@ -67,12 +67,8 @@ class DAG_Model {
     IndexVertexMap index2Vertex_;
     int N;
     double longestPath;
-    double volume;
 
-    DAG_Model() {
-        longestPath = 0;
-        volume = 0;
-    }
+    DAG_Model() { longestPath = 0; }
     DAG_Model(TaskSet &tasks) {
         tasks_ = tasks;
         N = tasks.size();
@@ -80,7 +76,6 @@ class DAG_Model {
         graph_ = ss.first;
         index2Vertex_ = ss.second;
         longestPath = 0;
-        volume = 0;
     }
     // constructors for DAG specifically
     DAG_Model(TaskSet &tasks, Graph &graph, IndexVertexMap &index2Vertex,
@@ -88,7 +83,6 @@ class DAG_Model {
         : tasks_(tasks), graph_(graph), index2Vertex_(index2Vertex) {
         N = tasks.size();
         longestPath = 0;
-        volume = 0;
     }
 
     inline TaskSet GetNormalTaskSet() { return tasks_; }
@@ -98,13 +92,12 @@ class DAG_Model {
         auto vertex2index_ = boost::get(boost::vertex_name, graph_);
         return vertex2index_;
     }
+    inline double GetPeriod() const { return tasks_[0].period; }
     static std::string Type() { return "dag"; }
 
-    inline void RoundPeriod(double round_quantum = PeriodRoundQuantum) {
+    inline void RoundPeriod() {
         for (Task &task_curr : tasks_) {
-            task_curr.period =
-                round(task_curr.period / round_quantum) * round_quantum;
-            // task_curr.deadline = task_curr.period;
+            task_curr.RoundPeriod();
         }
     }
     /**
@@ -128,13 +121,12 @@ class DAG_Model {
     }
     TaskSet GetTasks() const { return tasks_; }
 
-    double Volume() {
-        if (volume)
-            return volume;
+    double Volume() const {
+        double volume_curr = 0;
         for (uint i = 0; i < tasks_.size(); i++) {
-            volume += tasks_[i].executionTime;
+            volume_curr += tasks_[i].executionTime;
         }
-        return volume;
+        return volume_curr;
     }
     struct EdgeProperties {
         int weight;
