@@ -6,6 +6,7 @@
 #include "AlgorithmImpl.hpp"
 
 #include "sources/TaskModel/Tasks.h"
+#include "sources/TaskModel/TaskSetNormal.h"
 
 template <typename GenotypeType>
 class NumericAlgorithm : public Algorithm<GenotypeType>

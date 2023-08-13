@@ -5,6 +5,7 @@
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/MatrixConvenient.h"
 #include "sources/TaskModel/Tasks.h"
+#include "sources/TaskModel/TaskSetNormal.h"
 #include "sources/Utils/Parameters.h"
 #include "sources/Utils/utils.h"
 

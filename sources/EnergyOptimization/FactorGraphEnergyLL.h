@@ -16,6 +16,7 @@
 #include "sources/RTA/RTA_LL.h"
 #include "sources/RTA/RTA_Nasri19.h"
 #include "sources/TaskModel/Tasks.h"
+#include "sources/TaskModel/TaskSetNormal.h"
 #include "sources/Utils/FactorGraphUtils.h"
 #include "sources/Utils/GlobalVariables.h"
 #include "sources/Utils/InequalifyFactor.h"

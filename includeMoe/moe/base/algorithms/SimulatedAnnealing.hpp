@@ -4,7 +4,7 @@
 #include "../parameters/SAParameters.hpp"
 
 #include "sources/TaskModel/Tasks.h"
-
+#include "sources/TaskModel/TaskSetNormal.h"
 namespace moe
 {
 
