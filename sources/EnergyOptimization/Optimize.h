@@ -24,11 +24,12 @@
 #include <Eigen/Dense>
 #include <chrono>
 
+#include "sources/TaskModel/Tasks.h"
+#include "sources/TaskModel/TaskSetNormal.h"
 #include "sources/EnergyOptimization/Energy.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/MatrixConvenient.h"
 #include "sources/RTA/RTA_LL.h"
-#include "sources/TaskModel/Tasks.h"
 #include "sources/Utils/GlobalVariables.h"
 #include "sources/Utils/Parameters.h"
 #include "sources/Utils/utils.h"
