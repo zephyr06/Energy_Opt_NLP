@@ -43,10 +43,10 @@ struct DAG_Nasri19 : public TaskSetNormal {
     }
 
     void UpdatePeriod(size_t dag_index, double period) {
+        DAG_Model &dag_curr = tasksVecNasri_[dag_index];
         // prevent some unrealistic values
         if (period <= 0)
-            period = 1e7;
-        DAG_Model &dag_curr = tasksVecNasri_[dag_index];
+            period = std::max(1e0, dag_curr.tasks_[0].executionTime / 2.0);
         for (uint i = 0; i < dag_curr.tasks_.size(); i++) {
             dag_curr.tasks_[i].period = period;
             dag_curr.tasks_[i].RoundPeriod();
