@@ -35,11 +35,6 @@ jacobianScale: 1
 whether_IPM: 0
 #*************************************************************
 
-# used in Nasri19ECRTS 
-Nasri19Param_timeout: 1e-1
-Nasri19Param_max_depth: 0
-
-
 
 # in generating task set
 parallelFactor: 0.2
@@ -66,6 +61,9 @@ relativeErrorToleranceOuterLoop: 1e-7
 weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 #*************************************************************
 
+# used in Nasri19ECRTS 
+Nasri19Param_timeout: 1e-1
+Nasri19Param_max_depth: 0
 
 # used in SA
 randomInitialize: 0

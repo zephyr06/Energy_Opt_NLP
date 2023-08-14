@@ -266,8 +266,9 @@ struct FactorGraphNasri {
         while (!whether_new_eliminate && disturb <= disturb_max) {
             for (uint i = 0; i < taskSetType.SizeDag(); i++) {
                 // tasks[i].period -= disturb;
-                taskSetType.AdjustPeriod(i, disturb * -1);
-                Schedul_Analysis r1(taskSetType);
+                TaskSetType taskSetTypeCurr = taskSetType;
+                taskSetTypeCurr.AdjustPeriod(i, disturb * -1);
+                Schedul_Analysis r1(taskSetTypeCurr);
                 VectorDynamic rtaCurr = r1.ResponseTimeOfTaskSet();
                 if ((rtaBase - rtaCurr).array().abs().maxCoeff() >= disturb ||
                     !r1.CheckSchedulabilityDirect(rtaCurr)) {
@@ -276,7 +277,7 @@ struct FactorGraphNasri {
                     maskForElimination[i] = true;
                 }
                 // tasks[i].period += disturb;
-                taskSetType.AdjustPeriod(i, disturb * 1);
+                taskSetTypeCurr.AdjustPeriod(i, disturb * 1);
             }
             if (!whether_new_eliminate)
                 disturb *= disturb_step;
