@@ -46,10 +46,15 @@ struct DAG_Nasri19 : public TaskSetNormal {
         DAG_Model &dag_curr = tasksVecNasri_[dag_index];
         // prevent some unrealistic values
         if (period <= 0)
-            period = std::max(1e0, dag_curr.tasks_[0].executionTime / 2.0);
+            period = 1e0;
+
         for (uint i = 0; i < dag_curr.tasks_.size(); i++) {
             dag_curr.tasks_[i].period = period;
-            dag_curr.tasks_[i].RoundPeriod();
+            if (period >=
+                dag_curr.tasks_[i]
+                    .executionTime)  // otherwise, this is unschedulable, and we
+                                     // hope the system simply return it
+                dag_curr.tasks_[i].RoundPeriod();
         }
         UpdateTasksFromVecNasri_();
         hyperPeriod = HyperPeriod(tasks_);

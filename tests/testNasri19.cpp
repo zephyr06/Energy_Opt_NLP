@@ -152,6 +152,21 @@ TEST(read_dag, rounding) {
     EXPECT_LONGS_EQUAL(50000, tasks_dag.tasks_[0].period);
     EXPECT_LONGS_EQUAL(30000, tasks_dag.tasks_[0].deadline);
 }
+TEST(DAG, Adjust_period) {
+    rt_num_opt::PeriodRoundQuantum = 1000;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v18.yaml";
+    rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    tasks_dag.UpdatePeriod(0, 2000);
+    tasks_dag.UpdatePeriod(1, 2000);
+    tasks_dag.AdjustPeriod(1, -759);
+    EXPECT_LONGS_EQUAL(2000, tasks_dag.tasks_[1].period);
+    EXPECT_LONGS_EQUAL(2000, tasks_dag.tasks_[2].period);
+    tasks_dag.AdjustPeriod(1, -1100);
+    EXPECT_LONGS_EQUAL(1000, tasks_dag.tasks_[2].period);
+    tasks_dag.AdjustPeriod(1, -2400);
+    EXPECT_LONGS_EQUAL(1, tasks_dag.tasks_[2].period);
+}
 
 int main() {
     TestResult tr;
