@@ -9,6 +9,7 @@
 
 // #include "sources/ControlOptimization/CoeffFactor.h"
 // #include "sources/ControlOptimization/FactorGraphForceManifold.h"
+#include "sources/ControlOptimization/AdjustPriority.h"
 #include "sources/ControlOptimization/FactorGraph_Nasri19.h"
 #include "sources/Utils/FactorGraphUtils.h"
 #include "sources/Utils/InequalifyFactor.h"
