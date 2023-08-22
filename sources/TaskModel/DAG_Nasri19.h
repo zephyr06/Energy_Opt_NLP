@@ -106,11 +106,11 @@ struct DAG_Nasri19 : public TaskSetNormal {
      * @return std::string
      */
     inline std::string LineInTaskCsv(int taskId, int jobId, int release,
-                                     int cost, int deadline) {
+                                     int cost, int deadline, int priority) {
         return std::to_string(taskId) + ", " + std::to_string(jobId) + ", " +
                std::to_string(release) + ", " + std::to_string(release) + ", " +
                std::to_string(cost) + ", " + std::to_string(cost) + ", " +
-               std::to_string(deadline) + ", " + std::to_string(deadline) +
+               std::to_string(deadline) + ", " + std::to_string(priority) +
                "\n";
     }
 
@@ -205,12 +205,18 @@ struct DAG_Nasri19 : public TaskSetNormal {
                      node_job_index < size_t(hyperPeriod / period);
                      node_job_index++) {
                     int globalId = IdJob2Global(taskId, nodeId, node_job_index);
+                    int priority = task_curr.priority;
+                    if (priority ==
+                        -1)  // not set, so switch to absolute deadline
+                        priority = task_curr.offset + node_job_index * period +
+                                   task_curr.deadline;
                     taskSetStr += LineInTaskCsv(
                         taskId, globalId,
                         task_curr.offset + node_job_index * period,
                         task_curr.executionTime,
                         task_curr.offset + node_job_index * period +
-                            task_curr.deadline);
+                            task_curr.deadline,
+                        priority);
                 }
             }
         }

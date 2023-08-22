@@ -187,6 +187,19 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                                                          periodResCurr);
 
         // adjust tasks' priority based on RM
+        if (enableReorder > 0) {
+            // errCurr = FactorGraphType::RealObj(taskSetType, coeff);
+            // TaskSet tasksTry = tasks;
+            // VectorDynamic coeffTry = coeff;
+            // Reorder(tasksTry, coeffTry);
+            // double errCurrTry =
+            //     FactorGraphType::RealObj(tasksTry, coeffTry, taskSetType);
+            // if (errCurrTry < errCurr) {
+            //     tasks = tasksTry;
+            //     coeff = coeffTry;
+            //     // whether_pa_changed = true;
+            // }
+        }
 
         // adjust optimization settings
         loopCount++;

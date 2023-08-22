@@ -47,6 +47,7 @@ class Task {
     double period;
     double periodOrg;
     int processorId;
+    int priority = -1;  // -1 means not being set
 
     // initializer
 
@@ -57,7 +58,8 @@ class Task {
           offset(0),
           overhead(0),
           period(0),
-          processorId(0) {
+          processorId(0),
+          priority(-1) {
         executionTimeOrg = executionTime;
         periodOrg = period;
     }
@@ -67,7 +69,8 @@ class Task {
           executionTime(executionTime),
           offset(offset),
           overhead(overhead),
-          period(period) {
+          period(period),
+          priority(-1) {
         id = -1;
         processorId = -1;
         executionTimeOrg = executionTime;
@@ -81,7 +84,8 @@ class Task {
           offset(offset),
           overhead(overhead),
           period(period),
-          processorId(processorId) {
+          processorId(processorId),
+          priority(-1) {
         executionTimeOrg = executionTime;
         periodOrg = period;
     }
