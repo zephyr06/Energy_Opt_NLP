@@ -38,6 +38,15 @@ struct DAG_Nasri19 : public TaskSetNormal {
 
     static inline std::string Type() { return "Nasri19"; }
 
+    // based on rate-monotonic
+    void InitializePriority() {
+        for (Task &task_curr : tasks_) task_curr.priority = task_curr.period;
+        UpdateTasksVecNasri_();
+    }
+
+    // TODO: fill in!
+    void UpdatePriority(const std::vector<int> &task_id_seq) { ; }
+
     void AdjustPeriod(size_t dag_index, double delta) {
         UpdatePeriod(dag_index, delta + tasksVecNasri_[dag_index].GetPeriod());
     }
