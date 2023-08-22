@@ -119,13 +119,13 @@ std::vector<TaskPriority> SortPriorityBasedGradient(const TaskSet &tasks,
 // higher priority tasks appear first, lower priority task appear later
 std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
                                               const VectorDynamic &coeff,
-                                              const VectorDynamic &rta,
                                               double weight) {
     const TaskSet &tasks = dag_tasks.tasks_;
     std::vector<TaskPriority> tasks_w_pri = GetPriorityVector(dag_tasks);
     double obj_base =
         FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(dag_tasks, coeff);
 
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
     std::vector<TaskPriority> tasks_w_gra =
         SortPriorityBasedGradient(tasks, coeff, rta, weight);
 

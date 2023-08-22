@@ -121,4 +121,9 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
         return CheckSchedulabilityDirect(rta);
     }
 };
+
+inline VectorDynamic GetNasri19RTA(const DAG_Nasri19 &dagNasri) {
+    RTA_Nasri19 r(dagNasri);
+    return r.ResponseTimeOfTaskSet();
+}
 }  // namespace rt_num_opt

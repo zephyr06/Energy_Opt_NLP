@@ -8,8 +8,7 @@ TEST(RTA, V1) {
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v20.yaml";
     rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
-    RTA_Nasri19 r(dag_tasks);
-    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
     VectorDynamic rta_exp = rta;
     rta_exp << 500, 1500, 200, 100;
     EXPECT(gtsam::assert_equal(rta_exp, rta, 1e-3));
@@ -132,7 +131,7 @@ TEST(PriorityAssignment, ReorderWithGradient_v1) {
     std::cout << rta << "\n";
     double weight = -10;
     std::vector<TaskPriority> priority_vec =
-        ReorderWithGradient(dag_tasks, coeff, rta, weight);
+        ReorderWithGradient(dag_tasks, coeff, weight);
     // no changes because the RTA cannot be improved under any priority
     // assignments
     EXPECT_LONGS_EQUAL(0, priority_vec[0].task_index);
@@ -156,7 +155,7 @@ TEST(PriorityAssignment, ReorderWithGradient_v2) {
     std::cout << rta << "\n";
     double weight = -10;
     std::vector<TaskPriority> priority_vec =
-        ReorderWithGradient(dag_tasks, coeff, rta, weight);
+        ReorderWithGradient(dag_tasks, coeff, weight);
     std::cout << "New RTA:\n";
     DAG_Nasri19 dag_tasks_curr = dag_tasks;
     for (uint i = 0; i < priority_vec.size(); i++) {
