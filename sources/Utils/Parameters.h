@@ -126,6 +126,8 @@ double SkipRateFindElimination =
 double jacobianScale = (double)ConfigParameters["jacobianScale"];
 double control_sort_obj_coeff_weight = (double)ConfigParameters["control_sort_obj_coeff_weight"];
 double control_sort_exec_weight = (double)ConfigParameters["control_sort_exec_weight"];
+double weight_priority_assignment = (double)ConfigParameters["weight_priority_assignment"];
+
 double Nasri19Param_timeout = (double)ConfigParameters["Nasri19Param_timeout"];
 double Nasri19Param_max_depth = (double)ConfigParameters["Nasri19Param_max_depth"];
 

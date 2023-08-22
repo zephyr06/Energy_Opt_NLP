@@ -200,8 +200,9 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             //     coeff = coeffTry;
             //     // whether_pa_changed = true;
             // }
-            // std::vector<TaskPriority> pri_ass =
-            //     ReorderWithGradient(taskSetType, coeff, weight);
+            std::vector<TaskPriority> pri_ass = ReorderWithGradient(
+                taskSetType, coeff, weight_priority_assignment);
+            UpdateAllTasksPriority(taskSetType, pri_ass);
         }
 
         // adjust optimization settings
