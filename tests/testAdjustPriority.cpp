@@ -141,8 +141,15 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
                 if (tasks_w_pri[0].task_index != task_id_curr)
                     DecreasePriority(task_id_curr, tasks_w_pri);
                 break;
-            } else
+            } else {
+                if (debugMode == 1) {
+                    std::cout << "Priority change: task " << task_id_curr
+                              << "'s priority increases, and improves the "
+                                 "objective function from "
+                              << obj_base << " to " << obj_curr << "\n";
+                }
                 obj_base = obj_curr;
+            }
         }
     }
     return tasks_w_pri;
@@ -273,30 +280,34 @@ TEST(PriorityAssignment, ReorderWithGradient_v1) {
     EXPECT_LONGS_EQUAL(2, priority_vec[2].task_index);
     EXPECT_LONGS_EQUAL(3, priority_vec[3].task_index);
 }
-// TEST(PriorityAssignment, ReorderWithGradient_v2) {
-//     core_m_dag = 1;
-//     std::string path =
-//         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+TEST(PriorityAssignment, ReorderWithGradient_v2) {
+    core_m_dag = 1;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
-//     rt_num_opt::DAG_Nasri19 dag_tasks =
-//     rt_num_opt::ReadDAGNasri19_Tasks(path); TaskSet tasks = dag_tasks.tasks_;
-//     VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
-//     coeff << 1, 10, 2, 20, 3, 30, 4, 40;
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    TaskSet tasks = dag_tasks.tasks_;
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    coeff << 1, 10, 2, 20, 3, 30, 4, 40;
 
-//     std::cout << "RTA analysis:\n";
-//     RTA_Nasri19 r(dag_tasks);
-//     VectorDynamic rta = r.ResponseTimeOfTaskSet();
-//     std::cout << rta << "\n";
-//     double weight = -10;
-//     std::vector<TaskPriority> priority_vec =
-//         ReorderWithGradient(dag_tasks, coeff, rta, weight);
-//     // no changes because the RTA cannot be improved under any priority
-//     // assignments
-//     EXPECT_LONGS_EQUAL(0, priority_vec[0].task_index);
-//     EXPECT_LONGS_EQUAL(1, priority_vec[1].task_index);
-//     EXPECT_LONGS_EQUAL(2, priority_vec[2].task_index);
-//     EXPECT_LONGS_EQUAL(3, priority_vec[3].task_index);
-// }
+    std::cout << "RTA analysis:\n";
+    RTA_Nasri19 r(dag_tasks);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    std::cout << rta << "\n";
+    double weight = -10;
+    std::vector<TaskPriority> priority_vec =
+        ReorderWithGradient(dag_tasks, coeff, rta, weight);
+    std::cout << "New RTA:\n";
+    DAG_Nasri19 dag_tasks_curr = dag_tasks;
+    for (uint i = 0; i < priority_vec.size(); i++) {
+        dag_tasks_curr.tasks_[priority_vec[i].task_index].priority = i;
+    }
+    RTA_Nasri19 r1(dag_tasks_curr);
+    rta = r1.ResponseTimeOfTaskSet();
+    std::cout << rta << "\n";
+    EXPECT_LONGS_EQUAL(200, rta(2));
+    EXPECT_LONGS_EQUAL(300, rta(3));
+}
 
 int main() {
     TestResult tr;
