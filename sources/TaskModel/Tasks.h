@@ -118,8 +118,7 @@ class Task {
     void print() const {
         std::cout << "The period is: " << period << " The executionTime is "
                   << executionTime << " The deadline is " << deadline
-                  << " The overhead is " << overhead << " The offset is "
-                  << offset << std::endl;
+                  << " The priority is " << priority << std::endl;
     }
 
     double utilization() const { return double(executionTime) / period; }
