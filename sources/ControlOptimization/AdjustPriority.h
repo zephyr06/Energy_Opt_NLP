@@ -33,15 +33,20 @@ double GetObjGradient(int task_index, const TaskSet &tasks,
     return coeff(2 * task_index + 1) +
            weight / (tasks[task_index].deadline - rta(task_index));
 }
+
+void UpdateAllTasksPriority(DAG_Nasri19 &dag_tasks,
+                            const std::vector<TaskPriority> &priority_assign) {
+    for (uint i = 0; i < priority_assign.size(); i++) {
+        dag_tasks.tasks_[priority_assign[i].task_index].priority = i;
+    }
+}
+
 // TODO: how to describe priority assignments more elegant?
 double GetObjAfterAdjustPriority(
     const DAG_Nasri19 &dag_tasks, const VectorDynamic &coeff,
     const std::vector<TaskPriority> &priority_assign) {
     DAG_Nasri19 dag_tasks_curr = dag_tasks;
-    for (uint i = 0; i < priority_assign.size(); i++) {
-        dag_tasks_curr.tasks_[priority_assign[i].task_index].priority = i;
-    }
-
+    UpdateAllTasksPriority(dag_tasks_curr, priority_assign);
     return FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(dag_tasks_curr,
                                                                coeff);
 }
