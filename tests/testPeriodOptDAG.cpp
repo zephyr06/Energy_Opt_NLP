@@ -12,13 +12,9 @@ TEST(case1, v1) {
 
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
     TaskSet tasks = tasks_dag.tasks_;
-    VectorDynamic coeff = GenerateVectorDynamic(9 * 2);
-    coeff.setOnes();
-    for (uint i = 0; i < coeff.rows() / 2; i++)
-        coeff(2 * i + 1, 0) = coeff(2 * i + 1, 0) * 10;
-    // std::tie(tasks, coeff) = ReadControlCase(path1);
-    std::vector<bool> maskForElimination(tasks_dag.SizeDag(), false);
-    VectorDynamic periodInitial1 = GenerateVectorDynamic(tasks.size());
+    VectorDynamic coeff = ReadControlCoeff(path);
+
+    std::vector<bool> maskForElimination(tasks_dag.SizeNode(), false);
 
     auto sth =
         OptimizeTaskSetIterative<FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>,
