@@ -182,6 +182,39 @@ TEST(ReadControlCoeff, dag_v1) {
     coeff_expected << 978, 4531, 719, 4916, 480, 8022, 755, 7236;
     EXPECT(gtsam::assert_equal(coeff_expected, coeff_actual));
 }
+
+TEST(ExtractDAGPeriodVec, V1) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    vector<bool> maskForElimination(2);
+    maskForElimination[0] = true;
+    dag_tasks.AdjustPeriod(1, -2000);
+    gtsam::Values result =
+        FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::GenerateInitialFG(
+            dag_tasks, maskForElimination);
+    VectorDynamic periodVec =
+        FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::ExtractDAGPeriodVec(
+            result, dag_tasks);
+    EXPECT_LONGS_EQUAL(5000, periodVec(0));
+    EXPECT_LONGS_EQUAL(8000, periodVec(1));
+}
+TEST(ExtractDAGPeriodVec, V2) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    vector<bool> maskForElimination(2);
+    maskForElimination[0] = true;
+    dag_tasks.AdjustPeriod(0, -2000);
+    gtsam::Values result =
+        FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::GenerateInitialFG(
+            dag_tasks, maskForElimination);
+    VectorDynamic periodVec =
+        FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::ExtractDAGPeriodVec(
+            result, dag_tasks);
+    EXPECT_LONGS_EQUAL(3000, periodVec(0));
+    EXPECT_LONGS_EQUAL(10000, periodVec(1));
+}
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);

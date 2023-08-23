@@ -89,7 +89,7 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
     }
 
     VectorDynamic optComp;
-    optComp = FactorGraphType::ExtractResults(result, taskSetType);
+    optComp = FactorGraphType::ExtractDAGPeriodVec(result, taskSetType);
     if (debugMode == 1) {
         using namespace std;
         cout << std::endl;
@@ -150,6 +150,14 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
 //     return;
 // }
 
+bool ContainFalse(std::vector<bool> &eliminationRecord) {
+    for (uint i = 0; i < eliminationRecord.size(); i++) {
+        if (eliminationRecord[i] == false) {
+            return true;
+        }
+    }
+    return false;
+}
 // only accepts DAG-related task set type, update taskSetType during
 // optimization
 template <typename FactorGraphType, class TaskSetType, class Schedul_Analysis>
@@ -158,6 +166,9 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     std::vector<bool> &maskForElimination) {
     VectorDynamic periodResCurr, periodResPrev;
     std::vector<bool> maskForEliminationPrev = maskForElimination;
+    RTA_Nasri19 rr(taskSetType);
+    if (!rr.CheckSchedulability())
+        CoutError("The input DAG is not schedulable!");
     double errPrev = 1e30;
     double errCurr = FactorGraphType::RealObj(taskSetType, coeff);
     int loopCount = 0;
