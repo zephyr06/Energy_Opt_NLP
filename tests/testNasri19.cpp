@@ -3,6 +3,7 @@
 #include <gtsam/base/Testable.h>
 #include <yaml-cpp/yaml.h>
 
+#include "sources/MatrixConvenient.h"
 #include "sources/RTA/RTA_Nasri19.h"
 #include "sources/TaskModel/DAG_Nasri19.h"
 #include "sources/TaskModel/DAG_Task.h"
@@ -54,8 +55,10 @@ TEST(io, v3) {
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
     auto dags = rt_num_opt::ReadDAG_NasriFromYaml(path);
+    rt_num_opt::VectorDynamic dummy = rt_num_opt::GenerateVectorDynamic1D(0);
     rt_num_opt::WriteDAG_NasriToYaml(
-        dags, "/home/zephyr/Programming/Energy_Opt_NLP/build/testOutput1.yaml");
+        dags, "/home/zephyr/Programming/Energy_Opt_NLP/build/testOutput1.yaml",
+        dummy);
 }
 
 TEST(io, no_edge) {
@@ -67,7 +70,8 @@ TEST(io, no_edge) {
     dags.push_back(dag);
     std::string outputPath =
         "/home/zephyr/Programming/Energy_Opt_NLP/build/testOutput2.yaml";
-    rt_num_opt::WriteDAG_NasriToYaml(dags, outputPath);
+    rt_num_opt::VectorDynamic dummy = rt_num_opt::GenerateVectorDynamic1D(0);
+    rt_num_opt::WriteDAG_NasriToYaml(dags, outputPath, dummy);
     auto dagsRead = rt_num_opt::ReadDAG_NasriFromYaml(outputPath);
     EXPECT_LONGS_EQUAL(200, dagsRead[0].tasks_[0].period);
     EXPECT_LONGS_EQUAL(0, boost::num_edges(dag.graph_));
