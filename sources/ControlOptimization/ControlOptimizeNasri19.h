@@ -10,6 +10,7 @@
 // #include "sources/ControlOptimization/CoeffFactor.h"
 // #include "sources/ControlOptimization/FactorGraphForceManifold.h"
 #include "sources/ControlOptimization/AdjustPriority.h"
+#include "sources/ControlOptimization/ControlOptimize.h"
 #include "sources/ControlOptimization/FactorGraph_Nasri19.h"
 #include "sources/Utils/FactorGraphUtils.h"
 #include "sources/Utils/InequalifyFactor.h"
@@ -150,14 +151,6 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
 //     return;
 // }
 
-bool ContainFalse(std::vector<bool> &eliminationRecord) {
-    for (uint i = 0; i < eliminationRecord.size(); i++) {
-        if (eliminationRecord[i] == false) {
-            return true;
-        }
-    }
-    return false;
-}
 // only accepts DAG-related task set type, update taskSetType during
 // optimization
 template <typename FactorGraphType, class TaskSetType, class Schedul_Analysis>
