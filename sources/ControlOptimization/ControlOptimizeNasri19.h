@@ -164,6 +164,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         CoutError("The input DAG is not schedulable!");
     double errPrev = 1e30;
     double errCurr = FactorGraphType::RealObj(taskSetType, coeff);
+    double err_initial = errCurr;
     int loopCount = 0;
 
     // double disturbIte = eliminateTol;
@@ -233,7 +234,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     if (r.CheckSchedulability()) {
         return std::make_pair(
             GetParameterVD<double>(taskSetType.tasks_, "period"),
-            FactorGraphType::RealObj(taskSetType, coeff));
+            FactorGraphType::RealObj(taskSetType, coeff) / err_initial);
     } else {
         CoutError("Return unschedulable result during control optimization!");
         return std::make_pair(GenerateVectorDynamic1D(0), 1e9);
