@@ -24,9 +24,9 @@ int TargetFileType(std::string file) {
     if (file.find(".yaml") == file.length() - 5 &&
         file.find(".yaml") != std::string::npos)
         return 0;
-    else if (file.find("_control_north.txt") != std::string::npos)
+    else if (file.find("_Res_control_north.txt") != std::string::npos)
         return 1;
-    else if (file.find("_control_north_plus.txt") != std::string::npos)
+    else if (file.find("_Res_control_north_plus.txt") != std::string::npos)
         return 2;
     else
         return 3;
