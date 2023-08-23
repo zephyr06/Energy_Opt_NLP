@@ -95,7 +95,7 @@ struct FactorGraphNasri {
                 // TODO: !! consider whether using periodVec or not!
                 // double period_curr =
                 //     taskSetType.tasksVecNasri_[taskId].tasks_[nodeId].period;
-                double period_curr=periodVec(taskId,0);
+                double period_curr = periodVec(taskId, 0);
                 error(2 * node_overall_count) =
                     period_curr * coeff[2 * node_overall_count] +
                     rta(node_overall_count) * coeff[2 * node_overall_count + 1];
@@ -179,8 +179,7 @@ struct FactorGraphNasri {
                 UpdateTaskSetPeriodFromValues(taskSetTypeRounded, x);
                 Schedul_Analysis r(taskSetTypeRounded);
                 VectorDynamic rta = r.ResponseTimeOfTaskSet();
-                VectorDynamic periodVec = ExtractNodePeriodVec(x,
-                taskSetType);
+                VectorDynamic periodVec = ExtractDAGPeriodVec(x, taskSetType);
                 VectorDynamic error = GetControlObjVector(
                     rta, periodVec, taskSetTypeRounded, coeff);
                 EndTimer("f_with_RTA");
@@ -223,7 +222,7 @@ struct FactorGraphNasri {
                                 gtsam::Values xx = x;
                                 xx.update(a, xi);
                                 VectorDynamic periodVec =
-                                    ExtractNodePeriodVec(xx, taskSetType);
+                                    ExtractDAGPeriodVec(xx, taskSetType);
                                 return GetControlObjVector(rta_base, periodVec,
                                                            taskSetType, coeff);
                             };

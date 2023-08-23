@@ -5,7 +5,7 @@ runMode: normal
 testDataSetName: test_n3_v18
 
 
-debugMode: 1
+debugMode: 0
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 0
 EnergyMode: 1
@@ -50,7 +50,7 @@ relativeErrorToleranceInit: 1e-6
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
-MaxLoopControl: 1
+MaxLoopControl: 100
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
 weightSchedulabilityMax: 1e12
 weightSchedulabilityStep: 1.5
