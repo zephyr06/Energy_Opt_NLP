@@ -1,6 +1,6 @@
 #pragma once
 #include "sources/BatchControlOptimize.h"
-#include "sources/BatchOptimize.h"
+#include "sources/BatchOptimizeIO.h"
 #include "sources/BatchTestutils.h"
 #include "sources/ControlOptimization/ControlIfoptSpec.h"
 #include "sources/ControlOptimization/ControlOptimize.h"
@@ -36,7 +36,7 @@ inline std::string GetResFileName(const std::string &pathDataset,
                                   const std::string &file) {
     if (rt_num_opt::enableReorder == 0) {
         return pathDataset + file + "_control_north.txt";
-    } else if (rt_num_opt::enableReorder == 1) {
+    } else {  // (rt_num_opt::enableReorder == 1)
         return pathDataset + file + "_control_north_plus.txt";
     }
 }
@@ -59,17 +59,14 @@ bool VerifyResFileExist(const std::string &pathDataset,
 
 }  // namespace ControlNasri19
 
-
-
-
 namespace rt_num_opt {
 using namespace ControlOptimize;
 
 // only for Nasri19 experiment
 void BatchOptimizeNasri19(int Nn = 5) {
     const char *pathDataset;
-    "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" + std::to_string(Nn) +
-        "/";
+    std::string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" +
+                      std::to_string(Nn) + "/";
     pathDataset = str.c_str();
     if (debugMode == 1)
         printf("Directory: %s\n", pathDataset);

@@ -131,32 +131,24 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
                           FactorGraphType::RealObj(taskSetType, coeff));
 }
 
-void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination,
-                 VectorDynamic &coeff) {
-    if (roundTypeInClamp == "none")
-        return;
-    else if (roundTypeInClamp == "rough") {
-        for (uint i = 0; i < maskForElimination.size(); i++) {
-            if (maskForElimination[i]) {
-                tasks[i].period = ceil(tasks[i].period);
-            }
-        }
-    } else {
-        std::cout << "input error in ClampComputationTime: " << roundTypeInClamp
-                  << std::endl;
-        throw;
-    }
-    return;
-}
-
-bool ContainFalse(std::vector<bool> &eliminationRecord) {
-    for (uint i = 0; i < eliminationRecord.size(); i++) {
-        if (eliminationRecord[i] == false) {
-            return true;
-        }
-    }
-    return false;
-}
+// void RoundPeriod(TaskSet &tasks, std::vector<bool> &maskForElimination,
+//                  VectorDynamic &coeff) {
+//     if (roundTypeInClamp == "none")
+//         return;
+//     else if (roundTypeInClamp == "rough") {
+//         for (uint i = 0; i < maskForElimination.size(); i++) {
+//             if (maskForElimination[i]) {
+//                 tasks[i].period = ceil(tasks[i].period);
+//             }
+//         }
+//     } else {
+//         std::cout << "input error in ClampComputationTime: " <<
+//         roundTypeInClamp
+//                   << std::endl;
+//         throw;
+//     }
+//     return;
+// }
 
 // only accepts DAG-related task set type, update taskSetType during
 // optimization
