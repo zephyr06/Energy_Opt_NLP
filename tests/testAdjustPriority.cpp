@@ -5,6 +5,7 @@
 using namespace rt_num_opt;
 using namespace std;
 TEST(RTA, V1) {
+    core_m_dag = 4;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v20.yaml";
     rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
@@ -15,6 +16,7 @@ TEST(RTA, V1) {
 }
 
 TEST(PriorityAssignment, GetObjGradient) {
+    core_m_dag = 4;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
@@ -38,6 +40,7 @@ TEST(PriorityAssignment, GetObjGradient) {
                          GetObjGradient(3, tasks, coeff, rta, weight), 1e-6);
 }
 TEST(PriorityAssignment, SortPriorityBasedGradient) {
+    core_m_dag = 4;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
@@ -65,6 +68,7 @@ TEST(PriorityAssignment, SortPriorityBasedGradient) {
     EXPECT_LONGS_EQUAL(1, tasks_w_gra[3].task_index);
 }
 TEST(PriorityAssignment, GetPriorityVector) {
+    core_m_dag = 4;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
@@ -85,6 +89,7 @@ TEST(PriorityAssignment, GetPriorityVector) {
     EXPECT_LONGS_EQUAL(3, tasks_w_pri[3].task_index);
 }
 TEST(PriorityAssignment, In_De_creasePriority) {
+    core_m_dag = 4;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
@@ -117,6 +122,7 @@ TEST(PriorityAssignment, In_De_creasePriority) {
 }
 
 TEST(PriorityAssignment, ReorderWithGradient_v1) {
+    core_m_dag = 4;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
@@ -168,6 +174,14 @@ TEST(PriorityAssignment, ReorderWithGradient_v2) {
     EXPECT_LONGS_EQUAL(300, rta(3));
 }
 
+TEST(ReadControlCoeff, dag_v1) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    VectorDynamic coeff_actual = ReadControlCoeff(path);
+    VectorDynamic coeff_expected = GenerateVectorDynamic(8);
+    coeff_expected << 978, 4531, 719, 4916, 480, 8022, 755, 7236;
+    EXPECT(gtsam::assert_equal(coeff_expected, coeff_actual));
+}
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);

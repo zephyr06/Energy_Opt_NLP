@@ -41,6 +41,17 @@ int CountFiles(const std::string &path) {
     std::cout << "# of files in " << p1 << ": " << count << '\n';
     return count;
 }
+VectorDynamic GenerateControlCoefficient(
+    const std::vector<DAG_Model> &dagTaskSet) {
+    DAG_Nasri19 dagNasri19(dagTaskSet);
+    int n = dagNasri19.SizeNode();
+    VectorDynamic coeff = GenerateVectorDynamic(2 * n);
+    for (int i = 0; i < n; i++) {
+        coeff(2 * i) = rand() % 999 + 1;
+        coeff(2 * i + 1) = rand() % 9999 + 1;
+    }
+    return coeff;
+}
 int main(int argc, char *argv[]) {
     argparse::ArgumentParser program("program name");
     program.add_argument("-v", "--verbose");  // parameter packing
@@ -220,6 +231,8 @@ int main(int argc, char *argv[]) {
                     ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[j],
                     numberOfProcessor, periodCurr, periodCurr, deadlineType));
             }
+            VectorDynamic coeff_control_optimization =
+                GenerateControlCoefficient(dagTaskSet);
 
             string fileName = "periodic-dag-Nasri-set-" + to_string(N) + "-" +
                               string(3 - to_string(i).size(), '0') +
@@ -233,7 +246,8 @@ int main(int argc, char *argv[]) {
                     continue;
                 }
             }
-            WriteDAG_NasriToYaml(dagTaskSet, outDirectory + fileName);
+            WriteDAG_NasriToYaml(dagTaskSet, outDirectory + fileName,
+                                 coeff_control_optimization);
             // follow-up verification on system utilization
             auto tasksN =
                 rt_num_opt::ReadDAGNasri19_Tasks(outDirectory + fileName);
