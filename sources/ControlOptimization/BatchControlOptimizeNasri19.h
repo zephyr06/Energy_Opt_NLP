@@ -35,9 +35,9 @@ int TargetFileType(std::string file) {
 inline std::string GetNasri19ResFileName(const std::string &pathDataset,
                                          const std::string &file) {
     if (rt_num_opt::enableReorder == 0) {
-        return pathDataset + file + "_control_north.txt";
+        return pathDataset + file + "_Res_control_north.txt";
     } else {  // (rt_num_opt::enableReorder == 1)
-        return pathDataset + file + "_control_north_plus.txt";
+        return pathDataset + file + "_Res_control_north_plus.txt";
     }
 }
 void WriteToResultFile(const std::string &pathDataset, const std::string &file,
