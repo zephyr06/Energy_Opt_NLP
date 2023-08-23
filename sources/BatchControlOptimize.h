@@ -2,6 +2,7 @@
 #include "sources/BatchTestutils.h"
 #include "sources/ControlOptimization/ControlIfoptSpec.h"
 #include "sources/ControlOptimization/ControlOptimize.h"
+#include "sources/ControlOptimization/ControlOptimizeNasri19.h"
 namespace rt_num_opt {
 using namespace ControlOptimize;
 
@@ -181,10 +182,12 @@ void BatchOptimize(int Nn = 5) {
                                                  Schedul_Analysis>(
                             tasks, coeff, maskForElimination,
                             TaskSetNormal(tasks));
+                // NOTE: currently, only use this method for control_LL
+                // experiment
                 else if (optimizerType == 6) {
                     TaskSetNormal tasksN(tasks);
-                    res = OptimizeControlIfopt<TaskSetNormal, Schedul_Analysis>(
-                        tasksN, coeff);
+                    res = OptimizeControlIfopt<TaskSetNormal, RTA_LL>(tasksN,
+                                                                      coeff);
                 }
                 auto stop = std::chrono::high_resolution_clock::now();
                 size_t rtaCall = ReadRTAControl();
