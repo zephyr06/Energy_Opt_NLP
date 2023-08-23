@@ -19,6 +19,7 @@ struct DAG_Nasri19 : public TaskSetNormal {
                 tasks_.push_back(tasksVecNasri_[taskId].tasks_[nodeId]);
             }
         }
+        InitializePriority();
         hyperPeriod = HyperPeriod(tasks_);
         N = tasks_.size();
         dagCsv = convertDAGsToCsv();
