@@ -32,8 +32,8 @@ int TargetFileType(std::string file) {
         return 3;
 }
 
-inline std::string GetResFileName(const std::string &pathDataset,
-                                  const std::string &file) {
+inline std::string GetNasri19ResFileName(const std::string &pathDataset,
+                                         const std::string &file) {
     if (rt_num_opt::enableReorder == 0) {
         return pathDataset + file + "_control_north.txt";
     } else {  // (rt_num_opt::enableReorder == 1)
@@ -42,18 +42,18 @@ inline std::string GetResFileName(const std::string &pathDataset,
 }
 void WriteToResultFile(const std::string &pathDataset, const std::string &file,
                        double res, double timeTaken) {
-    std::string resFile = GetResFileName(pathDataset, file);
+    std::string resFile = GetNasri19ResFileName(pathDataset, file);
     rt_num_opt::WriteToResultFile(resFile, res, timeTaken);
 }
 std::pair<double, double> ReadFromResultFile(const std::string &pathDataset,
                                              const std::string &file) {
-    std::string resFile = GetResFileName(pathDataset, file);
+    std::string resFile = GetNasri19ResFileName(pathDataset, file);
     return rt_num_opt::ReadFromResultFile(resFile);
 }
 
 bool VerifyResFileExist(const std::string &pathDataset,
                         const std::string &file) {
-    std::string resFile = GetResFileName(pathDataset, file);
+    std::string resFile = GetNasri19ResFileName(pathDataset, file);
     return rt_num_opt::VerifyResFileExist(resFile);
 }
 
@@ -94,7 +94,7 @@ void BatchOptimizeNasri19(int Nn = 5) {
                                                      false);
                 double obj_res;
                 double timeTaken;
-                if (VerifyResFileExist(pathDataset, file)) {
+                if (ControlNasri19::VerifyResFileExist(pathDataset, file)) {
                     std::pair<double, double> res_from_read =
                         ControlNasri19::ReadFromResultFile(pathDataset, file);
                     timeTaken = res_from_read.second;
