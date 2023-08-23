@@ -29,8 +29,8 @@ VectorDynamic GetPeriodVecNasri19(const DAG_Nasri19 &tasks_dag) {
 template <class TaskSetType, class Schedul_Analysis>
 struct FactorGraphNasri {
     // TODO: pass by reference
-    static VectorDynamic ExtractResults(const gtsam::Values &result,
-                                        const TaskSetType &taskSetTypeRef) {
+    static VectorDynamic ExtractNodePeriodVec(
+        const gtsam::Values &result, const TaskSetType &taskSetTypeRef) {
         VectorDynamic periods =
             GetParameterVD<double>(taskSetTypeRef, "period");
         size_t node_overall_count = 0;
@@ -45,6 +45,20 @@ struct FactorGraphNasri {
                 }
                 node_overall_count++;
             }
+        }
+        return periods;
+    }
+    static VectorDynamic ExtractDAGPeriodVec(
+        const gtsam::Values &result, const TaskSetType &taskSetTypeRef) {
+        VectorDynamic periods = GenerateVectorDynamic(taskSetTypeRef.SizeDag());
+        for (size_t taskId = 0; taskId < taskSetTypeRef.tasksVecNasri_.size();
+             taskId++) {
+            if (result.exists(GenerateKey(taskId, "period"))) {
+                periods(taskId, 0) = result.at<VectorDynamic>(
+                    GenerateKey(taskId, "period"))(0, 0);
+            } else
+                periods(taskId, 0) =
+                    taskSetTypeRef.tasksVecNasri_[taskId].tasks_[0].period;
         }
         return periods;
     }
@@ -78,7 +92,10 @@ struct FactorGraphNasri {
             for (size_t nodeId = 0;
                  nodeId < taskSetType.tasksVecNasri_[taskId].tasks_.size();
                  nodeId++) {
-                double period_curr = periodVec(node_overall_count);
+                // TODO: !! consider whether using periodVec or not!
+                // double period_curr =
+                //     taskSetType.tasksVecNasri_[taskId].tasks_[nodeId].period;
+                double period_curr=periodVec(taskId,0);
                 error(2 * node_overall_count) =
                     period_curr * coeff[2 * node_overall_count] +
                     rta(node_overall_count) * coeff[2 * node_overall_count + 1];
@@ -162,9 +179,10 @@ struct FactorGraphNasri {
                 UpdateTaskSetPeriodFromValues(taskSetTypeRounded, x);
                 Schedul_Analysis r(taskSetTypeRounded);
                 VectorDynamic rta = r.ResponseTimeOfTaskSet();
-                VectorDynamic periodVec = ExtractResults(x, taskSetType);
-                VectorDynamic error =
-                    GetControlObjVector(rta, periodVec, taskSetType, coeff);
+                VectorDynamic periodVec = ExtractNodePeriodVec(x,
+                taskSetType);
+                VectorDynamic error = GetControlObjVector(
+                    rta, periodVec, taskSetTypeRounded, coeff);
                 EndTimer("f_with_RTA");
                 return error;
             };
@@ -205,7 +223,7 @@ struct FactorGraphNasri {
                                 gtsam::Values xx = x;
                                 xx.update(a, xi);
                                 VectorDynamic periodVec =
-                                    ExtractResults(xx, taskSetType);
+                                    ExtractNodePeriodVec(xx, taskSetType);
                                 return GetControlObjVector(rta_base, periodVec,
                                                            taskSetType, coeff);
                             };
