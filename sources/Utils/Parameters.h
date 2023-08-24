@@ -128,6 +128,7 @@ double control_sort_obj_coeff_weight = (double)ConfigParameters["control_sort_ob
 double control_sort_exec_weight = (double)ConfigParameters["control_sort_exec_weight"];
 double weight_priority_assignment = (double)ConfigParameters["weight_priority_assignment"];
 
+double OverallTimeLimit = (double)ConfigParameters["OverallTimeLimit"];
 double Nasri19Param_timeout = (double)ConfigParameters["Nasri19Param_timeout"];
 double Nasri19Param_max_depth = (double)ConfigParameters["Nasri19Param_max_depth"];
 

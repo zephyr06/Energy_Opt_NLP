@@ -151,12 +151,25 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
 //     return;
 // }
 
+typedef std::chrono::time_point<std::chrono::high_resolution_clock> TimerType;
+bool ifTimeout(TimerType start_time) {
+    auto curr_time = std::chrono::system_clock::now();
+    if (std::chrono::duration_cast<std::chrono::seconds>(curr_time - start_time)
+            .count() >= OverallTimeLimit) {
+        std::cout << "\nTime out when running OptimizeOrder. Maximum time is "
+                  << OverallTimeLimit << " seconds.\n\n";
+        return true;
+    }
+    return false;
+}
 // only accepts DAG-related task set type, update taskSetType during
 // optimization
 template <typename FactorGraphType, class TaskSetType, class Schedul_Analysis>
 static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     TaskSetType &taskSetType, VectorDynamic &coeff,
     std::vector<bool> &maskForElimination) {
+    auto run_time_track_start = std::chrono::high_resolution_clock::now();
+
     VectorDynamic periodResCurr, periodResPrev;
     std::vector<bool> maskForEliminationPrev = maskForElimination;
     RTA_Nasri19 rr(taskSetType);
@@ -169,7 +182,8 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
 
     // double disturbIte = eliminateTol;
     while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) &&
-           ContainFalse(maskForElimination) && loopCount < MaxLoopControl) {
+           ContainFalse(maskForElimination) && loopCount < MaxLoopControl &&
+           !(ifTimeout(run_time_track_start))) {
         // store prev result
         errPrev = errCurr;
         periodResPrev = GetPeriodVecNasri19(taskSetType);
@@ -186,17 +200,6 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
 
         // adjust tasks' priority based on RM
         if (enableReorder > 0) {
-            // errCurr = FactorGraphType::RealObj(taskSetType, coeff);
-            // TaskSet tasksTry = tasks;
-            // VectorDynamic coeffTry = coeff;
-            // Reorder(tasksTry, coeffTry);
-            // double errCurrTry =
-            //     FactorGraphType::RealObj(tasksTry, coeffTry, taskSetType);
-            // if (errCurrTry < errCurr) {
-            //     tasks = tasksTry;
-            //     coeff = coeffTry;
-            //     // whether_pa_changed = true;
-            // }
             std::vector<TaskPriority> pri_ass = ReorderWithGradient(
                 taskSetType, coeff, weight_priority_assignment);
             UpdateAllTasksPriority(taskSetType, pri_ass);
