@@ -56,11 +56,11 @@ if __name__ == "__main__":
     data_2d = read_data_2d_time(minTaskNumber, maxTaskNumber)
     data_2d = np.array(data_2d).transpose()
     dataset_pd = pd.DataFrame()
-    optimizer_name = ["NORTH", "NORTH+_RM", "NORTH+_Sort"]
+    optimizer_name = ["NORTH", "NORTH+_RM"] # , "NORTH+_Sort"
     marker_list = ["o", "v", "^", "s", "D"]  #
     color_list = ["#0084DB", "r", "y", "limegreen", "purple"]  #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
-    for i in range(min(data_2d.shape[0], 3)):
+    for i in range(min(data_2d.shape[0], 2)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
                              color=color_list[i], markersize=8, label = optimizer_name[i])
