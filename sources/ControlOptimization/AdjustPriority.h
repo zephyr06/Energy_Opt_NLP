@@ -119,7 +119,7 @@ std::vector<TaskPriority> SortPriorityBasedGradient(const TaskSet &tasks,
 void PrintPriorityAssignment(const std::vector<TaskPriority> &tasks_w_pri) {
     std::cout << "Current priority sequence:\n";
     for (auto x : tasks_w_pri) {
-        std::cout << "(" << x.task_index << ", " << x.priority << ") ";
+        std::cout << "(" << x.task_index << ") ";  //  << ", " << x.priority
     }
     std::cout << "\n";
 }
