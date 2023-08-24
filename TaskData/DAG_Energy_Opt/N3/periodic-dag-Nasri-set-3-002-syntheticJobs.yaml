@@ -1,0 +1,76 @@
+tasks:
+  - deadline: 20000
+    period: 20000
+    vertices:
+      - id: 0
+        executionTime: 396
+      - id: 1
+        executionTime: 915
+    edges: ~
+  - deadline: 100000
+    period: 100000
+    vertices:
+      - id: 0
+        executionTime: 260
+      - id: 1
+        executionTime: 143
+      - id: 2
+        executionTime: 147
+      - id: 3
+        executionTime: 35
+      - id: 4
+        executionTime: 869
+    edges:
+      - from: 0
+        to: 2
+      - from: 0
+        to: 3
+      - from: 0
+        to: 4
+      - from: 2
+        to: 3
+      - from: 2
+        to: 4
+      - from: 3
+        to: 4
+  - deadline: 50000
+    period: 50000
+    vertices:
+      - id: 0
+        executionTime: 777
+      - id: 1
+        executionTime: 115
+      - id: 2
+        executionTime: 1010
+      - id: 3
+        executionTime: 785
+      - id: 4
+        executionTime: 3305
+    edges:
+      - from: 1
+        to: 3
+coeff_control:
+  - 22
+  - 7645
+  - 528
+  - 7014
+  - 353
+  - 245
+  - 535
+  - 2045
+  - 911
+  - 2504
+  - 84
+  - 7808
+  - 162
+  - 2402
+  - 325
+  - 6149
+  - 101
+  - 2923
+  - 930
+  - 2929
+  - 436
+  - 3666
+  - 819
+  - 8033
