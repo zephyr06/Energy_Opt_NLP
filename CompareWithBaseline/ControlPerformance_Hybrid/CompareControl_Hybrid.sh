@@ -52,10 +52,10 @@ do
 	# perform_optimization $jobNumber
 
 	# reorder with sorting
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_exec_weight" --value 1
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_obj_coeff_weight" --value -0.01
-	perform_optimization $jobNumber	
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_exec_weight" --value 1
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_obj_coeff_weight" --value -0.01
+	# perform_optimization $jobNumber	
 done
 
 
