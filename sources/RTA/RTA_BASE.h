@@ -1,7 +1,6 @@
 #pragma once
 
 #include "sources/MatrixConvenient.h"
-
 #include "sources/TaskModel/TaskSetNormal.h"
 #include "sources/TaskModel/Tasks.h"
 #include "sources/Tools/profilier.h"
@@ -133,6 +132,10 @@ class RTA_BASE {
         for (int i = 0; i < N; i++) {
             if (rta(i, 0) >
                 min(tasks.tasks_[i].deadline, tasks.tasks_[i].period)) {
+                if (debugMode == 1)
+                    std::cout << "Check2: RTA\n"
+                              << rta(i, 0) << ", " << tasks.tasks_[i].period
+                              << "\n";
                 return false;
             }
         }

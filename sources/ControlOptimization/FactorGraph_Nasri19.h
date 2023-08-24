@@ -318,6 +318,8 @@ struct FactorGraphNasri {
             res += coeff.coeffRef(i * 2, 0) * taskSetType.tasks_[i].period;
             res += coeff.coeffRef(i * 2 + 1, 0) * rta(i, 0);
         }
+        if (!r.CheckSchedulabilityDirect(rta))
+            res += 1e30;
         EndTimer(__func__);
         return res;
     }
