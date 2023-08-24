@@ -273,7 +273,7 @@ struct FactorGraphNasri {
         return ControlObjFactor(keys, coeff, model, taskSetType,
                                 maskForElimination);
     }
-    // TODO: modify this function to work with dag-wise maskForElimination
+
     static void FindEliminatedVariables(const TaskSetType &taskSetType,
                                         std::vector<bool> &maskForElimination,
                                         double disturb = disturb_init) {
