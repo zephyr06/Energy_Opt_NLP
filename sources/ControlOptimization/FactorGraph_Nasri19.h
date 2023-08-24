@@ -154,6 +154,7 @@ struct FactorGraphNasri {
         return initialEstimateFG;
     }
 
+    // TODO: rm maskForElimination caused not used
     class ControlObjFactor : public gtsam::NoiseModelFactor {
        public:
         // data members
@@ -272,7 +273,7 @@ struct FactorGraphNasri {
         return ControlObjFactor(keys, coeff, model, taskSetType,
                                 maskForElimination);
     }
-
+    // TODO: modify this function to work with dag-wise maskForElimination
     static void FindEliminatedVariables(const TaskSetType &taskSetType,
                                         std::vector<bool> &maskForElimination,
                                         double disturb = disturb_init) {
@@ -304,29 +305,9 @@ struct FactorGraphNasri {
                 std::cout << std::endl;
             }
         }
-        ExpandElimination(taskSetType, maskForElimination);
         EndTimer(__func__);
     }
-    // if one node of one DAG is eliminated, then all the nodes of the DAG will
-    // be eliminated;
-    static void ExpandElimination(const TaskSetType &taskSetType,
-                                  std::vector<bool> &maskForElimination) {
-        int node_overall_count = 0;
-        for (size_t taskId = 0; taskId < taskSetType.tasksVecNasri_.size();
-             taskId++) {
-            bool dag_eliminated = false;
-            for (size_t nodeId = 0;
-                 nodeId < taskSetType.tasksVecNasri_[taskId].tasks_.size();
-                 nodeId++) {
-                if (maskForElimination[node_overall_count]) {
-                    dag_eliminated = true;
-                }
-                if (dag_eliminated)
-                    maskForElimination[node_overall_count] = true;
-                node_overall_count++;
-            }
-        }
-    }
+
     static double RealObj(const TaskSetType &taskSetType,
                           const VectorDynamic &coeff) {
         BeginTimer(__func__);

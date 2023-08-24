@@ -87,21 +87,22 @@ TEST(ControlObjFactor, obj) {
     EXPECT_LONGS_EQUAL(obj_exp, obj_actual);
 }
 
-TEST(ExpandElimination, V1) {
+TEST(FindEliminatedVariables, V1) {
+    core_m_dag = 4;
     std::string path =
-        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"
-        "test_n3_v19.yaml";
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    tasks_dag.UpdatePeriod(0, 1500);
+
     std::vector<bool> maskForElimination(tasks_dag.SizeDag(), false);
-    maskForElimination[0] = true;
-    FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::ExpandElimination(
+    FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::FindEliminatedVariables(
         tasks_dag, maskForElimination);
+    EXPECT_LONGS_EQUAL(2, maskForElimination.size());
     EXPECT(maskForElimination[0]);
-    EXPECT(maskForElimination[1]);
-    EXPECT(!maskForElimination[2]);
-    EXPECT(!maskForElimination[3]);
+    EXPECT(!maskForElimination[1]);
 }
+
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);
