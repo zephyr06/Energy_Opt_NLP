@@ -194,6 +194,10 @@ struct FactorGraphNasri {
                 boost::none) const override {
             BeginTimer("RTARelatedFactor_unwhitenedError");
             gtsam::Vector result = f_with_RTA(x);
+            if (debugMode == 1) {
+                std::cout << "Trying period vector: \n";
+                x.print();
+            }
             if (H) {
                 if (exactJacobian) {
                     for (uint i = 0; i < keyVec.size(); i++) {
