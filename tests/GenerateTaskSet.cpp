@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
                     ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[j],
                     numberOfProcessor, periodCurr, periodCurr, deadlineType));
             }
-            double period_from_sum = SumExecutionTime(dagTaskSet) * 10;
+            double period_from_sum = SumExecutionTime(dagTaskSet) * 5;
             period_from_sum =
                 ceil(period_from_sum / PeriodRoundQuantum) * PeriodRoundQuantum;
             SetPeriodForAllDag(dagTaskSet, period_from_sum);
