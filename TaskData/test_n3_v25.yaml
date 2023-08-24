@@ -6,13 +6,16 @@ tasks:
         executionTime: 500
       - id: 1
         executionTime: 1000
-      - id: 2
+    edges: ~
+tasks:
+  - deadline: 85000
+    period: 85000
+    vertices:
+      - id: 0
         executionTime: 500
-      - id: 3
+      - id: 1
         executionTime: 1000
-    edges:
-      - from: 0
-        to: 1
+    edges: ~
 coeff_control:
   - 978
   - 4531

@@ -1,3 +1,4 @@
+#include "sources/ControlOptimization/ControlOptimizeNasri19.h"
 #include "sources/ControlOptimization/FactorGraph_Nasri19.h"
 #include "sources/MatrixConvenient.h"
 #include "sources/Tools/testMy.h"
@@ -89,11 +90,14 @@ TEST(ControlObjFactor, obj) {
 
 TEST(FindEliminatedVariables, V1) {
     core_m_dag = 4;
+    disturb_init = 100;
+    PeriodRoundQuantum = 500;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
     tasks_dag.UpdatePeriod(0, 1500);
+    EXPECT_LONGS_EQUAL(1500, tasks_dag.tasks_[0].period);
 
     std::vector<bool> maskForElimination(tasks_dag.SizeDag(), false);
     FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::FindEliminatedVariables(
@@ -103,6 +107,69 @@ TEST(FindEliminatedVariables, V1) {
     EXPECT(!maskForElimination[1]);
 }
 
+TEST(OptimizeTaskSetIterative, V1) {
+    using namespace rt_num_opt;
+    using namespace ControlOptimize;
+    core_m_dag = 1;
+    PeriodRoundQuantum = 500;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v24.yaml";
+
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic coeff = ReadControlCoeff(path);
+    std::vector<bool> maskForElimination(dag_tasks.SizeDag(), false);
+    auto sth =
+        OptimizeTaskSetIterative<FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>,
+                                 DAG_Nasri19, RTA_Nasri19>(dag_tasks, coeff,
+                                                           maskForElimination);
+    EXPECT_LONGS_EQUAL(3000 + PeriodRoundQuantum, sth.first(0));
+}
+
+TEST(OptimizeTaskSetIterative, V2) {
+    using namespace rt_num_opt;
+    using namespace ControlOptimize;
+    core_m_dag = 2;
+    PeriodRoundQuantum = 500;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v24.yaml";
+
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    // dag_tasks.InitializePriority();
+    for (Task &task_curr : dag_tasks.tasks_) task_curr.priority = task_curr.id;
+    dag_tasks.UpdateTasksVecNasri_();
+    VectorDynamic coeff = ReadControlCoeff(path);
+    std::vector<bool> maskForElimination(dag_tasks.SizeDag(), false);
+    auto sth =
+        OptimizeTaskSetIterative<FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>,
+                                 DAG_Nasri19, RTA_Nasri19>(dag_tasks, coeff,
+                                                           maskForElimination);
+
+    EXPECT(sth.first(0) <=
+           3500 + PeriodRoundQuantum);  // all the nodes of one DAG are assigned
+                                        // to one core
+}
+
+TEST(OptimizeTaskSetIterative, V3) {
+    using namespace rt_num_opt;
+    using namespace ControlOptimize;
+    core_m_dag = 2;
+    PeriodRoundQuantum = 500;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v25.yaml";
+
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    // dag_tasks.InitializePriority();
+    for (Task &task_curr : dag_tasks.tasks_) task_curr.priority = task_curr.id;
+    dag_tasks.UpdateTasksVecNasri_();
+    VectorDynamic coeff = ReadControlCoeff(path);
+    std::vector<bool> maskForElimination(dag_tasks.SizeDag(), false);
+    auto sth =
+        OptimizeTaskSetIterative<FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>,
+                                 DAG_Nasri19, RTA_Nasri19>(dag_tasks, coeff,
+                                                           maskForElimination);
+    EXPECT_LONGS_EQUAL(1500 + PeriodRoundQuantum,
+                       sth.first(0));  // two DAGs will be assigned to two cores
+}
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);
