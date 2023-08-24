@@ -123,8 +123,8 @@ int main(int argc, char *argv[]) {
     //     .help("the parallelismFactor DAG")
     //     .scan<'i', int>();
     program.add_argument("--directory")
-        .default_value(std::string(
-            "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/"))
+        .default_value(
+            std::string("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"))
         .required()
         .help("specify the output directory.");
     try {
@@ -169,10 +169,7 @@ int main(int argc, char *argv[]) {
         << endl;
 
     string outDirectory = program.get<std::string>("--directory");
-    if (schedulabilityCheck) {
-        outDirectory = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" +
-                       to_string(N) + "/";
-    }
+    outDirectory = outDirectory + "/N" + to_string(N) + "/";
     cout << "Output Directory: " << outDirectory << "\n";
 
     VerifyDirectoryExist(outDirectory);
