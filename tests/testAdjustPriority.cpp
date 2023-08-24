@@ -170,10 +170,33 @@ TEST(PriorityAssignment, ReorderWithGradient_v2) {
     RTA_Nasri19 r1(dag_tasks_curr);
     rta = r1.ResponseTimeOfTaskSet();
     std::cout << rta << "\n";
-    EXPECT_LONGS_EQUAL(200, rta(2));
-    EXPECT_LONGS_EQUAL(300, rta(3));
+    EXPECT_LONGS_EQUAL(300, rta(2));
+    EXPECT_LONGS_EQUAL(100, rta(3));
 }
 
+TEST(PriorityAssignment, ReorderWithGradient_v3) {
+    core_m_dag = 1;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    TaskSet tasks = dag_tasks.tasks_;
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    coeff << 1, 10, 2, 20, 3, 30, 4, 40;
+
+    std::cout << "RTA analysis:\n";
+    RTA_Nasri19 r(dag_tasks);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    std::cout << rta << "\n";
+    double weight = -10;
+    std::vector<TaskPriority> priority_vec =
+        ReorderWithGradient(dag_tasks, coeff, weight);
+
+    EXPECT_LONGS_EQUAL(3, priority_vec[0].task_index);
+    EXPECT_LONGS_EQUAL(2, priority_vec[1].task_index);
+    EXPECT_LONGS_EQUAL(0, priority_vec[2].task_index);
+    EXPECT_LONGS_EQUAL(1, priority_vec[3].task_index);
+}
 TEST(ReadControlCoeff, dag_v1) {
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";

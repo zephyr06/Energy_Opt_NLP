@@ -2,15 +2,15 @@
 
 # optimization seettings
 runMode: normal
-testDataSetName: test_n3_v18
+testDataSetName: test_n3_v23
 
 
-debugMode: 0
+debugMode: 1
 executionTimeModel: 1 # 1 is normal, 2 is more difficult
 elimIte: 0
 EnergyMode: 1
 batchOptimizeFolder: ControlPerformance
-core_m_dag: 4
+core_m_dag: 1
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
 eliminateTol: 1e0
@@ -40,7 +40,7 @@ whether_IPM: 0
 parallelFactor: 0.2
 PeriodSetAM: [1, 2, 5, 10, 20, 50,100]
 timeScaleFactor: 1e4
-maxNode_GenerateTaskSet: 20
+maxNode_GenerateTaskSet: 5
 #*************************************************************
 
 # used in control
@@ -78,6 +78,9 @@ granularity_FindUnsustainable: 0.01
 taskSetSize_FindUnsustainable: 3
 #*************************************************************
 
+
+enableReorder: 1
+
 # no need to adjust
 punishmentFrequency: 10
 maxIterationsOptimizer: 1e3
@@ -86,7 +89,6 @@ utilTol: 1e-3
 linearOptimizerType: "MULTIFRONTAL_CHOLESKY"
 weightEnergy: 1e9
 LLCompareWithGeneralizedElimination: 0
-enableReorder: 0
 deltaOptimizer: 1e-5
 readTaskMode: RM
 baselineLLCompare: 1

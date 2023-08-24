@@ -39,6 +39,7 @@ void UpdateAllTasksPriority(DAG_Nasri19 &dag_tasks,
     for (uint i = 0; i < priority_assign.size(); i++) {
         dag_tasks.tasks_[priority_assign[i].task_index].priority = i;
     }
+    dag_tasks.UpdateTasksVecNasri_();
 }
 
 // TODO: how to describe priority assignments more elegant?
@@ -115,6 +116,13 @@ std::vector<TaskPriority> SortPriorityBasedGradient(const TaskSet &tasks,
          });
     return tasks_w_gra;
 }
+void PrintPriorityAssignment(const std::vector<TaskPriority> &tasks_w_pri) {
+    std::cout << "Current priority sequence:\n";
+    for (auto x : tasks_w_pri) {
+        std::cout << "(" << x.task_index << ", " << x.priority << ") ";
+    }
+    std::cout << "\n";
+}
 
 // higher priority tasks appear first, lower priority task appear later
 std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
@@ -122,6 +130,8 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
                                               double weight) {
     const TaskSet &tasks = dag_tasks.tasks_;
     std::vector<TaskPriority> tasks_w_pri = GetPriorityVector(dag_tasks);
+    std::cout << "Initial assignment: ";
+    PrintPriorityAssignment(tasks_w_pri);
     double obj_base =
         FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(dag_tasks, coeff);
 
@@ -135,23 +145,31 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
         tasks_w_gra.pop_back();
         double obj_curr;
         while (true) {
-            IncreasePriority(task_id_curr, tasks_w_pri);
-            obj_curr = GetObjAfterAdjustPriority(dag_tasks, coeff, tasks_w_pri);
-            if (obj_curr >= obj_base) {  // if IncreasePriority happens
-                if (tasks_w_pri[0].task_index != task_id_curr)
-                    DecreasePriority(task_id_curr, tasks_w_pri);
+            std::vector<TaskPriority> tasks_w_pri_curr = tasks_w_pri;
+            IncreasePriority(task_id_curr, tasks_w_pri_curr);
+            obj_curr =
+                GetObjAfterAdjustPriority(dag_tasks, coeff, tasks_w_pri_curr);
+            if (obj_curr >= obj_base) {
                 break;
             } else {
                 if (debugMode == 1) {
-                    std::cout << "Priority change: task " << task_id_curr
+                    std::cout << "\nPriority change: task " << task_id_curr
                               << "'s priority increases, and improves the "
                                  "objective function from "
                               << obj_base << " to " << obj_curr << "\n";
+                    std::cout << "Current RTA:\n";
+                    DAG_Nasri19 dag_tasks_curr = dag_tasks;
+                    UpdateAllTasksPriority(dag_tasks_curr, tasks_w_pri_curr);
+                    std::cout << GetNasri19RTA(dag_tasks_curr) << "\n";
+                    PrintPriorityAssignment(tasks_w_pri_curr);
                 }
                 obj_base = obj_curr;
+                tasks_w_pri = tasks_w_pri_curr;
             }
         }
     }
+    std::cout << "Final assignment: ";
+    PrintPriorityAssignment(tasks_w_pri);
     return tasks_w_pri;
 }
 
