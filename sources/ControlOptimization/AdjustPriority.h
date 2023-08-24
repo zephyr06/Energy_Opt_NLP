@@ -130,8 +130,11 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
                                               double weight) {
     const TaskSet &tasks = dag_tasks.tasks_;
     std::vector<TaskPriority> tasks_w_pri = GetPriorityVector(dag_tasks);
-    std::cout << "Initial assignment: ";
-    PrintPriorityAssignment(tasks_w_pri);
+
+    if (debugMode == 1) {
+        std::cout << "Initial assignment: ";
+        PrintPriorityAssignment(tasks_w_pri);
+    }
     double obj_base =
         FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(dag_tasks, coeff);
 
@@ -168,8 +171,10 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
             }
         }
     }
-    std::cout << "Final assignment: ";
-    PrintPriorityAssignment(tasks_w_pri);
+    if (debugMode == 1) {
+        std::cout << "Final assignment: ";
+        PrintPriorityAssignment(tasks_w_pri);
+    }
     return tasks_w_pri;
 }
 
