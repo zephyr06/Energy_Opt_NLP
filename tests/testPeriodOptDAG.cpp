@@ -14,7 +14,7 @@ TEST(case1, v1) {
     TaskSet tasks = tasks_dag.tasks_;
     VectorDynamic coeff = ReadControlCoeff(path);
 
-    std::vector<bool> maskForElimination(tasks_dag.SizeNode(), false);
+    std::vector<bool> maskForElimination(tasks_dag.SizeDag(), false);
 
     auto sth =
         OptimizeTaskSetIterative<FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>,

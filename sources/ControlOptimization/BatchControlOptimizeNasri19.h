@@ -90,7 +90,7 @@ void BatchOptimizeNasri19(int Nn = 5) {
                 std::cout << file << std::endl;
                 DAG_Nasri19 dag_tasks = ReadDAGNasri19_Tasks(path);
                 VectorDynamic coeff = ReadControlCoeff(path);
-                std::vector<bool> maskForElimination(dag_tasks.SizeNode(),
+                std::vector<bool> maskForElimination(dag_tasks.SizeDag(),
                                                      false);
                 double obj_res;
                 double timeTaken;
