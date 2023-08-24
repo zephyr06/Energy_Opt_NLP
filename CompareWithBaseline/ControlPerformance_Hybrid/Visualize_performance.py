@@ -24,7 +24,7 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         data.append(float(lines[1]))
 
         # NORTH+Sort
-        data.append(float(lines[2]))
+        # data.append(float(lines[2]))
 
         data2d.append(data)
         file.close()

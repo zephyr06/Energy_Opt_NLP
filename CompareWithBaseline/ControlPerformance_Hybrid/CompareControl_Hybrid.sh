@@ -3,7 +3,7 @@
 # ************** Adjust settings there **************
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 title="ControlPerformance_Hybrid"
-MaxTaskNumber=5
+MaxTaskNumber=20
 # ***************************************************
 
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
@@ -52,10 +52,10 @@ do
 	# perform_optimization $jobNumber
 
 	# reorder with sorting
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_exec_weight" --value 1
-	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_obj_coeff_weight" --value -0.01
-	perform_optimization $jobNumber	
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_exec_weight" --value 1
+	# python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "control_sort_obj_coeff_weight" --value -0.01
+	# perform_optimization $jobNumber	
 done
 
 
@@ -67,6 +67,6 @@ cd $ROOT_PATH/CompareWithBaseline/$title
 python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --main_data_index 1
 
 # show the comparison between NORTH and NORTH_Sort
-python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --main_data_index 2
+# python draw_box_plot.py --minTaskNumber 5 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --main_data_index 2
 
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
