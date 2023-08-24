@@ -52,6 +52,24 @@ VectorDynamic GenerateControlCoefficient(
     }
     return coeff;
 }
+int SumExecutionTime(const std::vector<DAG_Model> &dagTaskSet) {
+    int sum = 0;
+    for (const auto &dag : dagTaskSet) {
+        for (const auto &task : dag.tasks_) {
+            sum += task.executionTime;
+        }
+    }
+    return sum;
+}
+void SetPeriodForAllDag(std::vector<DAG_Model> &dagTaskSet, int period) {
+    for (auto &dag : dagTaskSet) {
+        for (auto &task : dag.tasks_) {
+            task.period = period;
+            task.deadline = period;
+        }
+    }
+}
+
 int main(int argc, char *argv[]) {
     argparse::ArgumentParser program("program name");
     program.add_argument("-v", "--verbose");  // parameter packing
@@ -85,8 +103,10 @@ int main(int argc, char *argv[]) {
         .help("type of deadline, 0 means implicit, 1 means random")
         .scan<'i', int>();
     program.add_argument("--taskType")
-        .default_value(2)
-        .help("type of tasksets, 0 means normal, 1 means DAG")
+        .default_value(3)
+        .help(
+            "type of tasksets, 0 means normal, 1 means DAG, 3 means DAG with "
+            "same initial period")
         .scan<'i', int>();
     program.add_argument("--schedulabilityCheck")
         .default_value(2)
@@ -103,8 +123,8 @@ int main(int argc, char *argv[]) {
     //     .help("the parallelismFactor DAG")
     //     .scan<'i', int>();
     program.add_argument("--directory")
-        .default_value(std::string(
-            "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/task_number/"))
+        .default_value(
+            std::string("/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"))
         .required()
         .help("specify the output directory.");
     try {
@@ -149,10 +169,7 @@ int main(int argc, char *argv[]) {
         << endl;
 
     string outDirectory = program.get<std::string>("--directory");
-    if (schedulabilityCheck) {
-        outDirectory = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" +
-                       to_string(N) + "/";
-    }
+    outDirectory = outDirectory + "/N" + to_string(N) + "/";
     cout << "Output Directory: " << outDirectory << "\n";
 
     VerifyDirectoryExist(outDirectory);
@@ -258,9 +275,44 @@ int main(int argc, char *argv[]) {
                 int a = std::filesystem::remove(ppp);
                 i--;
             }
-        }
+        } else if (taskType == 3) {  // DAG for control optimization
+            std::vector<DAG_Model> dagTaskSet;
+            if (totalUtilization <= 0) {
+                totalUtilization = RandRange(0.1, 0.8);
+            }
+            vector<double> utilVec = Uunifast(N, totalUtilization, true);
+            vector<double> weightVec;
+            for (int j = 0; j < N; j++) {
+                // int periodCurr = (1 + rand() % 9) * pow(10, rand() % 2);
+                int periodCurr = int(PeriodSetAM[rand() % PeriodSetAM.size()] *
+                                     timeScaleFactor);
+                dagTaskSet.push_back(GenerateDAG(
+                    ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[j],
+                    numberOfProcessor, periodCurr, periodCurr, deadlineType));
+            }
+            double period_from_sum = SumExecutionTime(dagTaskSet) * 5;
+            period_from_sum =
+                ceil(period_from_sum / PeriodRoundQuantum) * PeriodRoundQuantum;
+            SetPeriodForAllDag(dagTaskSet, period_from_sum);
+            VectorDynamic coeff_control_optimization =
+                GenerateControlCoefficient(dagTaskSet);
 
-        else if (taskType == 4) {
+            string fileName = "periodic-dag-Nasri-set-" + to_string(N) + "-" +
+                              string(3 - to_string(i).size(), '0') +
+                              to_string(i) + "-syntheticJobs" + ".yaml";
+
+            if (schedulabilityCheck) {
+                DAG_Nasri19 dagNasri19(dagTaskSet);
+                RTA_Nasri19 r(dagNasri19);
+                if (!r.CheckSchedulability()) {
+                    i--;
+                    continue;
+                }
+            }
+            WriteDAG_NasriToYaml(dagTaskSet, outDirectory + fileName,
+                                 coeff_control_optimization);
+
+        } else if (taskType == 4) {
             totalUtilization = RandRange(0.5, 0.9);
             int periodLogUniform = 1;
             TaskSet tasks = GenerateTaskSet(

@@ -65,8 +65,8 @@ using namespace ControlOptimize;
 // only for Nasri19 experiment
 void BatchOptimizeNasri19(int Nn = 5) {
     const char *pathDataset;
-    std::string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/N" +
-                      std::to_string(Nn) + "/";
+    std::string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" +
+                      batchOptimizeFolder + "/N" + std::to_string(Nn) + "/";
     pathDataset = str.c_str();
     if (debugMode == 1)
         printf("Directory: %s\n", pathDataset);
@@ -75,7 +75,6 @@ void BatchOptimizeNasri19(int Nn = 5) {
     std::vector<double> runTime;
     std::vector<size_t> rtaCallTime;
     std::vector<std::string> failedFiles;
-    int N;
     if (debugMode == 1)
         printf("Directory: %s\n", pathDataset);
     std::vector<std::string> errorFiles;
@@ -120,7 +119,7 @@ void BatchOptimizeNasri19(int Nn = 5) {
                     "/home/zephyr/Programming/Energy_Opt_NLP/"
                     "CompareWithBaseline/" +
                     batchOptimizeFolder + "/EnergySaveRatio/N" +
-                    std::to_string(N) + ".txt";
+                    std::to_string(Nn) + ".txt";
                 AddEntry(pathRes, obj_res);
                 ControlNasri19::WriteToResultFile(pathDataset, file, obj_res,
                                                   timeTaken);
