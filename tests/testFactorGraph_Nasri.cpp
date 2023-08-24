@@ -4,6 +4,7 @@
 using namespace rt_num_opt;
 using namespace std;
 TEST(RTA, V1) {
+    core_m_dag = 4;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v20.yaml";
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
@@ -15,7 +16,8 @@ TEST(RTA, V1) {
 }
 TEST(ControlObjFactor, v1) {
     std::string path =
-        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"
+        "test_n3_v19.yaml";
 
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
     TaskSet tasks = tasks_dag.tasks_;
@@ -85,6 +87,21 @@ TEST(ControlObjFactor, obj) {
     EXPECT_LONGS_EQUAL(obj_exp, obj_actual);
 }
 
+TEST(ExpandElimination, V1) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"
+        "test_n3_v19.yaml";
+
+    rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    std::vector<bool> maskForElimination(tasks_dag.SizeDag(), false);
+    maskForElimination[0] = true;
+    FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::ExpandElimination(
+        tasks_dag, maskForElimination);
+    EXPECT(maskForElimination[0]);
+    EXPECT(maskForElimination[1]);
+    EXPECT(!maskForElimination[2]);
+    EXPECT(!maskForElimination[3]);
+}
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);
