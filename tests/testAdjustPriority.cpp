@@ -207,6 +207,7 @@ TEST(ReadControlCoeff, dag_v1) {
 }
 
 TEST(ExtractDAGPeriodVec, V1) {
+    PeriodRoundQuantum = 1e3;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
     rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);

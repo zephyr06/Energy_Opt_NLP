@@ -216,9 +216,6 @@ long long int HyperPeriod(const TaskSet &tasks) {
         for (int i = 1; i < N; i++) {
             hyper = lcm(hyper, int(ceil(tasks[i].period)));
             if (hyper < 0 || hyper > LLONG_MAX) {
-                // cout << Color::red <<  << Color::def << std::endl;
-                // throw;
-
                 // if (debugMode == 1)
                 // CoutWarning("The hyper-period over flows!");
                 CoutError("The hyper-period over flows!");

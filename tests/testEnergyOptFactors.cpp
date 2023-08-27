@@ -5,6 +5,7 @@
 #include "sources/TaskModel/DAG_Nasri19.h"
 using namespace rt_num_opt;
 TEST(UnitOpt, v0_test) {
+    PeriodRoundQuantum = 1;
     core_m_dag = 4;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v5.yaml";

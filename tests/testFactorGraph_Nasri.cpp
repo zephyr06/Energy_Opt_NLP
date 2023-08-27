@@ -16,6 +16,7 @@ TEST(RTA, V1) {
     EXPECT(gtsam::assert_equal(rta_exp, rta, 1e-3));
 }
 TEST(ControlObjFactor, v1) {
+    PeriodRoundQuantum = 1e3;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"
         "test_n3_v19.yaml";
