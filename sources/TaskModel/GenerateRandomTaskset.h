@@ -72,20 +72,36 @@ void WriteTaskSets(std::ofstream &file, TaskSet &tasks) {
     WriteFrequencyModelRatio(file);
 }
 
+TaskSet GenerateTaskSetForControl(int N) {
+    TaskSet tasks;
+    std::vector<int> execution_time_vec(N);
+    for (int i = 0; i < N; i++) execution_time_vec[i] = RandRange(1, 100);
+    int period = std::accumulate(execution_time_vec.begin(),
+                                 execution_time_vec.end(), 0);
+    for (int i = 0; i < N; i++) {
+        Task task(0, period, 0, execution_time_vec[i], period, i,
+                  -1);  // processor id is not set
+        tasks.push_back(task);
+    }
+    return tasks;
+}
+
+void AddRandomEdges(DAG_Model &dagModel) {
+    for (uint i = 0; i < dagModel.tasks_.size(); i++) {
+        for (uint j = i + 1; j < dagModel.tasks_.size(); j++) {
+            if (double(rand()) / RAND_MAX < parallelFactor) {
+                dagModel.AddEdge(i, j);
+            }
+        }
+    }
+}
 DAG_Model GenerateDAG(int N, double totalUtilization, int numberOfProcessor,
                       int periodMin, int periodMax, int deadlineType = 0) {
     TaskSet tasks = GenerateTaskSet(N, totalUtilization, numberOfProcessor,
                                     periodMin, periodMax, deadlineType);
 
     DAG_Model dagModel(tasks);
-    // add edges randomly
-    for (int i = 0; i < N; i++) {
-        for (int j = i + 1; j < N; j++) {
-            if (double(rand()) / RAND_MAX < parallelFactor) {
-                dagModel.AddEdge(i, j);
-            }
-        }
-    }
+    AddRandomEdges(dagModel);
     return dagModel;
 }
 
