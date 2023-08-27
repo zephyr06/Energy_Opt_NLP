@@ -41,7 +41,7 @@ To optimize for several task sets collectively, use the scripts provided in `Com
 Generate random DAG task sets
 ```
 make GenerateTaskSet
-./tests/GenerateTaskSet --taskType 2 --taskSetNumber 9 --NumberOfProcessor 2 
+./tests/GenerateTaskSet --taskType 3 --taskSetNumber 9 --NumberOfProcessor 2 --N 3 
 ```
 
 
