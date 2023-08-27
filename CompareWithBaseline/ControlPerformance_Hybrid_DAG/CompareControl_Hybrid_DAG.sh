@@ -6,6 +6,8 @@ title="ControlPerformance_Hybrid_DAG"
 MaxTaskNumber=3
 # ***************************************************
 
+# clear results saved in TaskData
+# python ClearResFiles.py --pathDataset TaskData/ControlPerformance_Hybrid_DAG/
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 # clear buffer file content
 cd $ROOT_PATH/CompareWithBaseline

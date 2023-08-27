@@ -5,7 +5,7 @@ import sys
 def clear_dataset(path_dataset, all):
     files_periodic = []
     for f in os.listdir(path_dataset):
-        if ("_Res.txt" in f or all>0):
+        if ("_Res" in f or all>0):
             task_path = os.path.join(path_dataset, f)
             os.remove(task_path)
 
