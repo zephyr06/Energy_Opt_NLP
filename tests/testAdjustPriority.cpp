@@ -135,7 +135,7 @@ TEST(PriorityAssignment, ReorderWithGradient_v1) {
     RTA_Nasri19 r(dag_tasks);
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     std::cout << rta << "\n";
-    double weight = -10;
+    double weight = 0;
     std::vector<TaskPriority> priority_vec =
         ReorderWithGradient(dag_tasks, coeff, weight);
     // no changes because the RTA cannot be improved under any priority
@@ -249,6 +249,41 @@ TEST(IsHyperPeriodOverflow, V1) {
     EXPECT(!dag_tasks.IsHyperPeriodOverflow());
     dag_tasks.UpdatePeriod(1, 1.08521321e+09);
     EXPECT(dag_tasks.IsHyperPeriodOverflow());
+}
+
+TEST(GetSchedulabilityObj, v1) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v20.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    VectorDynamic rta_exp = rta;
+    rta_exp << 500, 1500, 200, 100;
+    EXPECT(gtsam::assert_equal(rta_exp, rta, 1e-3));
+    weight_priority_assignment = 1;
+    EXPECT_DOUBLES_EQUAL(log(2500) + log(1500) + log(7800) + log(7900),
+                         GetSchedulabilityObj(dag_tasks, rta, 1), 1e-3);
+}
+
+TEST(SortPriorityBasedGradient, v1) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    VectorDynamic rta_exp = rta;
+    rta_exp << 500, 1500, 200, 100;
+    EXPECT(gtsam::assert_equal(rta_exp, rta, 1e-3));
+    weight_priority_assignment = 1;
+
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    coeff << 1, 10, 2, 20, 3, 30, 4, 40;
+    std::vector<TaskPriority> tasks_w_gra = SortPriorityBasedGradient(
+        dag_tasks.tasks_, coeff, rta, weight_priority_assignment);
+    // four tasks' gradient should be
+    EXPECT_LONGS_EQUAL(3, tasks_w_gra[3].task_index);
+    EXPECT_DOUBLES_EQUAL(40 - weight_priority_assignment / (10000 - 100),
+                         tasks_w_gra[3].priority, 1e-3);
 }
 int main() {
     TestResult tr;
