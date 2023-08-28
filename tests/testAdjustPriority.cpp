@@ -30,13 +30,13 @@ TEST(PriorityAssignment, GetObjGradient) {
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     std::cout << rta << "\n";
     double weight = -10;
-    EXPECT_DOUBLES_EQUAL(10 + weight / (5000 - 500),
+    EXPECT_DOUBLES_EQUAL(10 - weight / (5000 - 500),
                          GetObjGradient(0, tasks, coeff, rta, weight), 1e-6);
-    EXPECT_DOUBLES_EQUAL(20 + weight / (5000 - 1500),
+    EXPECT_DOUBLES_EQUAL(20 - weight / (5000 - 1500),
                          GetObjGradient(1, tasks, coeff, rta, weight), 1e-6);
-    EXPECT_DOUBLES_EQUAL(30 + weight / (10000 - 200),
+    EXPECT_DOUBLES_EQUAL(30 - weight / (10000 - 200),
                          GetObjGradient(2, tasks, coeff, rta, weight), 1e-6);
-    EXPECT_DOUBLES_EQUAL(40 + weight / (10000 - 100),
+    EXPECT_DOUBLES_EQUAL(40 - weight / (10000 - 100),
                          GetObjGradient(3, tasks, coeff, rta, weight), 1e-6);
 }
 TEST(PriorityAssignment, SortPriorityBasedGradient) {
@@ -62,10 +62,10 @@ TEST(PriorityAssignment, SortPriorityBasedGradient) {
     EXPECT_LONGS_EQUAL(3, tasks_w_gra[3].task_index);
     weight = 1e6;
     tasks_w_gra = SortPriorityBasedGradient(tasks, coeff, rta, weight);
-    EXPECT_LONGS_EQUAL(2, tasks_w_gra[0].task_index);
-    EXPECT_LONGS_EQUAL(3, tasks_w_gra[1].task_index);
-    EXPECT_LONGS_EQUAL(0, tasks_w_gra[2].task_index);
-    EXPECT_LONGS_EQUAL(1, tasks_w_gra[3].task_index);
+    EXPECT_LONGS_EQUAL(1, tasks_w_gra[0].task_index);
+    EXPECT_LONGS_EQUAL(0, tasks_w_gra[1].task_index);
+    EXPECT_LONGS_EQUAL(2, tasks_w_gra[2].task_index);
+    EXPECT_LONGS_EQUAL(3, tasks_w_gra[3].task_index);
 }
 TEST(PriorityAssignment, GetPriorityVector) {
     core_m_dag = 4;
