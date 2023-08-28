@@ -30,7 +30,7 @@ struct TaskPriority {
 double GetObjGradient(int task_index, const TaskSet &tasks,
                       const VectorDynamic &coeff, const VectorDynamic &rta,
                       double weight) {
-    return coeff(2 * task_index + 1) +
+    return coeff(2 * task_index + 1) -
            weight / (tasks[task_index].deadline - rta(task_index));
 }
 
@@ -42,14 +42,33 @@ void UpdateAllTasksPriority(DAG_Nasri19 &dag_tasks,
     dag_tasks.UpdateTasksVecNasri_();
 }
 
+double GetSchedulabilityObj(const DAG_Nasri19 &dag_tasks,
+                            const VectorDynamic &rta, double weight,
+                            double log_base = exp(1)) {
+    double sum = 0;
+    for (uint i = 0; i < dag_tasks.tasks_.size(); i++) {
+        double diff = dag_tasks.tasks_[i].deadline - rta(i);
+        if (diff < 0)
+            CoutError("Unschedulable GetSchedulabilityObj!");
+        sum += log(diff) / log(log_base);
+    }
+    return sum * weight;
+}
+
 // TODO: how to describe priority assignments more elegant?
 double GetObjAfterAdjustPriority(
     const DAG_Nasri19 &dag_tasks, const VectorDynamic &coeff,
-    const std::vector<TaskPriority> &priority_assign) {
+    const std::vector<TaskPriority> &priority_assign, double weight) {
     DAG_Nasri19 dag_tasks_curr = dag_tasks;
     UpdateAllTasksPriority(dag_tasks_curr, priority_assign);
-    return FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(dag_tasks_curr,
-                                                               coeff);
+    double obj = FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(
+        dag_tasks_curr, coeff);
+
+    RTA_Nasri19 r(dag_tasks_curr);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    double schedulability_obj =
+        GetSchedulabilityObj(dag_tasks_curr, rta, weight);
+    return obj + schedulability_obj;
 }
 
 void IncreasePriority(int task_index, std::vector<TaskPriority> &tasks_w_pri) {
@@ -150,8 +169,8 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
         while (true) {
             std::vector<TaskPriority> tasks_w_pri_curr = tasks_w_pri;
             IncreasePriority(task_id_curr, tasks_w_pri_curr);
-            obj_curr =
-                GetObjAfterAdjustPriority(dag_tasks, coeff, tasks_w_pri_curr);
+            obj_curr = GetObjAfterAdjustPriority(dag_tasks, coeff,
+                                                 tasks_w_pri_curr, weight);
             if (obj_curr >= obj_base) {
                 break;
             } else {

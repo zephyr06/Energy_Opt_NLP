@@ -251,9 +251,9 @@ struct FactorGraphNasri {
                     std::cout << Color::blue;
                     std::cout << "Variables: \n";
                     x.print();
-                    std::cout << "Jacobian matrix: \n";
-                    for (uint i = 0; i < keyVec.size(); i++)
-                        std::cout << i << ":\n" << (*H)[i] << "\n\n";
+                    // std::cout << "Jacobian matrix: \n";
+                    // for (uint i = 0; i < keyVec.size(); i++)
+                    //     std::cout << i << ":\n" << (*H)[i] << "\n\n";
                     std::cout << "Error vector: " << result << "\n";
                     std::cout << Color::def;
                 }

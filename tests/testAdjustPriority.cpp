@@ -30,13 +30,13 @@ TEST(PriorityAssignment, GetObjGradient) {
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     std::cout << rta << "\n";
     double weight = -10;
-    EXPECT_DOUBLES_EQUAL(10 + weight / (5000 - 500),
+    EXPECT_DOUBLES_EQUAL(10 - weight / (5000 - 500),
                          GetObjGradient(0, tasks, coeff, rta, weight), 1e-6);
-    EXPECT_DOUBLES_EQUAL(20 + weight / (5000 - 1500),
+    EXPECT_DOUBLES_EQUAL(20 - weight / (5000 - 1500),
                          GetObjGradient(1, tasks, coeff, rta, weight), 1e-6);
-    EXPECT_DOUBLES_EQUAL(30 + weight / (10000 - 200),
+    EXPECT_DOUBLES_EQUAL(30 - weight / (10000 - 200),
                          GetObjGradient(2, tasks, coeff, rta, weight), 1e-6);
-    EXPECT_DOUBLES_EQUAL(40 + weight / (10000 - 100),
+    EXPECT_DOUBLES_EQUAL(40 - weight / (10000 - 100),
                          GetObjGradient(3, tasks, coeff, rta, weight), 1e-6);
 }
 TEST(PriorityAssignment, SortPriorityBasedGradient) {
@@ -62,10 +62,10 @@ TEST(PriorityAssignment, SortPriorityBasedGradient) {
     EXPECT_LONGS_EQUAL(3, tasks_w_gra[3].task_index);
     weight = 1e6;
     tasks_w_gra = SortPriorityBasedGradient(tasks, coeff, rta, weight);
-    EXPECT_LONGS_EQUAL(2, tasks_w_gra[0].task_index);
-    EXPECT_LONGS_EQUAL(3, tasks_w_gra[1].task_index);
-    EXPECT_LONGS_EQUAL(0, tasks_w_gra[2].task_index);
-    EXPECT_LONGS_EQUAL(1, tasks_w_gra[3].task_index);
+    EXPECT_LONGS_EQUAL(1, tasks_w_gra[0].task_index);
+    EXPECT_LONGS_EQUAL(0, tasks_w_gra[1].task_index);
+    EXPECT_LONGS_EQUAL(2, tasks_w_gra[2].task_index);
+    EXPECT_LONGS_EQUAL(3, tasks_w_gra[3].task_index);
 }
 TEST(PriorityAssignment, GetPriorityVector) {
     core_m_dag = 4;
@@ -135,7 +135,7 @@ TEST(PriorityAssignment, ReorderWithGradient_v1) {
     RTA_Nasri19 r(dag_tasks);
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     std::cout << rta << "\n";
-    double weight = -10;
+    double weight = 0;
     std::vector<TaskPriority> priority_vec =
         ReorderWithGradient(dag_tasks, coeff, weight);
     // no changes because the RTA cannot be improved under any priority
@@ -249,6 +249,41 @@ TEST(IsHyperPeriodOverflow, V1) {
     EXPECT(!dag_tasks.IsHyperPeriodOverflow());
     dag_tasks.UpdatePeriod(1, 1.08521321e+09);
     EXPECT(dag_tasks.IsHyperPeriodOverflow());
+}
+
+TEST(GetSchedulabilityObj, v1) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v20.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    VectorDynamic rta_exp = rta;
+    rta_exp << 500, 1500, 200, 100;
+    EXPECT(gtsam::assert_equal(rta_exp, rta, 1e-3));
+    weight_priority_assignment = 1;
+    EXPECT_DOUBLES_EQUAL(log(2500) + log(1500) + log(7800) + log(7900),
+                         GetSchedulabilityObj(dag_tasks, rta, 1), 1e-3);
+}
+
+TEST(SortPriorityBasedGradient, v1) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    VectorDynamic rta_exp = rta;
+    rta_exp << 500, 1500, 200, 100;
+    EXPECT(gtsam::assert_equal(rta_exp, rta, 1e-3));
+    weight_priority_assignment = 1;
+
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    coeff << 1, 10, 2, 20, 3, 30, 4, 40;
+    std::vector<TaskPriority> tasks_w_gra = SortPriorityBasedGradient(
+        dag_tasks.tasks_, coeff, rta, weight_priority_assignment);
+    // four tasks' gradient should be
+    EXPECT_LONGS_EQUAL(3, tasks_w_gra[3].task_index);
+    EXPECT_DOUBLES_EQUAL(40 - weight_priority_assignment / (10000 - 100),
+                         tasks_w_gra[3].priority, 1e-3);
 }
 int main() {
     TestResult tr;
