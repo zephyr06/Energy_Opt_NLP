@@ -2,25 +2,9 @@
 
 # optimization seettings
 runMode: normal
-testDataSetName: test_n3_v23
-
+testDataSetName: test_n3_v28
 
 debugMode: 1
-executionTimeModel: 1 # 1 is normal, 2 is more difficult
-elimIte: 0
-EnergyMode: 1
-batchOptimizeFolder: ControlPerformance
-core_m_dag: 1
-enableMaxComputationTimeRestrict: 1
-MaxComputationTimeRestrict: 2
-eliminateTol: 1e0
-eliminateStep: 1.5
-adjustEliminateMaxIte: 100 # does not control whether enabling elimination
-roundTypeInClamp: "rough"
-clampTypeMiddle: "rough"
-exactJacobian: 0
-#*************************************************************
-
 # optimizer settings
 optimizerType: 2
 deltaInitialDogleg: 1e13
@@ -45,12 +29,12 @@ maxNode_GenerateTaskSet: 5
 
 # used in control
 weight_priority_assignment: -1
-PeriodRoundQuantum: 1000
+PeriodRoundQuantum: 1e2
 relativeErrorToleranceInit: 1e-6
 relativeErrorToleranceMin: 1e-10
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
-MaxLoopControl: 100
+MaxLoopControl: 1e4
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
 weightSchedulabilityMax: 1e12
 weightSchedulabilityStep: 1.5
@@ -63,9 +47,12 @@ weightHardConstraint: 1e10 # weight of period limits and r<d (3 factors)
 #*************************************************************
 
 # used in Nasri19ECRTS 
-Nasri19Param_timeout: 1e-1
+Nasri19Param_timeout: 1e1
 Nasri19Param_max_depth: 0
 OverallTimeLimit: 600
+
+
+enableReorder: 0
 
 # used in SA
 randomInitialize: 0
@@ -78,9 +65,6 @@ SA_iteration: 10000000
 granularity_FindUnsustainable: 0.01
 taskSetSize_FindUnsustainable: 3
 #*************************************************************
-
-
-enableReorder: 1
 
 # no need to adjust
 punishmentFrequency: 10
@@ -98,6 +82,21 @@ printFailureFile: 1
 # This is actually a relative parameter compared with weightEnergy
 punishmentInBarrier: 1e8
 noiseModelSigma: 1e0
+#*************************************************************
+
+executionTimeModel: 1 # 1 is normal, 2 is more difficult
+elimIte: 0
+EnergyMode: 1
+batchOptimizeFolder: ControlPerformance_Hybrid_DAG
+core_m_dag: 4
+enableMaxComputationTimeRestrict: 1
+MaxComputationTimeRestrict: 2
+eliminateTol: 1e0
+eliminateStep: 1.5
+adjustEliminateMaxIte: 100 # does not control whether enabling elimination
+roundTypeInClamp: "rough"
+clampTypeMiddle: "rough"
+exactJacobian: 0
 #*************************************************************
 
 

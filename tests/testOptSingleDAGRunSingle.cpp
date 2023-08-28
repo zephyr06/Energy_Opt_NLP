@@ -17,6 +17,9 @@ TEST(OptimizeTaskSet, RTA_DAG_V1) {
                        testDataSetName + ".yaml";
 
     rt_num_opt::DAG_Nasri19 tasksN = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    RTA_Nasri19 r(tasksN);
+    if (!r.CheckSchedulability())
+        CoutError("The input file is not schedulable!");
     InitializeGlobalVector(tasksN.tasks_.size());
     AssertBool(true, tasksN.tasks_.size() > 0, __LINE__);
     auto start = std::chrono::high_resolution_clock::now();
