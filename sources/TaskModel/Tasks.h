@@ -215,11 +215,11 @@ long long int HyperPeriod(const TaskSet &tasks) {
         long long int hyper = ceil(tasks[0].period);
         for (int i = 1; i < N; i++) {
             hyper = lcm(hyper, int(ceil(tasks[i].period)));
-            if (hyper < 0 || hyper > LLONG_MAX) {
+            if (hyper < 0 || hyper > LONG_MAX) {
                 // if (debugMode == 1)
                 // CoutWarning("The hyper-period over flows!");
-                CoutError("The hyper-period over flows!");
-                return LLONG_MAX / 2;
+                // CoutError("The hyper-period over flows!");
+                return LONG_MAX;
             }
         }
         return hyper;

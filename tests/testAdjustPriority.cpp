@@ -239,6 +239,17 @@ TEST(ExtractDAGPeriodVec, V2) {
     EXPECT_LONGS_EQUAL(3000, periodVec(0));
     EXPECT_LONGS_EQUAL(10000, periodVec(1));
 }
+
+TEST(IsHyperPeriodOverflow, V1) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v28.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    EXPECT(!dag_tasks.IsHyperPeriodOverflow());
+    dag_tasks.UpdatePeriod(0, 1.07229123e+09);
+    EXPECT(!dag_tasks.IsHyperPeriodOverflow());
+    dag_tasks.UpdatePeriod(1, 1.08521321e+09);
+    EXPECT(dag_tasks.IsHyperPeriodOverflow());
+}
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);

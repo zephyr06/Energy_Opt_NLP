@@ -44,7 +44,7 @@ struct DAG_Nasri19 : public TaskSetNormal {
         for (Task &task_curr : tasks_) task_curr.priority = task_curr.period;
         UpdateTasksVecNasri_();
     }
-
+    bool IsHyperPeriodOverflow() const { return hyperPeriod >= INT_MAX; }
     // TODO: fill in!
     void UpdatePriority(const std::vector<int> &task_id_seq) { ; }
 

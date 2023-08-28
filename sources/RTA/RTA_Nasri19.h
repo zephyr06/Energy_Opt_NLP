@@ -14,6 +14,13 @@ namespace rt_num_opt {
  * CheckSchedulabilityDirect
  *
  */
+VectorDynamic UnschedulableRTA(int n) {
+    VectorDynamic rta = GenerateVectorDynamic(n);
+    for (long int i = 0; i < rta.rows(); i++) {
+        rta(i) = INT32_MAX;
+    }
+    return rta;
+}
 class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
    private:
     DAG_Nasri19 dagNasri_;  // TODO: avoid this copy later
@@ -52,11 +59,13 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
     }
 
     VectorDynamic ResponseTimeOfTaskSet() {
-        BeginTimer(__func__);
         IncrementCallingTimes();
-
+        if (dagNasri_.IsHyperPeriodOverflow())
+            return UnschedulableRTA(dagNasri_.tasks_.size());
         if (!IsTasksValid())
             return GenerateInvalidRTA(dagNasri_.tasks_.size());
+
+        BeginTimer(__func__);
         // prepare input
         std::stringstream tasksInput;
         tasksInput << dagNasri_.ConvertTasksetToCsv(debugMode == 1);
@@ -104,9 +113,7 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
                 }
             }
         } else {
-            for (long int i = 0; i < rta.rows(); i++) {
-                rta(i) = INT32_MAX;
-            }
+            rta = UnschedulableRTA(dagNasri_.tasks_.size());
         }
         EndTimer(__func__);
         return rta;

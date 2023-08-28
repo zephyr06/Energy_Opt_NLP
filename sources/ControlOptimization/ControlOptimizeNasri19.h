@@ -98,9 +98,9 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         cout << "After optimization, the period vector is " << std::endl
              << optComp << std::endl;
         TaskSetType dags_copy = taskSetType;
-        FactorGraphNasri<DAG_Nasri19,
-                         RTA_Nasri19>::UpdateTaskSetPeriodFromValues(dags_copy,
-                                                                     result);
+        FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::
+            UpdateTaskSetPeriodFromValues(dags_copy, result,
+                                          maskForElimination);
         RTA_Nasri19 r(dags_copy);
         VectorDynamic rtaFromOpt = r.ResponseTimeOfTaskSet();
         cout << "After optimization, the rta vector is " << std::endl
@@ -111,15 +111,16 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         cout << Color::blue;
 
         FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::
-            UpdateTaskSetPeriodFromValues(dags_copy, initialEstimateFG);
+            UpdateTaskSetPeriodFromValues(dags_copy, initialEstimateFG,
+                                          maskForElimination);
         cout << "Before optimization, the actual obj is "
              << FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(dags_copy,
                                                                     coeff)
              << std::endl;
 
-        FactorGraphNasri<DAG_Nasri19,
-                         RTA_Nasri19>::UpdateTaskSetPeriodFromValues(dags_copy,
-                                                                     result);
+        FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::
+            UpdateTaskSetPeriodFromValues(dags_copy, result,
+                                          maskForElimination);
         cout << "After optimization, the actual obj is"
              << FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(dags_copy,
                                                                     coeff)

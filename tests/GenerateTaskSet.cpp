@@ -283,12 +283,11 @@ int main(int argc, char *argv[]) {
             vector<double> utilVec = Uunifast(N, totalUtilization, true);
             vector<double> weightVec;
             for (int j = 0; j < N; j++) {
-                // int periodCurr = (1 + rand() % 9) * pow(10, rand() % 2);
-                int periodCurr = int(PeriodSetAM[rand() % PeriodSetAM.size()] *
-                                     timeScaleFactor);
-                dagTaskSet.push_back(GenerateDAG(
-                    ceil(RandRange(1, maxNode_GenerateTaskSet)), utilVec[j],
-                    numberOfProcessor, periodCurr, periodCurr, deadlineType));
+                TaskSet tasks = GenerateTaskSetForControl(
+                    ceil(RandRange(1, maxNode_GenerateTaskSet)));
+                DAG_Model dagModel(tasks);
+                AddRandomEdges(dagModel);
+                dagTaskSet.push_back(dagModel);
             }
             double period_from_sum = SumExecutionTime(dagTaskSet) * 5;
             period_from_sum =

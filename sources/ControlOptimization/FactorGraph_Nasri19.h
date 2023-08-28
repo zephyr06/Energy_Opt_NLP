@@ -63,13 +63,15 @@ struct FactorGraphNasri {
         return periods;
     }
 
-    static void UpdateTaskSetPeriodFromValues(TaskSetType &taskSetType,
-                                              const gtsam::Values &result) {
+    static void UpdateTaskSetPeriodFromValues(
+        TaskSetType &taskSetType, const gtsam::Values &result,
+        const std::vector<bool> &maskForElimination) {
         for (uint i = 0; i < taskSetType.SizeDag(); i++) {
-            if (result.exists(GenerateKey(i, "period"))) {
-                taskSetType.UpdatePeriod(
-                    i,
-                    result.at<VectorDynamic>(GenerateKey(i, "period"))(0, 0));
+            if (result.exists(GenerateKey(i, "period")) &&
+                maskForElimination[i] == false) {
+                double period_curr =
+                    result.at<VectorDynamic>(GenerateKey(i, "period"))(0, 0);
+                taskSetType.UpdatePeriod(i, period_curr);
             }
         }
     }
@@ -172,12 +174,14 @@ struct FactorGraphNasri {
             : gtsam::NoiseModelFactor(model, keyVec),
               coeff(coeff),
               keyVec(keyVec),
-              taskSetType(taskSetType) {
+              taskSetType(taskSetType),
+              maskForElimination(maskForElimination) {
             f_with_RTA = [coeff, maskForElimination,
                           taskSetType](const gtsam::Values &x) {
                 BeginTimer("f_with_RTA");
                 TaskSetType taskSetTypeRounded = taskSetType;
-                UpdateTaskSetPeriodFromValues(taskSetTypeRounded, x);
+                UpdateTaskSetPeriodFromValues(taskSetTypeRounded, x,
+                                              maskForElimination);
                 Schedul_Analysis r(taskSetTypeRounded);
                 VectorDynamic rta = r.ResponseTimeOfTaskSet();
                 VectorDynamic periodVec = ExtractDAGPeriodVec(x, taskSetType);
@@ -216,7 +220,8 @@ struct FactorGraphNasri {
                     }
                 } else {
                     TaskSetType taskSetTypeRounded = taskSetType;
-                    UpdateTaskSetPeriodFromValues(taskSetTypeRounded, x);
+                    UpdateTaskSetPeriodFromValues(taskSetTypeRounded, x,
+                                                  maskForElimination);
                     Schedul_Analysis r(taskSetTypeRounded);
                     VectorDynamic rta_base = r.ResponseTimeOfTaskSet();
 
@@ -244,9 +249,11 @@ struct FactorGraphNasri {
                 if (debugMode == 1) {
                     std::lock_guard<std::mutex> lock(mtx);
                     std::cout << Color::blue;
-
-                    // for (uint i = 0; i < keyVec.size(); i++)
-                    //     std::cout << (*H)[i] << "\n";
+                    std::cout << "Variables: \n";
+                    x.print();
+                    std::cout << "Jacobian matrix: \n";
+                    for (uint i = 0; i < keyVec.size(); i++)
+                        std::cout << i << ":\n" << (*H)[i] << "\n\n";
                     std::cout << "Error vector: " << result << "\n";
                     std::cout << Color::def;
                 }
