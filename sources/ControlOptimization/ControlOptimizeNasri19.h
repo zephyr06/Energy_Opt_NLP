@@ -200,16 +200,17 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                                                          periodResCurr);
 
         // adjust tasks' priority based on RM
+        bool change_pa = false;
         if (enableReorder > 0) {
             std::vector<TaskPriority> pri_ass = ReorderWithGradient(
                 taskSetType, coeff, weight_priority_assignment);
-            UpdateAllTasksPriority(taskSetType, pri_ass);
+            change_pa = UpdateAllTasksPriority(taskSetType, pri_ass);
         }
 
         // adjust optimization settings
-        loopCount++;
-        FactorGraphType::FindEliminatedVariables(taskSetType,
-                                                 maskForElimination);
+        if (!change_pa)
+            FactorGraphType::FindEliminatedVariables(taskSetType,
+                                                     maskForElimination);
 
         // RoundPeriod(tasks, maskForElimination, coeff);
         errCurr = FactorGraphType::RealObj(taskSetType, coeff);
@@ -217,6 +218,8 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             relativeErrorTolerance > relativeErrorToleranceMin) {
             relativeErrorTolerance = relativeErrorTolerance / 10;
         }
+
+        loopCount++;
         if (debugMode) {
             using namespace std;
             cout << Color::green
