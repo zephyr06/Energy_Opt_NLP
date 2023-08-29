@@ -58,7 +58,7 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
         return true;
     }
 
-    VectorDynamic ResponseTimeOfTaskSet() {
+    VectorDynamic ResponseTimeOfTaskSet(double time_out=rt_num_opt::Nasri19Param_timeout) {
         IncrementCallingTimes();
         if (dagNasri_.IsHyperPeriodOverflow())
             return UnschedulableRTA(dagNasri_.tasks_.size());
@@ -81,7 +81,7 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
 
         // Set common analysis options
         NP::Analysis_options opts;
-        opts.timeout = rt_num_opt::Nasri19Param_timeout;
+        opts.timeout = time_out;
         opts.max_depth = rt_num_opt::Nasri19Param_max_depth;
         opts.early_exit = true;
         opts.num_buckets = problem.jobs.size();
@@ -125,6 +125,10 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
     }
     bool CheckSchedulability(bool whetherPrint = false) {
         VectorDynamic rta = ResponseTimeOfTaskSet();
+        return CheckSchedulabilityDirect(rta);
+    }
+    bool CheckSchedulabilityLongTimeOut() {
+        VectorDynamic rta = ResponseTimeOfTaskSet(rt_num_opt::Nasri19Param_timeout*3);
         return CheckSchedulabilityDirect(rta);
     }
 };

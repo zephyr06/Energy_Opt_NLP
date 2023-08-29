@@ -238,7 +238,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     // }
 
     RTA_Nasri19 r(taskSetType);
-    if (r.CheckSchedulability()) {
+    if (r.CheckSchedulabilityLongTimeOut()) {
         return std::make_pair(
             GetParameterVD<double>(taskSetType.tasks_, "period"),
             FactorGraphType::RealObj(taskSetType, coeff) / err_initial);
