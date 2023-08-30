@@ -10,6 +10,8 @@ MaxTaskNumber=3
 # python ClearResFiles.py --pathDataset TaskData/ControlPerformance_Hybrid_DAG/
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 # clear buffer file content
+cd $ROOT_PATH/TaskData/
+# python ClearResFiles.py --pathDataset TaskData/ControlPerformance_Hybrid_DAG/
 cd $ROOT_PATH/CompareWithBaseline
 python clear_result_files.py  --folder $title --Nmin 3 --Nmax $MaxTaskNumber
 python edit_yaml.py --entry "batchOptimizeFolder" --value $title
