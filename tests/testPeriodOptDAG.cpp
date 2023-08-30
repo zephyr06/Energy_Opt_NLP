@@ -9,7 +9,7 @@ TEST(case1, v1) {
 
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" +
                        testDataSetName + ".yaml";
-
+    std::cout<<"Optimization file path: "<<path<<"\n";
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
     TaskSet tasks = tasks_dag.tasks_;
     VectorDynamic coeff = ReadControlCoeff(path);
