@@ -34,12 +34,16 @@ double GetObjGradient(int task_index, const TaskSet &tasks,
            weight / (tasks[task_index].deadline - rta(task_index));
 }
 
-void UpdateAllTasksPriority(DAG_Nasri19 &dag_tasks,
+bool UpdateAllTasksPriority(DAG_Nasri19 &dag_tasks,
                             const std::vector<TaskPriority> &priority_assign) {
+    bool if_changed = false;
     for (uint i = 0; i < priority_assign.size(); i++) {
+        if (dag_tasks.tasks_[priority_assign[i].task_index].priority != int(i))
+            if_changed = true;
         dag_tasks.tasks_[priority_assign[i].task_index].priority = i;
     }
     dag_tasks.UpdateTasksVecNasri_();
+    return if_changed;
 }
 
 double GetSchedulabilityObj(const DAG_Nasri19 &dag_tasks,

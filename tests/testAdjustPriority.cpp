@@ -285,6 +285,28 @@ TEST(SortPriorityBasedGradient, v1) {
     EXPECT_DOUBLES_EQUAL(40 - weight_priority_assignment / (10000 - 100),
                          tasks_w_gra[3].priority, 1e-3);
 }
+
+TEST(UpdateAllTasksPriority, v1) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    VectorDynamic rta_exp = rta;
+    rta_exp << 500, 1500, 200, 100;
+    EXPECT(gtsam::assert_equal(rta_exp, rta, 1e-3));
+    weight_priority_assignment = 0;
+
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    coeff << 1, 10, 2, 20, 3, 30, 4, 40;
+    // obtain priority assignments based on coeff
+    std::vector<TaskPriority> tasks_w_p =
+        ReorderWithGradient(dag_tasks, coeff, 0);
+    UpdateAllTasksPriority(dag_tasks, tasks_w_p);
+    EXPECT(!UpdateAllTasksPriority(dag_tasks, tasks_w_p));
+    IncreasePriority(2, tasks_w_p);
+    EXPECT(UpdateAllTasksPriority(dag_tasks, tasks_w_p));
+}
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);
