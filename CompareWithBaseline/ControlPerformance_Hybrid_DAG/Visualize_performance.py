@@ -23,6 +23,12 @@ def read_data_2d(minTaskNumber, maxTaskNumber, type="Time"):
         # NORTH+Gradient
         data.append(float(lines[1]))
 
+        # NORTH+RM
+        data.append(float(lines[2]))
+
+        # NORTH+Coeff
+        data.append(float(lines[3]))
+
         data2d.append(data)
         file.close()
 
@@ -34,7 +40,7 @@ def read_data_2d(minTaskNumber, maxTaskNumber, type="Time"):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=3,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=4,
+parser.add_argument('--maxTaskNumber', type=int, default=3,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
@@ -56,11 +62,11 @@ if __name__ == "__main__":
     if (data_source == "EnergySaveRatio_Average"):
         data_2d = data_2d * 100
     dataset_pd = pd.DataFrame()
-    optimizer_name = ["NORTH", "NORTH+"] # , "NORTH+_Sort"
+    optimizer_name = ["NORTH", "NORTH+Gra", "NORTH+RM", "NORTH+Coeff"] # , "NORTH+_Sort"
     marker_list = ["o", "v", "^", "s", "D"]  #
     color_list = ["#0084DB", "r", "y", "limegreen", "purple"]  #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
-    for i in range(min(data_2d.shape[0], 2)):
+    for i in range(min(data_2d.shape[0], 4)):
         dataset_pd.insert(0, optimizer_name[i], data_2d[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
                              color=color_list[i], markersize=8, label = optimizer_name[i])

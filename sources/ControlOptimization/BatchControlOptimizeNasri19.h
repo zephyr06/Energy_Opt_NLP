@@ -36,9 +36,14 @@ inline std::string GetNasri19ResFileName(const std::string &pathDataset,
                                          const std::string &file) {
     if (rt_num_opt::enableReorder == 0) {
         return pathDataset + file + "_Res_control_north.txt";
-    } else {  // (rt_num_opt::enableReorder == 1)
+    } else if (rt_num_opt::enableReorder == 1) {
         return pathDataset + file + "_Res_control_north_plus.txt";
-    }
+    } else if (rt_num_opt::enableReorder == 2) {
+        return pathDataset + file + "_Res_control_north_RM.txt";
+    } else if (rt_num_opt::enableReorder == 3) {
+        return pathDataset + file + "_Res_control_north_coeff.txt";
+    } else
+        CoutError("Unrecognized enableReorder!");
 }
 void WriteToResultFile(const std::string &pathDataset, const std::string &file,
                        double res, double timeTaken) {

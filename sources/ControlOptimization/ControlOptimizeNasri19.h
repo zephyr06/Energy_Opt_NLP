@@ -218,9 +218,18 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                 10;  // weight needs to converge to 0 so that the approximated
                      // obj converges to the true obj
         } else if (enableReorder == 2) {
-            taskSetType.AssignPriorityRM();
+            // TODO: change this for formal comparison!
+            TaskSetType dag_tasks_copy = taskSetType;
+            dag_tasks_copy.AssignPriorityRM();
+            RTA_Nasri19 r(dag_tasks_copy);
+            if (r.CheckSchedulability())
+                taskSetType = dag_tasks_copy;
         } else if (enableReorder == 3) {
+            TaskSetType dag_tasks_copy = taskSetType;
             taskSetType.AssignPriorityControl(coeff);
+            RTA_Nasri19 r(dag_tasks_copy);
+            if (r.CheckSchedulability())
+                taskSetType = dag_tasks_copy;
         } else
             CoutError("Unknown enblaeReorder option!");
 

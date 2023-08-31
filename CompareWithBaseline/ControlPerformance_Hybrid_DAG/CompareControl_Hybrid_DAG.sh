@@ -36,9 +36,18 @@ do
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 0
 	perform_optimization $jobNumber
 	
-	# LM, with reorder (NORTH+)
+	# LM, with reorder-gradient
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 1
 	perform_optimization $jobNumber
+
+	# LM, with reorder-RM
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 2
+	perform_optimization $jobNumber
+
+	# LM, with reorder-coeff
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "enableReorder" --value 3
+	perform_optimization $jobNumber
+
 done
 
 
