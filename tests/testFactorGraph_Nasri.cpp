@@ -124,7 +124,7 @@ TEST(OptimizeTaskSetIterative, V1) {
                                  DAG_Nasri19, RTA_Nasri19>(dag_tasks, coeff,
                                                            maskForElimination);
     EXPECT_LONGS_EQUAL(PeriodRoundQuantum, sth.first(0));  // or 3000 if
-    PeriodRoundQuantum = 500;
+    // PeriodRoundQuantum = 500;
 }
 
 TEST(OptimizeTaskSetIterative, V2) {
@@ -173,6 +173,24 @@ TEST(OptimizeTaskSetIterative, V3) {
     //                    sth.first(0));  // two DAGs will be assigned to two
     //                    cores
     EXPECT_LONGS_EQUAL(PeriodRoundQuantum, sth.first(0));
+}
+
+TEST(GetTotalJobsWithinHyperPeriod, V1) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v29.yaml";
+
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    EXPECT_LONGS_EQUAL(11, dag_tasks.GetTotalJobsWithinHyperPeriod());
+}
+TEST(GetTotalJobsWithinHyperPeriod, V2) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v29.yaml";
+
+    PeriodRoundQuantum = 500;
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    dag_tasks.UpdatePeriod(0, 3500);
+    EXPECT_LONGS_EQUAL(8 * 5 + 7 * (5 + 1),
+                       dag_tasks.GetTotalJobsWithinHyperPeriod());
 }
 int main() {
     TestResult tr;

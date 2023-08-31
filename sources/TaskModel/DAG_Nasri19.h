@@ -33,6 +33,13 @@ struct DAG_Nasri19 : public TaskSetNormal {
             size += tasksVecNasri_[i].tasks_.size();
         return size;
     }
+    size_t GetTotalJobsWithinHyperPeriod() const {
+        size_t count = 0;
+        for (const auto &task : tasks_) {
+            count += hyperPeriod / task.period;
+        }
+        return count;
+    }
     inline const DAG_Model &getDag(size_t index) const {
         return tasksVecNasri_[index];
     }
