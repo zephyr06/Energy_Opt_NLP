@@ -115,6 +115,8 @@ void BatchOptimizeNasri19(int Nn = 5) {
 
                 runTime.push_back(timeTaken);
                 objVec.push_back(obj_res);
+                if (obj_res > 1)
+                    failedFiles.push_back(file);
                 std::string pathRes =
                     "/home/zephyr/Programming/Energy_Opt_NLP/"
                     "CompareWithBaseline/" +
@@ -150,5 +152,9 @@ void BatchOptimizeNasri19(int Nn = 5) {
         std::ios_base::app);
     outfileWrite << Average(runTime) << std::endl;
     outfileWrite.close();
+
+    std::cout << "Failed files: \n";
+    for (auto file : failedFiles) std::cout << file << "\n";
 }
+
 }  // namespace rt_num_opt
