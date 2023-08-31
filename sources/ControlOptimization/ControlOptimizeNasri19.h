@@ -170,21 +170,26 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     TaskSetType &taskSetType, VectorDynamic &coeff,
     std::vector<bool> &maskForElimination) {
     auto run_time_track_start = std::chrono::high_resolution_clock::now();
+    PeriodRoundQuantum =
+        taskSetType.hyperPeriod / 10;  // for shorter run-time cost
 
     VectorDynamic periodResCurr, periodResPrev;
     std::vector<bool> maskForEliminationPrev = maskForElimination;
     RTA_Nasri19 rr(taskSetType);
     if (!rr.CheckSchedulability())
         CoutError("The input DAG is not schedulable!");
+    if (enableReorder > 0) {
+        std::vector<TaskPriority> pri_ass =
+            ReorderWithGradient(taskSetType, coeff, weight_priority_assignment);
+        UpdateAllTasksPriority(taskSetType, pri_ass);
+    }
     double errPrev = 1e30;
     double errCurr = FactorGraphType::RealObj(taskSetType, coeff);
     double err_initial = errCurr;
     int loopCount = 0;
 
     // double disturbIte = eliminateTol;
-    while (errCurr < errPrev * (1 - relativeErrorToleranceOuterLoop) &&
-           ContainFalse(maskForElimination) && loopCount < MaxLoopControl &&
-           !(ifTimeout(run_time_track_start))) {
+    while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
         // store prev result
         errPrev = errCurr;
         periodResPrev = GetPeriodVecNasri19(taskSetType);
@@ -229,6 +234,13 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             print(maskForElimination);
             cout << std::endl;
         }
+
+        // termination conditions
+        // if (errCurr >= errPrev * (1 - relativeErrorToleranceOuterLoop) &&
+        //     change_pa == false && (!ContainFalse(maskForElimination)))
+        //     break;
+        if ( (!ContainFalse(maskForElimination)))
+            break;
     }
     // if (ContainFalse(maskForElimination)) {
     //     UpdateTaskSetPeriod(tasks, periodResPrev);

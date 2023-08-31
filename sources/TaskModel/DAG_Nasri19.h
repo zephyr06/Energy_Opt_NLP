@@ -48,7 +48,8 @@ struct DAG_Nasri19 : public TaskSetNormal {
 
     // based on rate-monotonic
     void InitializePriority() {
-        for (Task &task_curr : tasks_) task_curr.priority = task_curr.period;
+        uint count = 0;
+        for (Task &task_curr : tasks_) task_curr.priority = count++;
         UpdateTasksVecNasri_();
     }
     bool IsHyperPeriodOverflow() const { return hyperPeriod >= INT_MAX; }

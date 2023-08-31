@@ -199,7 +199,7 @@ struct FactorGraphNasri {
                 boost::none) const override {
             BeginTimer("RTARelatedFactor_unwhitenedError");
             gtsam::Vector result = f_with_RTA(x);
-            if (debugMode == 1) {
+            if (debugMode >= 2) {
                 std::cout << "Trying period vector: \n";
                 x.print();
             }
