@@ -132,7 +132,7 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
     }
     bool CheckSchedulabilityLongTimeOut() {
         VectorDynamic rta =
-            ResponseTimeOfTaskSet(rt_num_opt::Nasri19Param_timeout * 3);
+            ResponseTimeOfTaskSet(rt_num_opt::Nasri19Param_timeout * 10);
         return CheckSchedulabilityDirect(rta);
     }
 };
