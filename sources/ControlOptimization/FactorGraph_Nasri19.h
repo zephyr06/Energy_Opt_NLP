@@ -99,8 +99,8 @@ struct FactorGraphNasri {
                 //     taskSetType.tasksVecNasri_[taskId].tasks_[nodeId].period;
                 double period_curr = periodVec(taskId, 0);
                 error(2 * node_overall_count) =
-                    period_curr * coeff[2 * node_overall_count] +
-                    rta(node_overall_count) * coeff[2 * node_overall_count + 1];
+                    period_curr * coeff(2 * node_overall_count) +
+                    rta(node_overall_count) * coeff(2 * node_overall_count + 1);
 
                 // least-square
                 error(2 * node_overall_count) =

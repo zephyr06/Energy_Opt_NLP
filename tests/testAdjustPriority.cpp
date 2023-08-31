@@ -307,6 +307,29 @@ TEST(UpdateAllTasksPriority, v1) {
     IncreasePriority(2, tasks_w_p);
     EXPECT(UpdateAllTasksPriority(dag_tasks, tasks_w_p));
 }
+TEST(AssignPriorityBasedRM, v1) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    dag_tasks.AssignPriorityRM();
+    EXPECT_LONGS_EQUAL(5000, dag_tasks.tasks_[0].priority);
+    EXPECT_LONGS_EQUAL(5000, dag_tasks.tasks_[1].priority);
+    EXPECT_LONGS_EQUAL(10000, dag_tasks.tasks_[2].priority);
+    EXPECT_LONGS_EQUAL(10000, dag_tasks.tasks_[3].priority);
+}
+TEST(AssignPriorityBasedCoeff, v1) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic coeff = ReadControlCoeff(path);
+    dag_tasks.AssignPriorityControl(coeff);
+    EXPECT_LONGS_EQUAL(10000 - 4531, dag_tasks.tasks_[0].priority);
+    EXPECT_LONGS_EQUAL(10000 - 4916, dag_tasks.tasks_[1].priority);
+    EXPECT_LONGS_EQUAL(10000 - 8022, dag_tasks.tasks_[2].priority);
+    EXPECT_LONGS_EQUAL(10000 - 7236, dag_tasks.tasks_[3].priority);
+}
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);

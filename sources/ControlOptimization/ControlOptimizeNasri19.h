@@ -207,7 +207,9 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
 
         // adjust tasks' priority based on RM
         bool change_pa = false;
-        if (enableReorder > 0) {
+        if (enableReorder == 0)
+            ;
+        else if (enableReorder == 1) {
             std::vector<TaskPriority> pri_ass = ReorderWithGradient(
                 taskSetType, coeff, weight_priority_assignment);
             change_pa = UpdateAllTasksPriority(taskSetType, pri_ass);
@@ -215,7 +217,12 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                 weight_priority_assignment /
                 10;  // weight needs to converge to 0 so that the approximated
                      // obj converges to the true obj
-        }
+        } else if (enableReorder == 2) {
+            taskSetType.AssignPriorityRM();
+        } else if (enableReorder == 3) {
+            taskSetType.AssignPriorityControl(coeff);
+        } else
+            CoutError("Unknown enblaeReorder option!");
 
         // adjust optimization settings
         if (!change_pa)
