@@ -126,6 +126,8 @@ TEST(WithEliminationRecord, overall) {
     UpdateTaskSetExecutionTime(tasks, vec);
     RTA_LL r(tasks);
     r.CheckSchedulability(true);
+    disturb_init = 1e0;
+    disturb_max = 1e3;
     eliminationRecordGlobal.Initialize(tasks.size());
     for (int i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11})
         eliminationRecordGlobal.SetEliminated(i, EliminationType::Bound);

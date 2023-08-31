@@ -34,6 +34,7 @@ TEST(case1, v1) {
     cout << "After optimization, the period vector is " << sth.first << endl;
     cout << "After optimization, the objective function is " << sth.second
          << endl;
+    for (Task task : tasks_dag.tasks_) task.print();
     EndTimer("main");
     PrintTimer();
     std::cout << count1 << ", " << count2 << std::endl;
