@@ -27,3 +27,4 @@ Nmax = args.Nmax
 clear_dir_result(folder + "/EnergySaveRatio", Nmin, Nmax)
 clear_dir_result(folder + "/Time", Nmin, Nmax)
 clear_dir_result(folder + "/RTACalling", Nmin, Nmax)
+clear_dir_result(folder + "/EnergySaveRatio_Average", Nmin, Nmax)

@@ -153,6 +153,16 @@ void BatchOptimizeNasri19(int Nn = 5) {
     outfileWrite << Average(runTime) << std::endl;
     outfileWrite.close();
 
+    // used for realtive gap fiture
+    std::ofstream outfileWrite2;
+    outfileWrite2.open(
+        "/home/zephyr/Programming/Energy_Opt_NLP/CompareWithBaseline/" +
+            batchOptimizeFolder + "/EnergySaveRatio_Average/N" +
+            std::to_string(Nn) + ".txt",
+        std::ios_base::app);
+    outfileWrite2 << Average(objVec) << std::endl;
+    outfileWrite2.close();
+
     std::cout << "Failed files: \n";
     for (auto file : failedFiles) std::cout << file << "\n";
 }

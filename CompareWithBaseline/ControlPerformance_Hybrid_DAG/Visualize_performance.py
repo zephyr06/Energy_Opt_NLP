@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 
 
 
-def read_data_2d_time(minTaskNumber, maxTaskNumber):
+def read_data_2d(minTaskNumber, maxTaskNumber, type="Time"):
     data2d = []
     for task_number in range(minTaskNumber, maxTaskNumber + 1):
-        file_path = "Time" + "/N" + str(task_number) + ".txt"
+        file_path = type + "/N" + str(task_number) + ".txt"
         file = open(file_path, "r")
         lines = file.readlines()
         data = []
@@ -20,11 +20,12 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         # NORTH
         data.append(float(lines[0]))
 
-        # NORTH+RM
+        # NORTH+Gradient
         data.append(float(lines[1]))
 
         data2d.append(data)
         file.close()
+
     return data2d
 
 
@@ -33,12 +34,12 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=3,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=3,
+parser.add_argument('--maxTaskNumber', type=int, default=4,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="RTA",
-                    help='data source folder, EnergySaveRatio/RTA/Time')
+parser.add_argument('--data_source', type=str, default="EnergySaveRatio_Average",
+                    help='data source folder, EnergySaveRatio_Average/RTA/Time')
 parser.add_argument('--title', type=str, default="ControlPerformance",
                     help='tilte in produced figure')
 
@@ -50,8 +51,10 @@ title = args.title
 data_source = args.data_source
 
 if __name__ == "__main__":
-    data_2d = read_data_2d_time(minTaskNumber, maxTaskNumber)
+    data_2d = read_data_2d(minTaskNumber, maxTaskNumber, data_source)
     data_2d = np.array(data_2d).transpose()
+    if (data_source == "EnergySaveRatio_Average"):
+        data_2d = data_2d * 100
     dataset_pd = pd.DataFrame()
     optimizer_name = ["NORTH", "NORTH+"] # , "NORTH+_Sort"
     marker_list = ["o", "v", "^", "s", "D"]  #
@@ -64,10 +67,15 @@ if __name__ == "__main__":
 
 
 
-    splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
+    splot.set(xlabel="Task Number")
     # splot.set_ylim([0.95, 2.0])
-    splot.set(yscale="log")
-    splot.set_ylim(1e-4, 1e3)
+    if(data_source=="Time"):
+        splot.set(yscale="log")
+        splot.set_ylim(1e-4, 1e3)
+        splot.set( ylabel="Running time (seconds)")
+    elif (data_source=="EnergySaveRatio_Average"):
+        splot.set_ylim(10, 100)
+        splot.set(ylabel="Relative gap (%)")
     plt.legend()
     splot.set_xlim([2, 21])
     plt.grid(linestyle="--")

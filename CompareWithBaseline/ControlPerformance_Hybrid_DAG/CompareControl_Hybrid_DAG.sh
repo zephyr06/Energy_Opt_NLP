@@ -48,6 +48,7 @@ cd $ROOT_PATH/CompareWithBaseline/$title
 # show the comparison between NORTH and NORTH+
 python draw_box_plot.py --minTaskNumber 3 --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --main_data_index 1
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 3 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
+python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber 3 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio_Average"
 
 cd $ROOT_PATH/TaskData/$title
 zip Res_$(date +"%Y_%m_%d_%I_%M_%p").zip N*
