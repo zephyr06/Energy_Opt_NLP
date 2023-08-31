@@ -192,6 +192,54 @@ TEST(GetTotalJobsWithinHyperPeriod, V2) {
     EXPECT_LONGS_EQUAL(8 * 5 + 7 * (5 + 1),
                        dag_tasks.GetTotalJobsWithinHyperPeriod());
 }
+
+TEST(RTA, V2) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+
+    PeriodRoundQuantum = 1000;
+    enableReorder = 1;
+    core_m_dag = 1;
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic coeff = ReadControlCoeff(path);
+    std::vector<TaskPriority> pa = {TaskPriority(3, 0), TaskPriority(2, 0),
+                                    TaskPriority(0, 0), TaskPriority(1, 0)};
+    UpdateAllTasksPriority(dag_tasks, pa);
+
+    VectorDynamic periods = GenerateVectorDynamic(2);
+    // periods << 2802.82, 7556.948;
+    periods << 3000, 8000;
+    FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::UpdateTaskSetWithPeriodVariable(
+        dag_tasks, periods);
+    RTA_Nasri19 r(dag_tasks);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    std::cout << "RTA: \n" << rta << "\n";
+    EXPECT_LONGS_EQUAL(600, rta(3));
+}
+using namespace ControlOptimize;
+TEST(OverallOptimization, V1) {
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+
+    PeriodRoundQuantum = 1000;
+    enableReorder = 1;
+    core_m_dag = 1;
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic coeff = ReadControlCoeff(path);
+
+    std::vector<bool> maskForElimination(dag_tasks.SizeDag(), false);
+    auto sth =
+        OptimizeTaskSetIterative<FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>,
+                                 DAG_Nasri19, RTA_Nasri19>(dag_tasks, coeff,
+                                                           maskForElimination);
+    // EXPECT_LONGS_EQUAL(2000, sth.first(0));
+    // EXPECT_LONGS_EQUAL(2000, sth.first(1));
+    // EXPECT_LONGS_EQUAL(1000, sth.first(2));
+    // EXPECT_LONGS_EQUAL(1000, sth.first(3));
+    // double optimal_ratio = after_opt / initial_opt;
+    EXPECT(sth.second < 0.65);
+}
+
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);

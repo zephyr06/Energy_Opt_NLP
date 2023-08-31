@@ -9,7 +9,7 @@ TEST(case1, v1) {
 
     std::string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" +
                        testDataSetName + ".yaml";
-    std::cout<<"Optimization file path: "<<path<<"\n";
+    std::cout << "Optimization file path: " << path << "\n";
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
     TaskSet tasks = tasks_dag.tasks_;
     VectorDynamic coeff = ReadControlCoeff(path);
@@ -28,6 +28,9 @@ TEST(case1, v1) {
          << FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(
                 rt_num_opt::ReadDAGNasri19_Tasks(path), coeff)
          << endl;
+    RTA_Nasri19 r(tasks_dag);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    cout << "After optimization, the RTA vector is " << rta << endl;
     cout << "After optimization, the period vector is " << sth.first << endl;
     cout << "After optimization, the objective function is " << sth.second
          << endl;
