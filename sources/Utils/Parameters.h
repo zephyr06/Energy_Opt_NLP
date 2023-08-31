@@ -113,6 +113,8 @@ double granularity_FindUnsustainable =
 const int taskSetSize_FindUnsustainable =
     (int)ConfigParameters["taskSetSize_FindUnsustainable"];
 
+double Job_Limit_Scheduling =
+    (double)ConfigParameters["Job_Limit_Scheduling"];
 int maxNode_GenerateTaskSet = (int)ConfigParameters["maxNode_GenerateTaskSet"];
 
 int printRTA = (int)ConfigParameters["printRTA"];

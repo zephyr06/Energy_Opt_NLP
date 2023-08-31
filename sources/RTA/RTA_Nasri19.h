@@ -58,9 +58,12 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
         return true;
     }
 
-    VectorDynamic ResponseTimeOfTaskSet(double time_out=rt_num_opt::Nasri19Param_timeout) {
+    VectorDynamic ResponseTimeOfTaskSet(
+        double time_out = rt_num_opt::Nasri19Param_timeout) {
         IncrementCallingTimes();
-        if (dagNasri_.IsHyperPeriodOverflow())
+        if (dagNasri_.IsHyperPeriodOverflow() ||
+            dagNasri_.GetTotalJobsWithinHyperPeriod() >
+                rt_num_opt::Job_Limit_Scheduling)
             return UnschedulableRTA(dagNasri_.tasks_.size());
         if (!IsTasksValid())
             return GenerateInvalidRTA(dagNasri_.tasks_.size());
@@ -128,7 +131,8 @@ class RTA_Nasri19 : public RTA_BASE<DAG_Nasri19> {
         return CheckSchedulabilityDirect(rta);
     }
     bool CheckSchedulabilityLongTimeOut() {
-        VectorDynamic rta = ResponseTimeOfTaskSet(rt_num_opt::Nasri19Param_timeout*3);
+        VectorDynamic rta =
+            ResponseTimeOfTaskSet(rt_num_opt::Nasri19Param_timeout * 3);
         return CheckSchedulabilityDirect(rta);
     }
 };
