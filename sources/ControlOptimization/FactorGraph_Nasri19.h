@@ -107,7 +107,8 @@ struct FactorGraphNasri {
                     pow(error(2 * node_overall_count), 0.5);
 
                 error(2 * node_overall_count + 1) =
-                    HingeLoss(period_curr - rta(node_overall_count));
+                    HingeLoss(period_curr - rta(node_overall_count)) *
+                    weightHardConstraint;
                 node_overall_count++;
             }
         }
