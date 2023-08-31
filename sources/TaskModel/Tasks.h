@@ -113,6 +113,7 @@ class Task {
 
     inline void RoundPeriod(double round_quantum = PeriodRoundQuantum) {
         period = ceil(period / round_quantum) * round_quantum;
+        deadline = period;
     }
 
     void print() const {

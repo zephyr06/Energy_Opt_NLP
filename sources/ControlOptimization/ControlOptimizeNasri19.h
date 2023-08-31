@@ -173,19 +173,20 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     PeriodRoundQuantum =
         taskSetType.hyperPeriod / 10;  // for shorter run-time cost
 
-    VectorDynamic periodResCurr, periodResPrev;
-    std::vector<bool> maskForEliminationPrev = maskForElimination;
-    RTA_Nasri19 rr(taskSetType);
-    if (!rr.CheckSchedulability())
-        CoutError("The input DAG is not schedulable!");
-    if (enableReorder > 0) {
-        std::vector<TaskPriority> pri_ass =
-            ReorderWithGradient(taskSetType, coeff, weight_priority_assignment);
-        UpdateAllTasksPriority(taskSetType, pri_ass);
-    }
     double errPrev = 1e30;
     double errCurr = FactorGraphType::RealObj(taskSetType, coeff);
+    if (errCurr >= 1e30)
+        CoutError("The input DAG is not schedulable!");
+    VectorDynamic periodResCurr, periodResPrev;
+    std::vector<bool> maskForEliminationPrev = maskForElimination;
     double err_initial = errCurr;
+
+    // if (enableReorder > 0) {
+    //     std::vector<TaskPriority> pri_ass =
+    //         ReorderWithGradient(taskSetType, coeff,
+    //         weight_priority_assignment);
+    //     UpdateAllTasksPriority(taskSetType, pri_ass);
+    // }
     int loopCount = 0;
 
     // double disturbIte = eliminateTol;
@@ -210,6 +211,10 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             std::vector<TaskPriority> pri_ass = ReorderWithGradient(
                 taskSetType, coeff, weight_priority_assignment);
             change_pa = UpdateAllTasksPriority(taskSetType, pri_ass);
+            weight_priority_assignment =
+                weight_priority_assignment /
+                10;  // weight needs to converge to 0 so that the approximated
+                     // obj converges to the true obj
         }
 
         // adjust optimization settings
@@ -239,7 +244,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         // if (errCurr >= errPrev * (1 - relativeErrorToleranceOuterLoop) &&
         //     change_pa == false && (!ContainFalse(maskForElimination)))
         //     break;
-        if ( (!ContainFalse(maskForElimination)))
+        if ((!ContainFalse(maskForElimination)))
             break;
     }
     // if (ContainFalse(maskForElimination)) {
@@ -248,7 +253,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     // } else {
     //     ;  // nothing else to do
     // }
-
+    std::cout << "Overall loop: " << loopCount << "\n";
     RTA_Nasri19 r(taskSetType);
     if (r.CheckSchedulabilityLongTimeOut()) {
         return std::make_pair(
