@@ -44,6 +44,7 @@ inline std::string GetNasri19ResFileName(const std::string &pathDataset,
         return pathDataset + file + "_Res_control_north_coeff.txt";
     } else
         CoutError("Unrecognized enableReorder!");
+    return "404";
 }
 void WriteToResultFile(const std::string &pathDataset, const std::string &file,
                        double res, double timeTaken) {
