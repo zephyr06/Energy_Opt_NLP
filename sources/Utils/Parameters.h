@@ -108,6 +108,7 @@ int baselineLLCompare =
     (int)ConfigParameters["baselineLLCompare"];  // baselineLLCompare: 1 means
                                                  // Zhao20, 2 means MILP
 
+int Period_Round_For_Control_Opt = (int)ConfigParameters["Period_Round_For_Control_Opt"];
 double granularity_FindUnsustainable =
     (double)ConfigParameters["granularity_FindUnsustainable"];
 const int taskSetSize_FindUnsustainable =
