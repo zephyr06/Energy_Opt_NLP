@@ -219,17 +219,19 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                      // obj converges to the true obj
         } else if (enableReorder == 2) {
             // TODO: change this for formal comparison!
-            TaskSetType dag_tasks_copy = taskSetType;
-            dag_tasks_copy.AssignPriorityRM();
-            RTA_Nasri19 r(dag_tasks_copy);
-            if (r.CheckSchedulability())
-                taskSetType = dag_tasks_copy;
+            taskSetType.AssignPriorityRM();
+            // TaskSetType dag_tasks_copy = taskSetType;
+            // dag_tasks_copy.AssignPriorityRM();
+            // RTA_Nasri19 r(dag_tasks_copy);
+            // if (r.CheckSchedulability())
+            //     taskSetType = dag_tasks_copy;
         } else if (enableReorder == 3) {
-            TaskSetType dag_tasks_copy = taskSetType;
             taskSetType.AssignPriorityControl(coeff);
-            RTA_Nasri19 r(dag_tasks_copy);
-            if (r.CheckSchedulability())
-                taskSetType = dag_tasks_copy;
+            // TaskSetType dag_tasks_copy = taskSetType;
+            // dag_tasks_copy.AssignPriorityControl(coeff);
+            // RTA_Nasri19 r(dag_tasks_copy);
+            // if (r.CheckSchedulability())
+            //     taskSetType = dag_tasks_copy;
         } else
             CoutError("Unknown enblaeReorder option!");
 
@@ -276,8 +278,10 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             GetParameterVD<double>(taskSetType.tasks_, "period"),
             FactorGraphType::RealObj(taskSetType, coeff) / err_initial);
     } else {
-        CoutError("Return unschedulable result during control optimization!");
-        return std::make_pair(GenerateVectorDynamic1D(0), 1e9);
+        CoutWarning("Return unschedulable result during control optimization!");
+        if (enableReorder == 1)
+            CoutError("Return unexpected unschedulable result!");
+        return std::make_pair(GenerateVectorDynamic1D(0), 1);
     }
 }
 }  // namespace ControlOptimize
