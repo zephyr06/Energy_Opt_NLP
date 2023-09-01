@@ -272,7 +272,7 @@ TEST(GetSchedulabilityObj, v2) {
     rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
     dag_tasks.UpdatePeriod(0, 100);
     VectorDynamic rta = GetNasri19RTA(dag_tasks);
-    EXPECT(GetSchedulabilityObj(dag_tasks, rta, 1) > 1e30);
+    EXPECT(GetSchedulabilityObj(dag_tasks, rta, 1) < -1e49);
 }
 
 TEST(SortPriorityBasedGradient, v1) {
