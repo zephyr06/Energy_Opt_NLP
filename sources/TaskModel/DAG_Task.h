@@ -95,9 +95,9 @@ class DAG_Model {
     inline double GetPeriod() const { return tasks_[0].period; }
     static std::string Type() { return "dag"; }
 
-    inline void RoundPeriod() {
+    inline void RoundPeriod(const std::vector<int>& possible_period) {
         for (Task &task_curr : tasks_) {
-            task_curr.RoundPeriod();
+            task_curr.RoundPeriod(possible_period);
         }
     }
     /**

@@ -6,10 +6,18 @@
 #include "sources/TaskModel/ReadWriteYaml.h"
 
 namespace rt_num_opt {
+
+std::vector<int> PossiblePeriods() {
+    if (Period_Round_For_Control_Opt)
+        return {500, 1000, 2000, 4000, 5000, 8000, 10000};
+    else
+        return {};
+}
 struct DAG_Nasri19 : public TaskSetNormal {
-    DAG_Nasri19() {}
+    DAG_Nasri19() { possible_period = PossiblePeriods(); }
 
     DAG_Nasri19(const std::vector<rt_num_opt::DAG_Model> &dagsNum) {
+        possible_period = PossiblePeriods();
         tasksVecNasri_ = dagsNum;
         RoundPeriod();
 
@@ -64,8 +72,6 @@ struct DAG_Nasri19 : public TaskSetNormal {
     }
 
     bool IsHyperPeriodOverflow() const { return hyperPeriod >= INT_MAX; }
-    // TODO: fill in!
-    void UpdatePriority(const std::vector<int> &task_id_seq) { ; }
 
     void AdjustPeriod(size_t dag_index, double delta) {
         UpdatePeriod(dag_index, delta + tasksVecNasri_[dag_index].GetPeriod());
@@ -83,7 +89,7 @@ struct DAG_Nasri19 : public TaskSetNormal {
                 dag_curr.tasks_[i]
                     .executionTime)  // otherwise, this is unschedulable, and we
                                      // hope the system simply return it
-                dag_curr.tasks_[i].RoundPeriod();
+                dag_curr.tasks_[i].RoundPeriod(possible_period);
         }
         UpdateTasksFromVecNasri_();
         hyperPeriod = HyperPeriod(tasks_);
@@ -94,7 +100,8 @@ struct DAG_Nasri19 : public TaskSetNormal {
         for (uint i = 0; i < tasksVecNasri_.size(); i++) {
             DAG_Model &dag_curr = tasksVecNasri_[i];
             for (uint j = 0; j < dag_curr.tasks_.size(); j++) {
-                tasks_[node_count++].period = dag_curr.tasks_[j].period;
+                tasks_[node_count].period = dag_curr.tasks_[j].period;
+                tasks_[node_count++].deadline = dag_curr.tasks_[j].deadline;
             }
         }
     }
@@ -102,9 +109,9 @@ struct DAG_Nasri19 : public TaskSetNormal {
     // round for tasksVecNasri_
     void RoundPeriod() {
         for (uint i = 0; i < tasksVecNasri_.size(); i++) {
-            tasksVecNasri_[i].RoundPeriod();
+            tasksVecNasri_[i].RoundPeriod(possible_period);
         }
-        for (Task &task_curr : tasks_) task_curr.RoundPeriod();
+        for (Task &task_curr : tasks_) task_curr.RoundPeriod(possible_period);
     }
 
     void UpdateTaskSet(const TaskSet &tasks) {
@@ -298,6 +305,7 @@ struct DAG_Nasri19 : public TaskSetNormal {
         tasksVecNasri_;  // it mainly stores the graphical structure of DAGs
     // std::vector<int> nodeSizes_;
     std::string dagCsv;
+    std::vector<int> possible_period;
 };
 
 inline DAG_Nasri19 ReadDAGNasri19_Tasks(

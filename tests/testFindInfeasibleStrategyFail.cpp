@@ -36,6 +36,7 @@ using namespace rt_num_opt;
 // }
 
 TEST(iterate, v1) {
+    rt_num_opt::Period_Round_For_Control_Opt = 0;
     rt_num_opt::PeriodRoundQuantum = 1;
     BeginTimer("main");
     std::string path =

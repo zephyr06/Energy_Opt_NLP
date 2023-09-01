@@ -3,6 +3,8 @@
 #include <gtsam/base/Testable.h>
 #include <yaml-cpp/yaml.h>
 
+#include "sources/ControlOptimization/AdjustPriority.h"
+#include "sources/ControlOptimization/FactorGraph_Nasri19.h"
 #include "sources/MatrixConvenient.h"
 #include "sources/RTA/RTA_Nasri19.h"
 #include "sources/TaskModel/DAG_Nasri19.h"
@@ -10,7 +12,8 @@
 #include "sources/TaskModel/ReadWriteYaml.h"
 #include "sources/Tools/testMy.h"
 #include "sources/Utils/Parameters.h"
-
+using namespace rt_num_opt;
+using namespace std;
 TEST(io, read_vector) {
     rt_num_opt::PeriodRoundQuantum = 1;
     rt_num_opt::ReadVec("PeriodSetAM");
@@ -91,6 +94,7 @@ TEST(io, Nasri) {
 TEST(rta, Nasri) {
     rt_num_opt::core_m_dag = 3;
     rt_num_opt::PeriodRoundQuantum = 1;
+    rt_num_opt::Period_Round_For_Control_Opt = 0;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/taskset.yaml";
     std::vector<rt_num_opt::DAG_Model> dags =
@@ -103,8 +107,8 @@ TEST(rta, Nasri) {
     std::cout << rta << std::endl;
     rt_num_opt::VectorDynamic rtaExpect = rt_num_opt::GenerateVectorDynamic(13);
     rtaExpect << 2, 6, 6, 10, 5, 8, 9, 13, 12, 14, 3, 11, 14;
-    // EXPECT(gtsam::assert_equal<rt_num_opt::VectorDynamic>(rtaExpect, rta));
-    AssertEigenEqualVector(rtaExpect, rta);
+    EXPECT(gtsam::assert_equal(rtaExpect, rta, 1e-3));
+    // AssertEigenEqualVector(rtaExpect, rta);
 }
 
 TEST(rta, Nasri_no_edge) {

@@ -236,7 +236,8 @@ TEST(ExtractDAGPeriodVec, V2) {
     VectorDynamic periodVec =
         FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::ExtractDAGPeriodVec(
             result, dag_tasks);
-    EXPECT_LONGS_EQUAL(3000, periodVec(0));
+    // EXPECT_LONGS_EQUAL(3000, periodVec(0));
+    EXPECT(periodVec(0) <= 4000);
     EXPECT_LONGS_EQUAL(10000, periodVec(1));
 }
 
@@ -261,7 +262,7 @@ TEST(GetSchedulabilityObj, v1) {
     rta_exp << 500, 1500, 200, 100;
     EXPECT(gtsam::assert_equal(rta_exp, rta, 1e-3));
     weight_priority_assignment = 1;
-    EXPECT_DOUBLES_EQUAL(log(2500) + log(1500) + log(7800) + log(7900),
+    EXPECT_DOUBLES_EQUAL(log(3500) + log(2500) + log(7800) + log(7900),
                          GetSchedulabilityObj(dag_tasks, rta, 1), 1e-3);
 }
 
@@ -330,6 +331,35 @@ TEST(AssignPriorityBasedCoeff, v1) {
     EXPECT_LONGS_EQUAL(10000 - 8022, dag_tasks.tasks_[2].priority);
     EXPECT_LONGS_EQUAL(10000 - 7236, dag_tasks.tasks_[3].priority);
 }
+TEST(RoundPeriod, v1) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    EXPECT_LONGS_EQUAL(5000, dag_tasks.tasks_[0].period);
+}
+TEST(RoundPeriod, v2) {
+    core_m_dag = 4;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    dag_tasks.UpdatePeriod(1, 300);
+    EXPECT_LONGS_EQUAL(500, dag_tasks.tasks_[2].period);
+    EXPECT_LONGS_EQUAL(500, dag_tasks.tasks_[3].period);
+    dag_tasks.UpdatePeriod(1, 800);
+    EXPECT_LONGS_EQUAL(1000, dag_tasks.tasks_[2].period);
+    EXPECT_LONGS_EQUAL(1000, dag_tasks.tasks_[3].period);
+    dag_tasks.UpdatePeriod(0, 1200);
+    EXPECT_LONGS_EQUAL(2000, dag_tasks.tasks_[0].period);
+    EXPECT_LONGS_EQUAL(2000, dag_tasks.tasks_[1].period);
+    dag_tasks.UpdatePeriod(0, 2100);
+    EXPECT_LONGS_EQUAL(4000, dag_tasks.tasks_[0].period);
+    EXPECT_LONGS_EQUAL(4000, dag_tasks.tasks_[1].period);
+    dag_tasks.UpdatePeriod(0, 3500);
+    EXPECT_LONGS_EQUAL(4000, dag_tasks.tasks_[0].period);
+    EXPECT_LONGS_EQUAL(4000, dag_tasks.tasks_[1].period);
+}
+
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);

@@ -111,11 +111,23 @@ class Task {
         executionTimeOrg = executionTime;
     }
 
-    inline void RoundPeriod(double round_quantum = PeriodRoundQuantum) {
-        period = ceil(period / round_quantum) * round_quantum;
+    inline void UpdatePeriod(double period_target) {
+        period = period_target;
         deadline = period;
     }
 
+    inline void RoundPeriod(double round_quantum = PeriodRoundQuantum) {
+        UpdatePeriod(ceil(period / round_quantum) * round_quantum);
+    }
+    inline void RoundPeriod(const std::vector<int> &possible_period) {
+        auto itr_target = std::lower_bound(possible_period.begin(),
+                                           possible_period.end(), period);
+
+        if (itr_target - possible_period.begin() != int(possible_period.size()))
+            UpdatePeriod(*itr_target);
+        else
+            RoundPeriod(PeriodRoundQuantum);
+    }
     void print() const {
         std::cout << "The period is: " << period << " The executionTime is "
                   << executionTime << " The deadline is " << deadline
