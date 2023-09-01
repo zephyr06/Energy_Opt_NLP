@@ -188,6 +188,12 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     //     UpdateAllTasksPriority(taskSetType, pri_ass);
     // }
     int loopCount = 0;
+    if (enableReorder == 1) {
+        taskSetType.AssignPriorityControl(coeff);
+        RTA_Nasri19 r(taskSetType);
+        if (!r.CheckSchedulability())
+            taskSetType.InitializePriority();
+    }
 
     // double disturbIte = eliminateTol;
     while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
@@ -219,12 +225,12 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                      // obj converges to the true obj
         } else if (enableReorder == 2) {
             // TODO: change this for formal comparison!
-            taskSetType.AssignPriorityRM();
-            // TaskSetType dag_tasks_copy = taskSetType;
-            // dag_tasks_copy.AssignPriorityRM();
-            // RTA_Nasri19 r(dag_tasks_copy);
-            // if (r.CheckSchedulability())
-            //     taskSetType = dag_tasks_copy;
+            // taskSetType.AssignPriorityRM();
+            TaskSetType dag_tasks_copy = taskSetType;
+            dag_tasks_copy.AssignPriorityRM();
+            RTA_Nasri19 r(dag_tasks_copy);
+            if (r.CheckSchedulability())
+                taskSetType = dag_tasks_copy;
         } else if (enableReorder == 3) {
             taskSetType.AssignPriorityControl(coeff);
             // TaskSetType dag_tasks_copy = taskSetType;
