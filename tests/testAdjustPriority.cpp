@@ -265,6 +265,15 @@ TEST(GetSchedulabilityObj, v1) {
     EXPECT_DOUBLES_EQUAL(log(3500) + log(2500) + log(7800) + log(7900),
                          GetSchedulabilityObj(dag_tasks, rta, 1), 1e-3);
 }
+TEST(GetSchedulabilityObj, v2) {
+    core_m_dag = 1;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v20.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    dag_tasks.UpdatePeriod(0, 100);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    EXPECT(GetSchedulabilityObj(dag_tasks, rta, 1) > 1e30);
+}
 
 TEST(SortPriorityBasedGradient, v1) {
     core_m_dag = 4;
