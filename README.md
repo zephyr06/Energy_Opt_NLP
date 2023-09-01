@@ -44,6 +44,9 @@ make GenerateTaskSet
 ./tests/GenerateTaskSet --taskType 3 --taskSetNumber 9 --NumberOfProcessor 2 --N 3 
 ```
 
+python ClearResFiles.py --pathDataset TaskData/ControlPerformance_Hybrid_DAG/
+
+
 
 # Other things to notice before running
 - The parameters that influence optimization process can be found in sources/parameters.yaml. If performing optimization doesn't give good result, you can try adjusting parameters there. set `debugMode=1` if you want to see the optimization process and more about the optimization results;
