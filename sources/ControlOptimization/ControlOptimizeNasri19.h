@@ -212,6 +212,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                                                          periodResCurr);
 
         // adjust tasks' priority based on RM
+        BeginTimer("ChangePriorityAssignmentOrder");
         bool change_pa = false;
         if (enableReorder == 0)
             ;
@@ -240,7 +241,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             //     taskSetType = dag_tasks_copy;
         } else
             CoutError("Unknown enblaeReorder option!");
-
+        EndTimer("ChangePriorityAssignmentOrder");
         // adjust optimization settings
         if (!change_pa)
             FactorGraphType::FindEliminatedVariables(taskSetType,
