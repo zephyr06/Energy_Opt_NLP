@@ -173,7 +173,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     PeriodRoundQuantum =
         taskSetType.hyperPeriod / 10;  // for shorter run-time cost
 
-    double errPrev = 1e30;
+    // double errPrev = 1e30;
     double errCurr = FactorGraphType::RealObj(taskSetType, coeff);
     if (errCurr >= 1e30)
         CoutError("The input DAG is not schedulable!");
@@ -198,7 +198,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     // double disturbIte = eliminateTol;
     while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
         // store prev result
-        errPrev = errCurr;
+        // errPrev = errCurr;
         periodResPrev = GetPeriodVecNasri19(taskSetType);
         maskForEliminationPrev = maskForElimination;
 

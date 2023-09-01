@@ -54,7 +54,7 @@ double GetSchedulabilityObj(const DAG_Nasri19 &dag_tasks,
         double diff = dag_tasks.tasks_[i].deadline - rta(i);
         if (diff <= 0)
             // CoutError("Unschedulable GetSchedulabilityObj!");
-            sum += 1e30;
+            sum += -1e50;
         else
             sum += log(diff) / log(log_base);
     }
