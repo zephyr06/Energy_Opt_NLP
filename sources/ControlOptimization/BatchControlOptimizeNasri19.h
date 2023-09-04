@@ -69,7 +69,7 @@ namespace rt_num_opt {
 using namespace ControlOptimize;
 
 // only for Nasri19 experiment
-void BatchOptimizeNasri19(int Nn = 5) {
+double BatchOptimizeNasri19(int Nn = 5) {
     const char *pathDataset;
     std::string str = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" +
                       batchOptimizeFolder + "/N" + std::to_string(Nn) + "/";
@@ -84,7 +84,6 @@ void BatchOptimizeNasri19(int Nn = 5) {
     if (debugMode == 1)
         printf("Directory: %s\n", pathDataset);
     std::vector<std::string> errorFiles;
-    double worstObjRatio = -100;
     std::string worstFile = "";
     for (const auto &file : ReadFilesInDirectory(pathDataset)) {
         int type = ControlNasri19::TargetFileType(file);
@@ -171,6 +170,7 @@ void BatchOptimizeNasri19(int Nn = 5) {
 
     std::cout << "Failed files: \n";
     for (auto file : failedFiles) std::cout << file << "\n";
+    return Average(objVec);
 }
 
 }  // namespace rt_num_opt
