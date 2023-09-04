@@ -320,19 +320,34 @@ struct FactorGraphNasri {
         EndTimer(__func__);
     }
 
-    static double RealObj(const TaskSetType &taskSetType,
-                          const VectorDynamic &coeff) {
-        BeginTimer(__func__);
+    static double LinearObj(const TaskSetType &taskSetType,
+                            const VectorDynamic &coeff,
+                            const VectorDynamic &rta) {
         double res = 0;
-        Schedul_Analysis r(taskSetType);
-        VectorDynamic rta = r.ResponseTimeOfTaskSet();
         for (uint i = 0; i < taskSetType.tasks_.size(); i++) {
             res += coeff.coeffRef(i * 2, 0) * taskSetType.tasks_[i].period;
             res += coeff.coeffRef(i * 2 + 1, 0) * rta(i, 0);
         }
+        return res;
+    }
+    static double RealObj(const TaskSetType &taskSetType,
+                          const VectorDynamic &coeff) {
+        BeginTimer(__func__);
+        Schedul_Analysis r(taskSetType);
+        VectorDynamic rta = r.ResponseTimeOfTaskSet();
+        double res = LinearObj(taskSetType, coeff, rta);
         if (!r.CheckSchedulabilityDirect(rta))
             res += 1e30;
         EndTimer(__func__);
+        return res;
+    }
+    static double RealObj(const TaskSetType &taskSetType,
+                          const VectorDynamic &coeff,
+                          const VectorDynamic &rta) {
+        Schedul_Analysis r(taskSetType);
+        double res = LinearObj(taskSetType, coeff, rta);
+        if (!r.CheckSchedulabilityDirect(rta))
+            res += 1e30;
         return res;
     }
 };
