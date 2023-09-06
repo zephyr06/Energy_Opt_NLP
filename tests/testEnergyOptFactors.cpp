@@ -5,6 +5,7 @@
 #include "sources/TaskModel/DAG_Nasri19.h"
 using namespace rt_num_opt;
 TEST(UnitOpt, v0_test) {
+    Period_Round_For_Control_Opt = 0;
     PeriodRoundQuantum = 1;
     core_m_dag = 4;
     std::string path =

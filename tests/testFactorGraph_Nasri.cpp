@@ -186,6 +186,7 @@ TEST(GetTotalJobsWithinHyperPeriod, V2) {
 }
 
 TEST(RTA, V2) {
+        Period_Round_For_Control_Opt = 0;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
@@ -200,7 +201,7 @@ TEST(RTA, V2) {
 
     VectorDynamic periods = GenerateVectorDynamic(2);
     // periods << 2802.82, 7556.948;
-    periods << 3000, 8000;
+    periods << 4000, 8000;
     FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::UpdateTaskSetWithPeriodVariable(
         dag_tasks, periods);
     RTA_Nasri19 r(dag_tasks);
