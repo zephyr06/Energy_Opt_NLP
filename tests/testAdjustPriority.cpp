@@ -371,6 +371,62 @@ TEST(RoundPeriod, v2) {
     // EXPECT_LONGS_EQUAL(4000, dag_tasks.tasks_[1].period);
 }
 
+TEST(FindTaskIndexFromPAOrder, V1) {
+    Priority_assignment_adjustment_threshold = 0;
+    core_m_dag = 1;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic coeff = ReadControlCoeff(path);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    dag_tasks.InitializePriority();
+    std::vector<TaskPriority> tasks_w_pri = GetPriorityVector(dag_tasks);
+    EXPECT_LONGS_EQUAL(0, FindTaskIndexFromPAOrder(0, tasks_w_pri));
+    EXPECT_LONGS_EQUAL(1, FindTaskIndexFromPAOrder(1, tasks_w_pri));
+    EXPECT_LONGS_EQUAL(2, FindTaskIndexFromPAOrder(2, tasks_w_pri));
+    EXPECT_LONGS_EQUAL(3, FindTaskIndexFromPAOrder(3, tasks_w_pri));
+}
+TEST(ReorderWithGradient, significant_difference) {
+    Priority_assignment_adjustment_threshold = 0;
+    core_m_dag = 1;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic coeff = ReadControlCoeff(path);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    dag_tasks.InitializePriority();
+    std::vector<TaskPriority> tasks_w_pri = GetPriorityVector(dag_tasks);
+    EXPECT_LONGS_EQUAL(0, tasks_w_pri[0].task_index);
+    EXPECT_LONGS_EQUAL(1, tasks_w_pri[1].task_index);
+    EXPECT_LONGS_EQUAL(2, tasks_w_pri[2].task_index);
+    EXPECT_LONGS_EQUAL(3, tasks_w_pri[3].task_index);
+
+    double weight = -10;
+    std::vector<TaskPriority> tasks_w_gra =
+        SortPriorityBasedGradient(dag_tasks.tasks_, coeff, rta, weight);
+    EXPECT_LONGS_EQUAL(0, tasks_w_gra[0].task_index);
+    EXPECT_LONGS_EQUAL(1, tasks_w_gra[1].task_index);
+    EXPECT_LONGS_EQUAL(3, tasks_w_gra[2].task_index);
+    EXPECT_LONGS_EQUAL(2, tasks_w_gra[3].task_index);
+
+    // actual PA: 0 1 2 3
+    // Gradie PA: 2 3 1 0
+    EXPECT(!WhetherTaskNeedPAChange(0, tasks_w_pri, tasks_w_gra, 0));
+    EXPECT(!WhetherTaskNeedPAChange(0, tasks_w_pri, tasks_w_gra, 1));
+    EXPECT(!WhetherTaskNeedPAChange(0, tasks_w_pri, tasks_w_gra, 2));
+
+    EXPECT(!WhetherTaskNeedPAChange(1, tasks_w_pri, tasks_w_gra, 0));
+
+    EXPECT(WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 0));
+    EXPECT(WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 1));
+    EXPECT(WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 2));
+    EXPECT(!WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 3));
+
+    EXPECT(WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 0));
+    EXPECT(WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 1));
+    EXPECT(WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 2));
+    EXPECT(!WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 3));
+}
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);

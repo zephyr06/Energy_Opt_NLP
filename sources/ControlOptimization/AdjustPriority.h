@@ -149,6 +149,33 @@ void PrintPriorityAssignment(const std::vector<TaskPriority> &tasks_w_pri) {
     std::cout << "\n";
 }
 
+size_t FindTaskIndexFromPAOrder(int task_id,
+                                const std::vector<TaskPriority> &tasks_w_pri) {
+    for (uint i = 0; i < tasks_w_pri.size(); i++)
+        if (tasks_w_pri[i].task_index == task_id)
+            return i;
+    CoutError("didn't find task in FindTaskIndexFromPAOrder!");
+    return -1;
+}
+// return true if a task's current priority assignment is worse than those
+// indicated by its gradient
+// NOTICE: tasks_w_gra is ordered inversely, i.e., higher priority tasks appear
+// last
+bool WhetherTaskNeedPAChange(int task_id,
+                             const std::vector<TaskPriority> &tasks_w_pri,
+                             const std::vector<TaskPriority> &tasks_w_gra,
+                             int significant_difference) {
+    // std::reverse(tasks_w_gra.begin(), tasks_w_gra.end());
+    int id_index_priority = FindTaskIndexFromPAOrder(task_id, tasks_w_pri);
+    int id_index_gra =
+        tasks_w_gra.size() - 1 - FindTaskIndexFromPAOrder(task_id, tasks_w_gra);
+    if (significant_difference < 0)
+        significant_difference =
+            Priority_assignment_adjustment_threshold * tasks_w_pri.size();
+
+    return id_index_priority - id_index_gra >= significant_difference;
+}
+
 // higher priority tasks appear first, lower priority task appear later
 std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
                                               const VectorDynamic &coeff,
@@ -166,33 +193,44 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
     VectorDynamic rta = GetNasri19RTA(dag_tasks);
     std::vector<TaskPriority> tasks_w_gra =
         SortPriorityBasedGradient(tasks, coeff, rta, weight);
+    std::vector<TaskPriority> tasks_w_gra_copy = tasks_w_gra;
 
+    int count = 0;
     // adjust priority iteratively
     while (!tasks_w_gra.empty()) {
         int task_id_curr = tasks_w_gra.back().task_index;
-        tasks_w_gra.pop_back();
-        double obj_curr;
-        while (true) {
-            std::vector<TaskPriority> tasks_w_pri_curr = tasks_w_pri;
-            IncreasePriority(task_id_curr, tasks_w_pri_curr);
-            obj_curr = GetObjAfterAdjustPriority(dag_tasks, coeff,
-                                                 tasks_w_pri_curr, weight);
-            if (obj_curr >= obj_base) {
-                break;
-            } else {
-                if (debugMode == 1) {
-                    std::cout << "\nPriority change: task " << task_id_curr
-                              << "'s priority increases, and improves the "
-                                 "objective function from "
-                              << obj_base << " to " << obj_curr << "\n";
-                    std::cout << "Current RTA:\n";
-                    DAG_Nasri19 dag_tasks_curr = dag_tasks;
-                    UpdateAllTasksPriority(dag_tasks_curr, tasks_w_pri_curr);
-                    std::cout << GetNasri19RTA(dag_tasks_curr) << "\n";
-                    PrintPriorityAssignment(tasks_w_pri_curr);
+        if (!WhetherTaskNeedPAChange(task_id_curr, tasks_w_pri,
+                                     tasks_w_gra_copy, -1)) {
+            tasks_w_gra.pop_back();
+            count++;
+            continue;
+        } else {
+            // std::cout << "Try adjusting PA:\n";
+            tasks_w_gra.pop_back();
+            double obj_curr;
+            while (true) {
+                std::vector<TaskPriority> tasks_w_pri_curr = tasks_w_pri;
+                IncreasePriority(task_id_curr, tasks_w_pri_curr);
+                obj_curr = GetObjAfterAdjustPriority(dag_tasks, coeff,
+                                                     tasks_w_pri_curr, weight);
+                if (obj_curr >= obj_base) {
+                    break;
+                } else {
+                    if (debugMode == 1) {
+                        std::cout << "\nPriority change: task " << task_id_curr
+                                  << "'s priority increases, and improves the "
+                                     "objective function from "
+                                  << obj_base << " to " << obj_curr << "\n";
+                        std::cout << "Current RTA:\n";
+                        DAG_Nasri19 dag_tasks_curr = dag_tasks;
+                        UpdateAllTasksPriority(dag_tasks_curr,
+                                               tasks_w_pri_curr);
+                        std::cout << GetNasri19RTA(dag_tasks_curr) << "\n";
+                        PrintPriorityAssignment(tasks_w_pri_curr);
+                    }
+                    obj_base = obj_curr;
+                    tasks_w_pri = tasks_w_pri_curr;
                 }
-                obj_base = obj_curr;
-                tasks_w_pri = tasks_w_pri_curr;
             }
         }
     }
@@ -200,6 +238,8 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
         std::cout << "Final assignment: ";
         PrintPriorityAssignment(tasks_w_pri);
     }
+    std::cout << "ReorderWithGradient skip ratio: " << count << ", "
+              << tasks_w_pri.size() << "\n";
     return tasks_w_pri;
 }
 
