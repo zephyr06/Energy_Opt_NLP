@@ -60,9 +60,9 @@ TEST(case1, v1) {
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     cout << "After optimization, the RTA vector is " << rta << endl;
     cout << "After optimization, the period vector is " << sth.first << endl;
+    for (Task task : tasks_dag.tasks_) task.print();
     cout << "After optimization, the objective function is " << sth.second
          << endl;
-    for (Task task : tasks_dag.tasks_) task.print();
     EndTimer("main");
     PrintTimer();
     std::cout << count1 << ", " << count2 << std::endl;
