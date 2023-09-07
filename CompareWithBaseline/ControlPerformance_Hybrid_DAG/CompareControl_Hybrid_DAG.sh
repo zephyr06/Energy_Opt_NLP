@@ -3,7 +3,7 @@
 # ************** Adjust settings there **************
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 title="ControlPerformance_Hybrid_DAG"
-MinTaskNumber=10
+MinTaskNumber=3
 MaxTaskNumber=10
 # ***************************************************
 
@@ -61,4 +61,4 @@ python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTask
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio_Average"
 
 cd $ROOT_PATH/TaskData/$title
-zip Res_$(date +"%Y_%m_%d_%I_%M_%p").zip N*
+zip -r Res_$(date +"%Y_%m_%d_%I_%M_%p").zip N*
