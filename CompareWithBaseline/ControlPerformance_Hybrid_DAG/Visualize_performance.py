@@ -80,7 +80,7 @@ if __name__ == "__main__":
         splot.set_ylim(1e-4, 1e3)
         splot.set( ylabel="Running time (seconds)")
     elif (data_source=="EnergySaveRatio_Average"):
-        splot.set_ylim(10, 100)
+        splot.set_ylim(15, 50)
         splot.set(ylabel="Relative gap (%)")
     plt.legend()
     splot.set_xlim([2, 21])
