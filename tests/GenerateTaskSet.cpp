@@ -15,7 +15,7 @@
 using namespace rt_num_opt;
 using namespace std;
 
-// std::vector<int> PeriodSetAM = {1, 2, 5, 10, 20, 50, 100, 200, 1000};
+std::vector<int> PeriodSetAM = {1, 2, 5, 10, 20, 50, 100, 200, 1000};
 
 void VerifyDirectoryExist(const std::string &dir_path) {
     namespace fs = std::filesystem;
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
         exit(0);
     }
 
-    rt_num_opt::ReadVec("PeriodSetAM");  // read period set for Nasri19
+    // rt_num_opt::ReadVec("PeriodSetAM");  // read period set for Nasri19
 
     int N = program.get<int>("--N");
     int DAG_taskSetNumber = program.get<int>("--taskSetNumber");

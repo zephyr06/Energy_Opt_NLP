@@ -3,6 +3,7 @@
 using namespace rt_num_opt;
 using namespace ControlOptimize;
 using namespace std;
+
 TEST(case1, v1) {
     BeginTimer("main");
     noiseModelSigma = 1;
@@ -38,7 +39,6 @@ TEST(case1, v1) {
          << endl;
     EndTimer("main");
     PrintTimer();
-    std::cout << count1 << ", " << count2 << std::endl;
 }
 
 int main() {

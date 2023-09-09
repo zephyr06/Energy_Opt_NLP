@@ -2,9 +2,9 @@
 
 # optimization seettings
 runMode: normal
-testDataSetName: test_n10_v10
+testDataSetName: test_n3_v23
 
-debugMode: 0
+debugMode: 1
 # optimizer settings
 optimizerType: 2
 deltaInitialDogleg: 1e13
@@ -32,10 +32,10 @@ Period_Round_For_Control_Opt: 1
 # <-1 means full PA
 # >1 means remove all the PA part
 # 0.1 probably removes all the PA
-Priority_assignment_adjustment_threshold: -0.01
-weight_priority_assignment: -1e6
+Priority_assignment_adjustment_threshold: 0.1
+weight_priority_assignment: -1e4
 # not used in reality, by default, it is 0.1HyperPeriod
-PeriodRoundQuantum: 1e3 
+PeriodRoundQuantum: 1e3
 relativeErrorToleranceInit: 1e-3
 relativeErrorToleranceMin: 1e-3
 relErrorTolIPM: 1e-5
@@ -58,8 +58,8 @@ Nasri19Param_timeout: 1e2
 Nasri19Param_max_depth: 0
 OverallTimeLimit: 600
 
-# 1 means gradient, 2 means RM only, 3 means objective coefficients only
-enableReorder: 1
+# 0 means no, 1 means gradient, 2 means RM only, 3 means objective coefficients only
+enableReorder: 0
 core_m_dag: 2
 
 # used in SA
@@ -75,6 +75,8 @@ taskSetSize_FindUnsustainable: 3
 #*************************************************************
 
 # no need to adjust
+control_sort_obj_coeff_weight: -0.01
+control_sort_exec_weight: 1
 punishmentFrequency: 10
 maxIterationsOptimizer: 1e3
 gradientModify: 0
@@ -99,6 +101,7 @@ batchOptimizeFolder: ControlPerformance_Hybrid_DAG
 enableMaxComputationTimeRestrict: 1
 MaxComputationTimeRestrict: 2
 eliminateTol: 1e0
+# Variable Elimination, Used in Energy experiment
 eliminateStep: 1.5
 adjustEliminateMaxIte: 100 # does not control whether enabling elimination
 roundTypeInClamp: "rough"

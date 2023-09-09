@@ -14,16 +14,16 @@
 #include "sources/Utils/Parameters.h"
 using namespace rt_num_opt;
 using namespace std;
-TEST(io, read_vector) {
-    rt_num_opt::PeriodRoundQuantum = 1;
-    rt_num_opt::ReadVec("PeriodSetAM");
-    for (auto x : rt_num_opt::PeriodSetAM) {
-        std::cout << x << " ";
-    }
-    std::cout << std::endl;
-    // AssertEqualVectorExact({1, 2, 5, 10, 20, 50, 100, 200, 1000},
-    // rt_num_opt::PeriodSetAM);
-}
+// TEST(io, read_vector) {
+//     rt_num_opt::PeriodRoundQuantum = 1;
+//     rt_num_opt::ReadVec("PeriodSetAM");
+//     for (auto x : rt_num_opt::PeriodSetAM) {
+//         std::cout << x << " ";
+//     }
+//     std::cout << std::endl;
+//     // AssertEqualVectorExact({1, 2, 5, 10, 20, 50, 100, 200, 1000},
+//     // rt_num_opt::PeriodSetAM);
+// }
 
 TEST(IO, v1) {
     rt_num_opt::PeriodRoundQuantum = 1;

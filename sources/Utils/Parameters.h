@@ -2,153 +2,127 @@
 // this file records all the global variables
 #include <yaml-cpp/yaml.h>
 
-#include <opencv2/core/core.hpp>
+// #include <opencv2/core/core.hpp>
+
 #include <vector>
 namespace rt_num_opt {
 
-cv::FileStorage ConfigParameters(
-    "/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml",
-    cv::FileStorage::READ);
+// cv::FileStorage ConfigParameters(
+//     "/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml",
+//     cv::FileStorage::READ);
+const std::string PROJECT_PATH = std::string(PROJECT_ROOT_DIR) + "/";
+YAML::Node loaded_doc =
+    YAML::LoadFile(PROJECT_PATH + "sources/parameters.yaml");
 
-// const int TASK_NUMBER = (int)ConfigParameters["TASK_NUMBER"];
-// int TASK_NUMBER_DYNAMIC = 10;
+double MaxLoopControl = loaded_doc["MaxLoopControl"].as<double>();
+int enableReorder = loaded_doc["enableReorder"].as<int>();
 int TASK_NUMBER = 0;
-int count1 = 0;
-int count2 = 0;
-double weightEnergy = (double)ConfigParameters["weightEnergy"];
-double punishmentInBarrier =
-    weightEnergy * (double)ConfigParameters["punishmentInBarrier"];
-double eliminateTol = (double)ConfigParameters["eliminateTol"];
-double weightDrawBegin = (double)ConfigParameters["weightDrawBegin"];
-double weightDrawEnd = (double)ConfigParameters["weightDrawEnd"];
+double weightEnergy = loaded_doc["weightEnergy"].as<double>();
+
+double punishmentInBarrier = loaded_doc["punishmentInBarrier"].as<double>();
+double eliminateTol = loaded_doc["eliminateTol"].as<double>();
 double MaxComputationTimeRestrict =
-    (double)ConfigParameters["MaxComputationTimeRestrict"];
-double eliminateJacobianThreshold =
-    (double)ConfigParameters["eliminateJacobianThreshold"];
-double weightSchedulability = (double)ConfigParameters["weightSchedulability"];
-double weightHardConstraint = (double)ConfigParameters["weightHardConstraint"];
-double weightSchedulabilityMax =
-    (double)ConfigParameters["weightSchedulabilityMax"];
-double weightSchedulabilityMin =
-    (double)ConfigParameters["weightSchedulabilityMin"];
-double weightSchedulabilityStep =
-    (double)ConfigParameters["weightSchedulabilityStep"];
+    loaded_doc["MaxComputationTimeRestrict"].as<double>();
+double weightSchedulability = loaded_doc["weightSchedulability"].as<double>();
+double weightHardConstraint = loaded_doc["weightHardConstraint"].as<double>();
+double gradientModify = loaded_doc["gradientModify"].as<double>();
+double coolingRateSA = loaded_doc["coolingRateSA"].as<double>();
+double utilTol = loaded_doc["utilTol"].as<double>();
 
-double gradientModify = (double)ConfigParameters["gradientModify"];
-
-int maxIterationsOptimizer = (int)ConfigParameters["maxIterationsOptimizer"];
-int whether_IPM = (int)ConfigParameters["whether_IPM"];
+double maxIterationsOptimizer =
+    loaded_doc["maxIterationsOptimizer"].as<double>();
+int whether_IPM = loaded_doc["whether_IPM"].as<int>();
 
 int LLCompareWithGeneralizedElimination =
-    (int)ConfigParameters["LLCompareWithGeneralizedElimination"];
-int printFailureFile = (int)ConfigParameters["printFailureFile"];
-int EnergyMode = (int)ConfigParameters["EnergyMode"];
-int elimIte = (int)ConfigParameters["elimIte"];
-int executionTimeModel = (int)ConfigParameters["executionTimeModel"];
-int enableIPM = (int)ConfigParameters["enableIPM"];
-const double coolingRateSA = (double)ConfigParameters["coolingRateSA"];
+    loaded_doc["LLCompareWithGeneralizedElimination"].as<int>();
+int printFailureFile = loaded_doc["printFailureFile"].as<int>();
+int EnergyMode = loaded_doc["EnergyMode"].as<int>();
+int elimIte = loaded_doc["elimIte"].as<int>();
+int executionTimeModel = loaded_doc["executionTimeModel"].as<int>();
 int enableMaxComputationTimeRestrict =
-    (int)ConfigParameters["enableMaxComputationTimeRestrict"];
-int exactJacobian = (int)ConfigParameters["exactJacobian"];
-const int temperatureSA = (int)ConfigParameters["temperatureSA"];
-const double utilTol = (double)ConfigParameters["utilTol"];
-double deltaOptimizer = (double)ConfigParameters["deltaOptimizer"];
-const double initialLambda = (double)ConfigParameters["initialLambda"];
-const double lowerLambda = (double)ConfigParameters["lowerLambda"];
-const double upperLambda = (double)ConfigParameters["upperLambda"];
-double noiseModelSigma = (double)ConfigParameters["noiseModelSigma"];
-const double deltaInitialDogleg =
-    (double)ConfigParameters["deltaInitialDogleg"];
-const int randomInitialize = (int)ConfigParameters["randomInitialize"];
-const int weightEnergyMaxOrder = (int)ConfigParameters["weightEnergyMaxOrder"];
-const int SA_iteration = (int)ConfigParameters["SA_iteration"];
-double relativeErrorTolerance =
-    (double)ConfigParameters["relativeErrorTolerance"];
-double relativeErrorToleranceMin =
-    (double)ConfigParameters["relativeErrorToleranceMin"];
-const double relativeErrorToleranceInit =
-    (double)ConfigParameters["relativeErrorToleranceInit"];
-// enableReorder: 0 means no re-order, 1 means purely based on period with
-// random priority assignment for tasks with same period, 2 means mainly based
-// on period, prefer tasks with smaller execution time if tasks have same
-// period;
-int enableReorder = (int)ConfigParameters["enableReorder"];
-int MaxLoopControl = (int)ConfigParameters["MaxLoopControl"];
+    loaded_doc["enableMaxComputationTimeRestrict"].as<int>();
+int exactJacobian = loaded_doc["exactJacobian"].as<int>();
+const int temperatureSA = loaded_doc["temperatureSA"].as<int>();
+double deltaOptimizer = loaded_doc["deltaOptimizer"].as<double>();
+const double initialLambda = loaded_doc["initialLambda"].as<double>();
+const double lowerLambda = loaded_doc["lowerLambda"].as<double>();
+const double upperLambda = loaded_doc["upperLambda"].as<double>();
+double noiseModelSigma = loaded_doc["noiseModelSigma"].as<double>();
+const double deltaInitialDogleg = loaded_doc["deltaInitialDogleg"].as<double>();
 
-double Priority_assignment_adjustment_threshold = (double)ConfigParameters["Priority_assignment_adjustment_threshold"];
-double disturb_init = (double)ConfigParameters["disturb_init"];
-const double toleranceBarrier = (double)ConfigParameters["toleranceBarrier"];
-int optimizerType = (int)ConfigParameters["optimizerType"];
-double disturb_step = (double)ConfigParameters["disturb_step"];
+const int randomInitialize = loaded_doc["randomInitialize"].as<int>();
+const int SA_iteration = loaded_doc["SA_iteration"].as<int>();
+double relativeErrorTolerance =
+    loaded_doc["relativeErrorTolerance"].as<double>();
+double relativeErrorToleranceMin =
+    loaded_doc["relativeErrorToleranceMin"].as<double>();
+const double relativeErrorToleranceInit =
+    loaded_doc["relativeErrorToleranceInit"].as<double>();
+
+double Priority_assignment_adjustment_threshold =
+    loaded_doc["Priority_assignment_adjustment_threshold"].as<double>();
+double disturb_init = loaded_doc["disturb_init"].as<double>();
+int optimizerType = loaded_doc["optimizerType"].as<int>();
+double disturb_step = loaded_doc["disturb_step"].as<double>();
 double relativeErrorToleranceOuterLoop =
-    (double)ConfigParameters["relativeErrorToleranceOuterLoop"];
-double disturb_max = (double)ConfigParameters["disturb_max"];
+    loaded_doc["relativeErrorToleranceOuterLoop"].as<double>();
+double disturb_max = loaded_doc["disturb_max"].as<double>();
 
 const double punishmentFrequency =
-    (double)ConfigParameters["punishmentFrequency"];
+    loaded_doc["punishmentFrequency"].as<double>();
 const std::string testDataSetName =
-    (std::string)ConfigParameters["testDataSetName"];
-std::string roundTypeInClamp =
-    (std::string)ConfigParameters["roundTypeInClamp"];
-std::string verbosityLM = (std::string)ConfigParameters["verbosityLM"];
+    loaded_doc["testDataSetName"].as<std::string>();
+std::string roundTypeInClamp = loaded_doc["roundTypeInClamp"].as<std::string>();
+std::string verbosityLM = loaded_doc["verbosityLM"].as<std::string>();
 std::string linearOptimizerType =
-    (std::string)ConfigParameters["linearOptimizerType"];
+    loaded_doc["linearOptimizerType"].as<std::string>();
 
-std::string clampTypeMiddle = (std::string)ConfigParameters["clampTypeMiddle"];
-std::string controlPath = (std::string)ConfigParameters["controlPath"];
-std::string runMode = (std::string)ConfigParameters["runMode"];
+std::string clampTypeMiddle = loaded_doc["clampTypeMiddle"].as<std::string>();
+std::string controlPath = loaded_doc["controlPath"].as<std::string>();
+std::string runMode = loaded_doc["runMode"].as<std::string>();
 std::string batchOptimizeFolder =
-    (std::string)ConfigParameters["batchOptimizeFolder"];
-const double parallelFactor = (double)ConfigParameters["parallelFactor"];
-const std::string readTaskMode = (std::string)ConfigParameters["readTaskMode"];
-const int debugMode = (int)ConfigParameters["debugMode"];
-const int adjustEliminateMaxIte =
-    (int)ConfigParameters["adjustEliminateMaxIte"];
-int core_m_dag = (int)ConfigParameters["core_m_dag"];
+    loaded_doc["batchOptimizeFolder"].as<std::string>();
+const double parallelFactor = loaded_doc["parallelFactor"].as<double>();
+const std::string readTaskMode = loaded_doc["readTaskMode"].as<std::string>();
+const int debugMode = loaded_doc["debugMode"].as<int>();
+const int adjustEliminateMaxIte = loaded_doc["adjustEliminateMaxIte"].as<int>();
+int core_m_dag = loaded_doc["core_m_dag"].as<int>();
 int baselineLLCompare =
-    (int)ConfigParameters["baselineLLCompare"];  // baselineLLCompare: 1 means
-                                                 // Zhao20, 2 means MILP
+    loaded_doc["baselineLLCompare"].as<int>();  // baselineLLCompare: 1 means
+                                                // Zhao20, 2 means MILP
 
-int Period_Round_For_Control_Opt = (int)ConfigParameters["Period_Round_For_Control_Opt"];
+// *********************************************
+int Period_Round_For_Control_Opt =
+    loaded_doc["Period_Round_For_Control_Opt"].as<int>();
 double granularity_FindUnsustainable =
-    (double)ConfigParameters["granularity_FindUnsustainable"];
+    loaded_doc["granularity_FindUnsustainable"].as<double>();
 const int taskSetSize_FindUnsustainable =
-    (int)ConfigParameters["taskSetSize_FindUnsustainable"];
+    loaded_doc["taskSetSize_FindUnsustainable"].as<int>();
 
-double Job_Limit_Scheduling =
-    (double)ConfigParameters["Job_Limit_Scheduling"];
-int maxNode_GenerateTaskSet = (int)ConfigParameters["maxNode_GenerateTaskSet"];
+double Job_Limit_Scheduling = loaded_doc["Job_Limit_Scheduling"].as<double>();
+int maxNode_GenerateTaskSet = loaded_doc["maxNode_GenerateTaskSet"].as<int>();
 
-int printRTA = (int)ConfigParameters["printRTA"];
-const double relErrorTolIPM = (double)ConfigParameters["relErrorTolIPM"];
-const double eliminateStep = (double)ConfigParameters["eliminateStep"];
-double frequencyRatio = (double)ConfigParameters["frequencyRatio"];
-double timeScaleFactor = (double)ConfigParameters["timeScaleFactor"];
-double PeriodRoundQuantum= (double)ConfigParameters["PeriodRoundQuantum"];
-double SkipRateFindElimination =
-    (double)ConfigParameters["SkipRateFindElimination"];
-double jacobianScale = (double)ConfigParameters["jacobianScale"];
-double control_sort_obj_coeff_weight = (double)ConfigParameters["control_sort_obj_coeff_weight"];
-double control_sort_exec_weight = (double)ConfigParameters["control_sort_exec_weight"];
-double weight_priority_assignment = (double)ConfigParameters["weight_priority_assignment"];
+int printRTA = loaded_doc["printRTA"].as<int>();
+const double relErrorTolIPM = loaded_doc["relErrorTolIPM"].as<double>();
+const double eliminateStep = loaded_doc["eliminateStep"].as<double>();
+double frequencyRatio = 0;
+double timeScaleFactor = loaded_doc["timeScaleFactor"].as<double>();
+double PeriodRoundQuantum = loaded_doc["PeriodRoundQuantum"].as<double>();
+double jacobianScale = loaded_doc["jacobianScale"].as<double>();
+double control_sort_obj_coeff_weight =
+    loaded_doc["control_sort_obj_coeff_weight"].as<double>();
+double control_sort_exec_weight =
+    loaded_doc["control_sort_exec_weight"].as<double>();
+double weight_priority_assignment =
+    loaded_doc["weight_priority_assignment"].as<double>();
 
-double OverallTimeLimit = (double)ConfigParameters["OverallTimeLimit"];
-double Nasri19Param_timeout = (double)ConfigParameters["Nasri19Param_timeout"];
-double Nasri19Param_max_depth = (double)ConfigParameters["Nasri19Param_max_depth"];
+double OverallTimeLimit = loaded_doc["OverallTimeLimit"].as<double>();
+double Nasri19Param_timeout = loaded_doc["Nasri19Param_timeout"].as<double>();
+double Nasri19Param_max_depth =
+    loaded_doc["Nasri19Param_max_depth"].as<double>();
 
-int whether_ls = (int)ConfigParameters["whether_ls"];
+int whether_ls = loaded_doc["whether_ls"].as<int>();
 
-int setDiagonalDamping = (int)ConfigParameters["setDiagonalDamping"];
-int whetherWriteNasriTaskSet =
-    (int)ConfigParameters["whetherWriteNasriTaskSet"];
-std::vector<int> PeriodSetAM;
-void ReadVec(std::string str) {
-    YAML::Node config = YAML::LoadFile(
-        "/home/zephyr/Programming/Energy_Opt_NLP/sources/parameters.yaml");
-    YAML::Node nodeVecPeriodSet = config[str];
-    for (size_t i = 0; i < nodeVecPeriodSet.size(); i++) {
-        PeriodSetAM.push_back(nodeVecPeriodSet[i].as<int>());
-    }
-}
-
+int setDiagonalDamping = loaded_doc["setDiagonalDamping"].as<int>();
+int whetherWriteNasriTaskSet = 0;
 }  // namespace rt_num_opt

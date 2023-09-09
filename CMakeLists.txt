@@ -10,6 +10,9 @@ include(GtsamMakeConfigFile)
 include(GtsamBuildTypes)
 include(GtsamTesting)
 
+
+add_definitions(-DPROJECT_ROOT_DIR="${PROJECT_SOURCE_DIR}")
+
 find_package(yaml-cpp)
 add_compile_options("-Wno-deprecated")
 # add_subdirectory(DAG-scheduling_Verucchi)
