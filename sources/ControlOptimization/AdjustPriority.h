@@ -173,7 +173,7 @@ bool WhetherTaskNeedPAChange(int task_id,
         significant_difference =
             Priority_assignment_adjustment_threshold * tasks_w_pri.size();
 
-    return id_index_priority - id_index_gra >= significant_difference;
+    return id_index_priority - id_index_gra > significant_difference;
 }
 
 // higher priority tasks appear first, lower priority task appear later
@@ -195,14 +195,15 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
         SortPriorityBasedGradient(tasks, coeff, rta, weight);
     std::vector<TaskPriority> tasks_w_gra_copy = tasks_w_gra;
 
-    int count = 0;
+    int count_skipped_adjust = 0;
+    int count_effective_try = 0;
     // adjust priority iteratively
     while (!tasks_w_gra.empty()) {
         int task_id_curr = tasks_w_gra.back().task_index;
         if (!WhetherTaskNeedPAChange(task_id_curr, tasks_w_pri,
                                      tasks_w_gra_copy, -1)) {
             tasks_w_gra.pop_back();
-            count++;
+            count_skipped_adjust++;
             continue;
         } else {
             // std::cout << "Try adjusting PA:\n";
@@ -230,6 +231,7 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
                     }
                     obj_base = obj_curr;
                     tasks_w_pri = tasks_w_pri_curr;
+                    count_effective_try++;
                 }
             }
         }
@@ -238,7 +240,9 @@ std::vector<TaskPriority> ReorderWithGradient(const DAG_Nasri19 &dag_tasks,
         std::cout << "Final assignment: ";
         PrintPriorityAssignment(tasks_w_pri);
     }
-    std::cout << "ReorderWithGradient skip ratio: " << count << ", "
+    std::cout << "ReorderWithGradient, skipped adjustments: "
+              << count_skipped_adjust << ", "
+              << "actual adjust: " << count_effective_try << ", "
               << tasks_w_pri.size() << "\n";
     return tasks_w_pri;
 }
