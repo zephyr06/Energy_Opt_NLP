@@ -7,6 +7,9 @@
 
 namespace rt_num_opt {
 
+std::vector<int> PossiblePeriodGlobal = {
+    100,  200,  300,  400,   500,   600,  800,   1000,  2000,  3000, 4000,
+    5000, 6000, 8000, 10000, 20000, 3000, 40000, 50000, 60000, 80000};
 std::vector<int> PossiblePeriods() {
     if (Period_Round_For_Control_Opt)
         // return {100,  200,  500,  800,  1000, 2000,
@@ -15,8 +18,9 @@ std::vector<int> PossiblePeriods() {
         // 40000, 100000
         // return {100,  200,   500,   1000,  2000,
         //         5000, 10000, 20000, 100000};  // standard harmonic periods
-        return {100,  200,  500,   800,   1000,  2000,  3000,  4000,
-                5000, 8000, 10000, 12000, 16000, 20000, 40000, 100000};
+        // return {100,  200,  500,   800,   1000,  2000,  3000,  4000,
+        //         5000, 8000, 10000, 12000, 16000, 20000, 40000, 100000};
+        return PossiblePeriodGlobal;
     else
         return {};
 }

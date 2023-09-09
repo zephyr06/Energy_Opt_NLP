@@ -6,6 +6,7 @@ using namespace rt_num_opt;
 using namespace std;
 
 TEST(ControlObjFactor, v1) {
+    Period_Round_For_Control_Opt = 0;
     core_m_dag = 4;
     PeriodRoundQuantum = 1e3;
     std::string path =
@@ -83,7 +84,7 @@ TEST(ControlObjFactor, obj) {
 TEST(FindEliminatedVariables, V1) {
     core_m_dag = 4;
     disturb_init = 100;
-    PeriodRoundQuantum = 500;
+    PeriodRoundQuantum = 1000;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 
@@ -102,6 +103,7 @@ TEST(FindEliminatedVariables, V1) {
 TEST(OptimizeTaskSetIterative, V1) {
     using namespace rt_num_opt;
     using namespace ControlOptimize;
+    Period_Round_For_Control_Opt = 0;
     core_m_dag = 1;
     PeriodRoundQuantum = 500;
     std::string path =
@@ -116,7 +118,7 @@ TEST(OptimizeTaskSetIterative, V1) {
                                                            maskForElimination);
     // EXPECT_LONGS_EQUAL(PeriodRoundQuantum, sth.first(0));  // or 3000 if
     // PeriodRoundQuantum = 500;
-    EXPECT(sth.first(0) <= 4000);
+    EXPECT(sth.second < 0.25);
 }
 
 TEST(OptimizeTaskSetIterative, V2) {
@@ -186,7 +188,6 @@ TEST(GetTotalJobsWithinHyperPeriod, V2) {
 }
 
 TEST(RTA, V2) {
-        Period_Round_For_Control_Opt = 0;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
 

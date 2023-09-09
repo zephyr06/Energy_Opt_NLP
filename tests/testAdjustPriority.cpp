@@ -355,8 +355,8 @@ TEST(RoundPeriod, v2) {
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
     rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
     dag_tasks.UpdatePeriod(1, 300);
-    EXPECT_LONGS_EQUAL(500, dag_tasks.tasks_[2].period);
-    EXPECT_LONGS_EQUAL(500, dag_tasks.tasks_[3].period);
+    EXPECT_LONGS_EQUAL(300, dag_tasks.tasks_[2].period);
+    EXPECT_LONGS_EQUAL(300, dag_tasks.tasks_[3].period);
     // dag_tasks.UpdatePeriod(1, 800);
     // EXPECT_LONGS_EQUAL(1000, dag_tasks.tasks_[2].period);
     // EXPECT_LONGS_EQUAL(1000, dag_tasks.tasks_[3].period);
