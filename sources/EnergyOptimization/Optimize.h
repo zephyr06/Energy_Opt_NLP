@@ -24,12 +24,12 @@
 #include <Eigen/Dense>
 #include <chrono>
 
-#include "sources/TaskModel/Tasks.h"
-#include "sources/TaskModel/TaskSetNormal.h"
 #include "sources/EnergyOptimization/Energy.h"
 #include "sources/EnergyOptimization/FrequencyModel.h"
 #include "sources/MatrixConvenient.h"
 #include "sources/RTA/RTA_LL.h"
+#include "sources/TaskModel/TaskSetNormal.h"
+#include "sources/TaskModel/Tasks.h"
 #include "sources/Utils/GlobalVariables.h"
 #include "sources/Utils/Parameters.h"
 #include "sources/Utils/utils.h"
@@ -337,6 +337,7 @@ class Energy_Opt {
         // update the tasks with the new optimal computationTimeVector
         TaskSetType tasksCurr = tasks;
         int N = tasks.tasks_.size();
+        double SkipRateFindElimination = 0;
         for (int i = N - 1; i > lastTaskDoNotNeedOptimize; i--) {
             if (((double)rand() / (RAND_MAX)) < SkipRateFindElimination) {
                 continue;
