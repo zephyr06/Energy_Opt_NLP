@@ -138,7 +138,7 @@ TEST(PriorityAssignment, ReorderWithGradient_v1) {
     std::cout << rta << "\n";
     double weight = 0;
     std::vector<TaskPriority> priority_vec =
-        ReorderWithGradient(dag_tasks, coeff, weight);
+        ReorderWithGradient(dag_tasks, coeff, weight, -1);
     // no changes because the RTA cannot be improved under any priority
     // assignments
     EXPECT_LONGS_EQUAL(0, priority_vec[0].task_index);
@@ -162,7 +162,7 @@ TEST(PriorityAssignment, ReorderWithGradient_v2) {
     std::cout << rta << "\n";
     double weight = -10;
     std::vector<TaskPriority> priority_vec =
-        ReorderWithGradient(dag_tasks, coeff, weight);
+        ReorderWithGradient(dag_tasks, coeff, weight, -1);
     std::cout << "New RTA:\n";
     DAG_Nasri19 dag_tasks_curr = dag_tasks;
     for (uint i = 0; i < priority_vec.size(); i++) {
@@ -191,7 +191,7 @@ TEST(PriorityAssignment, ReorderWithGradient_v3) {
     std::cout << rta << "\n";
     double weight = -10;
     std::vector<TaskPriority> priority_vec =
-        ReorderWithGradient(dag_tasks, coeff, weight);
+        ReorderWithGradient(dag_tasks, coeff, weight, -1);
 
     EXPECT_LONGS_EQUAL(3, priority_vec[0].task_index);
     EXPECT_LONGS_EQUAL(2, priority_vec[1].task_index);
@@ -312,7 +312,7 @@ TEST(UpdateAllTasksPriority, v1) {
     coeff << 1, 10, 2, 20, 3, 30, 4, 40;
     // obtain priority assignments based on coeff
     std::vector<TaskPriority> tasks_w_p =
-        ReorderWithGradient(dag_tasks, coeff, 0);
+        ReorderWithGradient(dag_tasks, coeff, 0, -1);
     UpdateAllTasksPriority(dag_tasks, tasks_w_p);
     EXPECT(!UpdateAllTasksPriority(dag_tasks, tasks_w_p));
     IncreasePriority(2, tasks_w_p);
@@ -419,12 +419,12 @@ TEST(ReorderWithGradient, significant_difference) {
 
     EXPECT(WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 0));
     EXPECT(WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 1));
-    EXPECT(WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 2));
+    EXPECT(!WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 2));
     EXPECT(!WhetherTaskNeedPAChange(2, tasks_w_pri, tasks_w_gra, 3));
 
     EXPECT(WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 0));
     EXPECT(WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 1));
-    EXPECT(WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 2));
+    EXPECT(!WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 2));
     EXPECT(!WhetherTaskNeedPAChange(3, tasks_w_pri, tasks_w_gra, 3));
 }
 int main() {

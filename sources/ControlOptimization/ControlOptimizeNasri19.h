@@ -198,6 +198,8 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     // double disturbIte = eliminateTol;
     double weight_priority_assignment_during_iteration =
         weight_priority_assignment;
+    double pa_change_threshold = Priority_assignment_adjustment_threshold;
+
     while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
         // store prev result
         // errPrev = errCurr;
@@ -220,13 +222,16 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             ;
         else if (enableReorder == 1) {
             std::vector<TaskPriority> pri_ass = ReorderWithGradient(
-                taskSetType, coeff,
-                weight_priority_assignment_during_iteration);
+                taskSetType, coeff, weight_priority_assignment_during_iteration,
+                pa_change_threshold);
             change_pa = UpdateAllTasksPriority(taskSetType, pri_ass);
+
             weight_priority_assignment_during_iteration =
                 weight_priority_assignment_during_iteration /
                 10;  // weight needs to converge to 0 so that the approximated
-                     // obj converges to the true obj
+            // obj converges to the true obj
+            pa_change_threshold +=
+                0.01;  // in later iterations, less PA changes are needed
         } else if (enableReorder == 2) {
             // TODO: change this for formal comparison!
             // taskSetType.AssignPriorityRM();
