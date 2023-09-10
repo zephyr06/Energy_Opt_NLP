@@ -43,6 +43,21 @@ timeScaleFactor: 1e4
 maxNode_GenerateTaskSet: 20
 #*************************************************************
 
+
+# used in control-DAG
+Period_Round_For_Control_Opt: 1
+# <-1 means full PA
+# >1 means remove all the PA part
+# 0.1 probably removes all the PA
+Priority_assignment_adjustment_threshold: 2
+weight_priority_assignment: -1e6
+PeriodRoundQuantum: 1e3
+# used in Nasri19ECRTS 
+Job_Limit_Scheduling: 4e4
+Nasri19Param_timeout: 1e2
+Nasri19Param_max_depth: 0
+OverallTimeLimit: 600
+
 # used in control
 control_sort_exec_weight: 1
 control_sort_obj_coeff_weight: -0.01
