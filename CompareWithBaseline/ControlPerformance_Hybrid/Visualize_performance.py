@@ -36,13 +36,13 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=5,
+parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="RTA",
+parser.add_argument('--data_source', type=str, default="Time",
                     help='data source folder, EnergySaveRatio/RTA/Time')
-parser.add_argument('--title', type=str, default="ControlPerformance",
+parser.add_argument('--title', type=str, default="ControlPerformance_Hybrid",
                     help='tilte in produced figure')
 
 args = parser.parse_args()
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     data_2d = read_data_2d_time(minTaskNumber, maxTaskNumber)
     data_2d = np.array(data_2d).transpose()
     dataset_pd = pd.DataFrame()
-    optimizer_name = ["NORTH", "NORTH+_RM"] # , "NORTH+_Sort"
+    optimizer_name = ["NORTH", "NORTH+RM"] # , "NORTH+_Sort"
     marker_list = ["o", "v", "^", "s", "D"]  #
     color_list = ["#0084DB", "r", "y", "limegreen", "purple"]  #
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
