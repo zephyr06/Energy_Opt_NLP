@@ -61,8 +61,7 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         result = optimizer.optimize();
     } else if (optimizerType == 3) {
         gtsam::GaussNewtonParams params;
-        if (debugMode == 1)
-            params.setVerbosity("DELTA");
+        if (debugMode == 1) params.setVerbosity("DELTA");
         params.setRelativeErrorTol(relativeErrorTolerance);
         params.setLinearSolverType(linearOptimizerType);
         gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
@@ -76,8 +75,7 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         gtsam::NonlinearOptimizerParams params;
         params.setRelativeErrorTol(relativeErrorTolerance);
         params.setLinearSolverType(linearOptimizerType);
-        if (debugMode == 1)
-            params.setVerbosity("DELTA");
+        if (debugMode == 1) params.setVerbosity("DELTA");
         params.setMaxIterations(maxIterationsOptimizer);
         gtsam::NonlinearConjugateGradientOptimizer optimizer(
             graph, initialEstimateFG, params);
@@ -175,8 +173,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
 
     // double errPrev = 1e30;
     double errCurr = FactorGraphType::RealObj(taskSetType, coeff);
-    if (errCurr >= 1e30)
-        CoutError("The input DAG is not schedulable!");
+    if (errCurr >= 1e30) CoutError("The input DAG is not schedulable!");
     VectorDynamic periodResCurr, periodResPrev;
     std::vector<bool> maskForEliminationPrev = maskForElimination;
     double err_initial = errCurr;
@@ -191,8 +188,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     if (enableReorder == 1) {
         taskSetType.AssignPriorityControl(coeff);
         RTA_Nasri19 r(taskSetType);
-        if (!r.CheckSchedulability())
-            taskSetType.InitializePriority();
+        if (!r.CheckSchedulability()) taskSetType.InitializePriority();
     }
 
     // double disturbIte = eliminateTol;
@@ -231,15 +227,14 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                 10;  // weight needs to converge to 0 so that the approximated
             // obj converges to the true obj
             pa_change_threshold +=
-                0.01;  // in later iterations, less PA changes are needed
+                0.1;  // in later iterations, less PA changes are needed
         } else if (enableReorder == 2) {
             // TODO: change this for formal comparison!
             // taskSetType.AssignPriorityRM();
             TaskSetType dag_tasks_copy = taskSetType;
             dag_tasks_copy.AssignPriorityRM();
             RTA_Nasri19 r(dag_tasks_copy);
-            if (r.CheckSchedulability())
-                taskSetType = dag_tasks_copy;
+            if (r.CheckSchedulability()) taskSetType = dag_tasks_copy;
         } else if (enableReorder == 3) {
             taskSetType.AssignPriorityControl(coeff);
             // TaskSetType dag_tasks_copy = taskSetType;
@@ -277,8 +272,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         // if (errCurr >= errPrev * (1 - relativeErrorToleranceOuterLoop) &&
         //     change_pa == false && (!ContainFalse(maskForElimination)))
         //     break;
-        if ((!ContainFalse(maskForElimination)))
-            break;
+        if ((!ContainFalse(maskForElimination))) break;
     }
     // if (ContainFalse(maskForElimination)) {
     //     UpdateTaskSetPeriod(tasks, periodResPrev);
