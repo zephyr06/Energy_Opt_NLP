@@ -251,7 +251,14 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         } else if (enableReorder == 2) {
             taskSetType.AssignPriorityRM();
         } else if (enableReorder == 3) {
-            taskSetType.AssignPriorityControl(coeff);
+            // taskSetType.AssignPriorityControl(coeff);
+            std::vector<TaskPriority> pri_ass =
+                ReorderWithGradient(taskSetType, coeff, 0, -2);
+            VectorDynamic rta = GetNasri19RTA(taskSetType);
+            std::vector<TaskPriority> tasks_w_gra =
+                SortPriorityBasedGradient(taskSetType.tasks_, coeff, rta, 0);
+            std::reverse(tasks_w_gra.begin(), tasks_w_gra.end());
+            UpdateAllTasksPriority(taskSetType, tasks_w_gra);
         } else
             CoutError("Unknown enblaeReorder option!");
         if (!CheckNasri19Schedulability(taskSetType))
