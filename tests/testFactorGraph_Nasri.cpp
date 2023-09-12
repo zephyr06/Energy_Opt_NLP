@@ -9,6 +9,7 @@ TEST(ControlObjFactor, v1) {
     Period_Round_For_Control_Opt = 0;
     core_m_dag = 4;
     PeriodRoundQuantum = 1e3;
+    Obj_Pow = 1;
     std::string path =
         "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"
         "test_n3_v19.yaml";
@@ -232,6 +233,62 @@ TEST(OverallOptimization, V1) {
     // EXPECT_LONGS_EQUAL(1000, sth.first(3));
     // double optimal_ratio = after_opt / initial_opt;
     EXPECT(sth.second < 0.65);
+}
+
+TEST(ControlObjFactor, Obj_Pow_v1) {
+    Period_Round_For_Control_Opt = 0;
+    core_m_dag = 4;
+    PeriodRoundQuantum = 1e3;
+    Obj_Pow = 2;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/"
+        "test_n3_v19.yaml";
+
+    rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    TaskSet tasks = tasks_dag.tasks_;
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    coeff.setOnes();
+    for (uint i = 0; i < coeff.rows() / 2; i++)
+        coeff(2 * i + 1, 0) = coeff(2 * i + 1, 0) * 10;
+
+    std::cout << "RTA analysis:\n";
+    RTA_Nasri19 r(tasks_dag);
+    VectorDynamic rta = r.ResponseTimeOfTaskSet();
+    std::cout << rta << "\n";
+
+    std::vector<bool> maskForElimination(tasks_dag.SizeDag(), false);
+
+    FactorGraphNasri<DAG_Nasri19,
+                     RTA_Nasri19>::ControlObjFactor control_obj_factor =
+        FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::GenerateControlObjFactor(
+            maskForElimination, coeff, tasks_dag);
+
+    gtsam::Values initial_estimate =
+        FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::GenerateInitialFG(
+            tasks_dag, maskForElimination);
+
+    gtsam::Vector error_actual =
+        control_obj_factor.unwhitenedError(initial_estimate);
+    std::cout << "Actual error: " << error_actual << "\n";
+    VectorDynamic error_expect = error_actual;
+    error_expect(0) = pow(5000 + 500 * 500 * 10, 0.5);
+    error_expect(2) = pow(5000 + 1500 * 1500 * 10, 0.5);
+    error_expect(4) = pow(10000 + 200 * 200 * 10, 0.5);
+    error_expect(6) = pow(10000 + 100 * 100 * 10, 0.5);
+    EXPECT(gtsam::assert_equal(error_expect, error_actual, 1e-3));
+
+    std::vector<gtsam::Matrix> H;
+    H.push_back(GenerateMatrixDynamic(1, 1));
+    H.push_back(GenerateMatrixDynamic(1, 1));
+    control_obj_factor.unwhitenedError(initial_estimate, H);
+    gtsam::Matrix jacob_expect1 = GenerateVectorDynamic(8);
+    jacob_expect1 << 0.5 / error_expect(0), 0, 0.5 / error_expect(2), 0, 0, 0,
+        0, 0;
+    EXPECT(gtsam::assert_equal(jacob_expect1, H[0], 1e-3));
+    gtsam::Matrix jacob_expect2 = GenerateVectorDynamic(8);
+    jacob_expect2 << 0, 0, 0, 0, 0.5 / error_expect(4), 0,
+        0.5 / error_expect(6), 0;
+    EXPECT(gtsam::assert_equal(jacob_expect2, H[1], 1e-6));
 }
 
 int main() {

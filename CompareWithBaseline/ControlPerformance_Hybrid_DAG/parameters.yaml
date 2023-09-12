@@ -28,12 +28,14 @@ maxNode_GenerateTaskSet: 20
 #*************************************************************
 
 # used in control
+Obj_Pow: 1
 Period_Round_For_Control_Opt: 1
+Priority_assignment_threshold_incremental: 0.01
 # <-1 means full PA
 # >1 means remove all the PA part
 # 0.1 probably removes all the PA
-Priority_assignment_adjustment_threshold: 0.1
-weight_priority_assignment: -1e4
+Priority_assignment_adjustment_threshold: -0.1
+weight_priority_assignment: -1e6
 # not used in reality, by default, it is 0.1HyperPeriod
 PeriodRoundQuantum: 1e3
 relativeErrorToleranceInit: 1e-3

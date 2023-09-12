@@ -98,13 +98,15 @@ struct FactorGraphNasri {
                 // double period_curr =
                 //     taskSetType.tasksVecNasri_[taskId].tasks_[nodeId].period;
                 double period_curr = periodVec(taskId, 0);
+                //  Obj_Pow is a global variable
                 error(2 * node_overall_count) =
                     period_curr * coeff(2 * node_overall_count) +
-                    rta(node_overall_count) * coeff(2 * node_overall_count + 1);
+                    pow(rta(node_overall_count), Obj_Pow) *
+                        coeff(2 * node_overall_count + 1);
 
-                // least-square, Obj_Pow is a global variable
+                // least-square,
                 error(2 * node_overall_count) =
-                    pow(error(2 * node_overall_count), Obj_Pow / 2.0);
+                    pow(error(2 * node_overall_count), 0.5);
 
                 error(2 * node_overall_count + 1) =
                     HingeLoss(period_curr - rta(node_overall_count)) *
