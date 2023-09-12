@@ -277,11 +277,6 @@ int main(int argc, char *argv[]) {
             }
         } else if (taskType == 3) {  // DAG for control optimization
             std::vector<DAG_Model> dagTaskSet;
-            if (totalUtilization <= 0) {
-                totalUtilization = RandRange(0.1, 0.8);
-            }
-            vector<double> utilVec = Uunifast(N, totalUtilization, true);
-            vector<double> weightVec;
             for (int j = 0; j < N; j++) {
                 TaskSet tasks = GenerateTaskSetForControl(
                     ceil(RandRange(1, maxNode_GenerateTaskSet)));
@@ -289,7 +284,7 @@ int main(int argc, char *argv[]) {
                 AddRandomEdges(dagModel);
                 dagTaskSet.push_back(dagModel);
             }
-            double period_from_sum = SumExecutionTime(dagTaskSet) * 5;
+            double period_from_sum = SumExecutionTime(dagTaskSet) * 1;
             period_from_sum =
                 ceil(period_from_sum / PeriodRoundQuantum) * PeriodRoundQuantum;
             SetPeriodForAllDag(dagTaskSet, period_from_sum);
@@ -302,6 +297,7 @@ int main(int argc, char *argv[]) {
 
             if (schedulabilityCheck) {
                 DAG_Nasri19 dagNasri19(dagTaskSet);
+                dagNasri19.AssignPriorityRM();
                 RTA_Nasri19 r(dagNasri19);
                 if (!r.CheckSchedulability()) {
                     i--;
