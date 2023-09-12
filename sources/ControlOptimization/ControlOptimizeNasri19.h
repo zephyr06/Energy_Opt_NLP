@@ -188,7 +188,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     //     UpdateAllTasksPriority(taskSetType, pri_ass);
     // }
     int loopCount = 0;
-    if (enableReorder == 1) {
+    if (enableReorder == 1 || enableReorder == 3) {
         taskSetType.AssignPriorityControl(coeff);
         RTA_Nasri19 r(taskSetType);
         if (!r.CheckSchedulability())
@@ -231,25 +231,21 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                 10;  // weight needs to converge to 0 so that the approximated
             // obj converges to the true obj
             pa_change_threshold +=
-                0.01;  // in later iterations, less PA changes are needed
+                Priority_assignment_threshold_incremental;  // in later
+                                                            // iterations, less
+                                                            // PA changes are
+                                                            // needed
         } else if (enableReorder == 2) {
-            // TODO: change this for formal comparison!
-            // taskSetType.AssignPriorityRM();
-            TaskSetType dag_tasks_copy = taskSetType;
-            dag_tasks_copy.AssignPriorityRM();
-            RTA_Nasri19 r(dag_tasks_copy);
-            if (r.CheckSchedulability())
-                taskSetType = dag_tasks_copy;
+            taskSetType.AssignPriorityRM();
         } else if (enableReorder == 3) {
             taskSetType.AssignPriorityControl(coeff);
-            // TaskSetType dag_tasks_copy = taskSetType;
-            // dag_tasks_copy.AssignPriorityControl(coeff);
-            // RTA_Nasri19 r(dag_tasks_copy);
-            // if (r.CheckSchedulability())
-            //     taskSetType = dag_tasks_copy;
         } else
             CoutError("Unknown enblaeReorder option!");
+        if (!CheckNasri19Schedulability(taskSetType))
+            break;
+
         EndTimer("ChangePriorityAssignmentOrder");
+
         // adjust optimization settings
         if (!change_pa)
             FactorGraphType::FindEliminatedVariables(taskSetType,

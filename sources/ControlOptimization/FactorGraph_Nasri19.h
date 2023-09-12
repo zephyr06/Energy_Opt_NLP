@@ -102,9 +102,9 @@ struct FactorGraphNasri {
                     period_curr * coeff(2 * node_overall_count) +
                     rta(node_overall_count) * coeff(2 * node_overall_count + 1);
 
-                // least-square
+                // least-square, Obj_Pow is a global variable
                 error(2 * node_overall_count) =
-                    pow(error(2 * node_overall_count), 0.5);
+                    pow(error(2 * node_overall_count), Obj_Pow / 2.0);
 
                 error(2 * node_overall_count + 1) =
                     HingeLoss(period_curr - rta(node_overall_count)) *
@@ -325,7 +325,8 @@ struct FactorGraphNasri {
                             const VectorDynamic &rta) {
         double res = 0;
         for (uint i = 0; i < taskSetType.tasks_.size(); i++) {
-            res += coeff.coeffRef(i * 2, 0) * taskSetType.tasks_[i].period;
+            res += coeff.coeffRef(i * 2, 0) *
+                   pow(taskSetType.tasks_[i].period, Obj_Pow);
             res += coeff.coeffRef(i * 2 + 1, 0) * rta(i, 0);
         }
         return res;

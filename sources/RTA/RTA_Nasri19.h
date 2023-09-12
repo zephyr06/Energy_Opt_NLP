@@ -141,4 +141,8 @@ inline VectorDynamic GetNasri19RTA(const DAG_Nasri19 &dagNasri) {
     RTA_Nasri19 r(dagNasri);
     return r.ResponseTimeOfTaskSet();
 }
+inline bool CheckNasri19Schedulability(const DAG_Nasri19 &dag_tasks) {
+    RTA_Nasri19 r(dag_tasks);
+    return r.CheckSchedulability();
+}
 }  // namespace rt_num_opt

@@ -67,8 +67,9 @@ struct DAG_Nasri19 : public TaskSetNormal {
 
     // based on rate-monotonic
     void InitializePriority() {
-        uint count = 0;
-        for (Task &task_curr : tasks_) task_curr.priority = count++;
+        // uint count = 0;
+        // for (Task &task_curr : tasks_) task_curr.priority = count++;
+        AssignPriorityRM();
         UpdateTasksVecNasri_();
     }
     void AssignPriorityRM() {

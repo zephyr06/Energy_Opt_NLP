@@ -27,10 +27,11 @@ struct TaskPriority {
     int task_index;
     double priority;
 };
-double GetObjGradient(int task_index, const TaskSet &tasks,
-                      const VectorDynamic &coeff, const VectorDynamic &rta,
-                      double weight) {
-    return coeff(2 * task_index + 1) -
+inline double GetObjGradient(int task_index, const TaskSet &tasks,
+                             const VectorDynamic &coeff,
+                             const VectorDynamic &rta, double weight) {
+    return coeff(2 * task_index + 1) * Obj_Pow *
+               pow(rta(task_index), Obj_Pow - 1) -
            weight / (tasks[task_index].deadline - rta(task_index));
 }
 
