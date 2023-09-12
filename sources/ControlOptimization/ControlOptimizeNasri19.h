@@ -188,17 +188,30 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     //     UpdateAllTasksPriority(taskSetType, pri_ass);
     // }
     int loopCount = 0;
-    if (enableReorder == 1 || enableReorder == 3) {
+    // clean this part after experiments!!
+    if (enableReorder == 3) {
         taskSetType.AssignPriorityControl(coeff);
         RTA_Nasri19 r(taskSetType);
         if (!r.CheckSchedulability())
             taskSetType.InitializePriority();
     }
+    if (enableReorder == 1) {
+        taskSetType.AssignPriorityControl(coeff);
+        RTA_Nasri19 r(taskSetType);
+        if (!r.CheckSchedulability())
+            taskSetType.InitializePriority();
+
+        std::vector<TaskPriority> pri_ass =
+            ReorderWithGradient(taskSetType, coeff, weight_priority_assignment,
+                                Priority_assignment_adjustment_threshold);
+        UpdateAllTasksPriority(taskSetType, pri_ass);
+    }
 
     // double disturbIte = eliminateTol;
     double weight_priority_assignment_during_iteration =
-        weight_priority_assignment;
-    double pa_change_threshold = Priority_assignment_adjustment_threshold;
+        weight_priority_assignment / 10;
+    double pa_change_threshold = Priority_assignment_adjustment_threshold +
+                                 Priority_assignment_threshold_incremental;
 
     while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
         // store prev result
