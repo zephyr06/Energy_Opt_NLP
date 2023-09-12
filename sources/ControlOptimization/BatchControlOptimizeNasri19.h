@@ -7,6 +7,7 @@
 #include "sources/ControlOptimization/ControlOptimizeNasri19.h"
 
 namespace ControlNasri19 {
+
 /**
  * @brief check whether the file in the directory is what we're looking for;
  * this function assumes the possible input are only one of the following:
@@ -67,7 +68,20 @@ bool VerifyResFileExist(const std::string &pathDataset,
 
 namespace rt_num_opt {
 using namespace ControlOptimize;
-
+void ClearResultFiles(std::string dataSetFolder) {
+    std::string dirStr = dataSetFolder;
+    const char *pathDataset = (dirStr).c_str();
+    std::vector<std::string> files = ReadFilesInDirectory(pathDataset);
+    for (const auto &file : files) {
+        std::string delimiter = "-";
+        if (file.find("Res") != std::string::npos) {
+            std::string path = dataSetFolder + file;
+            if (remove(path.c_str()) != 0) {
+                perror("Error deleting file!");
+            }
+        }
+    }
+}
 // only for Nasri19 experiment
 double BatchOptimizeNasri19(int Nn = 5) {
     const char *pathDataset;

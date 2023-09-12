@@ -5,6 +5,7 @@
 using namespace rt_num_opt;
 using namespace std;
 TEST(RTA, V1) {
+    Obj_Pow = 1;
     Period_Round_For_Control_Opt = 0;
     core_m_dag = 4;
     std::string path =
