@@ -228,6 +228,11 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         taskSetType, coeff, enableReorder);
 
     int loopCount = 0;
+    // double disturbIte = eliminateTol;
+    double weight_priority_assignment_during_iteration =
+        weight_priority_assignment;
+    double pa_change_threshold = Priority_assignment_adjustment_threshold;
+
     while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
         // store prev result
         // errPrev = errCurr;
@@ -266,12 +271,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         } else if (enableReorder == 2) {
             taskSetType.AssignPriorityRM();
         } else if (enableReorder == 3) {
-            // taskSetType.AssignPriorityControl(coeff);
-            VectorDynamic rta = GetNasri19RTA(taskSetType);
-            std::vector<TaskPriority> tasks_w_gra =
-                SortPriorityBasedGradient(taskSetType.tasks_, coeff, rta, 0);
-            std::reverse(tasks_w_gra.begin(), tasks_w_gra.end());
-            UpdateAllTasksPriority(taskSetType, tasks_w_gra);
+            AssignPriorityBasedOnlyGradient(taskSetType, coeff);
         } else
             CoutError("Unknown enblaeReorder option!");
         if (!CheckNasri19Schedulability(taskSetType))
