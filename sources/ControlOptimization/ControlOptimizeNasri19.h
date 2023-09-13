@@ -194,17 +194,18 @@ template <typename FactorGraphType, class TaskSetType>
 void InitializePriorityAssignment(TaskSetType &taskSetType,
                                   const VectorDynamic &coeff,
                                   int enableReorderInput) {
-    if (enableReorderInput == 0)
-        return;
-    else if (enableReorderInput == 1) {
+    // if (enableReorderInput == 0)
+    //     return;
+    // else
+    if (enableReorderInput == 1)
         AssignBestInitialPriority<FactorGraphType, TaskSetType>(taskSetType,
                                                                 coeff);
-    } else if (enableReorderInput == 2)
-        taskSetType.AssignPriorityRM();
-    else if (enableReorderInput == 3) {
-        AssignPriorityBasedOnlyGradient(taskSetType, coeff);
-    } else
-        CoutError("Unrecognized enableReorderInput argument!");
+    // } else if (enableReorderInput == 2)
+    //     taskSetType.AssignPriorityRM();
+    // else if (enableReorderInput == 3) {
+    //     AssignPriorityBasedOnlyGradient(taskSetType, coeff);
+    // } else
+    //     CoutError("Unrecognized enableReorderInput argument!");
 }
 // only accepts DAG-related task set type, update taskSetType during
 // optimization
