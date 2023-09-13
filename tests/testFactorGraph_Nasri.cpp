@@ -271,24 +271,28 @@ TEST(ControlObjFactor, Obj_Pow_v1) {
         control_obj_factor.unwhitenedError(initial_estimate);
     std::cout << "Actual error: " << error_actual << "\n";
     VectorDynamic error_expect = error_actual;
-    error_expect(0) = pow(5000 + 500 * 500 * 10, 0.5);
-    error_expect(2) = pow(5000 + 1500 * 1500 * 10, 0.5);
-    error_expect(4) = pow(10000 + 200 * 200 * 10, 0.5);
-    error_expect(6) = pow(10000 + 100 * 100 * 10, 0.5);
+    error_expect(0) = pow(5000 + 500 * 10 + 500 * 500 * 0, 0.5);
+    error_expect(2) = pow(5000 + 1500 * 10 + 1500 * 1500 * 1, 0.5);
+    error_expect(4) = pow(10000 + 200 * 10 + 200 * 200 * 2, 0.5);
+    error_expect(6) = pow(10000 + 100 * 10 + 100 * 100 * 3, 0.5);
     EXPECT(gtsam::assert_equal(error_expect, error_actual, 1e-3));
 
-    std::vector<gtsam::Matrix> H;
-    H.push_back(GenerateMatrixDynamic(1, 1));
-    H.push_back(GenerateMatrixDynamic(1, 1));
-    control_obj_factor.unwhitenedError(initial_estimate, H);
-    gtsam::Matrix jacob_expect1 = GenerateVectorDynamic(8);
-    jacob_expect1 << 0.5 / error_expect(0), 0, 0.5 / error_expect(2), 0, 0, 0,
-        0, 0;
-    EXPECT(gtsam::assert_equal(jacob_expect1, H[0], 1e-3));
-    gtsam::Matrix jacob_expect2 = GenerateVectorDynamic(8);
-    jacob_expect2 << 0, 0, 0, 0, 0.5 / error_expect(4), 0,
-        0.5 / error_expect(6), 0;
-    EXPECT(gtsam::assert_equal(jacob_expect2, H[1], 1e-6));
+    double expect_res = 0;
+    for (int i = 0; i < 8; i += 2)
+        expect_res += error_expect(i) * error_expect(i);
+    double res_actual = FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(
+        tasks_dag, coeff, rta);
+    EXPECT_DOUBLES_EQUAL(expect_res, res_actual, 1e-3);
+
+    // test GetObjGradient
+    double gra_exp = GetObjGradient(0, tasks_dag.tasks_, coeff, rta, 0);
+    EXPECT_DOUBLES_EQUAL(10 + 2 * 500 * 0, gra_exp, 1e-6);
+    gra_exp = GetObjGradient(1, tasks_dag.tasks_, coeff, rta, 0);
+    EXPECT_DOUBLES_EQUAL(10 + 2 * 1500 * 1, gra_exp, 1e-6);
+    gra_exp = GetObjGradient(2, tasks_dag.tasks_, coeff, rta, 0);
+    EXPECT_DOUBLES_EQUAL(10 + 2 * 200 * 2, gra_exp, 1e-6);
+    gra_exp = GetObjGradient(3, tasks_dag.tasks_, coeff, rta, 0);
+    EXPECT_DOUBLES_EQUAL(10 + 2 * 100 * 3, gra_exp, 1e-6);
 }
 
 int main() {

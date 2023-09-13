@@ -163,6 +163,49 @@ bool ifTimeout(TimerType start_time) {
     }
     return false;
 }
+
+template <typename FactorGraphType, class TaskSetType>
+void AssignBestInitialPriority(TaskSetType &taskSetType,
+                               const VectorDynamic &coeff) {
+    // RM
+    taskSetType.InitializePriority();
+    double min_error = FactorGraphType::RealObj(taskSetType, coeff);
+    TaskSetType taskSetBest = taskSetType;
+
+    // control gradient
+    AssignPriorityBasedOnlyGradient(taskSetType, coeff);
+    double err_cur = FactorGraphType::RealObj(taskSetType, coeff);
+    if (err_cur < min_error) {
+        min_error = err_cur;
+        taskSetBest = taskSetType;
+    }
+
+    // control coeff
+    taskSetType.AssignPriorityControl(coeff);
+    err_cur = FactorGraphType::RealObj(taskSetType, coeff);
+    if (err_cur < min_error) {
+        min_error = err_cur;
+        taskSetBest = taskSetType;
+    }
+    taskSetType = taskSetBest;
+}
+
+template <typename FactorGraphType, class TaskSetType>
+void InitializePriorityAssignment(TaskSetType &taskSetType,
+                                  const VectorDynamic &coeff,
+                                  int enableReorderInput) {
+    if (enableReorderInput == 0)
+        return;
+    else if (enableReorderInput == 1) {
+        AssignBestInitialPriority<FactorGraphType, TaskSetType>(taskSetType,
+                                                                coeff);
+    } else if (enableReorderInput == 2)
+        taskSetType.AssignPriorityRM();
+    else if (enableReorderInput == 3) {
+        AssignPriorityBasedOnlyGradient(taskSetType, coeff);
+    } else
+        CoutError("Unrecognized enableReorderInput argument!");
+}
 // only accepts DAG-related task set type, update taskSetType during
 // optimization
 template <typename FactorGraphType, class TaskSetType, class Schedul_Analysis>
@@ -181,38 +224,10 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     std::vector<bool> maskForEliminationPrev = maskForElimination;
     double err_initial = errCurr;
 
-    // if (enableReorder > 0) {
-    //     std::vector<TaskPriority> pri_ass =
-    //         ReorderWithGradient(taskSetType, coeff,
-    //         weight_priority_assignment);
-    //     UpdateAllTasksPriority(taskSetType, pri_ass);
-    // }
+    InitializePriorityAssignment<FactorGraphType, TaskSetType>(
+        taskSetType, coeff, enableReorder);
+
     int loopCount = 0;
-    // clean this part after experiments!!
-    if (enableReorder == 3) {
-        taskSetType.AssignPriorityControl(coeff);
-        RTA_Nasri19 r(taskSetType);
-        if (!r.CheckSchedulability())
-            taskSetType.InitializePriority();
-    }
-    if (enableReorder == 1) {
-        taskSetType.AssignPriorityControl(coeff);
-        RTA_Nasri19 r(taskSetType);
-        if (!r.CheckSchedulability())
-            taskSetType.InitializePriority();
-
-        std::vector<TaskPriority> pri_ass =
-            ReorderWithGradient(taskSetType, coeff, weight_priority_assignment,
-                                Priority_assignment_adjustment_threshold);
-        UpdateAllTasksPriority(taskSetType, pri_ass);
-    }
-
-    // double disturbIte = eliminateTol;
-    double weight_priority_assignment_during_iteration =
-        weight_priority_assignment / 10;
-    double pa_change_threshold = Priority_assignment_adjustment_threshold +
-                                 Priority_assignment_threshold_incremental;
-
     while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
         // store prev result
         // errPrev = errCurr;
@@ -241,7 +256,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
 
             weight_priority_assignment_during_iteration =
                 weight_priority_assignment_during_iteration /
-                10;  // weight needs to converge to 0 so that the approximated
+                2;  // weight needs to converge to 0 so that the approximated
             // obj converges to the true obj
             pa_change_threshold +=
                 Priority_assignment_threshold_incremental;  // in later
@@ -252,8 +267,6 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             taskSetType.AssignPriorityRM();
         } else if (enableReorder == 3) {
             // taskSetType.AssignPriorityControl(coeff);
-            std::vector<TaskPriority> pri_ass =
-                ReorderWithGradient(taskSetType, coeff, 0, -2);
             VectorDynamic rta = GetNasri19RTA(taskSetType);
             std::vector<TaskPriority> tasks_w_gra =
                 SortPriorityBasedGradient(taskSetType.tasks_, coeff, rta, 0);
