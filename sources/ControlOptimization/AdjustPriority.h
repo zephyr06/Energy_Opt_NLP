@@ -4,6 +4,7 @@
 #include <string>
 
 #include "sources/ControlOptimization/FactorGraph_Nasri19.h"
+#include "sources/ControlOptimization/PriorityRecord.h"
 
 namespace rt_num_opt {
 // require x>0
@@ -19,14 +20,7 @@ double GradientBarrierReorder(double x) {
     else
         return -1 * 1e8;
 }
-// obj_sorted = obj + w * Barrier(D - R)
-// gradient = k_obj + w / (D-R)
-struct TaskPriority {
-    TaskPriority() {}
-    TaskPriority(int i, double p) : task_index(i), priority(p) {}
-    int task_index;
-    double priority;
-};
+
 // alternative: numerical graident based on FactorGraph_Nasri19::LinearObj()
 inline double GetObjGradient(int task_index, const TaskSet &tasks,
                              const VectorDynamic &coeff,
@@ -187,6 +181,7 @@ void AssignPriorityBasedOnlyGradient(DAG_Nasri19 &dag_tasks,
 // higher priority tasks appear first, lower priority task appear later
 std::vector<TaskPriority> ReorderWithGradient(
     const DAG_Nasri19 &dag_tasks, const VectorDynamic &coeff, double weight,
+    PriorityAssignmentRecord &pa_record,
     double pa_change_threshold = Priority_assignment_adjustment_threshold) {
     const TaskSet &tasks = dag_tasks.tasks_;
     std::vector<TaskPriority> tasks_w_pri = GetPriorityVector(dag_tasks);
@@ -212,7 +207,8 @@ std::vector<TaskPriority> ReorderWithGradient(
             pa_change_threshold * tasks_w_pri.size();
         if (!WhetherTaskNeedPAChange(task_id_curr, tasks_w_pri,
                                      tasks_w_gra_copy,
-                                     significant_difference_threshold)) {
+                                     significant_difference_threshold) ||
+            (!pa_record.EvaluateRecordHistory(task_id_curr, tasks_w_pri))) {
             tasks_w_gra.pop_back();
             count_skipped_adjust++;
             continue;
@@ -226,6 +222,7 @@ std::vector<TaskPriority> ReorderWithGradient(
                 obj_curr = GetObjAfterAdjustPriority(dag_tasks, coeff,
                                                      tasks_w_pri_curr, weight);
                 if (obj_curr >= obj_base) {
+                    pa_record.AddFailedRecord(task_id_curr, tasks_w_pri);
                     break;
                 } else {
                     if (debugMode == 1) {
@@ -240,6 +237,7 @@ std::vector<TaskPriority> ReorderWithGradient(
                         std::cout << GetNasri19RTA(dag_tasks_curr) << "\n";
                         PrintPriorityAssignment(tasks_w_pri_curr);
                     }
+                    pa_record.AddSuccessRecord(task_id_curr, tasks_w_pri);
                     obj_base = obj_curr;
                     tasks_w_pri = tasks_w_pri_curr;
                     count_effective_try++;

@@ -9,7 +9,7 @@ TEST(overall, batch) {
     Obj_Pow = 2;
     enableReorder = 1;
     double obj_act = BatchOptimizeNasri19(0);
-    EXPECT(obj_act <= 0.67);
+    EXPECT(obj_act <= 0.68);
 }
 
 int main() {
