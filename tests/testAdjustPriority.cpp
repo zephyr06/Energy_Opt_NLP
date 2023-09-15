@@ -140,8 +140,9 @@ TEST(PriorityAssignment, ReorderWithGradient_v1) {
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     std::cout << rta << "\n";
     double weight = 0;
+    PriorityAssignmentRecord pa_record;
     std::vector<TaskPriority> priority_vec =
-        ReorderWithGradient(dag_tasks, coeff, weight, -1);
+        ReorderWithGradient(dag_tasks, coeff, weight, pa_record, -1);
     // no changes because the RTA cannot be improved under any priority
     // assignments
     EXPECT_LONGS_EQUAL(0, priority_vec[0].task_index);
@@ -165,8 +166,9 @@ TEST(PriorityAssignment, ReorderWithGradient_v2) {
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     std::cout << rta << "\n";
     double weight = -10;
+    PriorityAssignmentRecord pa_record;
     std::vector<TaskPriority> priority_vec =
-        ReorderWithGradient(dag_tasks, coeff, weight, -1);
+        ReorderWithGradient(dag_tasks, coeff, weight, pa_record, -1);
     std::cout << "New RTA:\n";
     DAG_Nasri19 dag_tasks_curr = dag_tasks;
     for (uint i = 0; i < priority_vec.size(); i++) {
@@ -193,8 +195,9 @@ TEST(PriorityAssignment, ReorderWithGradient_v3) {
     VectorDynamic rta = r.ResponseTimeOfTaskSet();
     std::cout << rta << "\n";
     double weight = -10;
+    PriorityAssignmentRecord pa_record;
     std::vector<TaskPriority> priority_vec =
-        ReorderWithGradient(dag_tasks, coeff, weight, -1);
+        ReorderWithGradient(dag_tasks, coeff, weight, pa_record, -1);
 
     EXPECT_LONGS_EQUAL(3, priority_vec[0].task_index);
     EXPECT_LONGS_EQUAL(2, priority_vec[1].task_index);
@@ -314,9 +317,10 @@ TEST(UpdateAllTasksPriority, v1) {
 
     VectorDynamic coeff = GenerateVectorDynamic(4 * 3);
     coeff << 1, 10, 0, 2, 20, 0, 3, 30, 0, 4, 40, 0;
+    PriorityAssignmentRecord pa_record;
     // obtain priority assignments based on coeff
     std::vector<TaskPriority> tasks_w_p =
-        ReorderWithGradient(dag_tasks, coeff, 0, -1);
+        ReorderWithGradient(dag_tasks, coeff, 0, pa_record, -1);
     UpdateAllTasksPriority(dag_tasks, tasks_w_p);
     EXPECT(!UpdateAllTasksPriority(dag_tasks, tasks_w_p));
     IncreasePriority(2, tasks_w_p);
@@ -454,6 +458,27 @@ TEST(ReorderWithGradient, significant_difference) {
 //     err = FactorGraphNasri<DAG_Nasri19, RTA_Nasri19>::RealObj(dag_tasks,
 //     coeff); EXPECT(err >= 2 * 6.73e9 && err <= 2 * 6.75e9);
 // }
+
+TEST(ReorderWithGradient, PriorityAssignmentRecord) {
+    Priority_assignment_adjustment_threshold = 0;
+    core_m_dag = 1;
+    std::string path =
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v19.yaml";
+    rt_num_opt::DAG_Nasri19 dag_tasks = rt_num_opt::ReadDAGNasri19_Tasks(path);
+    VectorDynamic coeff = ReadControlCoeff(path);
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    dag_tasks.InitializePriority();
+    PriorityAssignmentRecord pa_record;
+    pa_record.AddFailedRecord(0, 3);
+    pa_record.AddFailedRecord(1, 2);
+    pa_record.AddFailedRecord(0, 3);
+    pa_record.AddFailedRecord(1, 2);
+    EXPECT(!pa_record.EvaluateRecordHistory(0, 3, 2));
+    EXPECT(!pa_record.EvaluateRecordHistory(1, 2, 2));
+    pa_record.AddSuccessRecord(1, 2);
+    EXPECT(pa_record.EvaluateRecordHistory(1, 2, 2));
+}
+
 int main() {
     TestResult tr;
     return TestRegistry::runAllTests(tr);

@@ -207,6 +207,7 @@ void InitializePriorityAssignment(TaskSetType &taskSetType,
     // } else
     //     CoutError("Unrecognized enableReorderInput argument!");
 }
+
 // only accepts DAG-related task set type, update taskSetType during
 // optimization
 template <typename FactorGraphType, class TaskSetType, class Schedul_Analysis>
@@ -233,6 +234,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     double weight_priority_assignment_during_iteration =
         weight_priority_assignment;
     double pa_change_threshold = Priority_assignment_adjustment_threshold;
+    PriorityAssignmentRecord pa_record;
 
     while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
         // store prev result
@@ -249,7 +251,6 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         FactorGraphType::UpdateTaskSetWithPeriodVariable(taskSetType,
                                                          periodResCurr);
 
-        // adjust tasks' priority based on RM
         BeginTimer("ChangePriorityAssignmentOrder");
         bool change_pa = false;
         if (enableReorder == 0)
@@ -257,7 +258,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         else if (enableReorder == 1) {
             std::vector<TaskPriority> pri_ass = ReorderWithGradient(
                 taskSetType, coeff, weight_priority_assignment_during_iteration,
-                pa_change_threshold);
+                pa_record, pa_change_threshold);
             change_pa = UpdateAllTasksPriority(taskSetType, pri_ass);
 
             weight_priority_assignment_during_iteration =

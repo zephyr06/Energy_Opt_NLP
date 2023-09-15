@@ -50,6 +50,7 @@ VectorDynamic GenerateControlCoefficient(
         coeff(3 * i) = rand() % 999 + 1;
         coeff(3 * i + 1) = rand() % 9999 + 1;
         coeff(3 * i + 2) = rand() % 21 - 10;
+        // coeff(3 * i + 2) = rand() % 9 + 1;
     }
     return coeff;
 }
