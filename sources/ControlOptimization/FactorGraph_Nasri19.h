@@ -98,11 +98,16 @@ struct FactorGraphNasri {
                 // double period_curr =
                 //     taskSetType.tasksVecNasri_[taskId].tasks_[nodeId].period;
                 double period_curr = periodVec(taskId, 0);
+                //  Obj_Pow is a global variable
                 error(2 * node_overall_count) =
-                    period_curr * coeff(2 * node_overall_count) +
-                    rta(node_overall_count) * coeff(2 * node_overall_count + 1);
-
-                // least-square
+                    period_curr * coeff(3 * node_overall_count) +
+                    pow(rta(node_overall_count), 1) *
+                        coeff(3 * node_overall_count + 1);
+                if (Obj_Pow != 1)
+                    error(2 * node_overall_count) +=
+                        pow(rta(node_overall_count), Obj_Pow) *
+                        coeff(3 * node_overall_count + 2);
+                // least-square,
                 error(2 * node_overall_count) =
                     pow(error(2 * node_overall_count), 0.5);
 
@@ -325,8 +330,11 @@ struct FactorGraphNasri {
                             const VectorDynamic &rta) {
         double res = 0;
         for (uint i = 0; i < taskSetType.tasks_.size(); i++) {
-            res += coeff.coeffRef(i * 2, 0) * taskSetType.tasks_[i].period;
-            res += coeff.coeffRef(i * 2 + 1, 0) * rta(i, 0);
+            res +=
+                coeff.coeffRef(i * 3, 0) * pow(taskSetType.tasks_[i].period, 1);
+            res += coeff.coeffRef(i * 3 + 1, 0) * rta(i, 0);
+            if (Obj_Pow != 1)
+                res += pow(rta(i), Obj_Pow) * i;
         }
         return res;
     }

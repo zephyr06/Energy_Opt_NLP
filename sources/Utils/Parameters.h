@@ -121,6 +121,10 @@ double Nasri19Param_timeout = loaded_doc["Nasri19Param_timeout"].as<double>();
 double Nasri19Param_max_depth =
     loaded_doc["Nasri19Param_max_depth"].as<double>();
 
+double Priority_assignment_threshold_incremental =
+    loaded_doc["Priority_assignment_threshold_incremental"].as<double>();
+double Obj_Pow =
+    loaded_doc["Obj_Pow"].as<double>();
 int whether_ls = loaded_doc["whether_ls"].as<int>();
 
 int setDiagonalDamping = loaded_doc["setDiagonalDamping"].as<int>();

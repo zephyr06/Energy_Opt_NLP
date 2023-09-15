@@ -45,10 +45,11 @@ VectorDynamic GenerateControlCoefficient(
     const std::vector<DAG_Model> &dagTaskSet) {
     DAG_Nasri19 dagNasri19(dagTaskSet);
     int n = dagNasri19.SizeNode();
-    VectorDynamic coeff = GenerateVectorDynamic(2 * n);
+    VectorDynamic coeff = GenerateVectorDynamic(3 * n);
     for (int i = 0; i < n; i++) {
-        coeff(2 * i) = rand() % 999 + 1;
-        coeff(2 * i + 1) = rand() % 9999 + 1;
+        coeff(3 * i) = rand() % 999 + 1;
+        coeff(3 * i + 1) = rand() % 9999 + 1;
+        coeff(3 * i + 2) = rand() % 21 - 10;
     }
     return coeff;
 }
@@ -277,11 +278,6 @@ int main(int argc, char *argv[]) {
             }
         } else if (taskType == 3) {  // DAG for control optimization
             std::vector<DAG_Model> dagTaskSet;
-            if (totalUtilization <= 0) {
-                totalUtilization = RandRange(0.1, 0.8);
-            }
-            vector<double> utilVec = Uunifast(N, totalUtilization, true);
-            vector<double> weightVec;
             for (int j = 0; j < N; j++) {
                 TaskSet tasks = GenerateTaskSetForControl(
                     ceil(RandRange(1, maxNode_GenerateTaskSet)));
@@ -302,6 +298,7 @@ int main(int argc, char *argv[]) {
 
             if (schedulabilityCheck) {
                 DAG_Nasri19 dagNasri19(dagTaskSet);
+                dagNasri19.AssignPriorityRM();
                 RTA_Nasri19 r(dagNasri19);
                 if (!r.CheckSchedulability()) {
                     i--;

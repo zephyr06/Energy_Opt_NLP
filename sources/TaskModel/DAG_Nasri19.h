@@ -67,8 +67,9 @@ struct DAG_Nasri19 : public TaskSetNormal {
 
     // based on rate-monotonic
     void InitializePriority() {
-        uint count = 0;
-        for (Task &task_curr : tasks_) task_curr.priority = count++;
+        // uint count = 0;
+        // for (Task &task_curr : tasks_) task_curr.priority = count++;
+        AssignPriorityRM();
         UpdateTasksVecNasri_();
     }
     void AssignPriorityRM() {
@@ -77,7 +78,7 @@ struct DAG_Nasri19 : public TaskSetNormal {
     void AssignPriorityControl(const VectorDynamic &coeff) {
         uint count = 0;
         for (Task &task_curr : tasks_) {
-            task_curr.priority = 10000 - coeff(2 * count + 1);
+            task_curr.priority = 10000 - coeff(3 * count + 1);
             count++;
         }
     }

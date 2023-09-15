@@ -27,11 +27,14 @@ struct TaskPriority {
     int task_index;
     double priority;
 };
-double GetObjGradient(int task_index, const TaskSet &tasks,
-                      const VectorDynamic &coeff, const VectorDynamic &rta,
-                      double weight) {
-    return coeff(2 * task_index + 1) -
-           weight / (tasks[task_index].deadline - rta(task_index));
+// alternative: numerical graident based on FactorGraph_Nasri19::LinearObj()
+inline double GetObjGradient(int task_index, const TaskSet &tasks,
+                             const VectorDynamic &coeff,
+                             const VectorDynamic &rta, double weight) {
+    return coeff(3 * task_index + 1) -
+           weight / (tasks[task_index].deadline - rta(task_index)) +
+           Obj_Pow * pow(rta(task_index), Obj_Pow - 1) *
+               coeff(3 * task_index + 2) * (Obj_Pow - 1);
 }
 
 bool UpdateAllTasksPriority(DAG_Nasri19 &dag_tasks,
@@ -170,6 +173,15 @@ bool WhetherTaskNeedPAChange(int task_id,
     int id_index_gra =
         tasks_w_gra.size() - 1 - FindTaskIndexFromPAOrder(task_id, tasks_w_gra);
     return id_index_priority - id_index_gra > significant_difference;
+}
+
+void AssignPriorityBasedOnlyGradient(DAG_Nasri19 &dag_tasks,
+                                     const VectorDynamic &coeff) {
+    VectorDynamic rta = GetNasri19RTA(dag_tasks);
+    std::vector<TaskPriority> tasks_w_gra =
+        SortPriorityBasedGradient(dag_tasks.tasks_, coeff, rta, 0);
+    std::reverse(tasks_w_gra.begin(), tasks_w_gra.end());
+    UpdateAllTasksPriority(dag_tasks, tasks_w_gra);
 }
 
 // higher priority tasks appear first, lower priority task appear later

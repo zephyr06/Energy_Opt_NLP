@@ -83,7 +83,8 @@ struct TaskAugment {
         }
     }
 };
-/* in-place adjustment of tasks' order; highest order being the first in tasks
+/* in-place adjustment of tasks' order; highest order being the first in tasks;
+ only used in workshop experiments
  */
 void Reorder(TaskSet &tasks, VectorDynamic &coeff) {
     std::vector<TaskAugment> tasksAug;
@@ -94,8 +95,8 @@ void Reorder(TaskSet &tasks, VectorDynamic &coeff) {
     stable_sort(tasksAug.begin(), tasksAug.end(), TaskAugment::Compare);
     for (uint i = 0; i < tasks.size(); i++) {
         tasks[i] = tasksAug[i].task_;
-        coeff(2 * i) = tasksAug[i].coeff_T;
-        coeff(2 * i + 1) = tasksAug[i].coeff_R;
+        coeff(3 * i) = tasksAug[i].coeff_T;
+        coeff(3 * i + 1) = tasksAug[i].coeff_R;
     }
 }
 
