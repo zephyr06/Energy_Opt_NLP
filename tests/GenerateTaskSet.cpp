@@ -45,10 +45,11 @@ VectorDynamic GenerateControlCoefficient(
     const std::vector<DAG_Model> &dagTaskSet) {
     DAG_Nasri19 dagNasri19(dagTaskSet);
     int n = dagNasri19.SizeNode();
-    VectorDynamic coeff = GenerateVectorDynamic(2 * n);
+    VectorDynamic coeff = GenerateVectorDynamic(3 * n);
     for (int i = 0; i < n; i++) {
-        coeff(2 * i) = rand() % 999 + 1;
-        coeff(2 * i + 1) = rand() % 9999 + 1;
+        coeff(3 * i) = rand() % 999 + 1;
+        coeff(3 * i + 1) = rand() % 9999 + 1;
+        coeff(3 * i + 2) = rand() % 21 - 10;
     }
     return coeff;
 }
@@ -284,7 +285,7 @@ int main(int argc, char *argv[]) {
                 AddRandomEdges(dagModel);
                 dagTaskSet.push_back(dagModel);
             }
-            double period_from_sum = SumExecutionTime(dagTaskSet) * 1;
+            double period_from_sum = SumExecutionTime(dagTaskSet) * 5;
             period_from_sum =
                 ceil(period_from_sum / PeriodRoundQuantum) * PeriodRoundQuantum;
             SetPeriodForAllDag(dagTaskSet, period_from_sum);

@@ -31,10 +31,10 @@ struct TaskPriority {
 inline double GetObjGradient(int task_index, const TaskSet &tasks,
                              const VectorDynamic &coeff,
                              const VectorDynamic &rta, double weight) {
-    return coeff(2 * task_index + 1) -
+    return coeff(3 * task_index + 1) -
            weight / (tasks[task_index].deadline - rta(task_index)) +
-           Obj_Pow * pow(rta(task_index), Obj_Pow - 1) * task_index *
-               (Obj_Pow - 1);
+           Obj_Pow * pow(rta(task_index), Obj_Pow - 1) *
+               coeff(3 * task_index + 2) * (Obj_Pow - 1);
 }
 
 bool UpdateAllTasksPriority(DAG_Nasri19 &dag_tasks,

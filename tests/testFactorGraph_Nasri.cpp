@@ -16,10 +16,11 @@ TEST(ControlObjFactor, v1) {
 
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
     TaskSet tasks = tasks_dag.tasks_;
-    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 3);
     coeff.setOnes();
-    for (uint i = 0; i < coeff.rows() / 2; i++)
-        coeff(2 * i + 1, 0) = coeff(2 * i + 1, 0) * 10;
+    for (uint i = 0; i < coeff.rows() / 3; i++) {
+        coeff(3 * i + 1, 0) = coeff(3 * i + 1, 0) * 10;
+    }
 
     std::cout << "RTA analysis:\n";
     RTA_Nasri19 r(tasks_dag);
@@ -65,10 +66,10 @@ TEST(ControlObjFactor, obj) {
 
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
     TaskSet tasks = tasks_dag.tasks_;
-    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 3);
     coeff.setOnes();
-    for (uint i = 0; i < coeff.rows() / 2; i++)
-        coeff(2 * i + 1, 0) = coeff(2 * i + 1, 0) * 10;
+    for (uint i = 0; i < coeff.rows() / 3; i++)
+        coeff(3 * i + 1, 0) = coeff(3 * i + 1, 0) * 10;
 
     std::cout << "RTA analysis:\n";
     RTA_Nasri19 r(tasks_dag);
@@ -246,10 +247,12 @@ TEST(ControlObjFactor, Obj_Pow_v1) {
 
     rt_num_opt::DAG_Nasri19 tasks_dag = rt_num_opt::ReadDAGNasri19_Tasks(path);
     TaskSet tasks = tasks_dag.tasks_;
-    VectorDynamic coeff = GenerateVectorDynamic(4 * 2);
+    VectorDynamic coeff = GenerateVectorDynamic(4 * 3);
     coeff.setOnes();
-    for (uint i = 0; i < coeff.rows() / 2; i++)
-        coeff(2 * i + 1, 0) = coeff(2 * i + 1, 0) * 10;
+    for (uint i = 0; i < coeff.rows() / 3; i++) {
+        coeff(3 * i + 1, 0) = coeff(3 * i + 1, 0) * 10;
+        coeff(3 * i + 2, 0) = i;
+    }
 
     std::cout << "RTA analysis:\n";
     RTA_Nasri19 r(tasks_dag);
