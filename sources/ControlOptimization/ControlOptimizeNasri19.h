@@ -213,38 +213,29 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     TaskSetType &taskSetType, VectorDynamic &coeff,
     std::vector<bool> &maskForElimination) {
     auto run_time_track_start = std::chrono::high_resolution_clock::now();
-    PeriodRoundQuantum =
-        taskSetType.hyperPeriod / 10;  // for shorter run-time cost
 
-    // double errPrev = 1e30;
-    double errCurr = FactorGraphType::RealObj(taskSetType, coeff);
-    if (errCurr >= 1e30) CoutError("The input DAG is not schedulable!");
-    VectorDynamic periodResCurr, periodResPrev;
+    double err_initial = FactorGraphType::RealObj(taskSetType, coeff);
+    if (err_initial >= 1e30) CoutError("The input DAG is not schedulable!");
     std::vector<bool> maskForEliminationPrev = maskForElimination;
-    double err_initial = errCurr;
 
     InitializePriorityAssignment<FactorGraphType, TaskSetType>(
         taskSetType, coeff, enableReorder);
 
     int loopCount = 0;
-    // double disturbIte = eliminateTol;
     double weight_priority_assignment_during_iteration =
         weight_priority_assignment;
     double pa_change_threshold = Priority_assignment_adjustment_threshold;
     PriorityAssignmentRecord pa_record;
 
     while (loopCount < MaxLoopControl && !(ifTimeout(run_time_track_start))) {
-        // store prev result
-        // errPrev = errCurr;
-        periodResPrev = GetPeriodVecNasri19(taskSetType);
         maskForEliminationPrev = maskForElimination;
 
         // perform optimization
         double err;
+        VectorDynamic periodResCurr;
         std::tie(periodResCurr, err) =
             UnitOptimizationPeriod<FactorGraphType, TaskSetType>(
                 taskSetType, coeff, maskForElimination);
-        // UpdateTaskSetPeriod(taskSetType, periodResCurr);
         FactorGraphType::UpdateTaskSetWithPeriodVariable(taskSetType,
                                                          periodResCurr);
 
@@ -258,15 +249,12 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
                 pa_record, pa_change_threshold);
             change_pa = UpdateAllTasksPriority(taskSetType, pri_ass);
 
+            // weight needs to converge to 0 so that the approximated obj
+            // converges to the true obj
             weight_priority_assignment_during_iteration =
-                weight_priority_assignment_during_iteration /
-                2;  // weight needs to converge to 0 so that the approximated
-            // obj converges to the true obj
-            pa_change_threshold +=
-                Priority_assignment_threshold_incremental;  // in later
-                                                            // iterations, less
-                                                            // PA changes are
-                                                            // needed
+                weight_priority_assignment_during_iteration / 2;
+            // in later iterations, less PA changes are needed
+            pa_change_threshold += Priority_assignment_threshold_incremental;
         } else if (enableReorder == 2) {
             taskSetType.AssignPriorityRM();
         } else if (enableReorder == 3) {
@@ -282,8 +270,6 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             FactorGraphType::FindEliminatedVariables(taskSetType,
                                                      maskForElimination);
 
-        // RoundPeriod(tasks, maskForElimination, coeff);
-        errCurr = FactorGraphType::RealObj(taskSetType, coeff);
         if (Equals(maskForElimination, maskForEliminationPrev) &&
             relativeErrorTolerance > relativeErrorToleranceMin) {
             relativeErrorTolerance = relativeErrorTolerance / 10;
@@ -292,6 +278,8 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
         loopCount++;
         if (debugMode) {
             using namespace std;
+
+            double errCurr = FactorGraphType::RealObj(taskSetType, coeff);
             cout << Color::green
                  << "Loop " + to_string_precision(loopCount, 4) + ": " +
                         std::to_string(errCurr)
@@ -299,19 +287,9 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             print(maskForElimination);
             cout << std::endl;
         }
-
-        // termination conditions
-        // if (errCurr >= errPrev * (1 - relativeErrorToleranceOuterLoop) &&
-        //     change_pa == false && (!ContainFalse(maskForElimination)))
-        //     break;
         if ((!ContainFalse(maskForElimination))) break;
     }
-    // if (ContainFalse(maskForElimination)) {
-    //     UpdateTaskSetPeriod(tasks, periodResPrev);
-    //     RoundPeriod(tasks, maskForElimination, coeff);
-    // } else {
-    //     ;  // nothing else to do
-    // }
+
     std::cout << "Overall loop: " << loopCount << "\n";
     RTA_Nasri19 r(taskSetType);
     if (r.CheckSchedulabilityLongTimeOut()) {

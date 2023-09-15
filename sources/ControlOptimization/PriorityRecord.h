@@ -90,7 +90,7 @@ class PriorityAssignmentRecord {
     // return false if the task can be skipped, true otherwise
     inline bool EvaluateRecordHistory(
         int task_id, const std::vector<TaskPriority> &tasks_w_pri,
-        int threshold = 2) {
+        int threshold = rt_num_opt::EvaluatePA_FailedThreshold) {
         return EvaluateRecordHistory(
             task_id, FindPriority(task_id, tasks_w_pri), threshold);
     }
