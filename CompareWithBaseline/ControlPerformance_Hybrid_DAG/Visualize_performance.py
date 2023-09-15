@@ -77,10 +77,10 @@ if __name__ == "__main__":
     # splot.set_ylim([0.95, 2.0])
     if(data_source=="Time"):
         splot.set(yscale="log")
-        splot.set_ylim(1e-4, 1e3)
+        splot.set_ylim(5e-2, 1e4)
         splot.set( ylabel="Running time (seconds)")
     elif (data_source=="EnergySaveRatio_Average"):
-        splot.set_ylim(30, 110)
+        splot.set_ylim(50, 105)
         splot.set(ylabel="Relative gap (%)")
     plt.legend()
     splot.set_xlim([2, 21])
