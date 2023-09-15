@@ -28,19 +28,22 @@ maxNode_GenerateTaskSet: 20
 #*************************************************************
 
 # used in control
+Obj_Pow: 2
+EvaluatePA_FailedThreshold: 1
 Period_Round_For_Control_Opt: 1
+Priority_assignment_threshold_incremental: 0
 # <-1 means full PA
 # >1 means remove all the PA part
 # 0.1 probably removes all the PA
-Priority_assignment_adjustment_threshold: 0.1
-weight_priority_assignment: -1e4
+Priority_assignment_adjustment_threshold: -0.1
+weight_priority_assignment: -1e7
 # not used in reality, by default, it is 0.1HyperPeriod
 PeriodRoundQuantum: 1e3
 relativeErrorToleranceInit: 1e-3
 relativeErrorToleranceMin: 1e-3
 relErrorTolIPM: 1e-5
 controlPath: "N5/Case0"
-MaxLoopControl: 1e4
+MaxLoopControl: 1000
 weightSchedulability: 500 # actual parameter that controls schedulability constraints' weight, larger means more important 
 weightSchedulabilityMax: 1e12
 weightSchedulabilityStep: 1.5
@@ -59,7 +62,7 @@ Nasri19Param_max_depth: 0
 OverallTimeLimit: 600
 
 # 0 means no, 1 means gradient, 2 means RM only, 3 means objective coefficients only
-enableReorder: 3
+enableReorder: 0
 core_m_dag: 2
 
 # used in SA
@@ -108,7 +111,6 @@ roundTypeInClamp: "rough"
 clampTypeMiddle: "rough"
 exactJacobian: 0
 #*************************************************************
-
 
 
 

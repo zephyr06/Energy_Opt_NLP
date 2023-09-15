@@ -21,7 +21,7 @@ whether_IPM: 0
 
 
 # in generating task set
-parallelFactor: 0.1
+parallelFactor: 0.2
 PeriodSetAM: [1, 2, 5, 10, 20, 50,100]
 timeScaleFactor: 1e4
 maxNode_GenerateTaskSet: 20
@@ -29,9 +29,9 @@ maxNode_GenerateTaskSet: 20
 
 # used in control
 Obj_Pow: 2
-EvaluatePA_FailedThreshold: 2
+EvaluatePA_FailedThreshold: 1
 Period_Round_For_Control_Opt: 1
-Priority_assignment_threshold_incremental: 0.01
+Priority_assignment_threshold_incremental: 0
 # <-1 means full PA
 # >1 means remove all the PA part
 # 0.1 probably removes all the PA
