@@ -4,7 +4,8 @@
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 title="ControlPerformance_Hybrid_DAG"
 MinTaskNumber=3
-MaxTaskNumber=15
+MaxTaskNumber=20
+TaskSetSize=1000
 # ***************************************************
 
 # clear results saved in TaskData
@@ -56,7 +57,7 @@ done
 # visualize the result
 cd $ROOT_PATH/CompareWithBaseline/$title
 # show the comparison between NORTH and NORTH+
-python draw_box_plot.py --minTaskNumber $MinTaskNumber --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --main_data_index 1
+python draw_box_plot.py --minTaskNumber $MinTaskNumber --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio" --main_data_index 1 --task_set_size $TaskSetSize
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance.py  --minTaskNumber $MinTaskNumber --title $title  --maxTaskNumber $MaxTaskNumber --data_source "EnergySaveRatio_Average"
 

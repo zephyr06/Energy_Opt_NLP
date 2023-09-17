@@ -37,9 +37,10 @@ if __name__ == "__main__":
                                      main_data_index)
     dataset_pd = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in data_box_plot.items()]))
     ax = sns.boxplot(data=dataset_pd, orient="v", fliersize=1, saturation=0.75, whis=1.5)
-    x = np.linspace(-0.5, 15.5, 16)
-    y = np.zeros((16))
-    plt.ylim(-80, 40)
+    line_len=18
+    x = np.linspace(-0.5, line_len-0.5, line_len)
+    y = np.zeros((line_len))
+    plt.ylim(-70, 60)
     ax = sns.lineplot(x=x, y=y, linestyle="dashed", color='darkgray')
 
     ax.set(xlabel="Task Number", ylabel="Relative Gap (%)")
