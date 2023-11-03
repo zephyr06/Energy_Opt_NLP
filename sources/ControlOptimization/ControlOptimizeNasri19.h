@@ -61,8 +61,7 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         result = optimizer.optimize();
     } else if (optimizerType == 3) {
         gtsam::GaussNewtonParams params;
-        if (debugMode == 1)
-            params.setVerbosity("DELTA");
+        if (debugMode == 1) params.setVerbosity("DELTA");
         params.setRelativeErrorTol(relativeErrorTolerance);
         params.setLinearSolverType(linearOptimizerType);
         gtsam::GaussNewtonOptimizer optimizer(graph, initialEstimateFG, params);
@@ -76,8 +75,7 @@ std::pair<VectorDynamic, double> UnitOptimizationPeriod(
         gtsam::NonlinearOptimizerParams params;
         params.setRelativeErrorTol(relativeErrorTolerance);
         params.setLinearSolverType(linearOptimizerType);
-        if (debugMode == 1)
-            params.setVerbosity("DELTA");
+        if (debugMode == 1) params.setVerbosity("DELTA");
         params.setMaxIterations(maxIterationsOptimizer);
         gtsam::NonlinearConjugateGradientOptimizer optimizer(
             graph, initialEstimateFG, params);
@@ -217,8 +215,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
     auto run_time_track_start = std::chrono::high_resolution_clock::now();
 
     double err_initial = FactorGraphType::RealObj(taskSetType, coeff);
-    if (err_initial >= 1e30)
-        CoutError("The input DAG is not schedulable!");
+    if (err_initial >= 1e30) CoutError("The input DAG is not schedulable!");
     std::vector<bool> maskForEliminationPrev = maskForElimination;
 
     InitializePriorityAssignment<FactorGraphType, TaskSetType>(
@@ -264,8 +261,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             AssignPriorityBasedOnlyGradient(taskSetType, coeff);
         } else
             CoutError("Unknown enblaeReorder option!");
-        if (!CheckNasri19Schedulability(taskSetType))
-            break;
+        if (!CheckNasri19Schedulability(taskSetType)) break;
 
         EndTimer("ChangePriorityAssignmentOrder");
 
@@ -291,8 +287,7 @@ static std::pair<VectorDynamic, double> OptimizeTaskSetIterative(
             print(maskForElimination);
             cout << std::endl;
         }
-        if ((!ContainFalse(maskForElimination)))
-            break;
+        if ((!ContainFalse(maskForElimination))) break;
     }
 
     std::cout << "Overall loop: " << loopCount << "\n";

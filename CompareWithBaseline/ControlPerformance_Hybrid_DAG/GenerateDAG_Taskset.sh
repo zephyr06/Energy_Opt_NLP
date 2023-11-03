@@ -3,7 +3,7 @@
 # ************** Adjust settings there **************
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 title="ControlPerformance_Hybrid_DAG"
-MaxTaskNumber=3
+MaxTaskNumber=20
 # ***************************************************
 
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
@@ -18,5 +18,5 @@ python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "PeriodRoundQuantum" 
 for (( jobNumber=3; jobNumber<=$MaxTaskNumber; jobNumber++ ))
 do
 	echo "$title iteration is: $jobNumber"	
-	./tests/GenerateTaskSet --taskType 3 --N $jobNumber --taskSetNumber 100 --NumberOfProcessor 2 --directory $ROOT_PATH/TaskData/$title	
+	./tests/GenerateTaskSet --taskType 3 --N $jobNumber --taskSetNumber 1000 --NumberOfProcessor 2 --directory $ROOT_PATH/TaskData/$title	
 done
