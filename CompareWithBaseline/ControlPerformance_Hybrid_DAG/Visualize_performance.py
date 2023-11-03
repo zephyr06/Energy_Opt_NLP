@@ -40,7 +40,7 @@ def read_data_2d(minTaskNumber, maxTaskNumber, type="Time"):
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=3,
                     help='Nmin')
-parser.add_argument('--maxTaskNumber', type=int, default=3,
+parser.add_argument('--maxTaskNumber', type=int, default=6,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         splot.set_ylim(5e-2, 1e4)
         splot.set( ylabel="Running time (seconds)")
     elif (data_source=="EnergySaveRatio_Average"):
-        splot.set_ylim(50, 105)
+        splot.set_ylim(10, 105)
         splot.set(ylabel="Relative gap (%)")
     plt.legend()
     splot.set_xlim([2, 21])

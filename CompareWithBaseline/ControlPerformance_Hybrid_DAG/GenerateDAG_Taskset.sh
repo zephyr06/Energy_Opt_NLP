@@ -3,7 +3,7 @@
 # ************** Adjust settings there **************
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 title="ControlPerformance_Hybrid_DAG"
-MaxTaskNumber=10
+MaxTaskNumber=3
 # ***************************************************
 
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml

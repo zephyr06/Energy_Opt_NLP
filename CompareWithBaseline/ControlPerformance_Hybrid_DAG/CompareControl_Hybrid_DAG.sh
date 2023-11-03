@@ -4,7 +4,7 @@
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 title="ControlPerformance_Hybrid_DAG"
 MinTaskNumber=3
-MaxTaskNumber=10
+MaxTaskNumber=3
 # ***************************************************
 
 # clear results saved in TaskData
