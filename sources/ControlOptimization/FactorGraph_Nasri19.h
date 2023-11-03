@@ -99,14 +99,27 @@ struct FactorGraphNasri {
                 //     taskSetType.tasksVecNasri_[taskId].tasks_[nodeId].period;
                 double period_curr = periodVec(taskId, 0);
                 //  Obj_Pow is a global variable
-                error(2 * node_overall_count) =
-                    period_curr * coeff(3 * node_overall_count) +
-                    pow(rta(node_overall_count), 1) *
-                        coeff(3 * node_overall_count + 1);
-                if (Obj_Pow != 1)
+                if (Obj_Pow == 1 &&
+                    coeff.rows() ==
+                        2 * rta.size()) {  // just to be compatiable with some
+                                           // old unit tests
+                    error(2 * node_overall_count) =
+                        period_curr * coeff(2 * node_overall_count) +
+                        pow(rta(node_overall_count), 1) *
+                            coeff(2 * node_overall_count + 1);
+                } else {
+                    error(2 * node_overall_count) =
+                        period_curr * coeff(3 * node_overall_count) +
+                        pow(rta(node_overall_count), 1) *
+                            coeff(3 * node_overall_count + 1);
                     error(2 * node_overall_count) +=
                         pow(rta(node_overall_count), Obj_Pow) *
-                        coeff(3 * node_overall_count + 2);
+                        coeff(3 * node_overall_count + 2) * (Obj_Pow - 1);
+                }
+                // else {
+                //     CoutError("Unknown Obj_Pow!!!");
+                // }
+
                 // least-square,
                 error(2 * node_overall_count) =
                     pow(error(2 * node_overall_count), 0.5);

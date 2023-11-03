@@ -67,8 +67,9 @@ struct TaskAugment {
     Task task_;
     double coeff_T;
     double coeff_R;
-    TaskAugment(Task &task, double coeffT, double coeffR)
-        : task_(task), coeff_T(coeffT), coeff_R(coeffR) {}
+    double coeff_R2;
+    TaskAugment(Task &task, double coeffT, double coeffR, double coeffR2)
+        : task_(task), coeff_T(coeffT), coeff_R(coeffR), coeff_R2(coeffR2) {}
 
     double sort_metric() const {
         return task_.period + control_sort_exec_weight * task_.executionTime +
@@ -86,18 +87,43 @@ struct TaskAugment {
 /* in-place adjustment of tasks' order; highest order being the first in tasks;
  only used in workshop experiments
  */
-void Reorder(TaskSet &tasks, VectorDynamic &coeff) {
+void Reorder_EachTaskHas2Coeff(TaskSet &tasks, VectorDynamic &coeff) {
     std::vector<TaskAugment> tasksAug;
     tasksAug.reserve(tasks.size());
     for (uint i = 0; i < tasks.size(); i++) {
-        tasksAug.push_back({tasks[i], coeff(i * 2), coeff(i * 2 + 1)});
+        tasksAug.push_back({tasks[i], coeff(i * 2), coeff(i * 2 + 1), 0});
+    }
+    stable_sort(tasksAug.begin(), tasksAug.end(), TaskAugment::Compare);
+    for (uint i = 0; i < tasks.size(); i++) {
+        tasks[i] = tasksAug[i].task_;
+        coeff(2 * i) = tasksAug[i].coeff_T;
+        coeff(2 * i + 1) = tasksAug[i].coeff_R;
+    }
+}
+void Reorder_EachTaskHas3Coeff(TaskSet &tasks, VectorDynamic &coeff) {
+    std::vector<TaskAugment> tasksAug;
+    tasksAug.reserve(tasks.size());
+    for (uint i = 0; i < tasks.size(); i++) {
+        tasksAug.push_back(
+            {tasks[i], coeff(i * 3), coeff(i * 3 + 1), coeff(i * 3 + 2)});
     }
     stable_sort(tasksAug.begin(), tasksAug.end(), TaskAugment::Compare);
     for (uint i = 0; i < tasks.size(); i++) {
         tasks[i] = tasksAug[i].task_;
         coeff(3 * i) = tasksAug[i].coeff_T;
         coeff(3 * i + 1) = tasksAug[i].coeff_R;
+        coeff(3 * i + 2) = tasksAug[i].coeff_R2;
     }
+}
+void Reorder(TaskSet &tasks, VectorDynamic &coeff) {
+    int n_coeff = coeff.rows();
+    int n = tasks.size();
+    if (n_coeff / n == 2)
+        Reorder_EachTaskHas2Coeff(tasks, coeff);
+    else if (n_coeff / n == 3)
+        Reorder_EachTaskHas3Coeff(tasks, coeff);
+    else
+        CoutError("Incorrect input dimension in Reorder function!");
 }
 
 /* @brief return a std::string with expected precision by adding leading 0 */
