@@ -13,7 +13,7 @@ TaskSetSize=1000
 cp parameters.yaml $ROOT_PATH/sources/parameters.yaml
 # clear buffer file content
 cd $ROOT_PATH/TaskData/
-# python ClearResFiles.py --pathDataset TaskData/ControlPerformance_Hybrid_DAG/
+python ClearResFiles.py --pathDataset TaskData/ControlPerformance_Hybrid_DAG/
 cd $ROOT_PATH/CompareWithBaseline
 python clear_result_files.py  --folder $title --Nmin $MinTaskNumber --Nmax $MaxTaskNumber
 python edit_yaml.py --entry "batchOptimizeFolder" --value $title
