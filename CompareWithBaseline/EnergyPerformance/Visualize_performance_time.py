@@ -169,6 +169,7 @@ if __name__ == "__main__":
                      data_2d[-1][:min(11, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1],
                      color=color_list[-1], markersize=8, label = optimizer_name[-1])
 
+    font_size = 15
     if (data_source == "EnergySaveRatio"):
         plt.set(xlabel="Task Number", ylabel="Relative gap with Zhao20 (%)")
         splot.set_ylim([0.95, 2.1])
@@ -178,7 +179,9 @@ if __name__ == "__main__":
         plt.show(block=False)
         plt.pause(3)
     elif (data_source == "Time"):
-        splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
+        # splot.set(xlabel="Task Number", ylabel="Running time (seconds)", fontsize=font_size)
+        splot.set_xlabel(xlabel="Task Number",  fontsize=font_size)
+        splot.set_ylabel("Running time (seconds)", fontsize=font_size)
         splot.set_xlim([0, 85])
         splot.set_ylim([1e-4, 1e3])
         splot.set(yscale="log")
