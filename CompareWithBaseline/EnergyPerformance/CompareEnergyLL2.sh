@@ -2,7 +2,7 @@
 
 # ************** Adjust settings there **************
 title="EnergyPerformance"
-MaxTaskNumber=30
+MaxTaskNumber=80
 ROOT_PATH="/home/zephyr/Programming/Energy_Opt_NLP"
 # ***************************************************
 
@@ -30,21 +30,21 @@ do
 	python $ROOT_PATH/CompareWithBaseline/ConvertYechengDataset.py --convertionNumber $jobNumber
 	echo "$title iteration is: $jobNumber"
 	
-	# LM, eliminated, approximated Jacobian
-    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
+	# # LM, eliminated, approximated Jacobian
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "jacobianScale" --value 1
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 1000
 	perform_optimization
 	
-	# LM, not eliminated, approximated Jacobian
+	# # LM, not eliminated, approximated Jacobian
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 2
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "exactJacobian" --value 0
 	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "elimIte" --value 0
 	perform_optimization
 	
-	# IPM
-    	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 6
+	# # IPM
+	python $ROOT_PATH/CompareWithBaseline/edit_yaml.py --entry "optimizerType" --value 6
 	perform_optimization
 	
 done
@@ -54,4 +54,4 @@ done
 # visualize the result
 cd $ROOT_PATH/CompareWithBaseline/$title
 python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance_time.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "Time"
-python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance_time.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "RTA"
+# python $ROOT_PATH/CompareWithBaseline/$title/Visualize_performance_time.py  --minTaskNumber 5 --title $title  --maxTaskNumber $MaxTaskNumber --data_source "RTA"
