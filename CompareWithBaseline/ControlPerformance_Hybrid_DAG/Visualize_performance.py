@@ -70,7 +70,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=20,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="EnergySaveRatio_Average",
+parser.add_argument('--data_source', type=str, default="Time",
                     help='data source folder, EnergySaveRatio_Average/RTA/Time')
 parser.add_argument('--title', type=str, default="ControlPerformance_Hybrid_DAG",
                     help='tilte in produced figure')
@@ -100,16 +100,21 @@ if __name__ == "__main__":
                              color=color_list[i], markersize=marker_size[i], label = optimizer_name[i])
 
 
-
-    splot.set(xlabel="Task Number")
+    font_size = 15
+    plt.rcParams.update({'font.size': font_size / 1.2})
+    # splot.set(xlabel="Task Number", fontsize=font_size)
+    splot.set_xlabel("Task Number", fontsize=font_size)
+    splot.set_xticks([i for i in range(3,22,2)])
     # splot.set_ylim([0.95, 2.0])
     if(data_source=="Time"):
         splot.set(yscale="log")
-        splot.set_ylim(5e-2, 1e4)
-        splot.set( ylabel="Running time (seconds)")
+        splot.set_ylim(5e-2, 1e3)
+        # splot.set( ylabel="Running time (seconds)", fontsize=font_size)
+        splot.set_ylabel("Running time (seconds)", fontsize=font_size)
     elif (data_source=="EnergySaveRatio_Average"):
         splot.set_ylim(-50, 5)
-        splot.set(ylabel="Relative gap (%)")
+        # splot.set(ylabel="Relative gap (%)", fontsize=font_size)
+        splot.set_ylabel("Relative gap with NORTH (%)", fontsize=font_size)
     plt.legend()
     splot.set_xlim([2, 21])
     plt.grid(linestyle="--")

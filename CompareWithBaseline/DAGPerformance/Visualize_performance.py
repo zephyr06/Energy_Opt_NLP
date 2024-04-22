@@ -52,7 +52,7 @@ parser.add_argument('--maxTaskNumber', type=int, default=10,
                     help='Nmax')
 parser.add_argument('--methodsNum', type=int, default=4,
                     help='number of optimizers to compare')
-parser.add_argument('--data_source', type=str, default="EnergySaveRatio",
+parser.add_argument('--data_source', type=str, default="Time",
                     help='data source folder, Time or EnergySaveRatio')
 parser.add_argument('--title', type=str, default="DAGPerformance",
                     help='tilte in produced figure')
@@ -89,11 +89,16 @@ if __name__ == "__main__":
             splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
                                  color=color_list[i], markersize=8, label = optimizer_name[i])
 
+
+    font_size = 15
     if (data_source == "EnergySaveRatio"):
-        splot.set(xlabel="Task Number", ylabel="Relative gap with NORTH (%)")
+        # splot.set(xlabel="Task Number", ylabel="Relative gap with NORTH (%)")
+        splot.set_xlabel("Task Number",  fontsize=font_size)
+        splot.set_ylabel("Relative gap with NORTH (%)", fontsize=font_size)
         # splot.set_ylim([55, 90])
     elif (data_source == "Time"):
-        splot.set(xlabel="Task Number", ylabel="Running time (seconds)")
+        splot.set_xlabel(xlabel="Task Number",  fontsize=font_size)
+        splot.set_ylabel("Running time (seconds)", fontsize=font_size)
         # splot.set_ylim([0.95, 2.0])
         splot.set(yscale="log")
         splot.set_ylim(1e-1, 1e3)

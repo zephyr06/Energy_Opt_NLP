@@ -20,7 +20,7 @@ TEST(OptimizeTaskSet, RTA_LL_V1) {
     if (optimizerType >= 5)
         optimizerType = 2;
     string path =
-        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n3_v4.csv";
+        "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/test_n2_v3.csv";
     CoutWarning("Default path used!");
     // string path = "/home/zephyr/Programming/Energy_Opt_NLP/TaskData/" +
     //               testDataSetName + ".csv";
