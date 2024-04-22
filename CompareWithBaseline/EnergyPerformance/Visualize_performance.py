@@ -9,6 +9,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
+MIGP_MAX_TASK_NUMBER = 20
+
 def read_data_2d_energy(minTaskNumber, maxTaskNumber):
     def extract_ave(method_index):
         ave = 0
@@ -36,7 +38,7 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         data.append(1.0)
 
         # MILP, maximum number is 15
-        if (task_number < 12):
+        if (task_number < MIGP_MAX_TASK_NUMBER+1):
             ave = 0
             for i in range(1000):
                 ave += float(lines[4000 + i]) / float(lines[3000 + i])
@@ -86,8 +88,8 @@ if __name__ == "__main__":
     font_size = 15
     plt.rcParams.update({'font.size': font_size / 1.2})
     # MILP
-    plt.plot(np.linspace(minTaskNumber, min(11, maxTaskNumber), min(11, maxTaskNumber) - minTaskNumber + 1),
-             data_2d[-1][:min(11, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
+    plt.plot(np.linspace(minTaskNumber, min(MIGP_MAX_TASK_NUMBER, maxTaskNumber), min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1),
+             data_2d[-1][:min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
              markersize=8, label = optimizer_name[-1])
 
     plt.xlabel("Task Number", fontsize=font_size)

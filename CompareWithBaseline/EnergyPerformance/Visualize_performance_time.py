@@ -7,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+MIGP_MAX_TASK_NUMBER = 20
 
 def read_data_2d_time(minTaskNumber, maxTaskNumber):
     data2d = []
@@ -29,8 +30,8 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         # MUA
         data.append(float(lines[3]))
 
-        # MILP, maximum number is 15
-        if (task_number < 12):
+        # MILP, maximum number is 20
+        if (task_number < MIGP_MAX_TASK_NUMBER+1):
             data.append(float(lines[4]))
         else:
             data.append(-1)
@@ -57,7 +58,7 @@ def read_data_2d_time(minTaskNumber, maxTaskNumber):
         # MUA
         data.append(-1)
 
-        # MILP, maximum number is 15
+        # MILP, maximum number is 20
         data.append(-1)
 
         data2d.append(data)
@@ -165,8 +166,8 @@ if __name__ == "__main__":
 
         # MILP
         if (data_source == "EnergySaveRatio" or data_source == "Time"):
-            plt.plot(np.linspace(minTaskNumber, min(11, maxTaskNumber), min(11, maxTaskNumber) - minTaskNumber + 1),
-                     data_2d[-1][:min(11, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1],
+            plt.plot(np.linspace(minTaskNumber, min(MIGP_MAX_TASK_NUMBER, maxTaskNumber), min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1),
+                     data_2d[-1][:min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1],
                      color=color_list[-1], markersize=8, label = optimizer_name[-1])
 
     if (data_source == "EnergySaveRatio"):
