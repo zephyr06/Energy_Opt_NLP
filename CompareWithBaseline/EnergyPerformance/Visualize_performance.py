@@ -19,7 +19,7 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
             ave += float(lines[i])
         return ave / 1000.0
 
-    data2d = []
+    data2d = {}
     for task_number in range(minTaskNumber, maxTaskNumber + 1):
         file_path = "EnergySaveRatio" + "/N" + str(task_number) + ".txt"
         file = open(file_path, "r")
@@ -45,14 +45,14 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
                 ave += float(lines[4000 + i]) / float(lines[3000 + i])
             data.append(ave / 1000)
         else:
-            data.append(-1)
+            data.append(np.nan)
 
-        data2d.append(data)
+        data2d[task_number]=data
         file.close()
     return data2d
 
 def read_data_2d_energy_from_set(task_number_set=[30, 40, 50, 60, 70, 80]):
-    data2d = []
+    data2d = {}
     for task_number in task_number_set:
         file_path = "EnergySaveRatio" + "/N" + str(task_number) + ".txt"
         file = open(file_path, "r")
@@ -69,8 +69,13 @@ def read_data_2d_energy_from_set(task_number_set=[30, 40, 50, 60, 70, 80]):
         data.append(float(lines[2]))
 
         file.close()
-        data2d.append(data)
+        data2d[task_number]=data
     return data2d
+
+def appendNan(seq, len_exp):
+    while len(seq) < len_exp:
+        seq.append(np.nan)
+    return seq
 
 
 parser = argparse.ArgumentParser()
@@ -88,40 +93,81 @@ title = args.title
 
 if __name__ == "__main__":
     data_2d_first_part = read_data_2d_energy(minTaskNumber, maxTaskNumber)
-    data_2d_first_part = np.array(data_2d_first_part).transpose()
-    data_2d_first_part = (data_2d_first_part - 0) * 100
+    # data_2d_first_part = np.array(data_2d_first_part).transpose()
+    # data_2d_first_part = (data_2d_first_part - 0) * 100
 
-    data_2d_second_part = read_data_2d_energy_from_set([30, 40, 50, 60, 70, 80])
-    data_2d_second_part = np.array(data_2d_second_part).transpose()
+    large_task_number_set = [ 40, 50, 60, 70, 80]
+    data_2d_second_part = read_data_2d_energy_from_set(large_task_number_set)
 
-    dataset_pd = pd.DataFrame()
+
     optimizer_name = ["NORTH", "NMBO", "IPM", "Zhao20", "MIGP"]
     marker_list = ["o", "v", "^", "s", "D"]  #
     color_list = ["#0084DB", "r", "y", "limegreen", "purple"]
-    dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
-    for i in range(min(data_2d_first_part.shape[0], 3)):
-        dataset_pd.insert(0, optimizer_name[i], data_2d_first_part[i])
-        splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
-                             color=color_list[i], markersize=8, label = optimizer_name[i])
 
-    # Zhao20
-    i = 3
-    dataset_pd.insert(0, optimizer_name[i], data_2d_first_part[i])
-    splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i],
-                         markersize=8, label = optimizer_name[i])
+    df = pd.DataFrame()
+    data_dict={}
+    for task_number in range(minTaskNumber, maxTaskNumber + 1):
+        data_dict[task_number] = {}
+        for i in range(len(optimizer_name)):
+            if len(data_2d_first_part[task_number]) > i:
+                data_dict[task_number][optimizer_name[i]] = data_2d_first_part[task_number][i]
+                df[task_number] = appendNan(data_2d_first_part[task_number], len(optimizer_name))
+        
+    
+    for task_number in large_task_number_set:
+        data_dict[task_number] = {}
+        for i in range(len(optimizer_name)):
+            if len(data_2d_second_part[task_number]) > i:
+                data_dict[task_number][optimizer_name[i]] = data_2d_second_part[task_number][i]
+                # df[task_number] = data_2d_second_part[task_number]
+                df[task_number] = appendNan(data_2d_second_part[task_number], len(optimizer_name))
+    df.index = optimizer_name
+    # df = pd.DataFrame(data_dict)
+    print(df)
+    # Normalize against NORTH
+    shape_data = df.shape
+    for i in range(shape_data[0]-1, -1, -1):
+        print(i)
+        for j in range(0, shape_data[1]):
+            df.iloc[i,j] = (df.iloc[i,j]/df.iloc[0,j]-1)*100.0
+        # df.iloc[0, j]=1.0
+    print(df)
 
-    font_size = 15
-    plt.rcParams.update({'font.size': font_size / 1.2})
-    # MILP
-    plt.plot(np.linspace(minTaskNumber, min(MIGP_MAX_TASK_NUMBER, maxTaskNumber), min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1),
-             data_2d_first_part[-1][:min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
-             markersize=8, label = optimizer_name[-1])
 
-    plt.xlabel("Task Number", fontsize=font_size)
-    plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
-    splot.set_ylim([-5, 130])
-    plt.legend()
-    plt.grid(linestyle="--")
-    plt.savefig("Compare_" + title + "_" + "EnergySaveRatio" + ".pdf", format='pdf')
-    plt.show(block=False)
-    plt.pause(3)
+    df_transposed = df.transpose()
+
+    # Plot the transposed DataFrame
+    df_transposed.plot(kind='line', marker='o', figsize=(10, 6))
+    plt.xlabel('Columns')
+    plt.ylabel('Values')
+    plt.title('Plot of Transposed DataFrame')
+    plt.grid(True)
+    plt.legend(title='Index')
+    plt.show()
+    # dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
+    # for i in range(min(data_2d_first_part.shape[0], 3)):
+    #     dataset_pd.insert(0, optimizer_name[i], data_2d_first_part[i])
+    #     splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
+    #                          color=color_list[i], markersize=8, label = optimizer_name[i])
+
+    # # Zhao20
+    # i = 3
+    # dataset_pd.insert(0, optimizer_name[i], data_2d_first_part[i])
+    # splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i],
+    #                      markersize=8, label = optimizer_name[i])
+
+    # font_size = 15
+    # plt.rcParams.update({'font.size': font_size / 1.2})
+    # # MILP
+    # plt.plot(np.linspace(minTaskNumber, min(MIGP_MAX_TASK_NUMBER, maxTaskNumber), min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1),
+    #          data_2d_first_part[-1][:min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
+    #          markersize=8, label = optimizer_name[-1])
+
+    # plt.xlabel("Task Number", fontsize=font_size)
+    # plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
+    # splot.set_ylim([-5, 130])
+    # plt.legend()
+    # plt.grid(linestyle="--")
+    # plt.savefig("Compare_" + title + "_" + "EnergySaveRatio" + ".pdf", format='pdf')
+    # plt.show(block=False)
+    # plt.pause(3)
