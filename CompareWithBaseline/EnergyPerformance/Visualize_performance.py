@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 MIGP_MAX_TASK_NUMBER = 20
 
 def read_data_2d_energy(minTaskNumber, maxTaskNumber):
+    """ read data from a continuous, inclusive range minTaskNumber to maxTaskNumber"""
     def extract_ave(method_index):
         ave = 0
         for i in range(method_index * 1000, method_index * 1000 + 1000):
@@ -50,6 +51,27 @@ def read_data_2d_energy(minTaskNumber, maxTaskNumber):
         file.close()
     return data2d
 
+def read_data_2d_energy_from_set(task_number_set=[30, 40, 50, 60, 70, 80]):
+    data2d = []
+    for task_number in task_number_set:
+        file_path = "EnergySaveRatio" + "/N" + str(task_number) + ".txt"
+        file = open(file_path, "r")
+        lines = file.readlines()
+        data = []
+
+        # NLP, with elimination
+        data.append(float(lines[0]))
+
+        # NLP, with elimination, exact Jacobian
+        data.append(float(lines[1]))
+
+        # NLP, without elimination
+        data.append(float(lines[2]))
+
+        file.close()
+        data2d.append(data)
+    return data2d
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--minTaskNumber', type=int, default=5,
@@ -65,23 +87,26 @@ maxTaskNumber = args.maxTaskNumber
 title = args.title
 
 if __name__ == "__main__":
-    data_2d = read_data_2d_energy(minTaskNumber, maxTaskNumber)
-    data_2d = np.array(data_2d).transpose()
-    data_2d = (data_2d - 1) * 100
+    data_2d_first_part = read_data_2d_energy(minTaskNumber, maxTaskNumber)
+    data_2d_first_part = np.array(data_2d_first_part).transpose()
+    data_2d_first_part = (data_2d_first_part - 0) * 100
+
+    data_2d_second_part = read_data_2d_energy_from_set([30, 40, 50, 60, 70, 80])
+    data_2d_second_part = np.array(data_2d_second_part).transpose()
 
     dataset_pd = pd.DataFrame()
     optimizer_name = ["NORTH", "NMBO", "IPM", "Zhao20", "MIGP"]
     marker_list = ["o", "v", "^", "s", "D"]  #
     color_list = ["#0084DB", "r", "y", "limegreen", "purple"]
     dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
-    for i in range(min(data_2d.shape[0], 3)):
-        dataset_pd.insert(0, optimizer_name[i], data_2d[i])
+    for i in range(min(data_2d_first_part.shape[0], 3)):
+        dataset_pd.insert(0, optimizer_name[i], data_2d_first_part[i])
         splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
                              color=color_list[i], markersize=8, label = optimizer_name[i])
 
     # Zhao20
     i = 3
-    dataset_pd.insert(0, optimizer_name[i], data_2d[i])
+    dataset_pd.insert(0, optimizer_name[i], data_2d_first_part[i])
     splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i],
                          markersize=8, label = optimizer_name[i])
 
@@ -89,7 +114,7 @@ if __name__ == "__main__":
     plt.rcParams.update({'font.size': font_size / 1.2})
     # MILP
     plt.plot(np.linspace(minTaskNumber, min(MIGP_MAX_TASK_NUMBER, maxTaskNumber), min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1),
-             data_2d[-1][:min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
+             data_2d_first_part[-1][:min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
              markersize=8, label = optimizer_name[-1])
 
     plt.xlabel("Task Number", fontsize=font_size)
