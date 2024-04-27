@@ -137,37 +137,22 @@ if __name__ == "__main__":
     df_transposed = df.transpose()
 
     # Plot the transposed DataFrame
-    df_transposed.plot(kind='line', marker='o', figsize=(10, 6))
-    plt.xlabel('Columns')
-    plt.ylabel('Values')
-    plt.title('Plot of Transposed DataFrame')
-    plt.grid(True)
-    plt.legend(title='Index')
-    plt.show()
-    # dataset_pd.insert(0, "index", np.linspace(minTaskNumber, maxTaskNumber, maxTaskNumber - minTaskNumber + 1))
-    # for i in range(min(data_2d_first_part.shape[0], 3)):
-    #     dataset_pd.insert(0, optimizer_name[i], data_2d_first_part[i])
-    #     splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i],
-    #                          color=color_list[i], markersize=8, label = optimizer_name[i])
-
-    # # Zhao20
-    # i = 3
-    # dataset_pd.insert(0, optimizer_name[i], data_2d_first_part[i])
-    # splot = sns.lineplot(data=dataset_pd, x="index", y=optimizer_name[i], marker=marker_list[i], color=color_list[i],
-    #                      markersize=8, label = optimizer_name[i])
-
-    # font_size = 15
-    # plt.rcParams.update({'font.size': font_size / 1.2})
-    # # MILP
-    # plt.plot(np.linspace(minTaskNumber, min(MIGP_MAX_TASK_NUMBER, maxTaskNumber), min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1),
-    #          data_2d_first_part[-1][:min(MIGP_MAX_TASK_NUMBER, maxTaskNumber) - minTaskNumber + 1], marker=marker_list[-1], color=color_list[-1],
-    #          markersize=8, label = optimizer_name[-1])
-
-    # plt.xlabel("Task Number", fontsize=font_size)
-    # plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
-    # splot.set_ylim([-5, 130])
-    # plt.legend()
-    # plt.grid(linestyle="--")
-    # plt.savefig("Compare_" + title + "_" + "EnergySaveRatio" + ".pdf", format='pdf')
-    # plt.show(block=False)
-    # plt.pause(3)
+    # df_transposed.plot(kind='line', marker='o', figsize=(10, 6), colormap = color_list)
+    for i in range(len(optimizer_name)):
+        x_values = df_transposed.index
+        x_values = [str(x) for x in x_values]
+        plt.plot(x_values, df_transposed[optimizer_name[i]], marker=marker_list[i], color=color_list[i],
+                 markersize=8, label=optimizer_name[i])
+    # plt.xlabel('Columns')
+    # plt.ylabel('Values')
+    # "40","60",
+    plt.xticks([0, 5, 10, 15, 20, 25,  26,  28, 30], ["5", "10", "15", "20", "25", "30 ",  " 40",  "60", "80"])
+    font_size = 15
+    plt.xlabel("Task Number", fontsize=font_size)
+    plt.ylabel("Relative gap with Zhao20 (%)", fontsize=font_size)
+    plt.legend()
+    plt.grid(linestyle="--")
+    plt.ylim(-5, 180)
+    plt.savefig("Compare_" + title + "_" + "EnergySaveRatio" + ".pdf", format='pdf')
+    plt.show(block=False)
+    plt.pause(3)
